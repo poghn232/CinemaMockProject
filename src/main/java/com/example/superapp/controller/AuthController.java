@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -61,25 +64,31 @@ public class AuthController {
     }
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+
         authService.register(request);
-        return ResponseEntity.ok("OTP đã được gửi về email");
+
+        return ResponseEntity.ok().body(
+                Map.of("message", "OTP đã được gửi về email")
+        );
     }
 
     @PostMapping("/verify")
     public ResponseEntity<?> verify(@RequestBody VerifyRequest request) {
 
-        boolean isValid = otpService.verifyOtp(
-                request.getEmail(),
-                request.getOtp()
-        );
+        boolean isValid =
+                otpService.verifyOtp(
+                        request.getEmail(),
+                        request.getOtp()
+                );
 
         if (!isValid) {
-            return ResponseEntity.badRequest()
-                    .body("OTP không hợp lệ hoặc đã hết hạn");
+            throw new RuntimeException("OTP không hợp lệ hoặc đã hết hạn");
         }
 
         authService.createUserAfterVerify(request.getEmail());
 
-        return ResponseEntity.ok("Đăng ký thành công");
+        return ResponseEntity.ok(
+                Map.of("message", "Đăng ký thành công")
+        );
     }
 }

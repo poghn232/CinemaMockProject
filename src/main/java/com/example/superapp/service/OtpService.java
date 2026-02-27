@@ -1,42 +1,58 @@
 package com.example.superapp.service;
 
-import com.example.superapp.dto.OtpData;
 import com.example.superapp.entity.PendingUser;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+
 @Service
 public class OtpService {
 
+    // lưu user đang chờ verify
     private final Map<String, PendingUser> pendingUsers = new ConcurrentHashMap<>();
+
+    // lưu otp theo email
     private final Map<String, String> otpStorage = new ConcurrentHashMap<>();
+
     private final EmailService emailService;
 
     public OtpService(EmailService emailService) {
         this.emailService = emailService;
     }
 
-    public void createPendingUser(String email, String encodedPassword) {
+    /**
+     * Tạo PendingUser + OTP
+     */
+    public void createPendingUser(String username, String email, String encodedPassword) {
 
+        // tạo OTP 6 số
         String otp = String.valueOf(
                 new Random().nextInt(900000) + 100000
         );
 
+        // hết hạn sau 5 phút
         long expireTime =
                 System.currentTimeMillis() + 5 * 60 * 1000;
 
+        // tạo PendingUser
         PendingUser pendingUser =
-                new PendingUser(email, encodedPassword, expireTime);
+                new PendingUser(
+                        email,encodedPassword,expireTime,username
+                );
 
+        // lưu vào memory
         pendingUsers.put(email, pendingUser);
         otpStorage.put(email, otp);
 
-        // 🔥 GỬI MAIL TẠI ĐÂY
+        // gửi email
         emailService.sendOtp(email, otp);
     }
 
+    /**
+     * Verify OTP
+     */
     public boolean verifyOtp(String email, String otpInput) {
 
         PendingUser pendingUser = pendingUsers.get(email);
@@ -45,20 +61,31 @@ public class OtpService {
         if (pendingUser == null || storedOtp == null)
             return false;
 
+        // check expire
         if (System.currentTimeMillis() > pendingUser.getExpireTime()) {
+
             pendingUsers.remove(email);
             otpStorage.remove(email);
+
             return false;
         }
 
+        // check otp đúng
         return storedOtp.equals(otpInput);
     }
 
+    /**
+     * lấy pending user
+     */
     public PendingUser getPendingUser(String email) {
         return pendingUsers.get(email);
     }
 
+    /**
+     * xoá pending user sau khi verify thành công
+     */
     public void removePendingUser(String email) {
+
         pendingUsers.remove(email);
         otpStorage.remove(email);
     }

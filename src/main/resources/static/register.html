@@ -382,6 +382,10 @@
                     <input type="email" id="email" placeholder="Nhập email của bạn" required>
                 </div>
                 <div class="field">
+                    <div class="field-label">Username</div>
+                    <input type="text" id="username" placeholder="Nhập username" required>
+                </div>
+                <div class="field">
                     <div class="field-label">Mật khẩu</div>
                     <input type="password" id="password" placeholder="Tối thiểu 6 ký tự" required>
                 </div>
@@ -407,55 +411,98 @@
         </div>
     </section>
 </div>
-
 <script>
 
     let savedEmail = "";
 
-    // 🔹 REGISTER
+    // REGISTER
     document.getElementById("registerForm").addEventListener("submit", async e => {
+
         e.preventDefault();
 
+        const username = document.getElementById("username").value;
         const email = document.getElementById("email").value;
         const password = document.getElementById("password").value;
 
         savedEmail = email;
 
         const res = await fetch("/api/auth/register", {
+
             method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ email, password })
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                username,
+                email,
+                password
+            })
+
         });
 
+        const data = await res.json();
+
         if (res.ok) {
-            document.getElementById("msg").innerText = "OTP đã gửi về email!";
-            document.getElementById("registerSection").style.display = "none";
-            document.getElementById("otpSection").style.display = "block";
+
+            document.getElementById("msg").style.color = "#22c55e";
+            document.getElementById("msg").innerText =
+                data.message;
+
+            document.getElementById("registerSection").style.display =
+                "none";
+
+            document.getElementById("otpSection").style.display =
+                "block";
+
         } else {
-            const text = await res.text();
-            document.getElementById("msg").innerText = text;
+
+            document.getElementById("msg").style.color = "#ef4444";
+            document.getElementById("msg").innerText =
+                data.message;
         }
+
     });
 
 
-    // 🔹 VERIFY OTP
+    // VERIFY OTP
     document.getElementById("verifyForm").addEventListener("submit", async e => {
+
         e.preventDefault();
 
         const otp = document.getElementById("otp").value;
 
         const res = await fetch("/api/auth/verify", {
+
             method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ email: savedEmail, otp })
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                email: savedEmail,
+                otp
+            })
+
         });
 
-        const text = await res.text();
-        document.getElementById("msg").innerText = text;
+        const data = await res.json();
 
         if (res.ok) {
-            document.getElementById("otpSection").style.display = "none";
+
+            document.getElementById("msg").style.color = "#22c55e";
+            document.getElementById("msg").innerText =
+                data.message;
+
+        } else {
+
+            document.getElementById("msg").style.color = "#ef4444";
+            document.getElementById("msg").innerText =
+                data.message;
         }
+
     });
 
 </script>
