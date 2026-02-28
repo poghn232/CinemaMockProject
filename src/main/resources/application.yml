@@ -25,3 +25,7 @@ spring:
 
 server:
   port: 8080
+
+tmdb:
+  api: 22dec769317e241940b4117c8fd359cc
+  paste-url: http://api.themoviedb.org/3

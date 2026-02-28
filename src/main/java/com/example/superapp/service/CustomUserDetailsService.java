@@ -1,6 +1,5 @@
 package com.example.superapp.service;
 
-import com.example.superapp.entity.User;
 import com.example.superapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
