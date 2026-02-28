@@ -2,6 +2,7 @@ package com.example.superapp.service;
 
 import com.example.superapp.dto.RegisterRequest;
 import com.example.superapp.entity.PendingUser;
+import com.example.superapp.entity.User;
 import com.example.superapp.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
