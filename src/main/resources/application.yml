@@ -2,11 +2,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/mock_project_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Ho_Chi_Minh
     username: root
-<<<<<<< HEAD
-    password: sa123
-=======
     password: 123456
->>>>>>> 56d71de (add forget and homepage(not done))
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -29,7 +25,6 @@ spring:
 
 server:
   port: 8080
-<<<<<<< HEAD
 
 vnpay:
   tmnCode: PYRHRA8O
@@ -39,7 +34,6 @@ vnpay:
   ipn-url: http://localhost:8080/api/vnpay/ipn
 
 tmdb:
-  api: 22dec769317e241940b4117c8fd359cc
-  paste-url: http://api.themoviedb.org/3
-=======
->>>>>>> 56d71de (add forget and homepage(not done))
+  api-key: c696c9223931030b8bf2bca6ccce27e6
+  base-url: https://api.themoviedb.org/3
+  image-base-url: https://image.tmdb.org/t/p/w500

@@ -548,6 +548,63 @@
             opacity: 0.8;
         }
 
+        /* FOOTER */
+        .site-footer {
+            margin-top: 48px;
+            padding: 28px 0 24px;
+            border-top: 1px solid rgba(148, 163, 184, 0.25);
+        }
+        .footer-inner {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 24px;
+        }
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .footer-logo {
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            background: radial-gradient(circle at 30% 20%, #f97316, #e11d48 55%, #4f46e5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .footer-title {
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            font-size: 13px;
+        }
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .footer-links a {
+            color: var(--text-subtle);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.15s ease;
+        }
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        .footer-bottom {
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(148, 163, 184, 0.15);
+            font-size: 12px;
+            color: var(--text-subtle);
+            text-align: center;
+        }
+
         /* RESPONSIVE */
         @media (max-width: 900px) {
             .navbar {
@@ -606,9 +663,7 @@
             <button class="nav-link" data-nav="movies">Movie</button>
             <button class="nav-link" data-nav="tv">TV Series</button>
             <button class="nav-link" data-nav="history" disabled>History</button>
-            <button class="nav-link nav-link-premium" id="premiumButton" type="button">
-                Go Premium
-            </button>
+            <a href="packs.html" class="nav-link nav-link-premium" id="premiumButton">Go Premium</a>
             <button class="nav-link" data-nav="profile" disabled>Profile</button>
             <button class="nav-link nav-link-logout" id="logoutButton" type="button">
                 Logout
@@ -692,6 +747,25 @@
             <!-- Cards render bằng JS -->
         </div>
     </section>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <div class="footer-logo">MZ</div>
+                <span class="footer-title">MOVIEZONE</span>
+            </div>
+            <div class="footer-links">
+                <a href="homepage.html">Trang chủ</a>
+                <a href="login.html">Đăng nhập</a>
+                <a href="register.html">Đăng ký</a>
+                <a href="packs.html">Gói Premium</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © 2025 MovieZone. Dự án demo — Đăng nhập / Đăng ký / Quên mật khẩu để trải nghiệm.
+        </div>
+    </footer>
 </div>
 
 <script>
@@ -874,22 +948,13 @@
 
     // ========== PREMIUM & LOGOUT ==========
     function initPremiumAndLogout() {
-        const premiumButton = document.getElementById("premiumButton");
         const adUpgradeButton = document.getElementById("adUpgradeButton");
         const logoutButton = document.getElementById("logoutButton");
 
-        const markPremium = () => {
-            // Demo: gán luôn premium vào localStorage
-            localStorage.setItem("isPremium", "true");
-            initUserUi();
-            alert("Bạn đã được đánh dấu là Premium (demo frontend). Sau này sẽ nối với thanh toán thực tế.");
-        };
-
-        if (premiumButton) {
-            premiumButton.addEventListener("click", markPremium);
-        }
         if (adUpgradeButton) {
-            adUpgradeButton.addEventListener("click", markPremium);
+            adUpgradeButton.addEventListener("click", () => {
+                window.location.href = "packs.html";
+            });
         }
 
         if (logoutButton) {
