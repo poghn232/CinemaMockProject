@@ -2,6 +2,7 @@ package com.example.superapp.controller;
 
 import com.example.superapp.dto.LoginRequest;
 import com.example.superapp.dto.LoginResponse;
+import com.example.superapp.dto.ForgotPasswordRequest;
 import com.example.superapp.dto.RegisterRequest;
 import com.example.superapp.dto.VerifyRequest;
 import com.example.superapp.service.AuthService;
@@ -89,6 +90,14 @@ public class AuthController {
 
         return ResponseEntity.ok(
                 Map.of("message", "Đăng ký thành công")
+        );
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        authService.forgotPassword(request.getUsername());
+        return ResponseEntity.ok(
+                Map.of("message", "Mật khẩu mới đã được gửi qua email")
         );
     }
 }

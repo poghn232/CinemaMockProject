@@ -44,6 +44,7 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // ✅ JWT stateless
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+<<<<<<< HEAD
                                 "/login.html", "/register.html", "/home.html", "/packs.html",
                                 "/", "/index.html",
                                 "/css/**", "/js/**", "/images/**", "/favicon.ico",
@@ -54,6 +55,25 @@ public class SecurityConfig {
                                 "/api/payment/**",      // nếu dùng path này
                                 "/api/payments/**"
                         ).permitAll()
+=======
+                                "/login.html",
+                                "/register.html",
+                                "/forgot-password.html",
+                                "/homepage.html",
+                                "/home.html",
+                                "/",
+                                "/index.html",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/favicon.ico"
+                        ).permitAll()
+
+                        // ✅ PUBLIC API
+                        .requestMatchers("/api/auth/**").permitAll()
+
+                        // ❌ còn lại phải login
+>>>>>>> 56d71de (add forget and homepage(not done))
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

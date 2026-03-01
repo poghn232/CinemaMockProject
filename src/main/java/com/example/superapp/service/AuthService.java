@@ -4,8 +4,11 @@ import com.example.superapp.dto.RegisterRequest;
 import com.example.superapp.entity.PendingUser;
 import com.example.superapp.entity.User;
 import com.example.superapp.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.security.SecureRandom;
 
 @Service
 public class AuthService {
@@ -13,13 +16,17 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final OtpService otpService;
+    private final EmailService emailService;
+    private final SecureRandom secureRandom = new SecureRandom();
 
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       OtpService otpService) {
+                       OtpService otpService,
+                       EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.otpService = otpService;
+        this.emailService = emailService;
     }
 
     public void register(RegisterRequest request) {
@@ -73,5 +80,37 @@ public class AuthService {
         userRepository.save(user);
 
         otpService.removePendingUser(email);
+    }
+
+    @Transactional
+    public void forgotPassword(String username) {
+        if (username == null || username.isBlank()) {
+            throw new RuntimeException("Username không được để trống");
+        }
+
+        User user = userRepository.findByUsername(username.trim())
+                .orElseThrow(() -> new RuntimeException("Username không tồn tại"));
+
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
+            throw new RuntimeException("Tài khoản chưa có email để nhận mật khẩu mới");
+        }
+
+        String newPassword = generateTempPassword(10);
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        emailService.sendNewPassword(user.getEmail(), user.getUsername(), newPassword);
+    }
+
+    private String generateTempPassword(int length) {
+        final String alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+        int safeLength = Math.max(8, length);
+
+        StringBuilder sb = new StringBuilder(safeLength);
+        for (int i = 0; i < safeLength; i++) {
+            int idx = secureRandom.nextInt(alphabet.length());
+            sb.append(alphabet.charAt(idx));
+        }
+        return sb.toString();
     }
 }

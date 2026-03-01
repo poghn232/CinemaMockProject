@@ -27,4 +27,19 @@ public class EmailService {
 
         mailSender.send(message);
     }
+
+    public void sendNewPassword(String to, String username, String newPassword) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Mật khẩu mới | MovieZone");
+        message.setText(
+                "Xin chào " + (username == null ? "" : username) + ",\n\n" +
+                        "Bạn vừa yêu cầu đặt lại mật khẩu.\n" +
+                        "Mật khẩu mới của bạn là: " + newPassword + "\n\n" +
+                        "Vui lòng đăng nhập lại và đổi mật khẩu ngay sau khi đăng nhập.\n\n" +
+                        "Nếu bạn không yêu cầu, hãy liên hệ admin để được hỗ trợ."
+        );
+
+        mailSender.send(message);
+    }
 }

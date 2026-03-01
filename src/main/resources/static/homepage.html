@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>MovieZone | Trang chủ</title>
+
+    <style>
+        :root {
+            --bg-primary: #020617;
+            --bg-elevated: #020617;
+            --accent: #f97316;
+            --accent-soft: rgba(249, 115, 22, 0.18);
+            --accent-strong: rgba(249, 115, 22, 0.45);
+            --text-main: #e5e7eb;
+            --text-subtle: #9ca3af;
+            --border-soft: rgba(148, 163, 184, 0.45);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background:
+                    radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.06), transparent 55%),
+                    radial-gradient(circle at 100% 100%, rgba(37, 99, 235, 0.3), transparent 60%),
+                    linear-gradient(135deg, #020617, #030712 50%, #020617);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        .page-shell {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 20px 28px 48px;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            border-radius: 18px;
+            background:
+                    radial-gradient(circle at 0 0, rgba(148, 163, 184, 0.35), transparent 58%),
+                    rgba(15, 23, 42, 0.96);
+            box-shadow:
+                    0 0 0 1px rgba(148, 163, 184, 0.45),
+                    0 18px 40px rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(18px);
+            position: sticky;
+            top: 12px;
+            z-index: 20;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-logo {
+            width: 30px;
+            height: 30px;
+            border-radius: 999px;
+            background: radial-gradient(circle at 30% 20%, #f97316, #e11d48 55%, #4f46e5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px rgba(248, 113, 113, 0.55);
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .nav-title {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+
+        .nav-title-main {
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+
+        .nav-title-sub {
+            font-size: 11px;
+            color: var(--text-subtle);
+        }
+
+        .nav-center {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+            margin-right: 10px;
+        }
+
+        .nav-link {
+            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            color: var(--text-subtle);
+            text-decoration: none;
+            border: 1px solid transparent;
+            transition: all 0.16s ease;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            color: var(--text-main);
+            border-color: rgba(148, 163, 184, 0.6);
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, #f97316, #ec4899);
+            color: white;
+            border-color: transparent;
+            box-shadow:
+                    0 12px 22px rgba(248, 113, 113, 0.6),
+                    0 0 0 1px rgba(248, 113, 113, 0.7);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .nav-username {
+            color: var(--text-subtle);
+        }
+
+        .nav-link-premium {
+            background: linear-gradient(135deg, #f97316, #ec4899);
+            color: white;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            box-shadow:
+                    0 10px 22px rgba(248, 113, 113, 0.6),
+                    0 0 0 1px rgba(248, 113, 113, 0.7);
+        }
+
+        .nav-link-premium:hover {
+            filter: brightness(1.05);
+            border-color: transparent;
+        }
+
+        .nav-link-logout {
+            border-color: rgba(248, 113, 22, 0.6);
+            color: #e91000;
+        }
+
+        .nav-link-logout:hover {
+            background: rgba(15, 23, 42, 1);
+            border-color: rgba(248, 113, 22, 0.9);
+        }
+
+        .badge-premium {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            background: rgba(234, 179, 8, 0.12);
+            border: 1px solid rgba(250, 204, 21, 0.7);
+            color: #facc15;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .badge-premium-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: #facc15;
+            box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.32);
+        }
+
+        .nav-button {
+            padding: 7px 13px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.7);
+            background: rgba(15, 23, 42, 0.9);
+            color: var(--text-main);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.16s ease;
+        }
+
+        .nav-button:hover {
+            background: rgba(15, 23, 42, 1);
+            border-color: rgba(249, 115, 22, 0.9);
+            color: #fed7aa;
+        }
+
+        .nav-button-primary {
+            border: none;
+            background: linear-gradient(135deg, #f97316, #ec4899);
+            color: white;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            box-shadow:
+                    0 12px 25px rgba(248, 113, 113, 0.6),
+                    0 0 0 1px rgba(248, 113, 113, 0.7);
+        }
+
+        .nav-button-primary:hover {
+            filter: brightness(1.05);
+        }
+
+        /* HERO: SEARCH + SOCIAL + ADS */
+        .hero {
+            margin-top: 30px;
+        }
+
+        .search-shell {
+            background:
+                    radial-gradient(circle at 0 0, rgba(148, 163, 184, 0.25), transparent 55%),
+                    radial-gradient(circle at 100% 100%, rgba(59, 130, 246, 0.4), transparent 60%),
+                    rgba(15, 23, 42, 0.96);
+            border-radius: 22px;
+            padding: 22px 24px 22px;
+            box-shadow:
+                    0 0 0 1px rgba(148, 163, 184, 0.45),
+                    0 24px 55px rgba(15, 23, 42, 0.98);
+        }
+
+        .search-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-radius: 999px;
+            padding: 8px 10px 8px 14px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(148, 163, 184, 0.6);
+        }
+
+        .search-icon {
+            width: 26px;
+            height: 26px;
+            border-radius: 999px;
+            background: radial-gradient(circle at 30% 20%, #f97316, #ec4899);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            box-shadow: 0 0 12px rgba(248, 113, 113, 0.6);
+        }
+
+        .search-input-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .search-input {
+            border: none;
+            background: transparent;
+            color: var(--text-main);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-placeholder-sub {
+            font-size: 11px;
+            color: var(--text-subtle);
+            margin-top: 2px;
+        }
+
+        .search-button {
+            padding: 10px 18px;
+            border-radius: 999px;
+            border: none;
+            background: linear-gradient(135deg, #f97316, #ec4899);
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow:
+                    0 10px 22px rgba(248, 113, 113, 0.55),
+                    0 0 0 1px rgba(248, 113, 113, 0.7);
+            transition: all 0.14s ease;
+        }
+
+        .search-button:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.05);
+        }
+
+        .social-row-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: 16px;
+        }
+
+        .social-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .social-label {
+            font-size: 11px;
+            color: var(--text-subtle);
+        }
+
+        .social-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            border: 1px solid rgba(148, 163, 184, 0.6);
+            background: rgba(15, 23, 42, 0.92);
+            color: var(--text-main);
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.14s ease;
+        }
+
+        .social-pill span.icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 999px;
+            background: rgba(37, 99, 235, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+
+        .social-pill.twitter span.icon {
+            background: black;
+        }
+
+        .social-pill.reddit span.icon {
+            background: #f97316;
+        }
+
+        .social-pill:hover {
+            border-color: var(--accent-strong);
+            transform: translateY(-1px);
+        }
+
+        /* AD BANNER (non premium only) */
+        .ad-wrapper {
+            margin-top: 26px;
+        }
+
+        .ad-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 14px 18px;
+            border-radius: 18px;
+            background:
+                    linear-gradient(135deg, #f97316, #facc15);
+            color: #111827;
+            box-shadow:
+                    0 18px 38px rgba(248, 113, 22, 0.7),
+                    0 0 0 1px rgba(248, 171, 22, 0.9);
+        }
+
+        .ad-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .ad-title {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .ad-subtitle {
+            font-size: 12px;
+        }
+
+        .ad-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.13em;
+            opacity: 0.9;
+        }
+
+        .ad-cta {
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: none;
+            background: #111827;
+            color: #f9fafb;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+
+        .ad-cta:hover {
+            filter: brightness(1.08);
+        }
+
+        /* MOVIE GRID */
+        .section-header {
+            margin-top: 34px;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .section-subtitle {
+            font-size: 12px;
+            color: var(--text-subtle);
+        }
+
+        .filter-pills {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+        }
+
+        .filter-pill {
+            padding: 5px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.6);
+            background: rgba(15, 23, 42, 0.9);
+            color: var(--text-subtle);
+            cursor: pointer;
+            transition: all 0.14s ease;
+        }
+
+        .filter-pill.active {
+            background: var(--accent-soft);
+            color: var(--accent);
+            border-color: var(--accent-strong);
+        }
+
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 18px 18px;
+        }
+
+        .movie-card {
+            background: rgba(15, 23, 42, 0.96);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(31, 41, 55, 0.9);
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.9);
+            cursor: pointer;
+            transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+            position: relative;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(96, 165, 250, 0.8);
+            box-shadow:
+                    0 20px 40px rgba(15, 23, 42, 0.95),
+                    0 0 0 1px rgba(59, 130, 246, 0.55);
+        }
+
+        .movie-thumb {
+            position: relative;
+            aspect-ratio: 2 / 3;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .movie-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-size: 10px;
+            background: rgba(15, 23, 42, 0.88);
+            color: #facc15;
+            border: 1px solid rgba(250, 204, 21, 0.8);
+        }
+
+        .movie-type {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-size: 10px;
+            background: rgba(15, 23, 42, 0.86);
+            color: #bfdbfe;
+            border: 1px solid rgba(96, 165, 250, 0.9);
+        }
+
+        .movie-body {
+            padding: 8px 9px 9px;
+        }
+
+        .movie-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .movie-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-subtle);
+        }
+
+        .movie-rating {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .movie-rating span.star {
+            color: #facc15;
+        }
+
+        .movie-year {
+            opacity: 0.8;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .navbar {
+                border-radius: 18px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .nav-center {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .page-shell {
+                padding-inline: 14px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .search-shell {
+                padding: 16px 14px 14px;
+            }
+
+            .search-button {
+                padding-inline: 12px;
+            }
+
+            .meta-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .movies-grid {
+                grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-shell">
+    <!-- NAVBAR -->
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="nav-logo">MZ</div>
+            <div class="nav-title">
+                <span class="nav-title-main">MOVIEZONE</span>
+                <span class="nav-title-sub">Find movies, series &amp; more</span>
+            </div>
+        </div>
+
+        <nav class="nav-center">
+            <button class="nav-link active" data-nav="home">Home</button>
+            <button class="nav-link" data-nav="movies">Movie</button>
+            <button class="nav-link" data-nav="tv">TV Series</button>
+            <button class="nav-link" data-nav="history" disabled>History</button>
+            <button class="nav-link nav-link-premium" id="premiumButton" type="button">
+                Go Premium
+            </button>
+            <button class="nav-link" data-nav="profile" disabled>Profile</button>
+            <button class="nav-link nav-link-logout" id="logoutButton" type="button">
+                Logout
+            </button>
+        </nav>
+
+        <div class="nav-right">
+            <span class="nav-username" id="navUsername"></span>
+            <span class="badge-premium" id="premiumBadge" style="display:none;">
+                <span class="badge-premium-dot"></span>
+                Premium
+            </span>
+        </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="search-shell">
+            <div class="search-row">
+                <div class="search-icon">🔍</div>
+                <div class="search-input-wrap">
+                    <input
+                            id="searchInput"
+                            class="search-input"
+                            type="text"
+                            placeholder="Nhập tên phim, TV series, diễn viên..."
+                    >
+                    <span class="search-placeholder-sub">
+                        Tìm nhanh trong tất cả nội dung.
+                    </span>
+                </div>
+                <button class="search-button" id="searchButton">Search</button>
+            </div>
+
+            <div class="social-row-wrapper">
+                <div class="social-row">
+                    <span class="social-label">Theo dõi MovieZone:</span>
+                    <a class="social-pill" href="javascript:void(0)">
+                        <span class="icon">f</span>
+                        <span>Facebook</span>
+                    </a>
+                    <a class="social-pill twitter" href="javascript:void(0)">
+                        <span class="icon">X</span>
+                        <span>Twitter</span>
+                    </a>
+                    <a class="social-pill reddit" href="javascript:void(0)">
+                        <span class="icon">R</span>
+                        <span>Reddit</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADS: chỉ hiện với user chưa premium -->
+        <div class="ad-wrapper" id="adWrapper">
+            <div class="ad-banner">
+                <div class="ad-text">
+                    <span class="ad-label">Ad · MovieZone Premium</span>
+                    <span class="ad-title">Xem phim không quảng cáo, tốc độ cao.</span>
+                    <span class="ad-subtitle">
+                        Nâng cấp Premium để bỏ quảng cáo, ưu tiên server và mở khóa nhiều nội dung hơn.
+                    </span>
+                </div>
+                <button class="ad-cta" type="button" id="adUpgradeButton">
+                    Nâng cấp ngay
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- MOVIE GRID -->
+    <section>
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">Tất cả nội dung</h2>
+                <p class="section-subtitle" id="resultCount"></p>
+            </div>
+        </div>
+
+        <div class="movies-grid" id="moviesGrid">
+            <!-- Cards render bằng JS -->
+        </div>
+    </section>
+</div>
+
+<script>
+    // ========== STATE ==========
+    let currentFilter = "all"; // all | movie | tv
+    let currentSearch = "";
+    let movies = [];
+
+    async function loadMovies(type) {
+        const normalizedType = type || "all";
+        const countEl = document.getElementById("resultCount");
+        const grid = document.getElementById("moviesGrid");
+
+        if (countEl) {
+            countEl.textContent = "Đang tải danh sách phim...";
+        }
+        if (grid) {
+            grid.innerHTML = "";
+        }
+
+        try {
+            const res = await fetch(`/api/movies/trending?type=${encodeURIComponent(normalizedType)}`);
+            if (!res.ok) {
+                throw new Error("Không tải được dữ liệu (" + res.status + ")");
+            }
+            const data = await res.json();
+            movies = Array.isArray(data) ? data : [];
+            renderMovies();
+        } catch (e) {
+            movies = [];
+            if (countEl) {
+                countEl.textContent = "Không tải được danh sách phim từ server.";
+            }
+        }
+    }
+
+    function isPremium() {
+        // Tạm thời dùng localStorage; sau này sẽ nối với API/profile thật
+        return localStorage.getItem("isPremium") === "true";
+    }
+
+    function initUserUi() {
+        const username = localStorage.getItem("username") || "Guest";
+        const usernameEl = document.getElementById("navUsername");
+        const premiumBadge = document.getElementById("premiumBadge");
+        const premiumButton = document.getElementById("premiumButton");
+        const adWrapper = document.getElementById("adWrapper");
+
+        if (usernameEl) {
+            usernameEl.textContent = "Xin chào, " + username;
+        }
+
+        if (isPremium()) {
+            if (premiumBadge) premiumBadge.style.display = "inline-flex";
+            if (premiumButton) premiumButton.style.display = "none";
+            if (adWrapper) adWrapper.style.display = "none";
+        } else {
+            if (premiumBadge) premiumBadge.style.display = "none";
+            if (premiumButton) premiumButton.style.display = "inline-flex";
+            if (adWrapper) adWrapper.style.display = "block";
+        }
+    }
+
+    // ========== RENDER MOVIES ==========
+    function renderMovies() {
+        const grid = document.getElementById("moviesGrid");
+        const countEl = document.getElementById("resultCount");
+        if (!grid) return;
+
+        grid.innerHTML = "";
+
+        const normalizedSearch = currentSearch.trim().toLowerCase();
+
+        const source = Array.isArray(movies) ? movies : [];
+
+        const filtered = source.filter(item => {
+            if (!item || !item.title) return false;
+            const matchSearch =
+                !normalizedSearch ||
+                String(item.title).toLowerCase().includes(normalizedSearch);
+            return matchSearch;
+        });
+
+        filtered.forEach(movie => {
+            const card = document.createElement("article");
+            card.className = "movie-card";
+
+            const isTrending =
+                typeof movie.rating === "number" && movie.rating >= 8;
+
+            const imgUrl = movie.imageUrl || movie.image || "";
+            const year = movie.year || "";
+            const ratingText =
+                typeof movie.rating === "number" ? movie.rating.toFixed(1) : "N/A";
+            const typeLabel =
+                movie.type === "tv"
+                    ? "TV Series"
+                    : "Movie";
+
+            card.innerHTML = `
+                <div class="movie-thumb" style="background-image: url('${imgUrl}')">
+                    ${isTrending ? '<span class="movie-badge">Trending</span>' : ""}
+                    <span class="movie-type">${typeLabel}</span>
+                </div>
+                <div class="movie-body">
+                    <div class="movie-title">${movie.title}</div>
+                    <div class="movie-meta-row">
+                        <div class="movie-rating">
+                            <span class="star">★</span>
+                            <span>${ratingText}</span>
+                        </div>
+                        <div class="movie-year">${year}</div>
+                    </div>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+
+        if (countEl) {
+            countEl.textContent = filtered.length
+                ? `${filtered.length} kết quả hiển thị`
+                : "Không tìm thấy nội dung phù hợp.";
+        }
+    }
+
+    // ========== NAV / FILTER HANDLERS ==========
+    function initNav() {
+        const navLinks = document.querySelectorAll(".nav-link");
+        navLinks.forEach(link => {
+            link.addEventListener("click", () => {
+                const navKey = link.getAttribute("data-nav");
+
+                if (navKey === "home" || navKey === "movies" || navKey === "tv") {
+                    navLinks.forEach(l => l.classList.remove("active"));
+                    // Home luôn active chính, nhưng khi chọn Movies/TV thì highlight riêng
+                    link.classList.add("active");
+
+                    if (navKey === "home") {
+                        currentFilter = "all";
+                    } else if (navKey === "movies") {
+                        currentFilter = "movie";
+                    } else if (navKey === "tv") {
+                        currentFilter = "tv";
+                    }
+                    loadMovies(currentFilter);
+
+                } else {
+                    // Profile, History hiện chưa làm backend -> chỉ báo nhẹ
+                    alert("Trang này sẽ được bổ sung sau.");
+                }
+            });
+        });
+
+    }
+
+    // ========== SEARCH ==========
+    function initSearch() {
+        const input = document.getElementById("searchInput");
+        const button = document.getElementById("searchButton");
+        if (!input || !button) return;
+
+        input.addEventListener("input", () => {
+            currentSearch = input.value;
+            renderMovies();
+        });
+
+        button.addEventListener("click", () => {
+            currentSearch = input.value;
+            renderMovies();
+        });
+
+        input.addEventListener("keydown", e => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                currentSearch = input.value;
+                renderMovies();
+            }
+        });
+    }
+
+    // ========== PREMIUM & LOGOUT ==========
+    function initPremiumAndLogout() {
+        const premiumButton = document.getElementById("premiumButton");
+        const adUpgradeButton = document.getElementById("adUpgradeButton");
+        const logoutButton = document.getElementById("logoutButton");
+
+        const markPremium = () => {
+            // Demo: gán luôn premium vào localStorage
+            localStorage.setItem("isPremium", "true");
+            initUserUi();
+            alert("Bạn đã được đánh dấu là Premium (demo frontend). Sau này sẽ nối với thanh toán thực tế.");
+        };
+
+        if (premiumButton) {
+            premiumButton.addEventListener("click", markPremium);
+        }
+        if (adUpgradeButton) {
+            adUpgradeButton.addEventListener("click", markPremium);
+        }
+
+        if (logoutButton) {
+            logoutButton.addEventListener("click", () => {
+                localStorage.removeItem("token");
+                localStorage.removeItem("username");
+                // giữ isPremium để dev test; nếu muốn xoá thì bỏ comment dòng dưới
+                // localStorage.removeItem("isPremium");
+                window.location.href = "login.html";
+            });
+        }
+    }
+
+    // ========== INIT ==========
+    (function init() {
+        initUserUi();
+        initNav();
+        initSearch();
+        initPremiumAndLogout();
+        loadMovies(currentFilter);
+    })();
+</script>
+
+</body>
+</html>
+
