@@ -31,6 +31,6 @@ public class Subscription {
     @Enumerated(EnumType.STRING)
     private SubscriptionStatus status;
 
-    @OneToMany(mappedBy = "subscription")
-    private List<Payment> payments;
+    @OneToOne(mappedBy = "subscription")
+    private Payment payment;
 }

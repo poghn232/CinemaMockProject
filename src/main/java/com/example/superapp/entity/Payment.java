@@ -17,8 +17,8 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long paymentId;
 
-    @ManyToOne
-    @JoinColumn(name = "sub_id", nullable = false)
+    @OneToOne
+    @JoinColumn(name = "sub_id", nullable = false, unique = true)
     private Subscription subscription;
 
     @Column(nullable = false, precision = 12, scale = 2)
