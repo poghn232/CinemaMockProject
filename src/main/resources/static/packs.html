@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <title>Mua gói Subscription</title>
+    <style>
+        body { font-family: Arial, sans-serif; background:#0b1220; color:#e5e7eb; margin:0; padding:24px;}
+        .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;}
+        .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:16px;}
+        .card { background:#0f172a; border:1px solid rgba(148,163,184,.35); border-radius:14px; padding:16px;}
+        .name { font-size:18px; font-weight:700; margin:0 0 8px;}
+        .price { font-size:22px; font-weight:800; margin:0 0 8px; color:#f97316;}
+        .meta { font-size:13px; color:#9ca3af; margin:0 0 14px;}
+        button { width:100%; padding:10px; border-radius:999px; border:none; cursor:pointer;
+            background:linear-gradient(135deg,#f97316,#ec4899); color:white; font-weight:700;}
+        button:disabled { opacity:.6; cursor:not-allowed;}
+        .msg { margin-top:14px; color:#93c5fd; }
+        .err { margin-top:14px; color:#fca5a5; }
+        a { color:#f97316; text-decoration:none;}
+    </style>
+</head>
+<body>
+
+<div class="top">
+    <h2>Chọn gói Subscription</h2>
+    <div>
+        <a href="home.html">← Về home</a>
+        <button style="margin-left:12px; width:auto; padding:8px 14px;" onclick="logout()">Logout</button>
+    </div>
+</div>
+
+<div id="grid" class="grid"></div>
+<div id="msg" class="msg"></div>
+<div id="err" class="err"></div>
+
+<script>
+    const token = localStorage.getItem("token");
+    if (!token) window.location.href = "login.html";
+
+    function moneyVND(n) {
+        return new Intl.NumberFormat("vi-VN").format(n) + " ₫";
+    }
+
+    async function loadPacks() {
+        document.getElementById("msg").innerText = "";
+        document.getElementById("err").innerText = "";
+
+        try {
+            const res = await fetch("/api/packs", {
+                headers: { "Authorization": "Bearer " + token }
+            });
+
+            if (res.status === 401) {
+                localStorage.removeItem("token");
+                window.location.href = "login.html";
+                return;
+            }
+
+            const packs = await res.json();
+
+            const grid = document.getElementById("grid");
+            grid.innerHTML = "";
+
+            packs.forEach(p => {
+                const el = document.createElement("div");
+                el.className = "card";
+                el.innerHTML = `
+          <p class="name">${p.packName}</p>
+          <p class="price">${moneyVND(p.packPrice)}</p>
+          <p class="meta">Thời hạn: ${p.durationDays ?? 30} ngày</p>
+          <button onclick="buy(${p.packId})">Mua ngay</button>
+        `;
+                grid.appendChild(el);
+            });
+
+            if (!packs.length) {
+                document.getElementById("msg").innerText = "Hiện chưa có gói nào trong hệ thống.";
+            }
+        } catch (e) {
+            document.getElementById("err").innerText = "Không tải được danh sách pack.";
+        }
+    }
+
+    async function buy(packId) {
+        document.getElementById("msg").innerText = "Đang tạo giao dịch...";
+        document.getElementById("err").innerText = "";
+
+        try {
+            const res = await fetch("/api/payments/vnpay", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: JSON.stringify({ packId })
+            });
+
+            if (res.status === 401) {
+                localStorage.removeItem("token");
+                window.location.href = "login.html";
+                return;
+            }
+
+            if (!res.ok) {
+                const t = await res.text();
+                document.getElementById("err").innerText = "Tạo giao dịch thất bại: " + t;
+                document.getElementById("msg").innerText = "";
+                return;
+            }
+
+            const data = await res.json();
+            document.getElementById("msg").innerText = "Chuyển sang VNPay...";
+            window.location.href = data.paymentUrl; // redirect sang VNPay
+        } catch (e) {
+            document.getElementById("err").innerText = "Có lỗi xảy ra khi mua gói.";
+            document.getElementById("msg").innerText = "";
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem("token");
+        localStorage.removeItem("username");
+        window.location.href = "login.html";
+    }
+
+    loadPacks();
+</script>
+
+</body>
+</html>
