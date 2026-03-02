@@ -429,7 +429,13 @@
             localStorage.setItem("token", data.token);
             localStorage.setItem("username", username);
 
-            window.location.href = "homepage.html";
+            const role = (data.role || '').toUpperCase();
+            // role might be like 'ROLE_ADMIN' or 'ADMIN'
+            if (role.includes('ADMIN')) {
+                window.location.href = 'admin.html';
+            } else {
+                window.location.href = 'homepage.html';
+            }
         } catch (err) {
             document.getElementById("error").innerText = "Có lỗi xảy ra, vui lòng thử lại.";
         }

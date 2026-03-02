@@ -25,10 +25,11 @@ public class CustomUserDetailsService implements UserDetailsService {
         System.out.println("DB password = " + user.getPassword());
         System.out.println("DB pass len = " + (user.getPassword() == null ? 0 : user.getPassword().length()));
 
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getUsername())
-                .password(user.getPassword())
-                .roles(user.getRole())
-                .build();
+    return org.springframework.security.core.userdetails.User
+        .withUsername(user.getUsername())
+        .password(user.getPassword())
+        .roles(user.getRole())
+        .disabled(user.getEnabled() == null ? false : !user.getEnabled())
+        .build();
     }
 }

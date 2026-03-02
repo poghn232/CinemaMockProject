@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
@@ -43,10 +44,12 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // ✅ JWT stateless
                 .authorizeHttpRequests(auth -> auth
+                        // admin page requires ADMIN
+                        
                         .requestMatchers(
                                 "/login.html", "/register.html", "/forgot-password.html",
                                 "/homepage.html", "/home.html", "/packs.html", "/contact.html",
-                                "/", "/index.html",
+                                "/", "/index.html", "/admin.html",
                                 "/css/**", "/js/**", "/images/**", "/favicon.ico",
                                 "/api/auth/**",
                                 "/api/movies/**","/api/contact",
@@ -58,6 +61,14 @@ public class SecurityConfig {
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
+                .exceptionHandling(exc -> exc.authenticationEntryPoint((req, res, authEx) -> {
+                    // if browser requests an HTML page, redirect to login page; otherwise send 401
+                    if (req.getRequestURI() != null && req.getRequestURI().endsWith(".html")) {
+                        res.sendRedirect("/login.html");
+                    } else {
+                        res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                    }
+                }))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable());

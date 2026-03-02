@@ -35,4 +35,7 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<Review> reviews;
+
+    @Column(nullable = false)
+    private Boolean enabled = true; // if false, user cannot authenticate
 }

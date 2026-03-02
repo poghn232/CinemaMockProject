@@ -59,9 +59,20 @@ public class AuthController {
         UserDetails userDetails =
                 userDetailsService.loadUserByUsername(request.getUsername());
 
-        String jwt = jwtUtil.generateToken(userDetails);
+                String jwt = jwtUtil.generateToken(userDetails);
 
-        return ResponseEntity.ok(new LoginResponse(jwt));
+                // include role in response for frontend redirect decisions
+                // load from userDetailsService / repository
+                String role = null;
+                try {
+                        var u = userDetailsService.loadUserByUsername(request.getUsername());
+                        // userDetailsService returns Spring Security User with roles prefixed, fetch authorities
+                        role = u.getAuthorities().stream().findFirst().map(Object::toString).orElse(null);
+                } catch (Exception ignore) {}
+
+                LoginResponse resp = new LoginResponse(jwt);
+                if (role != null) resp.setRole(role);
+                return ResponseEntity.ok(resp);
     }
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
