@@ -2,8 +2,7 @@ package com.example.superapp.controller;
 
 import com.example.superapp.dto.ContactEmailAttachment;
 import com.example.superapp.dto.ContactRequest;
-import com.example.superapp.service.EmailContactService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.superapp.service.EmailService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,8 +15,11 @@ import java.util.List;
 @RequestMapping("/api")
 public class ContactController {
 
-    @Autowired
-    private EmailContactService emailContactService;
+    private final EmailService emailService;
+
+    public ContactController(EmailService emailService) {
+        this.emailService = emailService;
+    }
 
     @PostMapping(value = "/contact", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> sendContact(
@@ -43,7 +45,7 @@ public class ContactController {
             }
         }
 
-        emailContactService.sendContactMail(request, attachments);
+        emailService.sendContactMail(request, attachments);
 
         return ResponseEntity.ok("Gửi liên hệ thành công!");
     }
