@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MovieZone | User Profile</title>
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+        <style>
+        :root {
+            --bg-main: #0b1120;
+            --bg-secondary: #161d2d;
+            --bg-input: #1f2937;
+            --text-primary: #ffffff;
+            --text-secondary: #9ca3af;
+            --accent-yellow: #facc15;
+            --accent-blue: #3b82f6;
+            --gradient-orange: linear-gradient(to right, #f97316, #ef4444);
+            --gradient-btn: linear-gradient(to right, #ff7a18, #af002d 100%);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-primary); }
+        .main-container { max-width: 1200px; margin: 40px auto; display: flex; gap: 30px; padding: 0 20px; }
+
+        .navbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; border-radius: 18px; background: radial-gradient(circle at 0 0, rgba(148, 163, 184, 0.35), transparent 58%), rgba(15, 23, 42, 0.96); box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.45), 0 18px 40px rgba(15, 23, 42, 0.95); backdrop-filter: blur(18px); position: sticky; top: 12px; z-index: 20; }
+        .nav-left { display: flex; align-items: center; gap: 12px; }
+        .nav-logo { width: 30px; height: 30px; border-radius: 999px; background: radial-gradient(circle at 30% 20%, #f97316, #e11d48 55%, #4f46e5); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 25px rgba(248, 113, 113, 0.55); font-size: 14px; font-weight: 700; }
+        .nav-title { display: flex; flex-direction: column; line-height: 1.1; }
+        .nav-title-main { font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; font-size: 12px; }
+        .nav-title-sub { font-size: 11px; color: var(--text-subtle); }
+        .nav-center { display: flex; align-items: center; gap: 6px; margin-left: auto; margin-right: 10px; }
+        .nav-link { font-size: 13px; padding: 6px 12px; border-radius: 999px; color: var(--text-subtle); text-decoration: none; border: 1px solid transparent; transition: all 0.16s ease; cursor: pointer; background: none;}
+        .nav-link:hover { color: var(--text-primary); border-color: rgba(148, 163, 184, 0.6); background: rgba(15, 23, 42, 0.9); }
+        .nav-link.active { background: linear-gradient(135deg, #f97316, #ec4899); color: white; border-color: transparent; box-shadow: 0 12px 22px rgba(248, 113, 113, 0.6), 0 0 0 1px rgba(248, 113, 113, 0.7); }
+        .nav-right { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+        .nav-username { color: var(--text-subtle); }
+        .nav-link-premium { background: linear-gradient(135deg, #f97316, #ec4899); color: white; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; box-shadow: 0 10px 22px rgba(248, 113, 113, 0.6), 0 0 0 1px rgba(248, 113, 113, 0.7); }
+        .nav-link-premium:hover { filter: brightness(1.05); border-color: transparent; }
+        .nav-link-logout { border-color: rgba(248, 113, 22, 0.6); color: #e91000; }
+        .nav-link-logout:hover { background: rgba(15, 23, 42, 1); border-color: rgba(248, 113, 22, 0.9); }
+        
+        .profile-banner { background-color: var(--accent-yellow); padding: 40px 0; }
+        .banner-container { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 20px; padding: 0 20px; }
+        .user-info { color: var(--bg-main); }
+        .user-info h2 { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
+        .user-info p { margin-bottom: 10px; font-weight: 500; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;}
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: bold; color: white; text-transform: uppercase; }
+        .badge.active { background-color: #10b981; } 
+        .badge.expired { background-color: #ef4444; } 
+        .badge.pending { background-color: #f59e0b; } 
+        .badge.cancelled { background-color: #6b7280; } 
+        .badge.failed { background-color: #991b1b; } 
+
+        .sidebar { width: 280px; background-color: var(--bg-secondary); border-radius: 12px; padding: 20px; height: fit-content; }
+        .sidebar-menu { list-style: none; margin-bottom: 30px; }
+        .sidebar-item { padding: 15px; border-radius: 8px; cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; gap: 10px; transition: 0.3s; margin-bottom: 5px; }
+        .sidebar-item:hover { background-color: rgba(255, 255, 255, 0.05); }
+        .sidebar-item.active { background-color: rgba(255, 255, 255, 0.1); color: var(--text-primary); border-left: 4px solid #ef4444; }
+        .btn-logout-full { width: 100%; background-color: #ef4444; border: none; color: white; padding: 12px; border-radius: 50px; cursor: pointer; font-weight: bold; display: flex; justify-content: center; gap: 10px; }
+        .content-area { flex: 1; overflow: hidden; }
+        .content-section { display: none; background-color: var(--bg-secondary); border-radius: 12px; padding: 30px; animation: fadeIn 0.4s ease-in-out; }
+        .content-section.active { display: block; }
+        .content-section h3 { margin-bottom: 25px; font-size: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 15px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .form-row { display: flex; gap: 20px; margin-bottom: 20px; }
+        .form-group { flex: 1; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .form-group label { font-size: 13px; color: var(--text-secondary); }
+        .form-group input { background-color: var(--bg-input); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-primary); padding: 12px 15px; border-radius: 8px; font-size: 14px; outline: none; width: 100%; transition: border 0.3s; }
+        .form-group input:focus { border-color: #f97316; }
+        .form-group input[readonly] { opacity: 0.6; cursor: not-allowed; background-color: rgba(255,255,255,0.05); }
+        .form-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 20px; }
+        .btn-cancel { background-color: #374151; border: none; color: white; padding: 10px 25px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: filter 0.3s;}
+        .btn-cancel:hover { filter: brightness(1.2); }
+        .btn-save { background: var(--gradient-orange); border: none; color: white; padding: 10px 25px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: filter 0.3s;}
+        .btn-save:hover { filter: brightness(1.1); }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #10b981;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+
+        .history-list { display: flex; flex-direction: column; gap: 15px; }
+
+        .subscription-card { background: linear-gradient(135deg, #1f2937, #111827); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 25px; margin-bottom: 20px;}
+        .subscription-card.premium { border-top: 4px solid var(--accent-yellow); }
+        .sub-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .sub-header h4 { font-size: 18px; color: var(--accent-yellow); }
+        .sub-desc { color: var(--text-secondary); font-size: 14px; margin-bottom: 20px; }
+        .sub-details p { font-size: 14px; margin-bottom: 8px; }
+        .sub-actions { margin-top: 25px; display: flex; gap: 15px; }
+        .site-footer {
+            margin-top: 48px;
+            padding: 28px 0 24px;
+            border-top: 1px solid rgba(148, 163, 184, 0.25);
+        }
+        .footer-inner {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 24px;
+        }
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .footer-logo {
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            background: radial-gradient(circle at 30% 20%, #f97316, #e11d48 55%, #4f46e5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .footer-title {
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            font-size: 13px;
+        }
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .footer-links a {
+            color: var(--text-subtle);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.15s ease;
+        }
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+    </style>
+    </head>
+
+    <body>
+        <div id="toastNotification" class="toast">
+            <i class="fas fa-check-circle"></i> <span id="toastMessage">Thành
+                công!</span>
+        </div>
+
+        <header class="navbar">
+            <div class="nav-left">
+                <div class="nav-logo">MZ</div>
+                <div class="nav-title">
+                    <span class="nav-title-main">MOVIEZONE</span>
+                    <span class="nav-title-sub">Find movies, series &amp;
+                        more</span>
+                </div>
+            </div>
+            <nav class="nav-center">
+                <a href="homepage.html" class="nav-link active">Home</a>
+                <button class="nav-link" data-nav="movies">Movie</button>
+                <button class="nav-link" data-nav="tv">TV Series</button>
+                <a href="packs.html" class="nav-link nav-link-premium"
+                    id="premiumButton">Go Premium</a>
+                <button class="nav-link" data-nav="profile"
+                    disabled>Profile</button>
+                <button class="nav-link nav-link-logout" id="logoutButton"
+                    type="button">Logout</button>
+            </nav>
+            <div class="nav-right">
+                <span class="nav-username" id="navUsername"></span>
+            </div>
+        </header>
+
+        <div class="profile-banner">
+            <div class="banner-container">
+                <div class="user-info">
+                    <h2 id="bannerName">Username</h2>
+                    <p id="bannerRole">Role</p>
+                </div>
+            </div>
+        </div>
+
+        <main class="main-container">
+            <aside class="sidebar">
+                <ul class="sidebar-menu">
+                    <li class="sidebar-item active" data-target="section-info">
+                        <i class="fas fa-user-circle"></i> User Information
+                    </li>
+                    <li class="sidebar-item" data-target="section-history">
+                        <i class="fas fa-history"></i> History
+                    </li>
+                    <li class="sidebar-item" data-target="section-subscription">
+                        <i class="fas fa-credit-card"></i> Subscriptions
+                    </li>
+                    <li class="sidebar-item" data-target="section-password">
+                        <i class="fas fa-lock"></i> Change password
+                    </li>
+                </ul>
+                <button class="btn btn-logout-full"><i
+                        class="fas fa-sign-out-alt"></i> Log out</button>
+            </aside>
+
+            <div class="content-area">
+
+                <section id="section-info" class="content-section active">
+                    <h3>User Information</h3>
+                    <form id="profileForm">
+                        <div class="form-group" style="max-width: 600px;">
+                            <label>Username</label>
+                            <input type="text" id="inputUsername" required
+                                title="You can edit your username">
+                        </div>
+                        <div class="form-group" style="max-width: 600px;">
+                            <label>Email</label>
+                            <input type="email" id="inputEmail" readonly
+                                title="Email cannot be changed">
+                        </div>
+                        <div class="form-group" style="max-width: 600px;">
+                            <label>Role</label>
+                            <input type="text" id="inputRole" readonly
+                                title="Role cannot be changed">
+                        </div>
+                        <div class="form-actions"
+                            style="max-width: 600px; justify-content: flex-start;">
+                            <button type="submit" class="btn btn-save">Save
+                                changes</button>
+                        </div>
+                    </form>
+                </section>
+
+                <section id="section-history" class="content-section">
+                    <h3>Watch lately</h3>
+                    <div class="history-list">
+                        <div
+                            style="text-align: center; padding: 40px; color: var(--accent-yellow); font-size: 24px; font-weight: bold; background: var(--bg-input); border-radius: 8px;">
+                            NEED UPDATE
+                        </div>
+                    </div>
+                </section>
+
+                <section id="section-subscription" class="content-section">
+                    <h3>My Subscriptions</h3>
+                    <div id="subscriptionContainer"></div>
+                </section>
+
+                <section id="section-password" class="content-section">
+                    <h3>Change password</h3>
+                    <form id="passwordForm">
+                        <div class="form-group">
+                            <label>Current password</label>
+                            <input type="password" id="oldPassword"
+                                placeholder="Enter current password" required>
+                        </div>
+                        <div class="form-group">
+                            <label>New password</label>
+                            <input type="password" id="newPassword"
+                                placeholder="Enter new password" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm new password</label>
+                            <input type="password" id="confirmPassword"
+                                placeholder="Confirm new password" required>
+                        </div>
+                        <div class="form-actions" style="margin-top: 30px;">
+                            <button type="submit" class="btn btn-save">Update
+                                password</button>
+                        </div>
+                    </form>
+                </section>
+                <footer class="site-footer">
+                    <div class="footer-inner">
+                        <div class="footer-brand">
+                            <div class="footer-logo">MZ</div>
+                            <span class="footer-title">MOVIEZONE</span>
+                        </div>
+                        <div class="footer-links">
+                            <a href="homepage.html">Trang chủ</a>
+                            <a href="packs.html">Gói Premium</a>
+                            <a href="contact.html">Liên hệ</a>
+                        </div>
+                    </div>
+                    <div class="footer-bottom">
+                        © 2025 MovieZone. Dự án demo — Đăng nhập / Đăng ký /
+                        Quên mật khẩu để trải nghiệm.
+                    </div>
+                </footer>
+            </div>
+        </main>
+
+        <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        function showToast(message) {
+            const toast = document.getElementById('toastNotification');
+            const msgEl = document.getElementById('toastMessage');
+            msgEl.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        let mockUser = {
+            userId: 1,
+            email: "azu.fan@email.com",
+            username: "azu_cinema_fan",
+            password: "mypassword123", 
+            role: "USER"
+        };
+
+        let dbUsers = JSON.parse(localStorage.getItem('users')) || [mockUser];
+        localStorage.setItem('users', JSON.stringify(dbUsers));
+        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || mockUser;
+
+        let mockSubscriptions = JSON.parse(localStorage.getItem('mockSubscriptions')) || [
+            { subId: 101, pack: { packName: "Gói 1 tháng", price: 49000 }, startDate: "2026-02-15T00:00:00", endDate: "2026-03-15T23:59:59", status: "ACTIVE" },
+            { subId: 102, pack: { packName: "Gói 3 tháng", price: 129000 }, startDate: null, endDate: null, status: "PENDING" },
+            { subId: 103, pack: { packName: "Gói 1 năm", price: 399000 }, startDate: "2025-01-01T00:00:00", endDate: "2025-12-31T23:59:59", status: "EXPIRED" }
+        ];
+        localStorage.setItem('mockSubscriptions', JSON.stringify(mockSubscriptions));
+
+        // 1. Render User Profile
+        document.getElementById('navUsername').textContent = "Xin chào, " + currentUser.username;
+        document.getElementById('bannerName').textContent = currentUser.username;
+        document.getElementById('bannerRole').textContent = "Role: " + currentUser.role;
+        document.getElementById('inputUsername').value = currentUser.username;
+        document.getElementById('inputEmail').value = currentUser.email;
+        document.getElementById('inputRole').value = currentUser.role;
+
+        // 2. Render Subscriptions (Đã loại bỏ nút Cancel Auto-renew và các chức năng gia hạn)
+        function renderSubscriptions() {
+            const subContainer = document.getElementById('subscriptionContainer');
+            subContainer.innerHTML = '';
+            mockSubscriptions.forEach((sub, index) => {
+                let statusClass = sub.status.toLowerCase();
+                let actionsHtml = '';
+                
+                // Chỉ hiển thị nút thao tác đối với các trạng thái thanh toán bị lỗi hoặc chờ xử lý
+                if (sub.status === 'FAILED') {
+                    actionsHtml = `
+                        <div class="sub-actions">
+                            <button class="btn btn-save" onclick="handleSubAction(${index}, 'RETRY')">Retry Payment</button>
+                        </div>`;
+                } else if (sub.status === 'PENDING') {
+                    actionsHtml = `
+                        <div class="sub-actions">
+                            <button class="btn btn-save" onclick="handleSubAction(${index}, 'COMPLETE')">Complete Payment</button>
+                            <button class="btn btn-cancel" onclick="handleSubAction(${index}, 'CANCEL_REQ')">Cancel Request</button>
+                        </div>`;
+                }
+
+                let dateHtml = '';
+                if (sub.startDate && sub.endDate) {
+                    dateHtml = `
+                        <div class="sub-details">
+                            <p><strong>Start Date:</strong> ${new Date(sub.startDate).toLocaleDateString()}</p>
+                            <p><strong>End Date:</strong> ${new Date(sub.endDate).toLocaleDateString()}</p>
+                        </div>`;
+                }
+
+                subContainer.innerHTML += `
+                    <div class="subscription-card ${sub.status === 'ACTIVE' ? 'premium' : ''}">
+                        <div class="sub-header">
+                            <h4>Gói đăng ký #${sub.subId} ${sub.pack ? '- ' + sub.pack.packName : ''}</h4>
+                            <span class="badge ${statusClass}">${sub.status}</span>
+                        </div>
+                        <p class="sub-desc" style="font-weight: bold; color: #fff;">Giá: ${sub.pack.price.toLocaleString('vi-VN')}đ</p>
+                        ${dateHtml}
+                        ${actionsHtml}
+                    </div>
+                `;
+            });
+        }
+        
+        window.handleSubAction = function(index, action) {
+            let sub = mockSubscriptions[index];
+            let today = new Date();
+            let endDate = new Date();
+            
+            if (['RETRY', 'COMPLETE'].includes(action)) {
+                if (confirm(`Thanh toán và kích hoạt ${sub.pack.packName}?`)) {
+                    sub.status = 'ACTIVE';
+                    sub.startDate = today.toISOString();
+                    if (sub.pack.packName.includes('1 tháng')) endDate.setDate(today.getDate() + 30);
+                    if (sub.pack.packName.includes('3 tháng')) endDate.setDate(today.getDate() + 90);
+                    if (sub.pack.packName.includes('1 năm')) endDate.setDate(today.getDate() + 365);
+                    sub.endDate = endDate.toISOString();
+                    showToast('Đăng ký thành công!');
+                }
+            } else if (action === 'CANCEL_REQ') {
+                if (confirm('Hủy yêu cầu đăng ký này?')) {
+                    sub.status = 'CANCELLED';
+                    showToast('Đã hủy yêu cầu đăng ký!');
+                }
+            }
+            
+            localStorage.setItem('mockSubscriptions', JSON.stringify(mockSubscriptions));
+            renderSubscriptions();
+        };
+
+        renderSubscriptions();
+
+        // 3. Các Form & Interactions
+        const logoutBtns = document.querySelectorAll('.logout-btn, .btn-logout-full, .nav-link-logout');
+        logoutBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi MovieZone?')) {
+                    localStorage.removeItem('currentUser');
+                    window.location.href = 'login.html';
+                }
+            });
+        });
+
+        const profileForm = document.getElementById('profileForm');
+        if(profileForm) {
+            profileForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newUsername = document.getElementById('inputUsername').value.trim();
+                const userEmail = currentUser.email;
+
+                currentUser.username = newUsername;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+                let usersList = JSON.parse(localStorage.getItem('users')) || [];
+                const userIndex = usersList.findIndex(u => u.email === userEmail);
+                if (userIndex !== -1) {
+                    usersList[userIndex].username = newUsername;
+                    localStorage.setItem('users', JSON.stringify(usersList));
+                }
+
+                document.getElementById('navUsername').textContent = "Xin chào, " + newUsername;
+                document.getElementById('bannerName').textContent = newUsername;
+                showToast('Cập nhật Username thành công!');
+            });
+        }
+
+        const passwordForm = document.getElementById('passwordForm');
+        if (passwordForm) {
+            passwordForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const oldPassInput = document.getElementById('oldPassword').value;
+                const newPassInput = document.getElementById('newPassword').value;
+                const confirmPassInput = document.getElementById('confirmPassword').value;
+
+                if (oldPassInput !== currentUser.password) {
+                    alert('Lỗi: Mật khẩu hiện tại không chính xác!');
+                    return;
+                }
+                if (newPassInput !== confirmPassInput) {
+                    alert('Lỗi: Mật khẩu xác nhận không khớp!');
+                    return;
+                }
+
+                currentUser.password = newPassInput;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+                let usersList = JSON.parse(localStorage.getItem('users')) || [];
+                const userIndex = usersList.findIndex(u => u.email === currentUser.email);
+                if (userIndex !== -1) {
+                    usersList[userIndex].password = newPassInput;
+                    localStorage.setItem('users', JSON.stringify(usersList));
+                }
+
+                showToast('Đổi mật khẩu thành công!');
+                passwordForm.reset();
+            });
+        }
+
+        // Chuyển Tab Sidebar
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        const contentSections = document.querySelectorAll('.content-section');
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', function () {
+                sidebarItems.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                contentSections.forEach(section => section.classList.remove('active'));
+                const targetId = this.getAttribute('data-target');
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) targetSection.classList.add('active');
+            });
+        });
+        
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            if (link.textContent.trim().toUpperCase() === 'HOME') {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.location.href = 'homepage.html';
+                });
+            }
+        });
+    });
+    </script>
+    </body>
+</html>
