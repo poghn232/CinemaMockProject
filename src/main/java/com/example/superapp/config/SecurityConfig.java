@@ -45,11 +45,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/login.html", "/register.html", "/forgot-password.html",
-                                "/homepage.html", "/home.html", "/packs.html",
+                                "/homepage.html", "/home.html", "/packs.html", "/contact.html",
                                 "/", "/index.html",
                                 "/css/**", "/js/**", "/images/**", "/favicon.ico",
                                 "/api/auth/**",
-                                "/api/movies/**",
+                                "/api/movies/**","/api/contact",
 
                                 // ✅ VNPay callbacks
                                 "/api/vnpay/**",
