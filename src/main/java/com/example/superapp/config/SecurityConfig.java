@@ -61,14 +61,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                .exceptionHandling(exc -> exc.authenticationEntryPoint((req, res, authEx) -> {
-                    // if browser requests an HTML page, redirect to login page; otherwise send 401
-                    if (req.getRequestURI() != null && req.getRequestURI().endsWith(".html")) {
-                        res.sendRedirect("/login.html");
-                    } else {
-                        res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-                    }
-                }))
+                
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable());
