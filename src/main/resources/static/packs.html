@@ -1,37 +1,442 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8" />
-    <title>Mua gói Subscription</title>
+    <meta charset="UTF-8">
+    <title>Gói Premium | MovieZone</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; background:#0b1220; color:#e5e7eb; margin:0; padding:24px;}
-        .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;}
-        .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:16px;}
-        .card { background:#0f172a; border:1px solid rgba(148,163,184,.35); border-radius:14px; padding:16px;}
-        .name { font-size:18px; font-weight:700; margin:0 0 8px;}
-        .price { font-size:22px; font-weight:800; margin:0 0 8px; color:#f97316;}
-        .meta { font-size:13px; color:#9ca3af; margin:0 0 14px;}
-        button { width:100%; padding:10px; border-radius:999px; border:none; cursor:pointer;
-            background:linear-gradient(135deg,#f97316,#ec4899); color:white; font-weight:700;}
-        button:disabled { opacity:.6; cursor:not-allowed;}
-        .msg { margin-top:14px; color:#93c5fd; }
-        .err { margin-top:14px; color:#fca5a5; }
-        a { color:#f97316; text-decoration:none;}
+        :root {
+            --bg-primary: #020617;
+            --bg-elevated: #020617;
+            --accent: #f97316;
+            --accent-soft: rgba(249, 115, 22, 0.18);
+            --accent-strong: rgba(249, 115, 22, 0.45);
+            --text-main: #e5e7eb;
+            --text-subtle: #9ca3af;
+            --border-soft: rgba(148, 163, 184, 0.45);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background:
+                    radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.06), transparent 55%),
+                    radial-gradient(circle at 100% 100%, rgba(37, 99, 235, 0.3), transparent 60%),
+                    linear-gradient(135deg, #020617, #030712 50%, #020617);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        .page-shell {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 20px 28px 48px;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            border-radius: 18px;
+            background:
+                    radial-gradient(circle at 0 0, rgba(148, 163, 184, 0.35), transparent 58%),
+                    rgba(15, 23, 42, 0.96);
+            box-shadow:
+                    0 0 0 1px rgba(148, 163, 184, 0.45),
+                    0 18px 40px rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(18px);
+            position: sticky;
+            top: 12px;
+            z-index: 20;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-logo {
+            width: 30px;
+            height: 30px;
+            border-radius: 999px;
+            background: radial-gradient(circle at 30% 20%, #f97316, #e11d48 55%, #4f46e5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px rgba(248, 113, 113, 0.55);
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            color: white;
+        }
+
+        .nav-title {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+
+        .nav-title-main {
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+
+        .nav-title-sub {
+            font-size: 11px;
+            color: var(--text-subtle);
+        }
+
+        .nav-center {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+            margin-right: 10px;
+        }
+
+        .nav-link {
+            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            color: var(--text-subtle);
+            text-decoration: none;
+            border: 1px solid transparent;
+            transition: all 0.16s ease;
+            cursor: pointer;
+            background: none;
+        }
+
+        .nav-link:hover {
+            color: var(--text-main);
+            border-color: rgba(148, 163, 184, 0.6);
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, #f97316, #ec4899);
+            color: white;
+            border-color: transparent;
+            box-shadow:
+                    0 12px 22px rgba(248, 113, 113, 0.6),
+                    0 0 0 1px rgba(248, 113, 113, 0.7);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .nav-username {
+            color: var(--text-subtle);
+        }
+
+        .nav-link-logout {
+            border-color: rgba(248, 113, 22, 0.6);
+            color: #e91000;
+        }
+
+        .nav-link-logout:hover {
+            background: rgba(15, 23, 42, 1);
+            border-color: rgba(248, 113, 22, 0.9);
+        }
+
+        .badge-premium {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            background: rgba(234, 179, 8, 0.12);
+            border: 1px solid rgba(250, 204, 21, 0.7);
+            color: #facc15;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .badge-premium-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: #facc15;
+            box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.32);
+        }
+
+        /* PACKS SECTION */
+        .packs-hero {
+            margin-top: 36px;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .packs-hero h1 {
+            font-size: clamp(22px, 2.8vw, 28px);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .packs-hero p {
+            font-size: 14px;
+            color: var(--text-subtle);
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .packs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 22px;
+            margin-top: 24px;
+        }
+
+        .pack-card {
+            background: rgba(15, 23, 42, 0.96);
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.9);
+            padding: 24px;
+            transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+            position: relative;
+        }
+
+        .pack-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(249, 115, 22, 0.6);
+            box-shadow:
+                    0 20px 40px rgba(15, 23, 42, 0.95),
+                    0 0 0 1px rgba(249, 115, 22, 0.35);
+        }
+
+        .pack-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .pack-price {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #f97316, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pack-meta {
+            font-size: 13px;
+            color: var(--text-subtle);
+            margin-bottom: 20px;
+        }
+
+        .pack-card button {
+            width: 100%;
+            padding: 12px 18px;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(135deg, #f97316, #ec4899);
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            box-shadow:
+                    0 10px 22px rgba(248, 113, 113, 0.55),
+                    0 0 0 1px rgba(248, 113, 113, 0.7);
+            transition: all 0.14s ease;
+        }
+
+        .pack-card button:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+            box-shadow:
+                    0 14px 28px rgba(248, 113, 113, 0.65),
+                    0 0 0 1px rgba(248, 113, 113, 0.8);
+        }
+
+        .pack-card button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .msg {
+            margin-top: 20px;
+            font-size: 13px;
+            color: #93c5fd;
+            text-align: center;
+        }
+
+        .err {
+            margin-top: 12px;
+            font-size: 13px;
+            color: #fca5a5;
+            text-align: center;
+        }
+
+        /* FOOTER */
+        .site-footer {
+            margin-top: 48px;
+            padding: 28px 0 24px;
+            border-top: 1px solid rgba(148, 163, 184, 0.25);
+        }
+
+        .footer-inner {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 24px;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-logo {
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            background: radial-gradient(circle at 30% 20%, #f97316, #e11d48 55%, #4f46e5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .footer-title {
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            font-size: 13px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: var(--text-subtle);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.15s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        .footer-bottom {
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(148, 163, 184, 0.15);
+            font-size: 12px;
+            color: var(--text-subtle);
+            text-align: center;
+        }
+
+        @media (max-width: 900px) {
+            .navbar {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .nav-center {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .page-shell {
+                padding-inline: 14px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .packs-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
 
-<div class="top">
-    <h2>Chọn gói Subscription</h2>
-    <div>
-        <a href="homepage.html">← Về home</a>
-        <button style="margin-left:12px; width:auto; padding:8px 14px;" onclick="logout()">Logout</button>
-    </div>
-</div>
+<div class="page-shell">
+    <!-- NAVBAR -->
+    <header class="navbar">
+        <a href="homepage.html" class="nav-left" style="text-decoration: none; color: inherit;">
+            <div class="nav-logo">MZ</div>
+            <div class="nav-title">
+                <span class="nav-title-main">MOVIEZONE</span>
+                <span class="nav-title-sub">Find movies, series &amp; more</span>
+            </div>
+        </a>
 
-<div id="grid" class="grid"></div>
-<div id="msg" class="msg"></div>
-<div id="err" class="err"></div>
+        <nav class="nav-center">
+            <a href="homepage.html" class="nav-link">Home</a>
+            <a href="packs.html" class="nav-link active">Gói Premium</a>
+            <button class="nav-link nav-link-logout" type="button" id="logoutButton">Logout</button>
+        </nav>
+
+        <div class="nav-right">
+            <span class="nav-username" id="navUsername"></span>
+            <span class="badge-premium" id="premiumBadge" style="display:none;">
+                <span class="badge-premium-dot"></span>
+                Premium
+            </span>
+        </div>
+    </header>
+
+    <!-- PACKS HERO -->
+    <section class="packs-hero">
+        <h1>Chọn gói Premium của bạn</h1>
+        <p>Nâng cấp để xem phim không quảng cáo, tốc độ cao và mở khóa nhiều nội dung độc quyền.</p>
+    </section>
+
+    <!-- PACKS GRID -->
+    <div id="grid" class="packs-grid"></div>
+    <div id="msg" class="msg"></div>
+    <div id="err" class="err"></div>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <div class="footer-logo">MZ</div>
+                <span class="footer-title">MOVIEZONE</span>
+            </div>
+            <div class="footer-links">
+                <a href="homepage.html">Trang chủ</a>
+                <a href="login.html">Đăng nhập</a>
+                <a href="register.html">Đăng ký</a>
+                <a href="packs.html">Gói Premium</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © 2025 MovieZone. Dự án demo — Đăng nhập / Đăng ký để trải nghiệm.
+        </div>
+    </footer>
+</div>
 
 <script>
     const token = localStorage.getItem("token");
@@ -39,6 +444,20 @@
 
     function moneyVND(n) {
         return new Intl.NumberFormat("vi-VN").format(n) + " ₫";
+    }
+
+    function initUserUi() {
+        const username = localStorage.getItem("username") || "Guest";
+        const usernameEl = document.getElementById("navUsername");
+        const premiumBadge = document.getElementById("premiumBadge");
+        const isPremium = localStorage.getItem("isPremium") === "true";
+
+        if (usernameEl) {
+            usernameEl.textContent = "Xin chào, " + username;
+        }
+        if (premiumBadge) {
+            premiumBadge.style.display = isPremium ? "inline-flex" : "none";
+        }
     }
 
     async function loadPacks() {
@@ -63,13 +482,13 @@
 
             packs.forEach(p => {
                 const el = document.createElement("div");
-                el.className = "card";
+                el.className = "pack-card";
                 el.innerHTML = `
-          <p class="name">${p.packName}</p>
-          <p class="price">${moneyVND(p.packPrice)}</p>
-          <p class="meta">Thời hạn: ${p.durationDays ?? 30} ngày</p>
-          <button onclick="buy(${p.packId})">Mua ngay</button>
-        `;
+                    <p class="pack-name">${p.packName}</p>
+                    <p class="pack-price">${moneyVND(p.packPrice)}</p>
+                    <p class="pack-meta">Thời hạn: ${p.durationDays ?? 30} ngày</p>
+                    <button onclick="buy(${p.packId})">Mua ngay</button>
+                `;
                 grid.appendChild(el);
             });
 
@@ -110,19 +529,20 @@
 
             const data = await res.json();
             document.getElementById("msg").innerText = "Chuyển sang VNPay...";
-            window.location.href = data.paymentUrl; // redirect sang VNPay
+            window.location.href = data.paymentUrl;
         } catch (e) {
             document.getElementById("err").innerText = "Có lỗi xảy ra khi mua gói.";
             document.getElementById("msg").innerText = "";
         }
     }
 
-    function logout() {
+    document.getElementById("logoutButton").addEventListener("click", function () {
         localStorage.removeItem("token");
         localStorage.removeItem("username");
         window.location.href = "login.html";
-    }
+    });
 
+    initUserUi();
     loadPacks();
 </script>
 

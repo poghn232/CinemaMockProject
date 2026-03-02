@@ -677,6 +677,16 @@
                 Premium
             </span>
         </div>
+        <div id="paymentNotice" style="
+        display:none;
+        margin:20px auto;
+        max-width:900px;
+        padding:14px 18px;
+        border-radius:12px;
+        font-size:14px;
+        text-align:center;
+        font-weight:500;">
+        </div>
     </header>
 
     <!-- HERO -->
@@ -969,6 +979,31 @@
         }
     }
 
+    function showPaymentNotice() {
+        const params = new URLSearchParams(window.location.search);
+        const status = params.get("payment");
+
+        const notice = document.getElementById("paymentNotice");
+        if (!notice || !status) return;
+
+        notice.style.display = "block";
+
+        if (status === "success") {
+            notice.style.background = "rgba(34,197,94,0.15)";
+            notice.style.border = "1px solid rgba(34,197,94,0.5)";
+            notice.style.color = "#22c55e";
+            notice.innerText = "🎉 Bạn đã mua gói Premium thành công!";
+        } else {
+            notice.style.background = "rgba(239,68,68,0.15)";
+            notice.style.border = "1px solid rgba(239,68,68,0.5)";
+            notice.style.color = "#ef4444";
+            notice.innerText = "❌ Thanh toán thất bại hoặc có lỗi xảy ra.";
+        }
+
+        // Xóa query param khỏi URL (cho đẹp)
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     // ========== INIT ==========
     (function init() {
         initUserUi();
@@ -976,7 +1011,9 @@
         initSearch();
         initPremiumAndLogout();
         loadMovies(currentFilter);
+        showPaymentNotice();
     })();
+
 </script>
 
 </body>

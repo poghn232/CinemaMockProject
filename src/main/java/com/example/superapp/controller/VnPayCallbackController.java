@@ -2,6 +2,7 @@ package com.example.superapp.controller;
 
 import com.example.superapp.service.VnPayCallbackService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
-@RestController
+@Controller
 @RequestMapping("/api/vnpay")
 @RequiredArgsConstructor
 public class VnPayCallbackController {
@@ -31,11 +32,24 @@ public class VnPayCallbackController {
     // Return: user redirect về (chỉ hiển thị)
     @GetMapping("/return")
     public String vnpReturn(@RequestParam Map<String, String> params) {
+
         try {
-            callbackService.handleCallback(params); // có thể gọi, nhưng IPN mới là chuẩn
-            return "Thanh toán xử lý xong. Bạn có thể quay lại app.";
+            callbackService.handleCallback(params);
+
+            String responseCode = params.get("vnp_ResponseCode");
+            String transactionStatus = params.get("vnp_TransactionStatus");
+
+            boolean success = "00".equals(responseCode)
+                    && "00".equals(transactionStatus);
+
+            if (success) {
+                return "redirect:/homepage.html?payment=success";
+            } else {
+                return "redirect:/homepage.html?payment=fail";
+            }
+
         } catch (Exception e) {
-            return "Thanh toán thất bại hoặc chữ ký không hợp lệ.";
+            return "redirect:/homepage.html?payment=fail";
         }
     }
 }

@@ -18,6 +18,9 @@ public class OtpService {
 
     private final EmailService emailService;
 
+    private final Map<String, String> forgotOtpStorage = new ConcurrentHashMap<>();
+    private final Map<String, Long> forgotOtpExpire = new ConcurrentHashMap<>();
+
     public OtpService(EmailService emailService) {
         this.emailService = emailService;
     }
@@ -88,5 +91,33 @@ public class OtpService {
 
         pendingUsers.remove(email);
         otpStorage.remove(email);
+    }
+
+    public void createForgotPasswordOtp(String username, String email) {
+
+        String otp = String.valueOf(new Random().nextInt(900000) + 100000);
+
+        long expireTime = System.currentTimeMillis() + 5 * 60 * 1000;
+
+        forgotOtpStorage.put(username, otp);
+        forgotOtpExpire.put(username, expireTime);
+
+        emailService.sendOtp(email, otp);
+    }
+    public boolean verifyForgotOtp(String username, String otpInput) {
+
+        String storedOtp = forgotOtpStorage.get(username);
+        Long expireTime = forgotOtpExpire.get(username);
+
+        if (storedOtp == null || expireTime == null)
+            return false;
+
+        if (System.currentTimeMillis() > expireTime) {
+            forgotOtpStorage.remove(username);
+            forgotOtpExpire.remove(username);
+            return false;
+        }
+
+        return storedOtp.equals(otpInput);
     }
 }
