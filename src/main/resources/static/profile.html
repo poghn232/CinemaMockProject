@@ -23,6 +23,7 @@
         body { background-color: var(--bg-main); color: var(--text-primary); }
         .main-container { max-width: 1200px; margin: 40px auto; display: flex; gap: 30px; padding: 0 20px; }
 
+        /* NAVBAR & HEADER */
         .navbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; border-radius: 18px; background: radial-gradient(circle at 0 0, rgba(148, 163, 184, 0.35), transparent 58%), rgba(15, 23, 42, 0.96); box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.45), 0 18px 40px rgba(15, 23, 42, 0.95); backdrop-filter: blur(18px); position: sticky; top: 12px; z-index: 20; }
         .nav-left { display: flex; align-items: center; gap: 12px; }
         .nav-logo { width: 30px; height: 30px; border-radius: 999px; background: radial-gradient(circle at 30% 20%, #f97316, #e11d48 55%, #4f46e5); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 25px rgba(248, 113, 113, 0.55); font-size: 14px; font-weight: 700; }
@@ -35,11 +36,10 @@
         .nav-link.active { background: linear-gradient(135deg, #f97316, #ec4899); color: white; border-color: transparent; box-shadow: 0 12px 22px rgba(248, 113, 113, 0.6), 0 0 0 1px rgba(248, 113, 113, 0.7); }
         .nav-right { display: flex; align-items: center; gap: 8px; font-size: 12px; }
         .nav-username { color: var(--text-subtle); }
-        .nav-link-premium { background: linear-gradient(135deg, #f97316, #ec4899); color: white; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; box-shadow: 0 10px 22px rgba(248, 113, 113, 0.6), 0 0 0 1px rgba(248, 113, 113, 0.7); }
-        .nav-link-premium:hover { filter: brightness(1.05); border-color: transparent; }
         .nav-link-logout { border-color: rgba(248, 113, 22, 0.6); color: #e91000; }
         .nav-link-logout:hover { background: rgba(15, 23, 42, 1); border-color: rgba(248, 113, 22, 0.9); }
         
+        /* PROFILE BANNER */
         .profile-banner { background-color: var(--accent-yellow); padding: 40px 0; }
         .banner-container { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 20px; padding: 0 20px; }
         .user-info { color: var(--bg-main); }
@@ -52,6 +52,7 @@
         .badge.cancelled { background-color: #6b7280; } 
         .badge.failed { background-color: #991b1b; } 
 
+        /* SIDEBAR & TAB MENU */
         .sidebar { width: 280px; background-color: var(--bg-secondary); border-radius: 12px; padding: 20px; height: fit-content; }
         .sidebar-menu { list-style: none; margin-bottom: 30px; }
         .sidebar-item { padding: 15px; border-radius: 8px; cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; gap: 10px; transition: 0.3s; margin-bottom: 5px; }
@@ -64,6 +65,7 @@
         .content-section h3 { margin-bottom: 25px; font-size: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 15px; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* GIAO DIỆN CÁC FORM */
         .form-row { display: flex; gap: 20px; margin-bottom: 20px; }
         .form-group { flex: 1; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
         .form-group label { font-size: 13px; color: var(--text-secondary); }
@@ -76,6 +78,7 @@
         .btn-save { background: var(--gradient-orange); border: none; color: white; padding: 10px 25px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: filter 0.3s;}
         .btn-save:hover { filter: brightness(1.1); }
 
+        /* TOAST NOTIFICATION POP-UP */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -95,10 +98,10 @@
             transition: all 0.3s ease;
             pointer-events: none;
         }
+        .toast.error { background: #ef4444; }
         .toast.show { opacity: 1; transform: translateY(0); }
 
-        .history-list { display: flex; flex-direction: column; gap: 15px; }
-
+        /* SUBSCRIPTION CARD */
         .subscription-card { background: linear-gradient(135deg, #1f2937, #111827); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 25px; margin-bottom: 20px;}
         .subscription-card.premium { border-top: 4px solid var(--accent-yellow); }
         .sub-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -158,8 +161,8 @@
 
     <body>
         <div id="toastNotification" class="toast">
-            <i class="fas fa-check-circle"></i> <span id="toastMessage">Thành
-                công!</span>
+            <i id="toastIcon" class="fas fa-check-circle"></i> <span
+                id="toastMessage">Thành công!</span>
         </div>
 
         <header class="navbar">
@@ -183,15 +186,15 @@
                     type="button">Logout</button>
             </nav>
             <div class="nav-right">
-                <span class="nav-username" id="navUsername"></span>
+                <span class="nav-username" id="navUsername">Đang tải...</span>
             </div>
         </header>
 
         <div class="profile-banner">
             <div class="banner-container">
                 <div class="user-info">
-                    <h2 id="bannerName">Username</h2>
-                    <p id="bannerRole">Role</p>
+                    <h2 id="bannerName">Đang tải...</h2>
+                    <p id="bannerRole">Đang tải...</p>
                 </div>
             </div>
         </div>
@@ -238,8 +241,8 @@
                         </div>
                         <div class="form-actions"
                             style="max-width: 600px; justify-content: flex-start;">
-                            <button type="submit" class="btn btn-save">Save
-                                changes</button>
+                            <button type="submit" class="btn btn-save"
+                                id="saveProfileBtn">Save changes</button>
                         </div>
                     </form>
                 </section>
@@ -256,7 +259,8 @@
 
                 <section id="section-subscription" class="content-section">
                     <h3>My Subscriptions</h3>
-                    <div id="subscriptionContainer"></div>
+                    <div id="subscriptionContainer">
+                    </div>
                 </section>
 
                 <section id="section-password" class="content-section">
@@ -278,8 +282,8 @@
                                 placeholder="Confirm new password" required>
                         </div>
                         <div class="form-actions" style="margin-top: 30px;">
-                            <button type="submit" class="btn btn-save">Update
-                                password</button>
+                            <button type="submit" class="btn btn-save"
+                                id="updatePassBtn">Update password</button>
                         </div>
                     </form>
                 </section>
@@ -291,6 +295,8 @@
                         </div>
                         <div class="footer-links">
                             <a href="homepage.html">Trang chủ</a>
+                            <a href="login.html">Đăng nhập</a>
+                            <a href="register.html">Đăng ký</a>
                             <a href="packs.html">Gói Premium</a>
                             <a href="contact.html">Liên hệ</a>
                         </div>
@@ -306,50 +312,86 @@
         <script>
     document.addEventListener('DOMContentLoaded', () => {
         
-        function showToast(message) {
+        // CẤU HÌNH API
+        const API_URL = 'http://localhost:8080/api/users';
+        const currentUserId = 1; // Giả sử ID của người dùng đang đăng nhập là 1 (Ánh xạ từ CSDL)
+        let savedPassword = "mypassword123"; // Lưu trữ mật khẩu tạm để check (Nên xử lý ở Backend)
+
+        // --- HÀM TOAST THÔNG BÁO ---
+        function showToast(message, isError = false) {
             const toast = document.getElementById('toastNotification');
             const msgEl = document.getElementById('toastMessage');
+            const icon = document.getElementById('toastIcon');
+            
             msgEl.textContent = message;
+            
+            if (isError) {
+                toast.classList.add('error');
+                icon.className = 'fas fa-exclamation-circle';
+            } else {
+                toast.classList.remove('error');
+                icon.className = 'fas fa-check-circle';
+            }
+            
             toast.classList.add('show');
             setTimeout(() => { toast.classList.remove('show'); }, 3000);
         }
 
-        let mockUser = {
-            userId: 1,
-            email: "azu.fan@email.com",
-            username: "azu_cinema_fan",
-            password: "mypassword123", 
-            role: "USER"
-        };
+        // --- LẤY DỮ LIỆU TỪ DATABASE SQL BẰNG FETCH API ---
+        function loadUserData() {
+            fetch(`${API_URL}/profile/${currentUserId}`)
+                .then(response => {
+                    if (!response.ok) throw new Error("Server Backend chưa chạy hoặc lỗi API");
+                    return response.json();
+                })
+                .then(userData => {
+                    // Cập nhật UI với dữ liệu thật từ MySQL
+                    renderUserInfo(userData.username, userData.email, userData.role);
+                    
+                    // Nếu Backend có trả kèm mảng subscriptions, thì hiển thị
+                    if(userData.subscriptions && userData.subscriptions.length > 0) {
+                        renderSubscriptions(userData.subscriptions);
+                    } else {
+                        renderSubscriptions(mockSubscriptions); // Fallback mẫu
+                    }
+                })
+                .catch(error => {
+                    console.error("Lỗi:", error);
+                    showToast("Lỗi kết nối Server. Đang dùng dữ liệu mô phỏng!", true);
+                    
+                    // Nếu không gọi được API, tự động dùng Data mẫu để web không bị trắng
+                    renderUserInfo("azu_cinema_fan", "azu.fan@email.com", "USER");
+                    renderSubscriptions(mockSubscriptions);
+                });
+        }
 
-        let dbUsers = JSON.parse(localStorage.getItem('users')) || [mockUser];
-        localStorage.setItem('users', JSON.stringify(dbUsers));
-        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || mockUser;
+        // Hàm điền dữ liệu User lên giao diện
+        function renderUserInfo(username, email, role) {
+            document.getElementById('navUsername').textContent = "Xin chào, " + username;
+            document.getElementById('bannerName').textContent = username;
+            document.getElementById('bannerRole').textContent = "Role: " + role;
+            document.getElementById('inputUsername').value = username;
+            document.getElementById('inputEmail').value = email;
+            document.getElementById('inputRole').value = role;
+        }
 
-        let mockSubscriptions = JSON.parse(localStorage.getItem('mockSubscriptions')) || [
+        // Dữ liệu Gói đăng ký Mẫu (Phòng khi Database chưa có dữ liệu Sub)
+        let mockSubscriptions = [
             { subId: 101, pack: { packName: "Gói 1 tháng", price: 49000 }, startDate: "2026-02-15T00:00:00", endDate: "2026-03-15T23:59:59", status: "ACTIVE" },
             { subId: 102, pack: { packName: "Gói 3 tháng", price: 129000 }, startDate: null, endDate: null, status: "PENDING" },
             { subId: 103, pack: { packName: "Gói 1 năm", price: 399000 }, startDate: "2025-01-01T00:00:00", endDate: "2025-12-31T23:59:59", status: "EXPIRED" }
         ];
-        localStorage.setItem('mockSubscriptions', JSON.stringify(mockSubscriptions));
 
-        // 1. Render User Profile
-        document.getElementById('navUsername').textContent = "Xin chào, " + currentUser.username;
-        document.getElementById('bannerName').textContent = currentUser.username;
-        document.getElementById('bannerRole').textContent = "Role: " + currentUser.role;
-        document.getElementById('inputUsername').value = currentUser.username;
-        document.getElementById('inputEmail').value = currentUser.email;
-        document.getElementById('inputRole').value = currentUser.role;
-
-        // 2. Render Subscriptions (Đã loại bỏ nút Cancel Auto-renew và các chức năng gia hạn)
-        function renderSubscriptions() {
+        // --- RENDER SUBSCRIPTIONS (Chỉ hiển thị nút thanh toán cho PENDING/FAILED) ---
+        function renderSubscriptions(subs) {
             const subContainer = document.getElementById('subscriptionContainer');
             subContainer.innerHTML = '';
-            mockSubscriptions.forEach((sub, index) => {
+
+            subs.forEach((sub, index) => {
                 let statusClass = sub.status.toLowerCase();
                 let actionsHtml = '';
                 
-                // Chỉ hiển thị nút thao tác đối với các trạng thái thanh toán bị lỗi hoặc chờ xử lý
+                // Loại bỏ hoàn toàn nút Renew / Cancel Auto-renew
                 if (sub.status === 'FAILED') {
                     actionsHtml = `
                         <div class="sub-actions">
@@ -372,13 +414,22 @@
                         </div>`;
                 }
 
+                // Nếu Backend không trả về price, lấy mặc định từ tên gói
+                let price = sub.pack.price;
+                if (!price) {
+                    if(sub.pack.packName.includes("1 tháng")) price = 49000;
+                    else if(sub.pack.packName.includes("3 tháng")) price = 129000;
+                    else if(sub.pack.packName.includes("1 năm")) price = 399000;
+                    else price = 0;
+                }
+
                 subContainer.innerHTML += `
                     <div class="subscription-card ${sub.status === 'ACTIVE' ? 'premium' : ''}">
                         <div class="sub-header">
                             <h4>Gói đăng ký #${sub.subId} ${sub.pack ? '- ' + sub.pack.packName : ''}</h4>
                             <span class="badge ${statusClass}">${sub.status}</span>
                         </div>
-                        <p class="sub-desc" style="font-weight: bold; color: #fff;">Giá: ${sub.pack.price.toLocaleString('vi-VN')}đ</p>
+                        <p class="sub-desc" style="font-weight: bold; color: #fff;">Giá: ${price.toLocaleString('vi-VN')}đ</p>
                         ${dateHtml}
                         ${actionsHtml}
                     </div>
@@ -386,19 +437,14 @@
             });
         }
         
+        // Hàm giả lập xử lý click nút Subscription
         window.handleSubAction = function(index, action) {
             let sub = mockSubscriptions[index];
-            let today = new Date();
-            let endDate = new Date();
-            
             if (['RETRY', 'COMPLETE'].includes(action)) {
                 if (confirm(`Thanh toán và kích hoạt ${sub.pack.packName}?`)) {
                     sub.status = 'ACTIVE';
-                    sub.startDate = today.toISOString();
-                    if (sub.pack.packName.includes('1 tháng')) endDate.setDate(today.getDate() + 30);
-                    if (sub.pack.packName.includes('3 tháng')) endDate.setDate(today.getDate() + 90);
-                    if (sub.pack.packName.includes('1 năm')) endDate.setDate(today.getDate() + 365);
-                    sub.endDate = endDate.toISOString();
+                    sub.startDate = new Date().toISOString();
+                    sub.endDate = new Date(new Date().setDate(new Date().getDate() + 30)).toISOString();
                     showToast('Đăng ký thành công!');
                 }
             } else if (action === 'CANCEL_REQ') {
@@ -407,77 +453,101 @@
                     showToast('Đã hủy yêu cầu đăng ký!');
                 }
             }
-            
-            localStorage.setItem('mockSubscriptions', JSON.stringify(mockSubscriptions));
-            renderSubscriptions();
+            renderSubscriptions(mockSubscriptions);
         };
 
-        renderSubscriptions();
+        // Khởi chạy hàm Load dữ liệu khi tải xong trang
+        loadUserData();
 
-        // 3. Các Form & Interactions
+        // --- CÁC FORM TƯƠNG TÁC CHÍNH ---
+
+        // Đăng xuất
         const logoutBtns = document.querySelectorAll('.logout-btn, .btn-logout-full, .nav-link-logout');
         logoutBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi MovieZone?')) {
-                    localStorage.removeItem('currentUser');
                     window.location.href = 'login.html';
                 }
             });
         });
 
+        // Update Profile (Gửi dữ liệu lên Backend)
         const profileForm = document.getElementById('profileForm');
         if(profileForm) {
             profileForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const newUsername = document.getElementById('inputUsername').value.trim();
-                const userEmail = currentUser.email;
+                const saveBtn = document.getElementById('saveProfileBtn');
+                saveBtn.textContent = "Đang lưu...";
 
-                currentUser.username = newUsername;
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-
-                let usersList = JSON.parse(localStorage.getItem('users')) || [];
-                const userIndex = usersList.findIndex(u => u.email === userEmail);
-                if (userIndex !== -1) {
-                    usersList[userIndex].username = newUsername;
-                    localStorage.setItem('users', JSON.stringify(usersList));
-                }
-
-                document.getElementById('navUsername').textContent = "Xin chào, " + newUsername;
-                document.getElementById('bannerName').textContent = newUsername;
-                showToast('Cập nhật Username thành công!');
+                // Fetch API (PUT) để cập nhật SQL
+                fetch(`${API_URL}/profile/${currentUserId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: newUsername })
+                })
+                .then(res => {
+                    if(!res.ok) throw new Error("Cập nhật thất bại");
+                    
+                    document.getElementById('navUsername').textContent = "Xin chào, " + newUsername;
+                    document.getElementById('bannerName').textContent = newUsername;
+                    showToast('Cập nhật Username thành công!');
+                })
+                .catch(err => {
+                    console.error(err);
+                    // Dùng tạm Frontend cập nhật nếu Backend không kết nối được
+                    document.getElementById('navUsername').textContent = "Xin chào, " + newUsername;
+                    document.getElementById('bannerName').textContent = newUsername;
+                    showToast('Đã cập nhật (Dự phòng do lỗi Server)');
+                })
+                .finally(() => {
+                    saveBtn.textContent = "Save changes";
+                });
             });
         }
 
+        // Thay đổi Password
         const passwordForm = document.getElementById('passwordForm');
         if (passwordForm) {
             passwordForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                const oldPassInput = document.getElementById('oldPassword').value;
-                const newPassInput = document.getElementById('newPassword').value;
-                const confirmPassInput = document.getElementById('confirmPassword').value;
+                const oldPass = document.getElementById('oldPassword').value;
+                const newPass = document.getElementById('newPassword').value;
+                const confirmPass = document.getElementById('confirmPassword').value;
 
-                if (oldPassInput !== currentUser.password) {
-                    alert('Lỗi: Mật khẩu hiện tại không chính xác!');
+                if (oldPass !== savedPassword) {
+                    showToast('Lỗi: Mật khẩu hiện tại không chính xác!', true);
                     return;
                 }
-                if (newPassInput !== confirmPassInput) {
-                    alert('Lỗi: Mật khẩu xác nhận không khớp!');
+                if (newPass !== confirmPass) {
+                    showToast('Lỗi: Mật khẩu xác nhận không khớp!', true);
                     return;
                 }
 
-                currentUser.password = newPassInput;
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                const btn = document.getElementById('updatePassBtn');
+                btn.textContent = "Đang xử lý...";
 
-                let usersList = JSON.parse(localStorage.getItem('users')) || [];
-                const userIndex = usersList.findIndex(u => u.email === currentUser.email);
-                if (userIndex !== -1) {
-                    usersList[userIndex].password = newPassInput;
-                    localStorage.setItem('users', JSON.stringify(usersList));
-                }
-
-                showToast('Đổi mật khẩu thành công!');
-                passwordForm.reset();
+                // Fetch API (PUT) gửi Password mới lên Server
+                fetch(`${API_URL}/password/${currentUserId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: newPass })
+                })
+                .then(res => {
+                    savedPassword = newPass; // Lưu tạm vào biến Front-end
+                    showToast('Đổi mật khẩu thành công!');
+                    passwordForm.reset();
+                })
+                .catch(err => {
+                    // Dự phòng
+                    savedPassword = newPass; 
+                    showToast('Đã đổi mật khẩu (Dự phòng do lỗi Server)');
+                    passwordForm.reset();
+                })
+                .finally(() => {
+                    btn.textContent = "Update password";
+                });
             });
         }
 
@@ -488,6 +558,7 @@
             item.addEventListener('click', function () {
                 sidebarItems.forEach(i => i.classList.remove('active'));
                 this.classList.add('active');
+                
                 contentSections.forEach(section => section.classList.remove('active'));
                 const targetId = this.getAttribute('data-target');
                 const targetSection = document.getElementById(targetId);
@@ -495,6 +566,7 @@
             });
         });
         
+        // Navbar Links
         const navLinks = document.querySelectorAll('.nav-link');
         navLinks.forEach(link => {
             if (link.textContent.trim().toUpperCase() === 'HOME') {
@@ -505,6 +577,7 @@
             }
         });
     });
+    
     </script>
     </body>
 </html>
