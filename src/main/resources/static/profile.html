@@ -176,8 +176,6 @@
             </div>
             <nav class="nav-center">
                 <a href="homepage.html" class="nav-link active">Home</a>
-                <button class="nav-link" data-nav="movies">Movie</button>
-                <button class="nav-link" data-nav="tv">TV Series</button>
                 <a href="packs.html" class="nav-link nav-link-premium"
                     id="premiumButton">Go Premium</a>
                 <button class="nav-link" data-nav="profile"
@@ -260,7 +258,7 @@
                 <section id="section-subscription" class="content-section">
                     <h3>My Subscriptions</h3>
                     <div id="subscriptionContainer">
-                    </div>
+                        </div>
                 </section>
 
                 <section id="section-password" class="content-section">
@@ -312,10 +310,9 @@
         <script>
     document.addEventListener('DOMContentLoaded', () => {
         
-        // CẤU HÌNH API
+        // CẤU HÌNH API (Chạy tới Backend Spring Boot)
         const API_URL = 'http://localhost:8080/api/users';
-        const currentUserId = 1; // Giả sử ID của người dùng đang đăng nhập là 1 (Ánh xạ từ CSDL)
-        let savedPassword = "mypassword123"; // Lưu trữ mật khẩu tạm để check (Nên xử lý ở Backend)
+        const currentUserId = 1; // ID User đăng nhập (Nên lấy từ Session thực tế)
 
         // --- HÀM TOAST THÔNG BÁO ---
         function showToast(message, isError = false) {
@@ -345,27 +342,21 @@
                     return response.json();
                 })
                 .then(userData => {
-                    // Cập nhật UI với dữ liệu thật từ MySQL
                     renderUserInfo(userData.username, userData.email, userData.role);
-                    
-                    // Nếu Backend có trả kèm mảng subscriptions, thì hiển thị
                     if(userData.subscriptions && userData.subscriptions.length > 0) {
                         renderSubscriptions(userData.subscriptions);
                     } else {
-                        renderSubscriptions(mockSubscriptions); // Fallback mẫu
+                        renderSubscriptions(mockSubscriptions); 
                     }
                 })
                 .catch(error => {
                     console.error("Lỗi:", error);
                     showToast("Lỗi kết nối Server. Đang dùng dữ liệu mô phỏng!", true);
-                    
-                    // Nếu không gọi được API, tự động dùng Data mẫu để web không bị trắng
                     renderUserInfo("azu_cinema_fan", "azu.fan@email.com", "USER");
                     renderSubscriptions(mockSubscriptions);
                 });
         }
 
-        // Hàm điền dữ liệu User lên giao diện
         function renderUserInfo(username, email, role) {
             document.getElementById('navUsername').textContent = "Xin chào, " + username;
             document.getElementById('bannerName').textContent = username;
@@ -375,33 +366,35 @@
             document.getElementById('inputRole').value = role;
         }
 
-        // Dữ liệu Gói đăng ký Mẫu (Phòng khi Database chưa có dữ liệu Sub)
         let mockSubscriptions = [
-            { subId: 101, pack: { packName: "Gói 1 tháng", price: 49000 }, startDate: "2026-02-15T00:00:00", endDate: "2026-03-15T23:59:59", status: "ACTIVE" },
-            { subId: 102, pack: { packName: "Gói 3 tháng", price: 129000 }, startDate: null, endDate: null, status: "PENDING" },
-            { subId: 103, pack: { packName: "Gói 1 năm", price: 399000 }, startDate: "2025-01-01T00:00:00", endDate: "2025-12-31T23:59:59", status: "EXPIRED" }
+            { subId: 101, pack: { packName: "Gói 1 tháng", packPrice: 49000 }, startDate: "2026-02-15T00:00:00", endDate: "2026-03-15T23:59:59", status: "ACTIVE" },
+            { subId: 102, pack: { packName: "Gói 3 tháng", packPrice: 129000 }, startDate: null, endDate: null, status: "PENDING" },
+            { subId: 103, pack: { packName: "Gói 1 năm", packPrice: 399000 }, startDate: "2025-01-01T00:00:00", endDate: "2025-12-31T23:59:59", status: "EXPIRED" }
         ];
 
-        // --- RENDER SUBSCRIPTIONS (Chỉ hiển thị nút thanh toán cho PENDING/FAILED) ---
         function renderSubscriptions(subs) {
             const subContainer = document.getElementById('subscriptionContainer');
             subContainer.innerHTML = '';
 
-            subs.forEach((sub, index) => {
+            if (subs.length === 0) {
+                subContainer.innerHTML = '<p style="color: var(--text-secondary);">Bạn chưa đăng ký gói nào.</p>';
+                return;
+            }
+
+            subs.forEach((sub) => {
                 let statusClass = sub.status.toLowerCase();
                 let actionsHtml = '';
                 
-                // Loại bỏ hoàn toàn nút Renew / Cancel Auto-renew
                 if (sub.status === 'FAILED') {
                     actionsHtml = `
                         <div class="sub-actions">
-                            <button class="btn btn-save" onclick="handleSubAction(${index}, 'RETRY')">Retry Payment</button>
+                            <button class="btn btn-save" onclick="handleSubAction(${sub.subId}, 'RETRY', event)">Retry Payment</button>
                         </div>`;
                 } else if (sub.status === 'PENDING') {
                     actionsHtml = `
                         <div class="sub-actions">
-                            <button class="btn btn-save" onclick="handleSubAction(${index}, 'COMPLETE')">Complete Payment</button>
-                            <button class="btn btn-cancel" onclick="handleSubAction(${index}, 'CANCEL_REQ')">Cancel Request</button>
+                            <button class="btn btn-save" onclick="handleSubAction(${sub.subId}, 'COMPLETE', event)">Complete Payment</button>
+                            <button class="btn btn-cancel" onclick="handleSubAction(${sub.subId}, 'CANCEL_REQ', event)">Cancel Request</button>
                         </div>`;
                 }
 
@@ -414,19 +407,13 @@
                         </div>`;
                 }
 
-                // Nếu Backend không trả về price, lấy mặc định từ tên gói
-                let price = sub.pack.price;
-                if (!price) {
-                    if(sub.pack.packName.includes("1 tháng")) price = 49000;
-                    else if(sub.pack.packName.includes("3 tháng")) price = 129000;
-                    else if(sub.pack.packName.includes("1 năm")) price = 399000;
-                    else price = 0;
-                }
+                let price = (sub.pack && sub.pack.packPrice) ? sub.pack.packPrice : 0;
+                let packName = (sub.pack && sub.pack.packName) ? sub.pack.packName : 'Gói không xác định';
 
                 subContainer.innerHTML += `
                     <div class="subscription-card ${sub.status === 'ACTIVE' ? 'premium' : ''}">
                         <div class="sub-header">
-                            <h4>Gói đăng ký #${sub.subId} ${sub.pack ? '- ' + sub.pack.packName : ''}</h4>
+                            <h4>Gói đăng ký #${sub.subId} - ${packName}</h4>
                             <span class="badge ${statusClass}">${sub.status}</span>
                         </div>
                         <p class="sub-desc" style="font-weight: bold; color: #fff;">Giá: ${price.toLocaleString('vi-VN')}đ</p>
@@ -437,26 +424,34 @@
             });
         }
         
-        // Hàm giả lập xử lý click nút Subscription
-        window.handleSubAction = function(index, action) {
-            let sub = mockSubscriptions[index];
-            if (['RETRY', 'COMPLETE'].includes(action)) {
-                if (confirm(`Thanh toán và kích hoạt ${sub.pack.packName}?`)) {
-                    sub.status = 'ACTIVE';
-                    sub.startDate = new Date().toISOString();
-                    sub.endDate = new Date(new Date().setDate(new Date().getDate() + 30)).toISOString();
-                    showToast('Đăng ký thành công!');
+        window.handleSubAction = function(subId, action, event) {
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = "Đang xử lý...";
+            btn.disabled = true;
+
+            setTimeout(() => {
+                if (['RETRY', 'COMPLETE'].includes(action)) {
+                    if (confirm('Xác nhận thanh toán gói này?')) {
+                        showToast('Thanh toán thành công! Đang cập nhật dữ liệu...');
+                        loadUserData(); 
+                    } else {
+                        btn.textContent = originalText;
+                        btn.disabled = false;
+                    }
+                } else if (action === 'CANCEL_REQ') {
+                    if (confirm('Hủy yêu cầu đăng ký này?')) {
+                        showToast('Đã hủy yêu cầu đăng ký!');
+                        loadUserData();
+                    } else {
+                        btn.textContent = originalText;
+                        btn.disabled = false;
+                    }
                 }
-            } else if (action === 'CANCEL_REQ') {
-                if (confirm('Hủy yêu cầu đăng ký này?')) {
-                    sub.status = 'CANCELLED';
-                    showToast('Đã hủy yêu cầu đăng ký!');
-                }
-            }
-            renderSubscriptions(mockSubscriptions);
+            }, 500);
         };
 
-        // Khởi chạy hàm Load dữ liệu khi tải xong trang
+        // Khởi chạy
         loadUserData();
 
         // --- CÁC FORM TƯƠNG TÁC CHÍNH ---
@@ -472,7 +467,7 @@
             });
         });
 
-        // Update Profile (Gửi dữ liệu lên Backend)
+        // Update Profile
         const profileForm = document.getElementById('profileForm');
         if(profileForm) {
             profileForm.addEventListener('submit', (e) => {
@@ -481,7 +476,6 @@
                 const saveBtn = document.getElementById('saveProfileBtn');
                 saveBtn.textContent = "Đang lưu...";
 
-                // Fetch API (PUT) để cập nhật SQL
                 fetch(`${API_URL}/profile/${currentUserId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -489,14 +483,11 @@
                 })
                 .then(res => {
                     if(!res.ok) throw new Error("Cập nhật thất bại");
-                    
                     document.getElementById('navUsername').textContent = "Xin chào, " + newUsername;
                     document.getElementById('bannerName').textContent = newUsername;
                     showToast('Cập nhật Username thành công!');
                 })
                 .catch(err => {
-                    console.error(err);
-                    // Dùng tạm Frontend cập nhật nếu Backend không kết nối được
                     document.getElementById('navUsername').textContent = "Xin chào, " + newUsername;
                     document.getElementById('bannerName').textContent = newUsername;
                     showToast('Đã cập nhật (Dự phòng do lỗi Server)');
@@ -507,7 +498,9 @@
             });
         }
 
-        // Thay đổi Password
+        // ==========================================
+        // UPDATE PASSWORD TỪ DATABASE MYSQL (MỚI SỬA)
+        // ==========================================
         const passwordForm = document.getElementById('passwordForm');
         if (passwordForm) {
             passwordForm.addEventListener('submit', (e) => {
@@ -516,37 +509,44 @@
                 const newPass = document.getElementById('newPassword').value;
                 const confirmPass = document.getElementById('confirmPassword').value;
 
-                if (oldPass !== savedPassword) {
-                    showToast('Lỗi: Mật khẩu hiện tại không chính xác!', true);
-                    return;
-                }
+                // Frontend chỉ làm nhiệm vụ kiểm tra Pass mới và Confirm Pass có khớp không
                 if (newPass !== confirmPass) {
                     showToast('Lỗi: Mật khẩu xác nhận không khớp!', true);
                     return;
                 }
 
                 const btn = document.getElementById('updatePassBtn');
+                const originalText = btn.textContent;
                 btn.textContent = "Đang xử lý...";
+                btn.disabled = true;
 
-                // Fetch API (PUT) gửi Password mới lên Server
+                // Gửi CẢ mật khẩu cũ và mới qua API để Backend kiểm tra Database
                 fetch(`${API_URL}/password/${currentUserId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: newPass })
+                    body: JSON.stringify({ 
+                        oldPassword: oldPass, 
+                        newPassword: newPass 
+                    })
                 })
-                .then(res => {
-                    savedPassword = newPass; // Lưu tạm vào biến Front-end
-                    showToast('Đổi mật khẩu thành công!');
-                    passwordForm.reset();
+                .then(async res => {
+                    // Nếu Backend xác nhận mật khẩu cũ đúng và đã lưu thành công (Mã HTTP 200 OK)
+                    if (res.ok) {
+                        showToast('Đổi mật khẩu thành công!');
+                        passwordForm.reset();
+                    } else {
+                        // Nếu Backend báo lỗi (Ví dụ 400 Bad Request: Mật khẩu cũ sai)
+                        const errorData = await res.json().catch(() => ({}));
+                        throw new Error(errorData.message || "Mật khẩu hiện tại không chính xác!");
+                    }
                 })
                 .catch(err => {
-                    // Dự phòng
-                    savedPassword = newPass; 
-                    showToast('Đã đổi mật khẩu (Dự phòng do lỗi Server)');
-                    passwordForm.reset();
+                    // Hiển thị lỗi từ Backend ra màn hình Toast
+                    showToast(`${err.message}`, true);
                 })
                 .finally(() => {
-                    btn.textContent = "Update password";
+                    btn.textContent = originalText;
+                    btn.disabled = false;
                 });
             });
         }
@@ -577,7 +577,6 @@
             }
         });
     });
-    
     </script>
     </body>
 </html>
