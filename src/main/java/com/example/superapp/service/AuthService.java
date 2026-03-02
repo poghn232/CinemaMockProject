@@ -113,4 +113,32 @@ public class AuthService {
         }
         return sb.toString();
     }
+
+    public void sendForgotOtp(String username) {
+
+        User user = userRepository.findByUsername(username.trim())
+                .orElseThrow(() -> new RuntimeException("Username không tồn tại"));
+
+        otpService.createForgotPasswordOtp(username, user.getEmail());
+    }
+    public void verifyForgotOtp(String username, String otp) {
+
+        boolean valid = otpService.verifyForgotOtp(username, otp);
+
+        if (!valid) {
+            throw new RuntimeException("OTP không hợp lệ hoặc đã hết hạn");
+        }
+    }
+    public void resetPassword(String username, String newPassword) {
+
+        if (newPassword.length() < 6) {
+            throw new RuntimeException("Mật khẩu phải >= 6 ký tự");
+        }
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User không tồn tại"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
 }

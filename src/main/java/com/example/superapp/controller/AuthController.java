@@ -93,11 +93,37 @@ public class AuthController {
         );
     }
 
-    @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
-        authService.forgotPassword(request.getUsername());
+    @PostMapping("/forgot-password/send-otp")
+    public ResponseEntity<?> sendOtp(@RequestBody Map<String, String> request) {
+
+        authService.sendForgotOtp(request.get("username"));
+
         return ResponseEntity.ok(
-                Map.of("message", "Mật khẩu mới đã được gửi qua email")
+                Map.of("message", "OTP đã được gửi về email")
+        );
+    }
+    @PostMapping("/forgot-password/verify")
+    public ResponseEntity<?> verifyOtp(@RequestBody Map<String, String> request) {
+
+        authService.verifyForgotOtp(
+                request.get("username"),
+                request.get("otp")
+        );
+
+        return ResponseEntity.ok(
+                Map.of("message", "OTP hợp lệ")
+        );
+    }
+    @PostMapping("/forgot-password/reset")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+
+        authService.resetPassword(
+                request.get("username"),
+                request.get("newPassword")
+        );
+
+        return ResponseEntity.ok(
+                Map.of("message", "Đổi mật khẩu thành công")
         );
     }
 }
