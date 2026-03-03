@@ -7,6 +7,12 @@
         <link rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
+        <script>
+            if (!localStorage.getItem('token')) {
+                window.location.replace('login.html');
+            }
+        </script>
+
         <style>
         :root {
             --bg-main: #0b1120;
@@ -258,7 +264,7 @@
                 <section id="section-subscription" class="content-section">
                     <h3>My Subscriptions</h3>
                     <div id="subscriptionContainer">
-                        </div>
+                    </div>
                 </section>
 
                 <section id="section-password" class="content-section">
@@ -293,15 +299,12 @@
                         </div>
                         <div class="footer-links">
                             <a href="homepage.html">Trang chủ</a>
-                            <a href="login.html">Đăng nhập</a>
-                            <a href="register.html">Đăng ký</a>
                             <a href="packs.html">Gói Premium</a>
                             <a href="contact.html">Liên hệ</a>
                         </div>
                     </div>
                     <div class="footer-bottom">
-                        © 2025 MovieZone. Dự án demo — Đăng nhập / Đăng ký /
-                        Quên mật khẩu để trải nghiệm.
+                        © 2025 MovieZone. Dự án demo.
                     </div>
                 </footer>
             </div>
@@ -310,9 +313,47 @@
         <script>
     document.addEventListener('DOMContentLoaded', () => {
         
-        // CẤU HÌNH API (Chạy tới Backend Spring Boot)
-        const API_URL = 'http://localhost:8080/api/users';
-        const currentUserId = 1; // ID User đăng nhập (Nên lấy từ Session thực tế)
+        // --- CẤU HÌNH API ---
+        const API_URL = 'http://localhost:8080/api/user';
+        
+        const getToken = () => localStorage.getItem('token') || ''; 
+
+        // ==========================================
+        // 1. KIỂM TRA THỜI HẠN TOKEN LIÊN TỤC
+        // ==========================================
+        function checkTokenExpiration() {
+            const token = getToken();
+            if (!token) {
+                window.location.replace('login.html');
+                return;
+            }
+            try {
+                // Giải mã JWT để lấy thời gian hết hạn (payload.exp)
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                const expTime = payload.exp * 1000; 
+                
+                if (Date.now() >= expTime) {
+                    alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+                    localStorage.removeItem('token');
+                    window.location.replace('login.html');
+                }
+            } catch (e) {
+                localStorage.removeItem('token');
+                window.location.replace('login.html');
+            }
+        }
+
+        // Chạy ngay khi tải trang và lặp lại mỗi 60 giây (60000ms)
+        checkTokenExpiration();
+        setInterval(checkTokenExpiration, 60000);
+
+        // Header đính kèm token để gọi API
+        const getAuthHeaders = () => {
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getToken()}`
+            };
+        };
 
         // --- HÀM TOAST THÔNG BÁO ---
         function showToast(message, isError = false) {
@@ -334,27 +375,36 @@
             setTimeout(() => { toast.classList.remove('show'); }, 3000);
         }
 
-        // --- LẤY DỮ LIỆU TỪ DATABASE SQL BẰNG FETCH API ---
+        // --- LẤY DỮ LIỆU TỪ MYSQL (KHÔNG CÒN MOCK DATA) ---
         function loadUserData() {
-            fetch(`${API_URL}/profile/${currentUserId}`)
-                .then(response => {
-                    if (!response.ok) throw new Error("Server Backend chưa chạy hoặc lỗi API");
-                    return response.json();
-                })
-                .then(userData => {
-                    renderUserInfo(userData.username, userData.email, userData.role);
-                    if(userData.subscriptions && userData.subscriptions.length > 0) {
-                        renderSubscriptions(userData.subscriptions);
-                    } else {
-                        renderSubscriptions(mockSubscriptions); 
-                    }
-                })
-                .catch(error => {
-                    console.error("Lỗi:", error);
-                    showToast("Lỗi kết nối Server. Đang dùng dữ liệu mô phỏng!", true);
-                    renderUserInfo("azu_cinema_fan", "azu.fan@email.com", "USER");
-                    renderSubscriptions(mockSubscriptions);
-                });
+            fetch(`${API_URL}/profile`, {
+                method: 'GET',
+                headers: getAuthHeaders()
+            })
+            .then(response => {
+                if (response.status === 401 || response.status === 403) {
+                    localStorage.removeItem('token');
+                    window.location.replace('login.html');
+                    throw new Error("Hết phiên đăng nhập");
+                }
+                if (!response.ok) throw new Error("Lỗi kết nối Server");
+                return response.json();
+            })
+            .then(userData => {
+                renderUserInfo(userData.username, userData.email, userData.role);
+                
+                if(userData.subscriptions && userData.subscriptions.length > 0) {
+                    renderSubscriptions(userData.subscriptions);
+                } else {
+                    renderSubscriptions([]); 
+                }
+            })
+            .catch(error => {
+                console.error("Lỗi:", error);
+                if (error.message !== "Hết phiên đăng nhập") {
+                    showToast("Lỗi kết nối Server. Vui lòng thử lại sau!", true);
+                }
+            });
         }
 
         function renderUserInfo(username, email, role) {
@@ -366,35 +416,29 @@
             document.getElementById('inputRole').value = role;
         }
 
-        let mockSubscriptions = [
-            { subId: 101, pack: { packName: "Gói 1 tháng", packPrice: 49000 }, startDate: "2026-02-15T00:00:00", endDate: "2026-03-15T23:59:59", status: "ACTIVE" },
-            { subId: 102, pack: { packName: "Gói 3 tháng", packPrice: 129000 }, startDate: null, endDate: null, status: "PENDING" },
-            { subId: 103, pack: { packName: "Gói 1 năm", packPrice: 399000 }, startDate: "2025-01-01T00:00:00", endDate: "2025-12-31T23:59:59", status: "EXPIRED" }
-        ];
-
         function renderSubscriptions(subs) {
             const subContainer = document.getElementById('subscriptionContainer');
             subContainer.innerHTML = '';
 
-            if (subs.length === 0) {
+            if (!subs || subs.length === 0) {
                 subContainer.innerHTML = '<p style="color: var(--text-secondary);">Bạn chưa đăng ký gói nào.</p>';
                 return;
             }
 
             subs.forEach((sub) => {
-                let statusClass = sub.status.toLowerCase();
+                let statusClass = sub.status ? sub.status.toLowerCase() : 'pending';
                 let actionsHtml = '';
                 
                 if (sub.status === 'FAILED') {
                     actionsHtml = `
                         <div class="sub-actions">
-                            <button class="btn btn-save" onclick="handleSubAction(${sub.subId}, 'RETRY', event)">Retry Payment</button>
+                            <button class="btn btn-save" onclick="handleSubAction(${sub.subId}, 'RETRY', event)">Thử thanh toán lại</button>
                         </div>`;
                 } else if (sub.status === 'PENDING') {
                     actionsHtml = `
                         <div class="sub-actions">
-                            <button class="btn btn-save" onclick="handleSubAction(${sub.subId}, 'COMPLETE', event)">Complete Payment</button>
-                            <button class="btn btn-cancel" onclick="handleSubAction(${sub.subId}, 'CANCEL_REQ', event)">Cancel Request</button>
+                            <button class="btn btn-save" onclick="handleSubAction(${sub.subId}, 'COMPLETE', event)">Hoàn tất thanh toán</button>
+                            <button class="btn btn-cancel" onclick="handleSubAction(${sub.subId}, 'CANCEL_REQ', event)">Hủy yêu cầu</button>
                         </div>`;
                 }
 
@@ -423,38 +467,49 @@
                 `;
             });
         }
-        
+
+        // ==========================================
+        // 2. XỬ LÝ THANH TOÁN (GỌI API TỚI BACKEND)
+        // ==========================================
         window.handleSubAction = function(subId, action, event) {
             const btn = event.target;
             const originalText = btn.textContent;
+            let confirmMsg = action === 'CANCEL_REQ' ? 'Hủy yêu cầu đăng ký này?' : 'Xác nhận thanh toán gói này?';
+            
+            if (!confirm(confirmMsg)) return;
+
             btn.textContent = "Đang xử lý...";
             btn.disabled = true;
 
-            setTimeout(() => {
-                if (['RETRY', 'COMPLETE'].includes(action)) {
-                    if (confirm('Xác nhận thanh toán gói này?')) {
-                        showToast('Thanh toán thành công! Đang cập nhật dữ liệu...');
-                        loadUserData(); 
-                    } else {
-                        btn.textContent = originalText;
-                        btn.disabled = false;
-                    }
-                } else if (action === 'CANCEL_REQ') {
-                    if (confirm('Hủy yêu cầu đăng ký này?')) {
-                        showToast('Đã hủy yêu cầu đăng ký!');
-                        loadUserData();
-                    } else {
-                        btn.textContent = originalText;
-                        btn.disabled = false;
-                    }
+            fetch(`${API_URL}/subscription/${subId}/${action}`, { 
+                method: 'POST',
+                headers: getAuthHeaders()
+            })
+            .then(async response => {
+                if (response.status === 401 || response.status === 403) {
+                    localStorage.removeItem('token');
+                    window.location.replace('login.html');
+                    return;
                 }
-            }, 500);
+                const data = await response.json().catch(() => ({}));
+                if (response.ok) {
+                    showToast(data.message || 'Thao tác thành công!');
+                    loadUserData(); 
+                } else {
+                    throw new Error(data.message || "Đã xảy ra lỗi từ hệ thống!");
+                }
+            })
+            .catch(err => {
+                showToast(err.message, true);
+                btn.textContent = originalText;
+                btn.disabled = false;
+            });
         };
 
-        // Khởi chạy
+        // Chạy lúc vào trang
         loadUserData();
 
-        // --- CÁC FORM TƯƠNG TÁC CHÍNH ---
+        // --- 3. CÁC FORM TƯƠNG TÁC ---
 
         // Đăng xuất
         const logoutBtns = document.querySelectorAll('.logout-btn, .btn-logout-full, .nav-link-logout');
@@ -462,7 +517,8 @@
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi MovieZone?')) {
-                    window.location.href = 'login.html';
+                    localStorage.removeItem('token');
+                    window.location.replace('login.html');
                 }
             });
         });
@@ -474,33 +530,42 @@
                 e.preventDefault();
                 const newUsername = document.getElementById('inputUsername').value.trim();
                 const saveBtn = document.getElementById('saveProfileBtn');
+                const originalText = saveBtn.textContent;
+                
                 saveBtn.textContent = "Đang lưu...";
+                saveBtn.disabled = true;
 
-                fetch(`${API_URL}/profile/${currentUserId}`, {
+                fetch(`${API_URL}/profile`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify({ username: newUsername })
                 })
-                .then(res => {
-                    if(!res.ok) throw new Error("Cập nhật thất bại");
-                    document.getElementById('navUsername').textContent = "Xin chào, " + newUsername;
-                    document.getElementById('bannerName').textContent = newUsername;
-                    showToast('Cập nhật Username thành công!');
+                .then(async res => {
+                    if (res.status === 401 || res.status === 403) {
+                        localStorage.removeItem('token');
+                        window.location.replace('login.html');
+                        return;
+                    }
+                    const data = await res.json().catch(() => ({}));
+                    if (res.ok) {
+                        document.getElementById('navUsername').textContent = "Xin chào, " + newUsername;
+                        document.getElementById('bannerName').textContent = newUsername;
+                        showToast(data.message || 'Cập nhật Username thành công!');
+                    } else {
+                        throw new Error(data.message || "Cập nhật thất bại!");
+                    }
                 })
                 .catch(err => {
-                    document.getElementById('navUsername').textContent = "Xin chào, " + newUsername;
-                    document.getElementById('bannerName').textContent = newUsername;
-                    showToast('Đã cập nhật (Dự phòng do lỗi Server)');
+                    showToast(err.message, true);
                 })
                 .finally(() => {
-                    saveBtn.textContent = "Save changes";
+                    saveBtn.textContent = originalText;
+                    saveBtn.disabled = false;
                 });
             });
         }
 
-        // ==========================================
-        // UPDATE PASSWORD TỪ DATABASE MYSQL (MỚI SỬA)
-        // ==========================================
+        // Đổi Mật khẩu
         const passwordForm = document.getElementById('passwordForm');
         if (passwordForm) {
             passwordForm.addEventListener('submit', (e) => {
@@ -509,7 +574,6 @@
                 const newPass = document.getElementById('newPassword').value;
                 const confirmPass = document.getElementById('confirmPassword').value;
 
-                // Frontend chỉ làm nhiệm vụ kiểm tra Pass mới và Confirm Pass có khớp không
                 if (newPass !== confirmPass) {
                     showToast('Lỗi: Mật khẩu xác nhận không khớp!', true);
                     return;
@@ -520,29 +584,30 @@
                 btn.textContent = "Đang xử lý...";
                 btn.disabled = true;
 
-                // Gửi CẢ mật khẩu cũ và mới qua API để Backend kiểm tra Database
-                fetch(`${API_URL}/password/${currentUserId}`, {
+                fetch(`${API_URL}/password`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify({ 
                         oldPassword: oldPass, 
                         newPassword: newPass 
                     })
                 })
                 .then(async res => {
-                    // Nếu Backend xác nhận mật khẩu cũ đúng và đã lưu thành công (Mã HTTP 200 OK)
+                    if (res.status === 401 || res.status === 403) {
+                        localStorage.removeItem('token');
+                        window.location.replace('login.html');
+                        return;
+                    }
+                    const data = await res.json().catch(() => ({}));
                     if (res.ok) {
-                        showToast('Đổi mật khẩu thành công!');
+                        showToast(data.message || 'Đổi mật khẩu thành công!');
                         passwordForm.reset();
                     } else {
-                        // Nếu Backend báo lỗi (Ví dụ 400 Bad Request: Mật khẩu cũ sai)
-                        const errorData = await res.json().catch(() => ({}));
-                        throw new Error(errorData.message || "Mật khẩu hiện tại không chính xác!");
+                        throw new Error(data.message || "Mật khẩu hiện tại không chính xác!");
                     }
                 })
                 .catch(err => {
-                    // Hiển thị lỗi từ Backend ra màn hình Toast
-                    showToast(`${err.message}`, true);
+                    showToast(err.message, true);
                 })
                 .finally(() => {
                     btn.textContent = originalText;
