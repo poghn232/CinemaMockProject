@@ -1,0 +1,34 @@
+<div class="card">
+    <h2>Admin Home</h2>
+    <div style="display:flex; gap:16px; margin-top:12px;">
+        <div style="flex:1; background:rgba(255,255,255,0.02); padding:12px; border-radius:8px;">
+            <div class="muted">Users (non-admin)</div>
+            <div id="homeUsers" style="font-weight:700; font-size:20px; margin-top:8px">--</div>
+        </div>
+        <div style="flex:1; background:rgba(255,255,255,0.02); padding:12px; border-radius:8px;">
+            <div class="muted">Subscription packs</div>
+            <div id="homePacks" style="font-weight:700; font-size:20px; margin-top:8px">--</div>
+        </div>
+    </div>
+
+    <button class="btn"
+    onclick="window.adminApi.loadFragment('admin_users.html')">
+    Manage Users
+</button>
+
+<button class="btn ghost"
+    onclick="window.adminApi.loadFragment('admin_packs.html')">
+    Manage Packs
+</button>
+
+<script data-fragment-script>
+(async function(){
+    const { fetchJson, api } = window.adminApi;
+    try{
+        const users = await fetchJson(api.users) || [];
+        const packs = await fetchJson(api.packs) || [];
+        document.getElementById('homeUsers').textContent = (users.filter(u => u.role !== 'ADMIN').length);
+        document.getElementById('homePacks').textContent = packs.length;
+    }catch(e){ console.error(e); }
+})();
+</script>
