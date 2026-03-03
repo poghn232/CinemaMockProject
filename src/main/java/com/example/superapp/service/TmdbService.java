@@ -128,7 +128,21 @@ public class TmdbService {
         return new MoviePageResponse(items, currentPage, totalPages);
     }
 
-    private static String stringVal(Object value) {
+    public static String stringVal(Object value) {
         return value == null ? null : String.valueOf(value).trim();
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getMovieDetails(long tmdbId) {
+        String url = baseUrl + "/movie/" + tmdbId + "?language=en-US&api_key=" + apiKey;
+        Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+        return response == null ? Map.of() : response;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getTvDetails(long tmdbId) {
+        String url = baseUrl + "/tv/" + tmdbId + "?language=en-US&api_key=" + apiKey;
+        Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+        return response == null ? Map.of() : response;
     }
 }

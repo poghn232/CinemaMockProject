@@ -53,13 +53,14 @@ public class SecurityConfig {
                                 "/css/**", "/js/**", "/images/**", "/favicon.ico",
                                 "/api/auth/**",
                                 "/api/movies/**","/api/contact",
-                                "/api/admin/**",
+                                "/api/public/**",
 
                                 // ✅ VNPay callbacks
                                 "/api/vnpay/**",
                                 "/api/payment/**",      // nếu dùng path này
                                 "/api/payments/**"
                         ).permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 

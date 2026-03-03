@@ -377,6 +377,10 @@
               <div class="stat-label">Subscription packs</div>
               <div class="stat-value" id="countPacks">--</div>
             </div>
+            <div class="stat">
+              <div class="stat-label">Published films</div>
+              <div class="stat-value" id="countFilms">--</div>
+            </div>
           </div>
           <nav class="side-menu">
             <button class="side-item" data-fragment="admin_home_fragment.html">
@@ -387,6 +391,9 @@
             </button>
             <button class="side-item" data-fragment="admin_packs.html">
               Packs
+            </button>
+            <button class="side-item" data-fragment="admin_movies.html">
+              Films
             </button>
           </nav>
         </aside>
@@ -401,10 +408,11 @@
     </div>
 
     <script>
-      // Shared admin JS: loads fragments and provides APIs for user/pack screens
+      // Shared admin JS: loads fragments and provides APIs for user/pack/film screens
       const api = {
         users: "/api/admin/users",
         packs: "/api/packs",
+        movies: "/api/admin/movies",
       };
 
       async function fetchJson(url, opts = {}) {
@@ -471,12 +479,16 @@
         try {
           const users = (await fetchJson(api.users)) || [];
           const packs = (await fetchJson(api.packs)) || [];
+          const films = (await fetchJson(api.movies)) || [];
           const nonAdmin = (users || []).filter(
             (u) => u.role !== "ADMIN",
           ).length;
           document.getElementById("countUsers").textContent = nonAdmin;
           document.getElementById("countPacks").textContent = (
             packs || []
+          ).length;
+          document.getElementById("countFilms").textContent = (
+            films || []
           ).length;
         } catch (e) {
           console.error("refreshCounts", e);
@@ -542,6 +554,11 @@
         refreshCounts,
         loadFragment,
       };
+
+      const footerYear = document.getElementById("footerYear");
+      if (footerYear) {
+        footerYear.textContent = new Date().getFullYear().toString();
+      }
     </script>
   </body>
 </html>
