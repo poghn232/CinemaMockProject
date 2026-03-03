@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>MovieZone | Trang chủ</title>
+    <head>
+        <meta charset="UTF-8">
+        <title>MovieZone | Trang chủ</title>
 
-    <style>
+        <style>
         :root {
             --bg-primary: #020617;
             --bg-elevated: #020617;
@@ -644,40 +644,45 @@
             }
         }
     </style>
-</head>
-<body>
+    </head>
+    <body>
 
-<div class="page-shell">
-    <!-- NAVBAR -->
-    <header class="navbar">
-        <div class="nav-left">
-            <div class="nav-logo">MZ</div>
-            <div class="nav-title">
-                <span class="nav-title-main">MOVIEZONE</span>
-                <span class="nav-title-sub">Find movies, series &amp; more</span>
-            </div>
-        </div>
+        <div class="page-shell">
+            <!-- NAVBAR -->
+            <header class="navbar">
+                <div class="nav-left">
+                    <div class="nav-logo">MZ</div>
+                    <div class="nav-title">
+                        <span class="nav-title-main">MOVIEZONE</span>
+                        <span class="nav-title-sub">Find movies, series &amp;
+                            more</span>
+                    </div>
+                </div>
 
-        <nav class="nav-center">
-            <button class="nav-link active" data-nav="home">Home</button>
-            <button class="nav-link" data-nav="movies">Movie</button>
-            <button class="nav-link" data-nav="tv">TV Series</button>
-            <button class="nav-link" data-nav="history" disabled>History</button>
-            <a href="packs.html" class="nav-link nav-link-premium" id="premiumButton">Go Premium</a>
-            <button class="nav-link" data-nav="profile" disabled>Profile</button>
-            <button class="nav-link nav-link-logout" id="logoutButton" type="button">
-                Logout
-            </button>
-        </nav>
+                <nav class="nav-center">
+                    <button class="nav-link active"
+                        data-nav="home">Home</button>
+                    <button class="nav-link" data-nav="movies">Movie</button>
+                    <button class="nav-link" data-nav="tv">TV Series</button>
+                    <a href="packs.html" class="nav-link nav-link-premium"
+                        id="premiumButton">Go Premium</a>
+                    <a href="profile.html" class="nav-link nav-link-profile"
+                        id="profileButton">Profile</a>
+                    <button class="nav-link nav-link-logout" id="logoutButton"
+                        type="button">
+                        Logout
+                    </button>
+                </nav>
 
-        <div class="nav-right">
-            <span class="nav-username" id="navUsername"></span>
-            <span class="badge-premium" id="premiumBadge" style="display:none;">
-                <span class="badge-premium-dot"></span>
-                Premium
-            </span>
-        </div>
-        <div id="paymentNotice" style="
+                <div class="nav-right">
+                    <span class="nav-username" id="navUsername"></span>
+                    <span class="badge-premium" id="premiumBadge"
+                        style="display:none;">
+                        <span class="badge-premium-dot"></span>
+                        Premium
+                    </span>
+                </div>
+                <div id="paymentNotice" style="
         display:none;
         margin:20px auto;
         max-width:900px;
@@ -686,100 +691,107 @@
         font-size:14px;
         text-align:center;
         font-weight:500;">
-        </div>
-    </header>
-
-    <!-- HERO -->
-    <section class="hero">
-        <div class="search-shell">
-            <div class="search-row">
-                <div class="search-icon">🔍</div>
-                <div class="search-input-wrap">
-                    <input
-                            id="searchInput"
-                            class="search-input"
-                            type="text"
-                            placeholder="Nhập tên phim, TV series, diễn viên..."
-                    >
-                    <span class="search-placeholder-sub">
-                        Tìm nhanh trong tất cả nội dung.
-                    </span>
                 </div>
-                <button class="search-button" id="searchButton">Search</button>
-            </div>
+            </header>
 
-            <div class="social-row-wrapper">
-                <div class="social-row">
-                    <span class="social-label">Theo dõi MovieZone:</span>
-                    <a class="social-pill" href="javascript:void(0)">
-                        <span class="icon">f</span>
-                        <span>Facebook</span>
-                    </a>
-                    <a class="social-pill twitter" href="javascript:void(0)">
-                        <span class="icon">X</span>
-                        <span>Twitter</span>
-                    </a>
-                    <a class="social-pill reddit" href="javascript:void(0)">
-                        <span class="icon">R</span>
-                        <span>Reddit</span>
-                    </a>
+            <!-- HERO -->
+            <section class="hero">
+                <div class="search-shell">
+                    <div class="search-row">
+                        <div class="search-icon">🔍</div>
+                        <div class="search-input-wrap">
+                            <input
+                                id="searchInput"
+                                class="search-input"
+                                type="text"
+                                placeholder="Nhập tên phim, TV series, diễn viên...">
+                            <span class="search-placeholder-sub">
+                                Tìm nhanh trong tất cả nội dung.
+                            </span>
+                        </div>
+                        <button class="search-button"
+                            id="searchButton">Search</button>
+                    </div>
+
+                    <div class="social-row-wrapper">
+                        <div class="social-row">
+                            <span class="social-label">Theo dõi
+                                MovieZone:</span>
+                            <a class="social-pill" href="javascript:void(0)">
+                                <span class="icon">f</span>
+                                <span>Facebook</span>
+                            </a>
+                            <a class="social-pill twitter"
+                                href="javascript:void(0)">
+                                <span class="icon">X</span>
+                                <span>Twitter</span>
+                            </a>
+                            <a class="social-pill reddit"
+                                href="javascript:void(0)">
+                                <span class="icon">R</span>
+                                <span>Reddit</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- ADS: chỉ hiện với user chưa premium -->
-        <div class="ad-wrapper" id="adWrapper">
-            <div class="ad-banner">
-                <div class="ad-text">
-                    <span class="ad-label">Ad · MovieZone Premium</span>
-                    <span class="ad-title">Xem phim không quảng cáo, tốc độ cao.</span>
-                    <span class="ad-subtitle">
-                        Nâng cấp Premium để bỏ quảng cáo, ưu tiên server và mở khóa nhiều nội dung hơn.
-                    </span>
+                <!-- ADS: chỉ hiện với user chưa premium -->
+                <div class="ad-wrapper" id="adWrapper">
+                    <div class="ad-banner">
+                        <div class="ad-text">
+                            <span class="ad-label">Ad · MovieZone Premium</span>
+                            <span class="ad-title">Xem phim không quảng cáo, tốc
+                                độ cao.</span>
+                            <span class="ad-subtitle">
+                                Nâng cấp Premium để bỏ quảng cáo, ưu tiên server
+                                và mở khóa nhiều nội dung hơn.
+                            </span>
+                        </div>
+                        <button class="ad-cta" type="button"
+                            id="adUpgradeButton">
+                            Nâng cấp ngay
+                        </button>
+                    </div>
                 </div>
-                <button class="ad-cta" type="button" id="adUpgradeButton">
-                    Nâng cấp ngay
-                </button>
-            </div>
-        </div>
-    </section>
+            </section>
 
-    <!-- MOVIE GRID -->
-    <section>
-        <div class="section-header">
-            <div>
-                <h2 class="section-title">Tất cả nội dung</h2>
-                <p class="section-subtitle" id="resultCount"></p>
-            </div>
+            <!-- MOVIE GRID -->
+            <section>
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Tất cả nội dung</h2>
+                        <p class="section-subtitle" id="resultCount"></p>
+                    </div>
+                </div>
+
+                <div class="movies-grid" id="moviesGrid">
+                    <!-- Cards render bằng JS -->
+                </div>
+            </section>
+
+            <!-- FOOTER -->
+            <footer class="site-footer">
+                <div class="footer-inner">
+                    <div class="footer-brand">
+                        <div class="footer-logo">MZ</div>
+                        <span class="footer-title">MOVIEZONE</span>
+                    </div>
+                    <div class="footer-links">
+                        <a href="homepage.html">Trang chủ</a>
+                        <a href="login.html">Đăng nhập</a>
+                        <a href="register.html">Đăng ký</a>
+                        <a href="packs.html">Gói Premium</a>
+                        <a href="contact.html">Liên hệ</a>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    © 2025 MovieZone. Dự án demo — Đăng nhập / Đăng ký / Quên
+                    mật khẩu để trải nghiệm.
+                </div>
+            </footer>
         </div>
 
-        <div class="movies-grid" id="moviesGrid">
-            <!-- Cards render bằng JS -->
-        </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer class="site-footer">
-        <div class="footer-inner">
-            <div class="footer-brand">
-                <div class="footer-logo">MZ</div>
-                <span class="footer-title">MOVIEZONE</span>
-            </div>
-            <div class="footer-links">
-                <a href="homepage.html">Trang chủ</a>
-                <a href="login.html">Đăng nhập</a>
-                <a href="register.html">Đăng ký</a>
-                <a href="packs.html">Gói Premium</a>
-                <a href="contact.html">Liên hệ</a>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            © 2025 MovieZone. Dự án demo — Đăng nhập / Đăng ký / Quên mật khẩu để trải nghiệm.
-        </div>
-    </footer>
-</div>
-
-<script>
+        <script>
     // ========== STATE ==========
     let currentFilter = "all"; // all | movie | tv
     let currentSearch = "";
@@ -903,10 +915,15 @@
     }
 
     // ========== NAV / FILTER HANDLERS ==========
+    // ========== NAV / FILTER HANDLERS ==========
     function initNav() {
         const navLinks = document.querySelectorAll(".nav-link");
         navLinks.forEach(link => {
-            link.addEventListener("click", () => {
+            link.addEventListener("click", (e) => {
+                if (link.tagName.toLowerCase() === 'a' || link.id === 'logoutButton') {
+                    return; 
+                }
+
                 const navKey = link.getAttribute("data-nav");
 
                 if (navKey === "home" || navKey === "movies" || navKey === "tv") {
@@ -924,12 +941,10 @@
                     loadMovies(currentFilter);
 
                 } else {
-                    // Profile, History hiện chưa làm backend -> chỉ báo nhẹ
                     alert("Trang này sẽ được bổ sung sau.");
                 }
             });
         });
-
     }
 
     // ========== SEARCH ==========
@@ -1016,6 +1031,5 @@
 
 </script>
 
-</body>
+    </body>
 </html>
-
