@@ -303,6 +303,14 @@
 
 <script>
 
+    const token = localStorage.getItem("token");
+
+    // Nếu chưa login -> đá về login
+    if (!token) {
+        window.location.href = "login.html";
+    }
+
+    // ====== HANDLE SUBMIT ======
     document.getElementById("contactForm").addEventListener("submit", async function (e) {
         e.preventDefault();
 
@@ -327,8 +335,18 @@
         try {
             const response = await fetch("/api/contact", {
                 method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + token
+                },
                 body: formData
             });
+
+            // Nếu token hết hạn -> đá về login
+            if (response.status === 401) {
+                localStorage.removeItem("token");
+                window.location.href = "login.html";
+                return;
+            }
 
             const result = await response.text();
 
