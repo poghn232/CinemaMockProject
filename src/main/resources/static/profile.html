@@ -278,12 +278,14 @@
                         <div class="form-group">
                             <label>New password</label>
                             <input type="password" id="newPassword"
-                                placeholder="Enter new password" required>
+                                placeholder="Enter new password" minlength="6"
+                                required>
                         </div>
                         <div class="form-group">
                             <label>Confirm new password</label>
                             <input type="password" id="confirmPassword"
-                                placeholder="Confirm new password" required>
+                                placeholder="Confirm new password" minlength="6"
+                                required>
                         </div>
                         <div class="form-actions" style="margin-top: 30px;">
                             <button type="submit" class="btn btn-save"
@@ -566,6 +568,7 @@
         }
 
         // Đổi Mật khẩu
+        // Đổi Mật khẩu
         const passwordForm = document.getElementById('passwordForm');
         if (passwordForm) {
             passwordForm.addEventListener('submit', (e) => {
@@ -573,6 +576,12 @@
                 const oldPass = document.getElementById('oldPassword').value;
                 const newPass = document.getElementById('newPassword').value;
                 const confirmPass = document.getElementById('confirmPassword').value;
+
+                // THÊM ĐOẠN KIỂM TRA ĐỘ DÀI NÀY
+                if (newPass.length < 6) {
+                    showToast('Lỗi: Mật khẩu mới phải có ít nhất 6 ký tự!', true);
+                    return;
+                }
 
                 if (newPass !== confirmPass) {
                     showToast('Lỗi: Mật khẩu xác nhận không khớp!', true);
