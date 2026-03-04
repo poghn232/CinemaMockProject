@@ -388,7 +388,7 @@
                 <input type="text" id="username" placeholder="Your Username" required>
             </div>
             <div class="field">
-                <div class="field-label">Mật khẩu</div>
+                <div class="field-label">Password</div>
                 <input type="password" id="password" placeholder="••••••••" required>
             </div>
 
@@ -421,7 +421,7 @@
             });
 
             if (!response.ok) {
-                document.getElementById("error").innerText = "Tài khoản hoặc mật khẩu đã sai";
+                document.getElementById("error").innerText = "Invalid username or password";
                 return;
             }
 
