@@ -38,11 +38,12 @@
     <script data-fragment-script>
         (async function () {
             const { fetchJson, api, titleCase, formatPrice, refreshCounts } =
-                window.adminApi;
+                window.adminApi;// Shared utilities from adminApi
             let packsCache = [];
             let currentPackPage = 1;
             const packPageSize = 5; // change to 10 if you want
 
+            // Render packs with search, sort and pagination
             function renderPacks() {
                 const container = document.getElementById("packs");
                 const q = (document.getElementById("packSearch").value || "")
@@ -94,7 +95,7 @@
 
                     const row = document.createElement("div");
                     row.className = "pack-row";
-
+                    // Pack information
                     row.innerHTML = `
                 <div>
                     <div style="font-weight:600">${name}</div>
@@ -103,7 +104,7 @@
             `;
 
                     const actions = document.createElement("div");
-
+                    // EDIT button
                     const edit = document.createElement("button");
                     edit.className = "btn ghost";
                     edit.textContent = "Edit";
@@ -113,7 +114,7 @@
                         document.getElementById("packPrice").value = p.packPrice;
                         document.getElementById("packDays").value = p.durationDays;
                     });
-
+                    // DELETE button
                     const del = document.createElement("button");
                     del.className = "btn ghost";
                     del.textContent = "Delete";
@@ -167,6 +168,7 @@
                 }
             }
 
+            //load packs from backend
             async function loadPacks() {
                 const container = document.getElementById("packs");
                 container.innerHTML = "Loading...";
@@ -178,7 +180,7 @@
                     console.error(e);
                 }
             }
-
+            // Create or Update Pack
             document
                 .getElementById("packForm")
                 .addEventListener("submit", async (ev) => {
@@ -241,7 +243,7 @@
                     document.getElementById("packId").value = "";
                 });
 
-
+            //Search and Sort
             document
                 .getElementById("packSearch")
                 .addEventListener("input", renderPacks); document

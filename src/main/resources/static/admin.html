@@ -1,10 +1,24 @@
 <!doctype html>
 <html lang="vi">
+  <script>
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      window.location.href = "/login.html";
+    } else {
+      // validate role from token (simple version)
+      const role = localStorage.getItem("role");
+
+      if (role !== "ROLE_ADMIN") {
+        window.location.href = "/login.html";
+      }
+    }
+  </script>
   <head>
     <meta charset="UTF-8" />
     <title>MovieZone | Admin</title>
     <style>
-      /* Shared admin styles extracted from original admin.html */
+      
       :root {
         --bg-primary: #020617;
         --accent: #f97316;
@@ -168,7 +182,7 @@
       .sidebar {
         position: sticky;
         width: 260px;
-        top: 100px; /* same offset as navbar */
+        top: 100px; 
         align-self: flex-start;
         height: fit-content;
       }
@@ -314,7 +328,7 @@
         cursor: pointer;
       }
 
-      /* Style dropdown items */
+      
       select option {
         background: #0f172a;
         color: #e5e7eb;

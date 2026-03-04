@@ -1,8 +1,8 @@
 <div class="card">
   <h2>Films</h2>
   <div class="muted">
-    Quản lý danh sách phim được hiển thị trên trang chính. Dùng Add để import
-    từ TMDB, Hide để ẩn phim đã xuất bản.
+    Quản lý danh sách phim được hiển thị trên trang chính. Dùng Add để import từ
+    TMDB, Hide để ẩn phim đã xuất bản.
   </div>
 
   <!-- ADD FROM TMDB -->
@@ -57,37 +57,62 @@
   </div>
 
   <div id="filmsList" class="packs" style="margin-top: 12px">Loading...</div>
+
+  <div
+    id="filmsPagination"
+    style="
+      margin-top: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+    "
+  >
+    <button id="filmsPrev" class="btn ghost">← Prev</button>
+    <span id="filmsPageInfo" class="muted"></span>
+    <button id="filmsNext" class="btn ghost">Next →</button>
+  </div>
 </div>
 
 <script data-fragment-script>
   (async function () {
-    const { fetchJson, api, refreshCounts } = window.adminApi;
+    const { fetchJson, api, refreshCounts } = window.adminApi;// Shared utilities from adminApi
     let filmsCache = [];
+    let currentPage = 1;
+    const pageSize = 5; 
 
+    // Render films with search and pagination
     function renderFilms() {
       const container = document.getElementById("filmsList");
+      const pageInfo = document.getElementById("filmsPageInfo");
+
       const q = (document.getElementById("filmSearch").value || "")
         .toLowerCase()
         .trim();
 
       let list = (filmsCache || []).slice();
-
+      // Search filter
       if (q) {
-        list = list.filter((f) =>
-          (f.title || "").toLowerCase().includes(q),
-        );
+        list = list.filter((f) => (f.title || "").toLowerCase().includes(q));
       }
-
-      if (!list.length) {
-        container.innerHTML = "No films found.";
-        return;
-      }
-
+      // Sort alphabetically
       list.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+
+      const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const start = (currentPage - 1) * pageSize;
+      const paginated = list.slice(start, start + pageSize);
 
       container.innerHTML = "";
 
-      list.forEach((f) => {
+      if (!paginated.length) {
+        container.innerHTML = "No films found.";
+        pageInfo.textContent = "";
+        return;
+      }
+      // Render each film row
+      paginated.forEach((f) => {
         const row = document.createElement("div");
         row.className = "pack-row";
 
@@ -96,12 +121,12 @@
         const status = f.published ? "Published" : "Hidden";
 
         info.innerHTML = `
-          <div style="font-weight:600">${f.title}</div>
-          <div class="muted">${typeLabel} · ${status}</div>
-        `;
+      <div style="font-weight:600">${f.title}</div>
+      <div class="muted">${typeLabel} · ${status}</div>
+    `;
 
         const actions = document.createElement("div");
-
+        // Hide button (only if published
         const hideBtn = document.createElement("button");
         hideBtn.className = "btn ghost";
         hideBtn.textContent = f.published ? "Hide" : "Hidden";
@@ -121,13 +146,14 @@
         });
 
         actions.appendChild(hideBtn);
-
         row.appendChild(info);
         row.appendChild(actions);
         container.appendChild(row);
       });
-    }
 
+      pageInfo.textContent = `Page ${currentPage} / ${totalPages}`;
+    }
+    // Load films from backend
     async function loadFilms() {
       const container = document.getElementById("filmsList");
       container.innerHTML = "Loading...";
@@ -140,13 +166,14 @@
       }
     }
 
-    document
-      .getElementById("filmSearch")
-      .addEventListener("input", renderFilms);
+    document.getElementById("filmSearch").addEventListener("input", () => {
+      currentPage = 1;
+      renderFilms();
+    });
     document
       .getElementById("refreshFilms")
       .addEventListener("click", loadFilms);
-
+    //Import films from TMDB
     document
       .getElementById("tmdbAddButton")
       .addEventListener("click", async () => {
@@ -185,7 +212,21 @@
         }
       });
 
+    document.getElementById("filmsPrev").addEventListener("click", () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderFilms();
+      }
+    });
+
+    document.getElementById("filmsNext").addEventListener("click", () => {
+      const totalPages = Math.ceil(filmsCache.length / pageSize);
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderFilms();
+      }
+    });
+
     await loadFilms();
   })();
 </script>
-
