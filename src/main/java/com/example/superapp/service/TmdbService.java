@@ -1,6 +1,7 @@
 package com.example.superapp.service;
 
 import com.example.superapp.dto.MovieItemDto;
+import com.example.superapp.dto.MoviePageResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -33,22 +34,38 @@ public class TmdbService {
      * @param type "all" | "movie" | "tv"
      */
     @SuppressWarnings("unchecked")
-    public List<MovieItemDto> getTrending(String type) {
+    public MoviePageResponse getTrending(String type, int page) {
         String mediaType = type == null || type.isBlank() ? "all" : type.trim().toLowerCase();
         if (!mediaType.equals("movie") && !mediaType.equals("tv")) {
             mediaType = "all";
         }
 
-        String url = baseUrl + "/trending/" + mediaType + "/day?language=en-US&api_key=" + apiKey;
+        int safePage = page <= 0 ? 1 : page;
+
+        String url =
+                baseUrl
+                        + "/trending/"
+                        + mediaType
+                        + "/day?language=en-US&page="
+                        + safePage
+                        + "&api_key="
+                        + apiKey;
 
         Map<String, Object> response = restTemplate.getForObject(url, Map.class);
         if (response == null) {
-            return List.of();
+            return new MoviePageResponse(List.of(), safePage, 1);
         }
+
+        Object pageObj = response.get("page");
+        Object totalPagesObj = response.get("total_pages");
+
+        int currentPage = (pageObj instanceof Number n) ? n.intValue() : safePage;
+        int totalPages =
+                (totalPagesObj instanceof Number n) ? Math.max(1, n.intValue()) : 1;
 
         Object resultsObj = response.get("results");
         if (!(resultsObj instanceof List<?> rawList)) {
-            return List.of();
+            return new MoviePageResponse(List.of(), currentPage, totalPages);
         }
 
         List<MovieItemDto> items = new ArrayList<>();
@@ -107,10 +124,25 @@ public class TmdbService {
                 items.add(dto);
             }
         }
-        return items;
+
+        return new MoviePageResponse(items, currentPage, totalPages);
     }
 
-    private static String stringVal(Object value) {
+    public static String stringVal(Object value) {
         return value == null ? null : String.valueOf(value).trim();
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getMovieDetails(long tmdbId) {
+        String url = baseUrl + "/movie/" + tmdbId + "?language=en-US&api_key=" + apiKey;
+        Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+        return response == null ? Map.of() : response;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getTvDetails(long tmdbId) {
+        String url = baseUrl + "/tv/" + tmdbId + "?language=en-US&api_key=" + apiKey;
+        Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+        return response == null ? Map.of() : response;
     }
 }

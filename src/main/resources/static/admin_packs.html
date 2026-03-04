@@ -1,0 +1,272 @@
+<div class="card">
+    <h2>Subscription packs</h2>
+    <div class="muted">View/Edit/Delete Subscription Packs</div>
+    <div style="display: flex; gap: 8px; margin-top: 12px; align-items: center">
+
+        <input id="packSearch" type="text" placeholder="Search by pack name"
+            style="flex: 1; padding: 8px; border-radius: 8px" />
+
+        <select id="packSortField" style="padding: 8px; border-radius: 8px">
+            <option value="name">Name</option>
+            <option value="price">Price</option>
+            <option value="days">Duration</option>
+        </select>
+
+        <button id="packSortDir" class="btn ghost" data-dir="asc">
+            ↑
+        </button>
+    </div>
+
+
+    <div id="packs" class="packs" style="margin-top: 12px">Loading...</div>
+    <div id="packPagination" style="margin-top:12px; display:flex; gap:8px; align-items:center;">
+    </div>
+</div>
+<div class="card" style="margin-top: 16px">
+    <h2>Create / Edit Pack</h2>
+    <form id="packForm" class="pack-form">
+        <input type="hidden" id="packId" />
+        <input type="text" id="packName" placeholder="Pack name" required />
+        <input id="packPrice" type="number" step="0.01" placeholder="Price" required />
+        <input id="packDays" type="number" placeholder="Duration days" required />
+        <div style="display: flex; gap: 8px; margin-top: 8px">
+            <button class="btn" id="savePack">Save</button>
+            <button class="btn ghost" id="resetPack" type="button">Reset</button>
+        </div>
+    </form>
+
+    <script data-fragment-script>
+        (async function () {
+            const { fetchJson, api, titleCase, formatPrice, refreshCounts } =
+                window.adminApi;
+            let packsCache = [];
+            let currentPackPage = 1;
+            const packPageSize = 5; // change to 10 if you want
+
+            function renderPacks() {
+                const container = document.getElementById("packs");
+                const q = (document.getElementById("packSearch").value || "")
+                    .toLowerCase()
+                    .trim();
+
+
+                let list = (packsCache || []).slice();
+
+                // ===== SEARCH =====
+                if (q) {
+                    list = list.filter((p) =>
+                        (p.packName || "").toLowerCase().includes(q),
+                    );
+                }
+
+                // ===== SORT =====
+                const field = document.getElementById("packSortField").value;
+                const dir = document.getElementById("packSortDir").dataset.dir;
+
+                if (field === "name") {
+                    list.sort((a, b) =>
+                        (a.packName || "").localeCompare(b.packName || "")
+                    );
+                } else if (field === "price") {
+                    list.sort((a, b) => a.packPrice - b.packPrice);
+                } else if (field === "days") {
+                    list.sort((a, b) => a.durationDays - b.durationDays);
+                }
+
+                if (dir === "desc") {
+                    list.reverse();
+                }
+
+                // ===== PAGINATION =====
+                const totalPages = Math.ceil(list.length / packPageSize);
+                if (currentPackPage > totalPages) currentPackPage = 1;
+
+                const start = (currentPackPage - 1) * packPageSize;
+                const end = start + packPageSize;
+                const paginatedList = list.slice(start, end);
+
+                // ===== RENDER =====
+                container.innerHTML = "";
+
+                paginatedList.forEach((p) => {
+                    const name = titleCase(String(p.packName || ""));
+                    const price = formatPrice(p.packPrice);
+
+                    const row = document.createElement("div");
+                    row.className = "pack-row";
+
+                    row.innerHTML = `
+                <div>
+                    <div style="font-weight:600">${name}</div>
+                    <div class="muted">${p.durationDays} days - $${price}</div>
+                </div>
+            `;
+
+                    const actions = document.createElement("div");
+
+                    const edit = document.createElement("button");
+                    edit.className = "btn ghost";
+                    edit.textContent = "Edit";
+                    edit.addEventListener("click", () => {
+                        document.getElementById("packId").value = p.packId;
+                        document.getElementById("packName").value = p.packName;
+                        document.getElementById("packPrice").value = p.packPrice;
+                        document.getElementById("packDays").value = p.durationDays;
+                    });
+
+                    const del = document.createElement("button");
+                    del.className = "btn ghost";
+                    del.textContent = "Delete";
+                    del.addEventListener("click", async () => {
+                        if (!confirm("Delete pack?")) return;
+                        await fetchJson(api.packs + "/" + p.packId, { method: "DELETE" });
+                        await loadPacks();
+                        refreshCounts();
+                    });
+
+                    actions.appendChild(edit);
+                    actions.appendChild(del);
+                    row.appendChild(actions);
+                    container.appendChild(row);
+                });
+
+                if (list.length === 0) {
+                    container.innerHTML = "No packs found";
+                }
+
+                // ===== RENDER PAGINATION =====
+                const pagination = document.getElementById('packPagination');
+                pagination.innerHTML = '';
+
+                if (totalPages > 1) {
+
+                    const prev = document.createElement('button');
+                    prev.className = 'btn ghost';
+                    prev.textContent = 'Prev';
+                    prev.disabled = currentPackPage === 1;
+                    prev.onclick = () => {
+                        currentPackPage--;
+                        renderPacks();
+                    };
+
+                    const info = document.createElement('span');
+                    info.textContent = `Page ${currentPackPage} of ${totalPages}`;
+
+                    const next = document.createElement('button');
+                    next.className = 'btn ghost';
+                    next.textContent = 'Next';
+                    next.disabled = currentPackPage === totalPages;
+                    next.onclick = () => {
+                        currentPackPage++;
+                        renderPacks();
+                    };
+
+                    pagination.appendChild(prev);
+                    pagination.appendChild(info);
+                    pagination.appendChild(next);
+                }
+            }
+
+            async function loadPacks() {
+                const container = document.getElementById("packs");
+                container.innerHTML = "Loading...";
+                try {
+                    packsCache = (await fetchJson(api.packs)) || [];
+                    renderPacks();
+                } catch (e) {
+                    container.innerHTML = "Failed to load packs";
+                    console.error(e);
+                }
+            }
+
+            document
+                .getElementById("packForm")
+                .addEventListener("submit", async (ev) => {
+
+                    ev.preventDefault();
+
+                    const id = document.getElementById("packId").value;
+
+                    const dto = {
+                        packName: document.getElementById("packName").value,
+                        packPrice: parseFloat(
+                            document.getElementById("packPrice").value
+                        ),
+                        durationDays: parseInt(
+                            document.getElementById("packDays").value
+                        )
+                    };
+
+                    try {
+
+                        if (id) {
+                            // UPDATE
+                            await fetchJson(api.packs + "/" + id, {
+                                method: "PUT",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify(dto)
+                            });
+
+                        } else {
+                            // CREATE
+                            await fetchJson(api.packs, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify(dto)
+                            });
+                        }
+
+                        document.getElementById("packForm").reset();
+                        document.getElementById("packId").value = "";
+
+                        await loadPacks();
+                        refreshCounts();
+
+                    } catch (e) {
+                        alert("Save failed: " + e);
+                    }
+                });
+
+            // ============================
+            // RESET
+            // ============================
+            document
+                .getElementById("resetPack")
+                .addEventListener("click", () => {
+                    document.getElementById("packForm").reset();
+                    document.getElementById("packId").value = "";
+                });
+
+
+            document
+                .getElementById("packSearch")
+                .addEventListener("input", renderPacks); document
+                    .getElementById("packSearch")
+                    .addEventListener("input", () => {
+                        currentPackPage = 1;
+                        renderPacks();
+                    });
+
+            document
+                .getElementById("packSortField")
+                .addEventListener("change", renderPacks);
+
+            document
+                .getElementById("packSortDir")
+                .addEventListener("click", function () {
+                    const current = this.dataset.dir;
+                    const newDir = current === "asc" ? "desc" : "asc";
+                    this.dataset.dir = newDir;
+                    this.textContent = newDir === "asc" ? "↑" : "↓";
+                    renderPacks();
+                });
+
+            await loadPacks();
+        })();
+    </script>
+</div>
+</div>

@@ -466,6 +466,50 @@
             gap: 18px 18px;
         }
 
+        /* PAGINATION */
+        .pagination {
+            margin-top: 22px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+        }
+
+        .page-button {
+            min-width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.6);
+            background: rgba(15, 23, 42, 0.96);
+            color: var(--text-subtle);
+            cursor: pointer;
+            padding: 0 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.16s ease;
+        }
+
+        .page-button:hover:not(.disabled):not(.active) {
+            border-color: var(--accent-strong);
+            color: var(--text-main);
+        }
+
+        .page-button.active {
+            background: linear-gradient(135deg, #f97316, #ec4899);
+            color: white;
+            border-color: transparent;
+            box-shadow:
+                    0 10px 22px rgba(248, 113, 113, 0.6),
+                    0 0 0 1px rgba(248, 113, 113, 0.7);
+        }
+
+        .page-button.disabled {
+            opacity: 0.4;
+            cursor: default;
+        }
+
         .movie-card {
             background: rgba(15, 23, 42, 0.96);
             border-radius: 16px;
@@ -662,12 +706,17 @@
             <button class="nav-link active" data-nav="home">Home</button>
             <button class="nav-link" data-nav="movies">Movie</button>
             <button class="nav-link" data-nav="tv">TV Series</button>
-            <button class="nav-link" data-nav="history" disabled>History</button>
-            <a href="packs.html" class="nav-link nav-link-premium" id="premiumButton">Go Premium</a>
-            <button class="nav-link" data-nav="profile" disabled>Profile</button>
-            <button class="nav-link nav-link-logout" id="logoutButton" type="button">
+
+            <!-- Các mục chỉ hiện khi đã đăng nhập -->
+            <button class="nav-link" data-nav="history" data-auth="auth" disabled>History</button>
+            <a href="packs.html" class="nav-link nav-link-premium" id="premiumButton" data-auth="auth">Go Premium</a>
+            <a href="profile.html" class="nav-link nav-link-profile" id="profileButton">Profile</a>
+            <button class="nav-link nav-link-logout" id="logoutButton" type="button" data-auth="auth"> 
                 Logout
             </button>
+
+            <!-- Nút Login chỉ hiện khi CHƯA đăng nhập -->
+            <a href="login.html" class="nav-link" id="loginNav" data-auth="guest">Login</a>
         </nav>
 
         <div class="nav-right">
@@ -676,16 +725,6 @@
                 <span class="badge-premium-dot"></span>
                 Premium
             </span>
-        </div>
-        <div id="paymentNotice" style="
-        display:none;
-        margin:20px auto;
-        max-width:900px;
-        padding:14px 18px;
-        border-radius:12px;
-        font-size:14px;
-        text-align:center;
-        font-weight:500;">
         </div>
     </header>
 
@@ -756,25 +795,20 @@
         <div class="movies-grid" id="moviesGrid">
             <!-- Cards render bằng JS -->
         </div>
+
+        <!-- PAGINATION -->
+        <div class="pagination" id="pagination"></div>
     </section>
 
     <!-- FOOTER -->
     <footer class="site-footer">
         <div class="footer-inner">
             <div class="footer-brand">
-                <div class="footer-logo">MZ</div>
-                <span class="footer-title">MOVIEZONE</span>
-            </div>
-            <div class="footer-links">
-                <a href="homepage.html">Trang chủ</a>
-                <a href="login.html">Đăng nhập</a>
-                <a href="register.html">Đăng ký</a>
-                <a href="packs.html">Gói Premium</a>
-                <a href="contact.html">Liên hệ</a>
+                <span class="footer-title">MovieZone · Xem phim chill mỗi ngày.</span>
             </div>
         </div>
         <div class="footer-bottom">
-            © 2025 MovieZone. Dự án demo — Đăng nhập / Đăng ký / Quên mật khẩu để trải nghiệm.
+            © <span id="footerYear"></span> MovieZone. Dự án web chiếu phim online.
         </div>
     </footer>
 </div>
@@ -783,11 +817,17 @@
     let currentFilter = "all"; // all | movie | tv
     let currentSearch = "";
     let movies = [];
+    let currentPage = 1;
+    let totalPages = 1;
 
-    async function loadMovies(type) {
+    const MAX_VISIBLE_PAGES = 5;
+
+    async function loadMovies(type, page = 1) {
         const normalizedType = type || "all";
+        const targetPage = page <= 0 ? 1 : page;
         const countEl = document.getElementById("resultCount");
         const grid = document.getElementById("moviesGrid");
+        const paginationEl = document.getElementById("pagination");
 
         if (countEl) {
             countEl.textContent = "Đang tải danh sách phim...";
@@ -795,14 +835,21 @@
         if (grid) {
             grid.innerHTML = "";
         }
+        if (paginationEl) {
+            paginationEl.innerHTML = "";
+        }
 
         try {
-            const res = await fetch(`/api/movies/trending?type=${encodeURIComponent(normalizedType)}`);
+            const res = await fetch(`/api/public/movies?type=${encodeURIComponent(normalizedType)}&page=${targetPage}`);
             if (!res.ok) {
                 throw new Error("Không tải được dữ liệu (" + res.status + ")");
             }
             const data = await res.json();
-            movies = Array.isArray(data) ? data : [];
+
+            movies = Array.isArray(data.items) ? data.items : [];
+            currentPage = typeof data.page === "number" ? data.page : targetPage;
+            totalPages = typeof data.totalPages === "number" ? data.totalPages : 1;
+
             renderMovies();
         } catch (e) {
             movies = [];
@@ -812,29 +859,81 @@
         }
     }
 
-    function isPremium() {
-        // Tạm thời dùng localStorage; sau này sẽ nối với API/profile thật
-        return localStorage.getItem("isPremium") === "true";
+    async function fetchPremiumInfo() {
+        const token = localStorage.getItem("token");
+        const hasToken = !!token;
+
+        if (!hasToken) {
+            return {
+                isLoggedIn: false,
+                isPremium: false,
+                username: "Guest",
+            };
+        }
+
+        try {
+            const res = await fetch("/api/user/profile", {
+                headers: {
+                    "Authorization": "Bearer " + token,
+                },
+            });
+
+            if (!res.ok) {
+                throw new Error("Profile error " + res.status);
+            }
+
+            const data = await res.json();
+            const subs = Array.isArray(data.subscriptions) ? data.subscriptions : [];
+            const hasActive = subs.some(s => s && s.status === "ACTIVE");
+
+            const usernameFromApi = data.username || localStorage.getItem("username") || "User";
+
+            return {
+                isLoggedIn: true,
+                isPremium: hasActive,
+                username: usernameFromApi,
+            };
+        } catch (e) {
+            const fallbackName = localStorage.getItem("username") || "User";
+            return {
+                isLoggedIn: true,
+                isPremium: false,
+                username: fallbackName,
+            };
+        }
     }
 
-    function initUserUi() {
-        const username = localStorage.getItem("username") || "Guest";
+    async function initUserUi() {
         const usernameEl = document.getElementById("navUsername");
         const premiumBadge = document.getElementById("premiumBadge");
         const premiumButton = document.getElementById("premiumButton");
         const adWrapper = document.getElementById("adWrapper");
+        const authOnlyEls = document.querySelectorAll("[data-auth='auth']");
+        const guestOnlyEls = document.querySelectorAll("[data-auth='guest']");
+
+        const info = await fetchPremiumInfo();
 
         if (usernameEl) {
-            usernameEl.textContent = "Xin chào, " + username;
+            usernameEl.textContent = "Xin chào, " + info.username;
         }
 
-        if (isPremium()) {
+        // Ẩn/hiện các mục navbar theo trạng thái đăng nhập
+        authOnlyEls.forEach(el => {
+            el.style.display = info.isLoggedIn ? "" : "none";
+        });
+        guestOnlyEls.forEach(el => {
+            el.style.display = info.isLoggedIn ? "none" : "";
+        });
+
+        if (info.isLoggedIn && info.isPremium) {
             if (premiumBadge) premiumBadge.style.display = "inline-flex";
             if (premiumButton) premiumButton.style.display = "none";
             if (adWrapper) adWrapper.style.display = "none";
         } else {
             if (premiumBadge) premiumBadge.style.display = "none";
-            if (premiumButton) premiumButton.style.display = "inline-flex";
+            // Nút Go Premium trên navbar chỉ hiện với user đã login nhưng chưa premium
+            if (premiumButton) premiumButton.style.display = info.isLoggedIn ? "inline-flex" : "none";
+            // Quảng cáo hiện cho mọi user chưa premium (kể cả guest)
             if (adWrapper) adWrapper.style.display = "block";
         }
     }
@@ -891,14 +990,99 @@
                     </div>
                 </div>
             `;
+
+            // Khi click vào card: nếu chưa đăng nhập thì yêu cầu login,
+            // nếu đã đăng nhập thì sau này sẽ chuyển sang trang chi tiết.
+            card.addEventListener("click", () => {
+                handleMovieClick(movie);
+            });
+
             grid.appendChild(card);
         });
 
         if (countEl) {
+            const totalStr =
+                totalPages && totalPages > 1
+                    ? `Trang ${currentPage}/${totalPages} — `
+                    : "";
+
             countEl.textContent = filtered.length
-                ? `${filtered.length} kết quả hiển thị`
+                ? `${totalStr}${filtered.length} kết quả hiển thị`
                 : "Không tìm thấy nội dung phù hợp.";
         }
+
+        renderPagination();
+    }
+
+    function renderPagination() {
+        const paginationEl = document.getElementById("pagination");
+        if (!paginationEl) return;
+
+        paginationEl.innerHTML = "";
+
+        if (!totalPages || totalPages <= 1) {
+            return; // Không cần phân trang
+        }
+
+        const safeTotal = Math.max(1, totalPages);
+
+        const maxPagesToShow = Math.min(MAX_VISIBLE_PAGES, safeTotal);
+
+        let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+        let endPage = startPage + maxPagesToShow - 1;
+
+        if (endPage > safeTotal) {
+            endPage = safeTotal;
+            startPage = Math.max(1, endPage - maxPagesToShow + 1);
+        }
+
+        const createBtn = (label, page, options = {}) => {
+            const btn = document.createElement("button");
+            btn.textContent = label;
+            btn.className = "page-button";
+
+            if (options.disabled) {
+                btn.classList.add("disabled");
+            } else if (options.active) {
+                btn.classList.add("active");
+            } else {
+                btn.addEventListener("click", () => {
+                    if (page !== currentPage) {
+                        loadMovies(currentFilter, page);
+                    }
+                });
+            }
+
+            paginationEl.appendChild(btn);
+        };
+
+        // Previous
+        createBtn("«", currentPage - 1, { disabled: currentPage <= 1 });
+
+        for (let p = startPage; p <= endPage; p++) {
+            createBtn(String(p), p, { active: p === currentPage });
+        }
+
+        // Next
+        createBtn("»", currentPage + 1, { disabled: currentPage >= safeTotal });
+    }
+
+    // ========== MOVIE DETAIL (YÊU CẦU LOGIN) ==========
+    function handleMovieClick(movie) {
+        const token = localStorage.getItem("token");
+        const isLoggedIn = !!token;
+
+        if (!isLoggedIn) {
+            const goLogin = confirm("Bạn cần đăng nhập để xem chi tiết phim. Chuyển tới trang đăng nhập?");
+            if (goLogin) {
+                window.location.href = "login.html";
+            }
+            return;
+        }
+
+        // Đã đăng nhập: sau này sẽ forward sang trang chi tiết phim.
+        // Hiện tại chỉ báo tạm để tránh trống chức năng.
+        alert("Chức năng xem chi tiết phim sẽ được bổ sung sau.");
     }
 
     // ========== NAV / FILTER HANDLERS ==========
@@ -907,6 +1091,11 @@
         navLinks.forEach(link => {
             link.addEventListener("click", () => {
                 const navKey = link.getAttribute("data-nav");
+
+                // Các link không có data-nav (như Login) giữ hành vi mặc định
+                if (!navKey) {
+                    return;
+                }
 
                 if (navKey === "home" || navKey === "movies" || navKey === "tv") {
                     navLinks.forEach(l => l.classList.remove("active"));
@@ -920,7 +1109,8 @@
                     } else if (navKey === "tv") {
                         currentFilter = "tv";
                     }
-                    loadMovies(currentFilter);
+                    currentPage = 1;
+                    loadMovies(currentFilter, currentPage);
 
                 } else {
                     // Profile, History hiện chưa làm backend -> chỉ báo nhẹ
@@ -978,41 +1168,19 @@
         }
     }
 
-    function showPaymentNotice() {
-        const params = new URLSearchParams(window.location.search);
-        const status = params.get("payment");
-
-        const notice = document.getElementById("paymentNotice");
-        if (!notice || !status) return;
-
-        notice.style.display = "block";
-
-        if (status === "success") {
-            notice.style.background = "rgba(34,197,94,0.15)";
-            notice.style.border = "1px solid rgba(34,197,94,0.5)";
-            notice.style.color = "#22c55e";
-            notice.innerText = "🎉 Bạn đã mua gói Premium thành công!";
-        } else {
-            notice.style.background = "rgba(239,68,68,0.15)";
-            notice.style.border = "1px solid rgba(239,68,68,0.5)";
-            notice.style.color = "#ef4444";
-            notice.innerText = "❌ Thanh toán thất bại hoặc có lỗi xảy ra.";
+    // ========== INIT ==========
+    (async function init() {
+        const yearEl = document.getElementById("footerYear");
+        if (yearEl) {
+            yearEl.textContent = new Date().getFullYear().toString();
         }
 
-        // Xóa query param khỏi URL (cho đẹp)
-        window.history.replaceState({}, document.title, window.location.pathname);
-    }
-
-    // ========== INIT ==========
-    (function init() {
-        initUserUi();
+        await initUserUi();
         initNav();
         initSearch();
         initPremiumAndLogout();
-        loadMovies(currentFilter);
-        showPaymentNotice();
+        loadMovies(currentFilter, currentPage);
     })();
-
 </script>
 
 </body>

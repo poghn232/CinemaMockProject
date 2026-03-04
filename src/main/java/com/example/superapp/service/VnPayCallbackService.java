@@ -1,10 +1,7 @@
 package com.example.superapp.service;
 
 import com.example.superapp.config.VnPayProperties;
-import com.example.superapp.entity.Payment;
-import com.example.superapp.entity.PaymentStatus;
-import com.example.superapp.entity.Subscription;
-import com.example.superapp.entity.SubscriptionStatus;
+import com.example.superapp.entity.*;
 import com.example.superapp.repository.PaymentRepository;
 import com.example.superapp.repository.SubscriptionRepository;
 import com.example.superapp.utils.VnPayUtil;
@@ -23,7 +20,7 @@ public class VnPayCallbackService {
     private final VnPayProperties vnp;
     private final PaymentRepository paymentRepo;
     private final SubscriptionRepository subRepo;
-
+    private final EmailService emailService;
     @Transactional
     public void handleCallback(Map<String, String> allParams) {
         // 1) tách secureHash
@@ -65,6 +62,21 @@ public class VnPayCallbackService {
             Integer durationDays = sub.getPack().getDurationDays();
             if (durationDays == null) durationDays = 30;
             sub.setEndDate(start.plusDays(durationDays));
+            User user = sub.getUser();
+            SubscriptionPack pack = sub.getPack();
+
+            try {
+                emailService.sendSubscriptionSuccessEmail(
+                        user.getEmail(),
+                        user.getUsername(),
+                        pack.getPackName(),
+                        pack.getPackPrice(),
+                        sub.getStartDate(),
+                        sub.getEndDate()
+                );
+            } catch (Exception e) {
+                e.printStackTrace(); // chỉ log thôi
+            }
 
             subRepo.save(sub);
             paymentRepo.save(payment);

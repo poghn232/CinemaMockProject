@@ -28,6 +28,15 @@ public class TvSeries {
 
     private LocalDate firstAirDate;
 
+    @Column(nullable = false)
+    private Boolean active = true;
+
+    @Column(nullable = false)
+    private Boolean published = false;
+
+    @Column(nullable = false)
+    private Boolean featured = false;
+
     /* ================= RELATIONSHIPS ================= */
 
     @ManyToMany
@@ -51,4 +60,92 @@ public class TvSeries {
 
     @OneToMany(mappedBy = "tvSeries", cascade = CascadeType.ALL)
     private Set<Season> seasons = new HashSet<>();
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getOverview() {
+        return overview;
+    }
+
+    public void setOverview(String overview) {
+        this.overview = overview;
+    }
+
+    public String getPosterPath() {
+        return posterPath;
+    }
+
+    public void setPosterPath(String posterPath) {
+        this.posterPath = posterPath;
+    }
+
+    public String getBackdropPath() {
+        return backdropPath;
+    }
+
+    public void setBackdropPath(String backdropPath) {
+        this.backdropPath = backdropPath;
+    }
+
+    public Double getVoteAverage() {
+        return voteAverage;
+    }
+
+    public void setVoteAverage(Double voteAverage) {
+        this.voteAverage = voteAverage;
+    }
+
+    public Integer getVoteCount() {
+        return voteCount;
+    }
+
+    public void setVoteCount(Integer voteCount) {
+        this.voteCount = voteCount;
+    }
+
+    public LocalDate getFirstAirDate() {
+        return firstAirDate;
+    }
+
+    public void setFirstAirDate(LocalDate firstAirDate) {
+        this.firstAirDate = firstAirDate;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+    public Boolean getPublished() {
+        return published;
+    }
+
+    public void setPublished(Boolean published) {
+        this.published = published;
+    }
+
+    public Boolean getFeatured() {
+        return featured;
+    }
+
+    public void setFeatured(Boolean featured) {
+        this.featured = featured;
+    }
 }
