@@ -168,7 +168,7 @@
     <body>
         <div id="toastNotification" class="toast">
             <i id="toastIcon" class="fas fa-check-circle"></i> <span
-                id="toastMessage">Thành công!</span>
+                id="toastMessage">Success!</span>
         </div>
 
         <header class="navbar">
@@ -190,15 +190,15 @@
                     type="button">Logout</button>
             </nav>
             <div class="nav-right">
-                <span class="nav-username" id="navUsername">Đang tải...</span>
+                <span class="nav-username" id="navUsername">Loading...</span>
             </div>
         </header>
 
         <div class="profile-banner">
             <div class="banner-container">
                 <div class="user-info">
-                    <h2 id="bannerName">Đang tải...</h2>
-                    <p id="bannerRole">Đang tải...</p>
+                    <h2 id="bannerName">Loading...</h2>
+                    <p id="bannerRole">Loading...</p>
                 </div>
             </div>
         </div>
@@ -300,13 +300,13 @@
                             <span class="footer-title">MOVIEZONE</span>
                         </div>
                         <div class="footer-links">
-                            <a href="homepage.html">Trang chủ</a>
-                            <a href="packs.html">Gói Premium</a>
-                            <a href="contact.html">Liên hệ</a>
+                            <a href="homepage.html">Home</a>
+                            <a href="packs.html">Premium Plan</a>
+                            <a href="contact.html">Contact</a>
                         </div>
                     </div>
                     <div class="footer-bottom">
-                        © 2025 MovieZone. Dự án demo.
+                        © 2025 MovieZone. Demo Project.
                     </div>
                 </footer>
             </div>
@@ -335,7 +335,7 @@
                 const expTime = payload.exp * 1000; 
                 
                 if (Date.now() >= expTime) {
-                    alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+                    alert("Login expired. Please log in again.");
                     localStorage.removeItem('token');
                     window.location.replace('login.html');
                 }
@@ -387,9 +387,9 @@
                 if (response.status === 401 || response.status === 403) {
                     localStorage.removeItem('token');
                     window.location.replace('login.html');
-                    throw new Error("Hết phiên đăng nhập");
+                    throw new Error("Login Expired");
                 }
-                if (!response.ok) throw new Error("Lỗi kết nối Server");
+                if (!response.ok) throw new Error("Server connection error");
                 return response.json();
             })
             .then(userData => {
@@ -402,9 +402,9 @@
                 }
             })
             .catch(error => {
-                console.error("Lỗi:", error);
-                if (error.message !== "Hết phiên đăng nhập") {
-                    showToast("Lỗi kết nối Server. Vui lòng thử lại sau!", true);
+                console.error("Error:", error);
+                if (error.message !== "Login Expired") {
+                    showToast("Server Connection Fail. Please try again later!", true);
                 }
             });
         }
@@ -423,7 +423,7 @@
             subContainer.innerHTML = '';
 
             if (!subs || subs.length === 0) {
-                subContainer.innerHTML = '<p style="color: var(--text-secondary);">Bạn chưa đăng ký gói nào.</p>';
+                subContainer.innerHTML = '<p style="color: var(--text-secondary);">You have not subscribed to any plan.</p>';
                 return;
             }
 
@@ -454,15 +454,15 @@
                 }
 
                 let price = (sub.pack && sub.pack.packPrice) ? sub.pack.packPrice : 0;
-                let packName = (sub.pack && sub.pack.packName) ? sub.pack.packName : 'Gói không xác định';
+                let packName = (sub.pack && sub.pack.packName) ? sub.pack.packName : 'Unknown Plan';
 
                 subContainer.innerHTML += `
                     <div class="subscription-card ${sub.status === 'ACTIVE' ? 'premium' : ''}">
                         <div class="sub-header">
-                            <h4>Gói đăng ký #${sub.subId} - ${packName}</h4>
+                            <h4>Subscription Plan #${sub.subId} - ${packName}</h4>
                             <span class="badge ${statusClass}">${sub.status}</span>
                         </div>
-                        <p class="sub-desc" style="font-weight: bold; color: #fff;">Giá: ${price.toLocaleString('vi-VN')}đ</p>
+                        <p class="sub-desc" style="font-weight: bold; color: #fff;">Price: ${price.toLocaleString('vi-VN')}đ</p>
                         ${dateHtml}
                         ${actionsHtml}
                     </div>
@@ -476,11 +476,11 @@
         window.handleSubAction = function(subId, action, event) {
             const btn = event.target;
             const originalText = btn.textContent;
-            let confirmMsg = action === 'CANCEL_REQ' ? 'Hủy yêu cầu đăng ký này?' : 'Xác nhận thanh toán gói này?';
-            
+            let confirmMsg = action === 'CANCEL_REQ' ? 'Cancel this subscription request?' : 'Confirm payment for this plan?';
+
             if (!confirm(confirmMsg)) return;
 
-            btn.textContent = "Đang xử lý...";
+            btn.textContent = "Processing...";
             btn.disabled = true;
 
             fetch(`${API_URL}/subscription/${subId}/${action}`, { 
@@ -495,10 +495,10 @@
                 }
                 const data = await response.json().catch(() => ({}));
                 if (response.ok) {
-                    showToast(data.message || 'Thao tác thành công!');
+                    showToast(data.message || 'Operation successful!');
                     loadUserData(); 
                 } else {
-                    throw new Error(data.message || "Đã xảy ra lỗi từ hệ thống!");
+                    throw new Error(data.message || "An error occurred!");
                 }
             })
             .catch(err => {
@@ -518,7 +518,7 @@
         logoutBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
-                if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi MovieZone?')) {
+                if (confirm('Are you sure you want to log out of MovieZone?')) {
                     localStorage.removeItem('token');
                     window.location.replace('login.html');
                 }
@@ -533,8 +533,8 @@
                 const newUsername = document.getElementById('inputUsername').value.trim();
                 const saveBtn = document.getElementById('saveProfileBtn');
                 const originalText = saveBtn.textContent;
-                
-                saveBtn.textContent = "Đang lưu...";
+
+                saveBtn.textContent = "Processing...";
                 saveBtn.disabled = true;
 
                 fetch(`${API_URL}/profile`, {
@@ -550,11 +550,11 @@
                     }
                     const data = await res.json().catch(() => ({}));
                     if (res.ok) {
-                        document.getElementById('navUsername').textContent = "Xin chào, " + newUsername;
+                        document.getElementById('navUsername').textContent = "Hello, " + newUsername;
                         document.getElementById('bannerName').textContent = newUsername;
-                        showToast(data.message || 'Cập nhật Username thành công!');
+                        showToast(data.message || 'Username updated successfully!');
                     } else {
-                        throw new Error(data.message || "Cập nhật thất bại!");
+                        throw new Error(data.message || "Update failed!");
                     }
                 })
                 .catch(err => {
@@ -579,12 +579,12 @@
 
                 // THÊM ĐOẠN KIỂM TRA ĐỘ DÀI NÀY
                 if (newPass.length < 6) {
-                    showToast('Lỗi: Mật khẩu mới phải có ít nhất 6 ký tự!', true);
+                    showToast('Error: New password must be at least 6 characters long!', true);
                     return;
                 }
 
                 if (newPass !== confirmPass) {
-                    showToast('Lỗi: Mật khẩu xác nhận không khớp!', true);
+                    showToast('Error: Password confirmation does not match!', true);
                     return;
                 }
 
@@ -609,10 +609,10 @@
                     }
                     const data = await res.json().catch(() => ({}));
                     if (res.ok) {
-                        showToast(data.message || 'Đổi mật khẩu thành công!');
+                        showToast(data.message || 'Password changed successfully!');
                         passwordForm.reset();
                     } else {
-                        throw new Error(data.message || "Mật khẩu hiện tại không chính xác!");
+                        throw new Error(data.message || "Current password is incorrect!");
                     }
                 })
                 .catch(err => {

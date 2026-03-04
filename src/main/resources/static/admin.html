@@ -428,17 +428,17 @@
         packs: "/api/packs",
         movies: "/api/admin/movies",
       };
-
+       // Generic fetch function with JWT token support
       async function fetchJson(url, opts = {}) {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");// Get saved login token
         const headers = Object.assign({}, opts.headers || {});
-        if (token) headers["Authorization"] = "Bearer " + token;
+        if (token) headers["Authorization"] = "Bearer " + token;// Attach token
         const res = await fetch(url, Object.assign({}, opts, { headers }));
         if (!res.ok) throw new Error(res.status + " " + (await res.text()));
         const txt = await res.text();
         return txt ? JSON.parse(txt) : null;
       }
-
+      // Convert string to Title Case (for display formatting)
       function titleCase(s) {
         if (!s) return s;
         return s
@@ -446,6 +446,7 @@
           .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
           .join(" ");
       }
+      // Format price to 2 decimal places
       function formatPrice(v) {
         if (v == null) return "";
         const n = parseFloat(v);
@@ -458,7 +459,7 @@
         const content = document.getElementById("content");
         content.innerHTML = '<div class="card"><h2>Loading...</h2></div>';
         try {
-          // add Authorization header if token exists (matches fetchJson behavior)
+          // Attach token header (same logic as fetchJson)
           const token = localStorage.getItem("token");
           const headers = {};
           if (token) headers["Authorization"] = "Bearer " + token;
@@ -474,7 +475,7 @@
           );
           scripts.forEach((s) => {
             try {
-              new Function(s.textContent)();
+              new Function(s.textContent)();// Run script
             } catch (e) {
               console.error("fragment script error", e);
             }
@@ -494,6 +495,7 @@
           const users = (await fetchJson(api.users)) || [];
           const packs = (await fetchJson(api.packs)) || [];
           const films = (await fetchJson(api.movies)) || [];
+          //non_admin only
           const nonAdmin = (users || []).filter(
             (u) => u.role !== "ADMIN",
           ).length;
@@ -509,7 +511,7 @@
         }
       }
 
-      // initial wiring
+      // Run when page is fully loaded
       document.addEventListener("DOMContentLoaded", () => {
         const logoutBtn = document.getElementById("logoutBtn");
 
@@ -524,19 +526,21 @@
             // redirect to login page
             window.location.href = "/login.html";
           });
-
+        
+          // Sidebar navigation click events
         const items = document.querySelectorAll(".side-item");
         items.forEach((b) =>
           b.addEventListener("click", (ev) => {
+            // Remove active from all
             document
               .querySelectorAll(".side-item")
-              .forEach((i) => i.classList.remove("active"));
+              .forEach((i) => i.classList.remove("active"));// Highlight selected
             b.classList.add("active");
             const frag = b.getAttribute("data-fragment");
             if (frag) loadFragment(frag);
           }),
         );
-
+        // Sidebar collapse toggle
         const menuToggle = document.getElementById("menuToggle");
         const sidebar = document.getElementById("sidebar");
         menuToggle &&
@@ -552,14 +556,14 @@
 
         refreshCounts();
       });
-
+      // Display logged-in username
       const username = localStorage.getItem("username");
 
       if (username) {
         document.getElementById("usernameDisplay").textContent = username;
       }
 
-      // expose helper functions for fragments
+      // Make helper functions accessible globally (used by fragments)
       window.adminApi = {
         fetchJson,
         api,

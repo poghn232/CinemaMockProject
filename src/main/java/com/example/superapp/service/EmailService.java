@@ -68,7 +68,7 @@ public class EmailService {
                 new MimeMessageHelper(message, true, "UTF-8");
 
         // Đổi sang mail admin ở đây
-        helper.setTo("manh12345678n@gmail.com");
+        helper.setTo("hieuden690@gmail.com");
         helper.setSubject("📩 New Contact From MovieZone");
 
         String html = """
