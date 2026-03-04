@@ -26,12 +26,15 @@
 <script data-fragment-script>
   (async function () {
     const { fetchJson, api } = window.adminApi;
-    let usersCache = [];
+    let usersCache = [];// Stores all users from backend
     let currentPage = 1;
     const pageSize = 5; // change to 10 if you want
 
+    // Render users with search, sort and pagination
     function renderUsers() {
       const container = document.getElementById("users");
+
+      //Search
       const q = (document.getElementById("userSearch").value || "")
         .toLowerCase()
         .trim();
@@ -69,17 +72,22 @@
       const paginatedList = list.slice(start, end);
 
       container.innerHTML = "";
+      // Render each user row
       paginatedList.forEach((u) => {
         const row = document.createElement("div");
         row.className = "user-row";
+        // User Info
         const meta = document.createElement("div");
+
         meta.className = "user-meta";
         meta.innerHTML = `<div class="user-name">${u.username} <span class="muted">(${u.role})</span></div><div class="user-email">${u.email}</div>`;
+        // Toggle switch for enabling/disabling user
         const toggle = document.createElement("div");
         toggle.className = "toggle" + (u.enabled ? " on" : "");
         const knob = document.createElement("div");
         knob.className = "knob";
         toggle.appendChild(knob);
+        // Toggle click event (enable/disable user)
         toggle.addEventListener("click", async () => {
           try {
             toggle.classList.toggle("on");
@@ -89,8 +97,8 @@
               body: JSON.stringify(!u.enabled),
             });
             u.enabled = !u.enabled;
-            window.adminApi.refreshCounts();
-            renderUsers();
+            window.adminApi.refreshCounts();// Update dashboard counts
+            renderUsers();// Re-render list
           } catch (e) {
             alert("Error toggling user: " + e);
             loadUsers();
@@ -132,7 +140,7 @@
         pagination.appendChild(next);
       }
     }
-
+// Load users from backend
     async function loadUsers() {
       const container = document.getElementById("users");
       container.innerHTML = "Loading...";
@@ -144,7 +152,7 @@
         console.error(e);
       }
     }
-
+// Event listeners for search and sorting
     document
       .getElementById("userSearch")
       .addEventListener("input", () => renderUsers());
