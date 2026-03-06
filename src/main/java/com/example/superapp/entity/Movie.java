@@ -57,6 +57,8 @@ public class Movie {
     private LocalDate releaseDate;
     private Integer runtime;
 
+    private String src;
+
     /* ================= RELATIONSHIPS ================= */
 
     @ManyToMany
