@@ -12,6 +12,8 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -66,7 +68,7 @@ public class EmailService {
                 new MimeMessageHelper(message, true, "UTF-8");
 
         // Đổi sang mail admin ở đây
-        helper.setTo("manh12345678n@gmail.com");
+        helper.setTo("hieuden690@gmail.com");
         helper.setSubject("📩 New Contact From MovieZone");
 
         String html = """
@@ -133,6 +135,51 @@ public class EmailService {
                 throw new RuntimeException("Ảnh vượt quá 5MB!");
             }
         }
+    }
+    public void sendSubscriptionSuccessEmail(
+            String to,
+            String username,
+            String packName,
+            BigDecimal price,
+            LocalDateTime startDate,
+            LocalDateTime endDate
+    ) throws Exception {
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper =
+                new MimeMessageHelper(message, false, "UTF-8");
+
+        helper.setTo(to);
+        helper.setSubject("🎬 MovieZone - Thanh toán thành công");
+
+        String html = """
+        <div style="font-family:Arial;padding:24px;background:#0b1220;color:#e5e7eb">
+            <h2 style="color:#22c55e">🎉 Thanh toán thành công!</h2>
+            
+            <p>Xin chào <b>%s</b>,</p>
+            
+            <p>Bạn đã mua thành công gói <b>%s</b>.</p>
+            
+            <hr>
+            
+            <p><b>💰 Giá:</b> %s VND</p>
+            <p><b>📅 Bắt đầu:</b> %s</p>
+            <p><b>⏳ Kết thúc:</b> %s</p>
+            
+            <br>
+            <p>Chúc bạn xem phim vui vẻ tại <b>MovieZone</b> 🍿</p>
+        </div>
+        """.formatted(
+                username,
+                packName,
+                price,
+                startDate,
+                endDate
+        );
+
+        helper.setText(html, true);
+
+        mailSender.send(message);
     }
 
     private void sendConfirmationToUser(String email, String name) throws Exception {

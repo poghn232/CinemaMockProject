@@ -1,0 +1,175 @@
+<div class="card">
+  <h2>Users</h2>
+  <div class="muted">Toggle to disable login for an user</div>
+  <div style="display: flex; gap: 8px; margin-top: 12px; align-items: center">
+    <input
+      id="userSearch"
+      type="text"
+      placeholder="Search by username or email"
+      style="flex: 1; padding: 8px; border-radius: 8px"
+    />
+    <select id="userSortField" style="padding: 8px; border-radius: 8px">
+      <option value="username">Username</option>
+      <option value="role">Role</option>
+      <option value="enabled">Enabled</option>
+    </select>
+
+    <button id="userSortDir" class="btn ghost" data-dir="asc">↑</button>
+  </div>
+  <div id="users" class="users-list" style="margin-top: 12px">Loading...</div>
+  <div
+    id="userPagination"
+    style="margin-top: 12px; display: flex; gap: 8px; align-items: center"
+  ></div>
+</div>
+
+<script data-fragment-script>
+  (async function () {
+    const { fetchJson, api } = window.adminApi;
+    let usersCache = [];// Stores all users from backend
+    let currentPage = 1;
+    const pageSize = 5; // change to 10 if you want
+
+    // Render users with search, sort and pagination
+    function renderUsers() {
+      const container = document.getElementById("users");
+
+      //Search
+      const q = (document.getElementById("userSearch").value || "")
+        .toLowerCase()
+        .trim();
+
+      let list = (usersCache || []).slice();
+      if (q) {
+        list = list.filter(
+          (u) =>
+            (u.username || "").toLowerCase().includes(q) ||
+            (u.email || "").toLowerCase().includes(q),
+        );
+      }
+      // ===== SORT =====
+      const field = document.getElementById("userSortField").value;
+      const dir = document.getElementById("userSortDir").dataset.dir;
+
+      if (field === "username") {
+        list.sort((a, b) => (a.username || "").localeCompare(b.username || ""));
+      } else if (field === "role") {
+        list.sort((a, b) => (a.role || "").localeCompare(b.role || ""));
+      } else if (field === "enabled") {
+        list.sort((a, b) => (a.enabled ? 1 : 0) - (b.enabled ? 1 : 0));
+      }
+
+      if (dir === "desc") {
+        list.reverse();
+      }
+
+      // ===== PAGINATION =====
+      const totalPages = Math.ceil(list.length / pageSize);
+      if (currentPage > totalPages) currentPage = 1;
+
+      const start = (currentPage - 1) * pageSize;
+      const end = start + pageSize;
+      const paginatedList = list.slice(start, end);
+
+      container.innerHTML = "";
+      // Render each user row
+      paginatedList.forEach((u) => {
+        const row = document.createElement("div");
+        row.className = "user-row";
+        // User Info
+        const meta = document.createElement("div");
+
+        meta.className = "user-meta";
+        meta.innerHTML = `<div class="user-name">${u.username} <span class="muted">(${u.role})</span></div><div class="user-email">${u.email}</div>`;
+        // Toggle switch for enabling/disabling user
+        const toggle = document.createElement("div");
+        toggle.className = "toggle" + (u.enabled ? " on" : "");
+        const knob = document.createElement("div");
+        knob.className = "knob";
+        toggle.appendChild(knob);
+        // Toggle click event (enable/disable user)
+        toggle.addEventListener("click", async () => {
+          try {
+            toggle.classList.toggle("on");
+            await fetchJson(api.users + "/" + u.userId + "/enabled", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(!u.enabled),
+            });
+            u.enabled = !u.enabled;
+            window.adminApi.refreshCounts();// Update dashboard counts
+            renderUsers();// Re-render list
+          } catch (e) {
+            alert("Error toggling user: " + e);
+            loadUsers();
+          }
+        });
+        row.appendChild(meta);
+        row.appendChild(toggle);
+        container.appendChild(row);
+      });
+
+      // ===== RENDER PAGINATION =====
+      const pagination = document.getElementById("userPagination");
+      pagination.innerHTML = "";
+
+      if (totalPages > 1) {
+        const prev = document.createElement("button");
+        prev.className = "btn ghost";
+        prev.textContent = "Prev";
+        prev.disabled = currentPage === 1;
+        prev.onclick = () => {
+          currentPage--;
+          renderUsers();
+        };
+
+        const info = document.createElement("span");
+        info.textContent = `Page ${currentPage} of ${totalPages}`;
+
+        const next = document.createElement("button");
+        next.className = "btn ghost";
+        next.textContent = "Next";
+        next.disabled = currentPage === totalPages;
+        next.onclick = () => {
+          currentPage++;
+          renderUsers();
+        };
+
+        pagination.appendChild(prev);
+        pagination.appendChild(info);
+        pagination.appendChild(next);
+      }
+    }
+// Load users from backend
+    async function loadUsers() {
+      const container = document.getElementById("users");
+      container.innerHTML = "Loading...";
+      try {
+        usersCache = (await fetchJson(api.users)) || [];
+        renderUsers();
+      } catch (e) {
+        container.innerHTML = "Failed to load users";
+        console.error(e);
+      }
+    }
+// Event listeners for search and sorting
+    document
+      .getElementById("userSearch")
+      .addEventListener("input", () => renderUsers());
+    document
+      .getElementById("userSortField")
+      .addEventListener("change", renderUsers);
+
+    document
+      .getElementById("userSortDir")
+      .addEventListener("click", function () {
+        const current = this.dataset.dir;
+        const newDir = current === "asc" ? "desc" : "asc";
+        this.dataset.dir = newDir;
+        this.textContent = newDir === "asc" ? "↑" : "↓";
+        renderUsers();
+      });
+
+    await loadUsers();
+  })();
+</script>

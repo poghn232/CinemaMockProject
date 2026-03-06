@@ -34,6 +34,26 @@ public class Movie {
     private Double voteAverage;
     private Integer voteCount;
 
+    /**
+     * Đánh dấu phim còn hoạt động (soft delete).
+     * true  = hiển thị / có thể dùng
+     * false = đã xoá mềm, ẩn khỏi trang public.
+     */
+    @Column(nullable = false)
+    private Boolean active = true;
+
+    /**
+     * Admin bật/tắt phim có xuất hiện ở homepage hay không.
+     */
+    @Column(nullable = false)
+    private Boolean published = false;
+
+    /**
+     * Dùng sau này cho banner / mục đặc biệt.
+     */
+    @Column(nullable = false)
+    private Boolean featured = false;
+
     private LocalDate releaseDate;
     private Integer runtime;
 

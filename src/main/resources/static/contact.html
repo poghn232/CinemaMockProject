@@ -266,16 +266,16 @@
     </header>
 
     <div class="card">
-        <div class="title">Liên hệ với chúng tôi</div>
+        <div class="title">Contact Us</div>
 
         <form id="contactForm" enctype="multipart/form-data">
-            <input type="text" id="name" placeholder="Tên bạn" required>
+            <input type="text" id="name" placeholder="Your Name" required>
             <input type="email" id="email" placeholder="Email" required>
-            <input type="text" id="phone" placeholder="Số điện thoại">
-            <textarea id="content" placeholder="Nội dung" required></textarea>
+            <input type="text" id="phone" placeholder="Phone Number">
+            <textarea id="content" placeholder="Message" required></textarea>
             <input type="file" id="images" multiple accept="image/*">
 
-            <button type="submit">Gửi liên hệ</button>
+            <button type="submit">Send Contact</button>
         </form>
 
         <div id="message"></div>
@@ -288,21 +288,29 @@
                 <span class="footer-title">MOVIEZONE</span>
             </div>
             <div class="footer-links">
-                <a href="homepage.html">Trang chủ</a>
-                <a href="login.html">Đăng nhập</a>
-                <a href="register.html">Đăng ký</a>
-                <a href="packs.html">Gói Premium</a>
-                <a href="contact.html">Liên hệ</a>
+                <a href="homepage.html">Home</a>
+                <a href="login.html">Login</a>
+                <a href="register.html">Signup</a>
+                <a href="packs.html">Go Premium</a>
+                <a href="contact.html">Contact</a>
             </div>
         </div>
         <div class="footer-bottom">
-            © 2025 MovieZone. Dự án demo — Đăng nhập / Đăng ký / Quên mật khẩu để trải nghiệm.
+            © 2025 MovieZone. Demo Project — Login/Sign Up to experience.
         </div>
     </footer>
 </div>
 
 <script>
 
+    const token = localStorage.getItem("token");
+
+    // Nếu chưa login -> đá về login
+    if (!token) {
+        window.location.href = "login.html";
+    }
+
+    // ====== HANDLE SUBMIT ======
     document.getElementById("contactForm").addEventListener("submit", async function (e) {
         e.preventDefault();
 
@@ -327,8 +335,18 @@
         try {
             const response = await fetch("/api/contact", {
                 method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + token
+                },
                 body: formData
             });
+
+            // Nếu token hết hạn -> đá về login
+            if (response.status === 401) {
+                localStorage.removeItem("token");
+                window.location.href = "login.html";
+                return;
+            }
 
             const result = await response.text();
 
@@ -339,7 +357,7 @@
 
         } catch (error) {
             msgDiv.innerHTML =
-                `<div class="err">${error.message || "Gửi thất bại!"}</div>`;
+                `<div class="err">${error.message || "Sending failed!"}</div>`;
         } finally {
             btn.disabled = false;
         }

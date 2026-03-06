@@ -335,36 +335,36 @@
             <span>MovieZone</span>
         </div>
         <h1 class="brand-title">
-            Rạp chiếu <span>trực tuyến</span><br/>
-            cho mọi đêm phim của bạn.
+            Online <span>Cinema</span><br/>
+            for every movie night.
         </h1>
         <p class="brand-subtitle">
-            Đăng nhập để tiếp tục xem những bộ phim bạn đang dở, khám phá xu hướng mới và lưu trữ danh sách yêu thích.
+            Log in to continue watching the movies you're currently viewing, discover new trends, and save your favorite list.
         </p>
 
         <div class="tagline-chips">
             <div class="tagline-chip">Full HD &amp; 4K</div>
-            <div class="tagline-chip">Không giới hạn tập</div>
-            <div class="tagline-chip">Đề xuất theo gu</div>
+            <div class="tagline-chip">Unlimited Episodes</div>
+            <div class="tagline-chip">Personalized Recommendations</div>
         </div>
 
         <div class="poster-row">
             <article class="poster poster-1">
                 <div class="poster-info">
                     <div class="poster-title">Night City Stories</div>
-                    <div class="poster-tag">Hành động · 2025</div>
+                    <div class="poster-tag">Action · 2025</div>
                 </div>
             </article>
             <article class="poster poster-2">
                 <div class="poster-info">
                     <div class="poster-title">Echoes of Stars</div>
-                    <div class="poster-tag">Khoa học viễn tưởng</div>
+                    <div class="poster-tag">Science Fiction</div>
                 </div>
             </article>
             <article class="poster poster-3">
                 <div class="poster-info">
                     <div class="poster-title">Hidden Notes</div>
-                    <div class="poster-tag">Tâm lý · Âm nhạc</div>
+                    <div class="poster-tag">Psychological · Music</div>
                 </div>
             </article>
         </div>
@@ -373,8 +373,8 @@
     <section class="login-container">
         <div class="login-header">
             <div>
-                <h2>Đăng nhập</h2>
-                <p class="login-caption">Tiếp tục hành trình xem phim của bạn.</p>
+                <h2>Login</h2>
+                <p class="login-caption">Continue your movie journey.</p>
             </div>
             <div class="badge">
                 <span class="badge-dot"></span>
@@ -384,19 +384,19 @@
 
         <form id="loginForm">
             <div class="field">
-                <div class="field-label">Tên đăng nhập</div>
-                <input type="text" id="username" placeholder="Nhập username của bạn" required>
+                <div class="field-label">User Name</div>
+                <input type="text" id="username" placeholder="Your Username" required>
             </div>
             <div class="field">
-                <div class="field-label">Mật khẩu</div>
+                <div class="field-label">Password</div>
                 <input type="password" id="password" placeholder="••••••••" required>
             </div>
 
-            <button type="submit">Bắt đầu xem ngay</button>
+            <button type="submit">Start Watching Now</button>
 
             <div class="helper-row">
-                <span>Chưa có tài khoản? <a href="register.html">Đăng ký</a></span>
-                <a href="forgot-password.html">Quên mật khẩu?</a>
+                <span>Don't have account? <a href="register.html">Sign Up</a></span>
+                <a href="forgot-password.html">Forgot Password?</a>
             </div>
         </form>
 
@@ -421,13 +421,15 @@
             });
 
             if (!response.ok) {
-                document.getElementById("error").innerText = "Tài khoản hoặc mật khẩu đã sai";
+                document.getElementById("error").innerText = "Invalid username or password";
                 return;
             }
 
             const data = await response.json();
             localStorage.setItem("token", data.token);
             localStorage.setItem("username", username);
+            localStorage.setItem("role", data.role);
+            
 
             const role = (data.role || '').toUpperCase();
             // role might be like 'ROLE_ADMIN' or 'ADMIN'

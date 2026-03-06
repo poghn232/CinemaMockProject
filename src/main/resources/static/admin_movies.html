@@ -1,0 +1,231 @@
+<div class="card">
+  <h2>Films</h2>
+  <div class="muted">
+    Manage the list of movies displayed on the homepage. Use Add to import from TMDB and Hide to hide published movies.
+  </div>
+
+  <!-- ADD FROM TMDB -->
+  <div
+    style="
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.02);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    "
+  >
+    <div style="font-weight: 600">Add film from TMDB</div>
+    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
+      <input
+        id="tmdbIdInput"
+        type="number"
+        placeholder="TMDB ID (ví dụ: 603692)"
+        style="flex: 1; min-width: 180px; padding: 8px; border-radius: 8px"
+      />
+      <select
+        id="tmdbTypeInput"
+        style="padding: 8px; border-radius: 8px; min-width: 120px"
+      >
+        <option value="movie">Movie</option>
+        <option value="tv">TV Series</option>
+      </select>
+      <button id="tmdbAddButton" class="btn">Add</button>
+    </div>
+    <div id="tmdbAddMessage" class="muted"></div>
+  </div>
+
+  <!-- LIST / HIDE -->
+  <div
+    style="
+      margin-top: 18px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    "
+  >
+    <input
+      id="filmSearch"
+      type="text"
+      placeholder="Search by title..."
+      style="flex: 1; min-width: 200px; padding: 8px; border-radius: 8px"
+    />
+    <button id="refreshFilms" class="btn ghost">Reload</button>
+  </div>
+
+  <div id="filmsList" class="packs" style="margin-top: 12px">Loading...</div>
+
+  <div
+    id="filmsPagination"
+    style="
+      margin-top: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+    "
+  >
+    <button id="filmsPrev" class="btn ghost">← Prev</button>
+    <span id="filmsPageInfo" class="muted"></span>
+    <button id="filmsNext" class="btn ghost">Next →</button>
+  </div>
+</div>
+
+<script data-fragment-script>
+  (async function () {
+    const { fetchJson, api, refreshCounts } = window.adminApi;// Shared utilities from adminApi
+    let filmsCache = [];
+    let currentPage = 1;
+    const pageSize = 5; 
+
+    // Render films with search and pagination
+    function renderFilms() {
+      const container = document.getElementById("filmsList");
+      const pageInfo = document.getElementById("filmsPageInfo");
+
+      const q = (document.getElementById("filmSearch").value || "")
+        .toLowerCase()
+        .trim();
+
+      let list = (filmsCache || []).slice();
+      // Search filter
+      if (q) {
+        list = list.filter((f) => (f.title || "").toLowerCase().includes(q));
+      }
+      // Sort alphabetically
+      list.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+
+      const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const start = (currentPage - 1) * pageSize;
+      const paginated = list.slice(start, start + pageSize);
+
+      container.innerHTML = "";
+
+      if (!paginated.length) {
+        container.innerHTML = "No films found.";
+        pageInfo.textContent = "";
+        return;
+      }
+      // Render each film row
+      paginated.forEach((f) => {
+        const row = document.createElement("div");
+        row.className = "pack-row";
+
+        const info = document.createElement("div");
+        const typeLabel = f.type === "tv" ? "TV Series" : "Movie";
+        const status = f.published ? "Published" : "Hidden";
+
+        info.innerHTML = `
+      <div style="font-weight:600">${f.title}</div>
+      <div class="muted">${typeLabel} · ${status}</div>
+    `;
+
+        const actions = document.createElement("div");
+        // Hide button (only if published
+        const hideBtn = document.createElement("button");
+        hideBtn.className = "btn ghost";
+        hideBtn.textContent = f.published ? "Hide" : "Hidden";
+        hideBtn.disabled = !f.published;
+
+        hideBtn.addEventListener("click", async () => {
+          if (!confirm("Ẩn phim này khỏi trang chính?")) return;
+          try {
+            await fetchJson(api.movies + "/" + f.type + "/" + f.id + "/hide", {
+              method: "PUT",
+            });
+            await loadFilms();
+            refreshCounts();
+          } catch (e) {
+            alert("Hide failed: " + e);
+          }
+        });
+
+        actions.appendChild(hideBtn);
+        row.appendChild(info);
+        row.appendChild(actions);
+        container.appendChild(row);
+      });
+
+      pageInfo.textContent = `Page ${currentPage} / ${totalPages}`;
+    }
+    // Load films from backend
+    async function loadFilms() {
+      const container = document.getElementById("filmsList");
+      container.innerHTML = "Loading...";
+      try {
+        filmsCache = (await fetchJson(api.movies)) || [];
+        renderFilms();
+      } catch (e) {
+        container.innerHTML = "Failed to load films.";
+        console.error(e);
+      }
+    }
+
+    document.getElementById("filmSearch").addEventListener("input", () => {
+      currentPage = 1;
+      renderFilms();
+    });
+    document
+      .getElementById("refreshFilms")
+      .addEventListener("click", loadFilms);
+    //Import films from TMDB
+    document
+      .getElementById("tmdbAddButton")
+      .addEventListener("click", async () => {
+        const idInput = document.getElementById("tmdbIdInput");
+        const typeInput = document.getElementById("tmdbTypeInput");
+        const msg = document.getElementById("tmdbAddMessage");
+
+        const rawId = idInput.value.trim();
+        const type = typeInput.value;
+
+        if (!rawId) {
+          msg.textContent = "Vui lòng nhập TMDB ID.";
+          return;
+        }
+
+        const tmdbId = parseInt(rawId, 10);
+        if (!tmdbId || tmdbId <= 0) {
+          msg.textContent = "TMDB ID không hợp lệ.";
+          return;
+        }
+
+        msg.textContent = "Đang import từ TMDB...";
+
+        try {
+          await fetchJson(api.movies + "/import", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ tmdbId, type }),
+          });
+          msg.textContent = "Import thành công. Phim đã được publish.";
+          idInput.value = "";
+          await loadFilms();
+          refreshCounts();
+        } catch (e) {
+          msg.textContent = "Import thất bại: " + e;
+        }
+      });
+
+    document.getElementById("filmsPrev").addEventListener("click", () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderFilms();
+      }
+    });
+
+    document.getElementById("filmsNext").addEventListener("click", () => {
+      const totalPages = Math.ceil(filmsCache.length / pageSize);
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderFilms();
+      }
+    });
+
+    await loadFilms();
+  })();
+</script>

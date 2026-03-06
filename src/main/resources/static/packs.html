@@ -394,7 +394,7 @@
 
         <nav class="nav-center">
             <a href="homepage.html" class="nav-link">Home</a>
-            <a href="packs.html" class="nav-link active">Gói Premium</a>
+            <a href="packs.html" class="nav-link active">Premium Plan</a>
             <button class="nav-link nav-link-logout" type="button" id="logoutButton">Logout</button>
         </nav>
 
@@ -409,8 +409,8 @@
 
     <!-- PACKS HERO -->
     <section class="packs-hero">
-        <h1>Chọn gói Premium của bạn</h1>
-        <p>Nâng cấp để xem phim không quảng cáo, tốc độ cao và mở khóa nhiều nội dung độc quyền.</p>
+        <h1>Choose your premium plan</h1>
+        <p>Upgrade to watch ad-free movies, high speed, and unlock exclusive content.</p>
     </section>
 
     <!-- PACKS GRID -->
@@ -426,14 +426,14 @@
                 <span class="footer-title">MOVIEZONE</span>
             </div>
             <div class="footer-links">
-                <a href="homepage.html">Trang chủ</a>
-                <a href="login.html">Đăng nhập</a>
-                <a href="register.html">Đăng ký</a>
-                <a href="packs.html">Gói Premium</a>
+                <a href="homepage.html">Home</a>
+                <a href="login.html">Login</a>
+                <a href="register.html">Sign Up</a>
+                <a href="packs.html">Go Premium</a>
             </div>
         </div>
         <div class="footer-bottom">
-            © 2025 MovieZone. Dự án demo — Đăng nhập / Đăng ký để trải nghiệm.
+            © 2025 MovieZone. Demo Project — Login/Signup to explore.
         </div>
     </footer>
 </div>
@@ -453,7 +453,7 @@
         const isPremium = localStorage.getItem("isPremium") === "true";
 
         if (usernameEl) {
-            usernameEl.textContent = "Xin chào, " + username;
+            usernameEl.textContent = "Hello, " + username;
         }
         if (premiumBadge) {
             premiumBadge.style.display = isPremium ? "inline-flex" : "none";
@@ -486,22 +486,22 @@
                 el.innerHTML = `
                     <p class="pack-name">${p.packName}</p>
                     <p class="pack-price">${moneyVND(p.packPrice)}</p>
-                    <p class="pack-meta">Thời hạn: ${p.durationDays ?? 30} ngày</p>
-                    <button onclick="buy(${p.packId})">Mua ngay</button>
+                    <p class="pack-meta">Duration: ${p.durationDays ?? 30} days</p>
+                    <button onclick="buy(${p.packId})">Buy Now</button>
                 `;
                 grid.appendChild(el);
             });
 
             if (!packs.length) {
-                document.getElementById("msg").innerText = "Hiện chưa có gói nào trong hệ thống.";
+                document.getElementById("msg").innerText = "No packs available at the moment.";
             }
         } catch (e) {
-            document.getElementById("err").innerText = "Không tải được danh sách pack.";
+            document.getElementById("err").innerText = "Failed to load packs.";
         }
     }
 
     async function buy(packId) {
-        document.getElementById("msg").innerText = "Đang tạo giao dịch...";
+        document.getElementById("msg").innerText = "Creating transaction...";
         document.getElementById("err").innerText = "";
 
         try {
@@ -522,16 +522,16 @@
 
             if (!res.ok) {
                 const t = await res.text();
-                document.getElementById("err").innerText = "Tạo giao dịch thất bại: " + t;
+                document.getElementById("err").innerText = "Failed to create transaction: " + t;
                 document.getElementById("msg").innerText = "";
                 return;
             }
 
             const data = await res.json();
-            document.getElementById("msg").innerText = "Chuyển sang VNPay...";
+            document.getElementById("msg").innerText = "Moving to VNPay...";
             window.location.href = data.paymentUrl;
         } catch (e) {
-            document.getElementById("err").innerText = "Có lỗi xảy ra khi mua gói.";
+            document.getElementById("err").innerText = "An error occurred while purchasing the plan.";
             document.getElementById("msg").innerText = "";
         }
     }
