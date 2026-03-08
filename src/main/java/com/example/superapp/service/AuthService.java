@@ -1,9 +1,11 @@
 package com.example.superapp.service;
 
+import com.example.superapp.dto.LoginResponse;
 import com.example.superapp.dto.RegisterRequest;
 import com.example.superapp.entity.PendingUser;
 import com.example.superapp.entity.User;
 import com.example.superapp.repository.UserRepository;
+import com.example.superapp.utils.JwtUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,15 +20,17 @@ public class AuthService {
     private final OtpService otpService;
     private final EmailService emailService;
     private final SecureRandom secureRandom = new SecureRandom();
+    private final JwtUtils jwtUtil;
 
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
                        OtpService otpService,
-                       EmailService emailService) {
+                       EmailService emailService, JwtUtils jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.otpService = otpService;
         this.emailService = emailService;
+        this.jwtUtil = jwtUtil;
     }
 
     public void register(RegisterRequest request) {
@@ -140,5 +144,53 @@ public class AuthService {
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+    }
+    public LoginResponse createGoogleUserAfterChooseUsername(String email, String username) {
+
+        if (email == null || email.isBlank()) {
+            throw new RuntimeException("Email không được để trống");
+        }
+
+        if (username == null || username.isBlank()) {
+            throw new RuntimeException("Username không được để trống");
+        }
+
+        String cleanUsername = username.trim().toLowerCase();
+
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new RuntimeException("Email này đã có tài khoản");
+        }
+
+        if (userRepository.findByUsername(cleanUsername).isPresent()) {
+            throw new RuntimeException("Username đã tồn tại");
+        }
+
+        User user = new User();
+        user.setEmail(email.trim().toLowerCase());
+        user.setUsername(cleanUsername);
+
+        // password random vì login Google không dùng password local
+        user.setPassword(passwordEncoder.encode(java.util.UUID.randomUUID().toString()));
+
+        user.setRole("CUSTOMER");
+        user.setEnabled(true);
+
+        userRepository.save(user);
+
+        org.springframework.security.core.userdetails.UserDetails userDetails =
+                org.springframework.security.core.userdetails.User
+                        .withUsername(user.getUsername())
+                        .password(user.getPassword())
+                        .roles(user.getRole())
+                        .disabled(user.getEnabled() == null ? false : !user.getEnabled())
+                        .build();
+
+        String jwt = jwtUtil.generateToken(userDetails);
+
+        LoginResponse resp = new LoginResponse(jwt);
+        resp.setRole(user.getRole());
+        resp.setUsername(user.getUsername());
+
+        return resp;
     }
 }

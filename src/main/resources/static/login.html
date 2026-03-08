@@ -398,13 +398,20 @@
                 <span>Don't have account? <a href="register.html">Sign Up</a></span>
                 <a href="forgot-password.html">Forgot Password?</a>
             </div>
-        </form>
 
+        </form>
+        <button type="button" onclick="loginWithGoogle()" style="margin-top:10px;background:#fff;color:#111827;">
+            Login with Google
+        </button>
         <p id="error" class="error"></p>
     </section>
 </div>
 
 <script>
+    function loginWithGoogle() {
+        window.location.href = "http://localhost:8080/oauth2/authorization/google";
+    }
+
     document.getElementById("loginForm").addEventListener("submit", async function (e) {
         e.preventDefault();
 

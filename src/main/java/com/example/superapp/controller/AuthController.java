@@ -1,10 +1,6 @@
 package com.example.superapp.controller;
 
-import com.example.superapp.dto.LoginRequest;
-import com.example.superapp.dto.LoginResponse;
-import com.example.superapp.dto.ForgotPasswordRequest;
-import com.example.superapp.dto.RegisterRequest;
-import com.example.superapp.dto.VerifyRequest;
+import com.example.superapp.dto.*;
 import com.example.superapp.service.AuthService;
 import com.example.superapp.service.CustomUserDetailsService;
 import com.example.superapp.service.OtpService;
@@ -69,10 +65,10 @@ public class AuthController {
                         // userDetailsService returns Spring Security User with roles prefixed, fetch authorities
                         role = u.getAuthorities().stream().findFirst().map(Object::toString).orElse(null);
                 } catch (Exception ignore) {}
-
-                LoginResponse resp = new LoginResponse(jwt);
-                if (role != null) resp.setRole(role);
-                return ResponseEntity.ok(resp);
+            LoginResponse resp = new LoginResponse(jwt);
+            resp.setRole(role);
+            resp.setUsername(request.getUsername());
+            return ResponseEntity.ok(resp);
     }
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
@@ -136,5 +132,17 @@ public class AuthController {
         return ResponseEntity.ok(
                 Map.of("message", "Đổi mật khẩu thành công")
         );
+    }
+
+    @PostMapping("/google/complete-profile")
+    public ResponseEntity<LoginResponse> completeGoogleProfile(
+            @RequestBody GoogleCompleteProfileRequest request) {
+
+        LoginResponse response = authService.createGoogleUserAfterChooseUsername(
+                request.getEmail(),
+                request.getUsername()
+        );
+
+        return ResponseEntity.ok(response);
     }
 }
