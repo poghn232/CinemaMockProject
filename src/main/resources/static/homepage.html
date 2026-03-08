@@ -1223,6 +1223,45 @@
           }
         });
       }
+      function showPaymentPopup(message) {
+          const popup = document.getElementById("paymentPopup");
+          const messageEl = document.getElementById("paymentPopupMessage");
+          const closeBtn = document.getElementById("closePaymentPopup");
+
+          if (!popup || !messageEl) return;
+
+          messageEl.textContent = message;
+          popup.style.display = "block";
+
+          if (closeBtn) {
+              closeBtn.onclick = () => {
+                  popup.style.display = "none";
+              };
+          }
+
+          setTimeout(() => {
+              popup.style.display = "none";
+          }, 6000);
+      }
+
+      function handlePaymentReturnMessage() {
+          const urlParams = new URLSearchParams(window.location.search);
+          const payment = urlParams.get("payment");
+          const expireAt = urlParams.get("expireAt");
+
+          if (payment === "extend-success" && expireAt) {
+              showPaymentPopup(
+                  `Bạn đã gia hạn subscription thành công. Gói của bạn sẽ hết hạn vào ngày ${decodeURIComponent(expireAt)}.`
+              );
+          } else if (payment === "fail") {
+              showPaymentPopup("Thanh toán thất bại hoặc đã bị hủy.");
+          }
+
+          if (payment) {
+              const cleanUrl = window.location.pathname;
+              window.history.replaceState({}, document.title, cleanUrl);
+          }
+      }
 
       // ========== PREMIUM & LOGOUT ==========
       function initPremiumAndLogout() {
@@ -1256,9 +1295,53 @@
         await initUserUi();
         initNav();
         initSearch();
+        handlePaymentReturnMessage();
         initPremiumAndLogout();
         loadMovies(currentFilter, currentPage);
       })();
     </script>
+    <div
+            id="paymentPopup"
+            style="
+    display: none;
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+    max-width: 400px;
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    color: white;
+    padding: 16px 18px;
+    border-radius: 14px;
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.35);
+    font-size: 14px;
+    line-height: 1.5;
+  "
+    >
+        <div
+                style="
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    "
+        >
+            <div id="paymentPopupMessage"></div>
+            <button
+                    id="closePaymentPopup"
+                    style="
+        border: none;
+        background: transparent;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        line-height: 1;
+      "
+                    type="button"
+            >
+                ×
+            </button>
+        </div>
+    </div>
   </body>
 </html>

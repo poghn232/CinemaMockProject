@@ -441,6 +441,9 @@
 <script>
     const token = localStorage.getItem("token");
     if (!token) window.location.href = "login.html";
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get("mode");
+    const subscriptionId = urlParams.get("subscriptionId");
 
     function moneyVND(n) {
         return new Intl.NumberFormat("vi-VN").format(n) + " ₫";
@@ -505,13 +508,19 @@
         document.getElementById("err").innerText = "";
 
         try {
+            const requestBody = { packId };
+
+            if (mode === "extend" && subscriptionId) {
+                requestBody.subscriptionId = Number(subscriptionId);
+            }
+
             const res = await fetch("/api/payments/vnpay", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": "Bearer " + token
                 },
-                body: JSON.stringify({ packId })
+                body: JSON.stringify(requestBody)
             });
 
             if (res.status === 401) {

@@ -1,12 +1,12 @@
 package com.example.superapp.service;
 
 import com.example.superapp.config.VnPayProperties;
-import com.example.superapp.utils.VnPayUtil;
 import com.example.superapp.entity.*;
 import com.example.superapp.repository.PaymentRepository;
 import com.example.superapp.repository.SubscriptionPackRepository;
 import com.example.superapp.repository.SubscriptionRepository;
 import com.example.superapp.repository.UserRepository;
+import com.example.superapp.utils.VnPayUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,24 +25,47 @@ public class PaymentService {
     private final SubscriptionPackRepository packRepo;
     private final SubscriptionRepository subRepo;
     private final PaymentRepository paymentRepo;
-    private final UserRepository userRepo; // bạn đã có entity User
+    private final UserRepository userRepo;
 
     @Transactional
-    public String createVnPayUrlByUsername(String username, Long packId, String clientIp) {
+    public String createVnPayUrlByUsername(String username, Long packId, Long subscriptionId, String clientIp) {
         User user = userRepo.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         SubscriptionPack pack = packRepo.findById(packId)
                 .orElseThrow(() -> new RuntimeException("Pack not found"));
 
-        // Subscription PENDING
-        Subscription sub = new Subscription();
-        sub.setUser(user);
-        sub.setPack(pack);
-        sub.setStatus(SubscriptionStatus.PENDING);
-        sub = subRepo.save(sub);
+        Subscription sub;
 
-        // Payment PENDING
+        // CÁCH B: gia hạn subscription cũ
+        if (subscriptionId != null) {
+            sub = subRepo.findById(subscriptionId)
+                    .orElseThrow(() -> new RuntimeException("Subscription not found"));
+
+            // kiểm tra subscription này có thuộc user hiện tại không
+            if (!sub.getUser().getUserId().equals(user.getUserId())) {
+                throw new RuntimeException("You cannot extend another user's subscription");
+            }
+
+            // chỉ cho gia hạn subscription đang active
+            if (sub.getStatus() != SubscriptionStatus.ACTIVE) {
+                throw new RuntimeException("Only active subscription can be extended");
+            }
+
+            // cập nhật pack mới mà user vừa chọn để lúc callback dùng durationDays mới
+            sub.setPack(pack);
+            subRepo.save(sub);
+
+        } else {
+            // MUA MỚI
+            sub = new Subscription();
+            sub.setUser(user);
+            sub.setPack(pack);
+            sub.setStatus(SubscriptionStatus.PENDING);
+            sub = subRepo.save(sub);
+        }
+
+        // Tạo payment PENDING
         Payment payment = new Payment();
         payment.setSubscription(sub);
         payment.setAmount(pack.getPackPrice());

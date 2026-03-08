@@ -29,7 +29,12 @@ public class PaymentController {
         String username = authentication.getName();
         String clientIp = IpUtil.getClientIp(request);
 
-        String paymentUrl = paymentService.createVnPayUrlByUsername(username, req.getPackId(), clientIp);
+        String paymentUrl = paymentService.createVnPayUrlByUsername(
+                username,
+                req.getPackId(),
+                req.getSubscriptionId(),
+                clientIp
+        );
 
         return Map.of("paymentUrl", paymentUrl);
     }
