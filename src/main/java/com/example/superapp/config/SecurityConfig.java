@@ -66,6 +66,7 @@ public class SecurityConfig {
                                 "/api/public/**",
                                 "/api/image/**",
                         "/api/admin/banner/upload",
+                                "/api/banner",
 
                                 "/api/vnpay/**",
                                 "/api/payment/**",
