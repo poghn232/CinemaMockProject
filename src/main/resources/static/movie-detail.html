@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>MovieZone | Movie Detail</title>
+    <style>
+      :root {
+        --bg: #020617;
+        --bg-soft: #0f172a;
+        --accent: #f97316;
+        --accent2: #ec4899;
+        --text-main: #e5e7eb;
+        --text-subtle: #9ca3af;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family:
+          "Poppins",
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        background: radial-gradient(circle at 0 0, rgba(37, 99, 235, 0.25), transparent 55%),
+          linear-gradient(135deg, #020617, #030712 55%, #020617);
+        color: var(--text-main);
+        min-height: 100vh;
+      }
+      .page-shell {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 24px 32px 44px;
+      }
+      .navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 22px;
+      }
+      .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .nav-logo {
+        width: 30px;
+        height: 30px;
+        border-radius: 999px;
+        background: radial-gradient(circle at 30% 20%, #f97316, #e11d48 55%, #4f46e5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 25px rgba(248, 113, 113, 0.55);
+        font-size: 14px;
+        font-weight: 700;
+      }
+      .nav-title-main {
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-size: 12px;
+      }
+      .nav-title-sub {
+        font-size: 11px;
+        color: var(--text-subtle);
+      }
+      .back-link {
+        font-size: 13px;
+        color: var(--text-subtle);
+        text-decoration: none;
+      }
+      .back-link:hover {
+        color: var(--text-main);
+      }
+
+      /* HERO */
+      .hero {
+        display: grid;
+        grid-template-columns: 260px minmax(0, 1fr);
+        gap: 26px;
+        padding: 22px 22px 20px;
+        border-radius: 22px;
+        background: radial-gradient(
+            circle at 0 0,
+            rgba(249, 115, 22, 0.45),
+            transparent 60%
+          ),
+          linear-gradient(135deg, #f97316, #facc15 55%, #f97316);
+        color: #111827;
+      }
+      .poster-wrapper {
+        position: relative;
+        max-width: 240px;
+      }
+      .poster {
+        width: 100%;
+        border-radius: 16px;
+        box-shadow:
+          0 20px 40px rgba(15, 23, 42, 0.7),
+          0 0 0 1px rgba(15, 23, 42, 0.2);
+        background-size: cover;
+        background-position: center;
+        aspect-ratio: 2 / 3;
+      }
+      .hero-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .hero-title {
+        font-size: 26px;
+        font-weight: 800;
+      }
+      .hero-subtitle {
+        font-size: 14px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        color: #111827;
+      }
+      .hero-pill {
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(15, 23, 42, 0.16);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+      .hero-rating {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+      }
+      .rating-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        background: #111827;
+        color: #facc15;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+      }
+      .hero-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 6px;
+      }
+      .btn-primary {
+        padding: 10px 16px;
+        border-radius: 999px;
+        border: none;
+        background: linear-gradient(135deg, #111827, #020617);
+        color: #f9fafb;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .btn-primary.disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+      .btn-secondary {
+        padding: 9px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(15, 23, 42, 0.5);
+        background: transparent;
+        color: #111827;
+        font-size: 13px;
+        cursor: pointer;
+      }
+
+      .hero-overview {
+        margin-top: 10px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.14);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      /* BODY */
+      .detail-body {
+        margin-top: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .card {
+        background: rgba(15, 23, 42, 0.96);
+        border-radius: 18px;
+        padding: 16px 18px 18px;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+      }
+      .card h3 {
+        font-size: 16px;
+        margin-bottom: 8px;
+      }
+      .overview {
+        font-size: 14px;
+        color: var(--text-main);
+      }
+      .meta-list {
+        list-style: none;
+        font-size: 13px;
+        color: var(--text-subtle);
+      }
+      .meta-list li {
+        display: flex;
+        justify-content: space-between;
+        padding: 4px 0;
+      }
+      .meta-label {
+        color: var(--text-subtle);
+      }
+      .meta-value {
+        color: var(--text-main);
+        text-align: right;
+      }
+
+      @media (max-width: 900px) {
+        .hero {
+          grid-template-columns: 1fr;
+        }
+        .poster-wrapper {
+          max-width: 200px;
+          margin: 0 auto;
+        }
+        .detail-body {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="navbar">
+        <div class="nav-left">
+          <div class="nav-logo">MZ</div>
+          <div>
+            <div class="nav-title-main">MOVIEZONE</div>
+            <div class="nav-title-sub">Movie details</div>
+          </div>
+        </div>
+        <a href="homepage.html" class="back-link">← Back to homepage</a>
+      </header>
+
+      <section class="hero" id="hero">
+        <div class="poster-wrapper">
+          <div id="poster" class="poster"></div>
+        </div>
+        <div class="hero-meta">
+          <div id="heroTitle" class="hero-title">Loading...</div>
+          <div id="heroSubtitle" class="hero-subtitle"></div>
+          <div id="heroRating" class="hero-rating"></div>
+          <div class="hero-buttons">
+            <button id="playTrailerBtn" class="btn-primary disabled" disabled>
+              ▶ Play Trailer
+            </button>
+          </div>
+          <div id="heroOverview" class="hero-overview">Loading...</div>
+        </div>
+      </section>
+
+      <section class="detail-body">
+        <aside class="card">
+          <h3>Details</h3>
+          <ul class="meta-list">
+            <li>
+              <span class="meta-label">Type</span>
+              <span class="meta-value" id="metaType"></span>
+            </li>
+            <li>
+              <span class="meta-label">Year</span>
+              <span class="meta-value" id="metaYear"></span>
+            </li>
+            <li>
+              <span class="meta-label">Runtime</span>
+              <span class="meta-value" id="metaRuntime"></span>
+            </li>
+            <li>
+              <span class="meta-label">Rating</span>
+              <span class="meta-value" id="metaRating"></span>
+            </li>
+            <li>
+              <span class="meta-label">Votes</span>
+              <span class="meta-value" id="metaVotes"></span>
+            </li>
+          </ul>
+        </aside>
+      </section>
+    </div>
+
+    <script>
+      async function loadDetail() {
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get("id");
+        const type = params.get("type") || "movie";
+        if (!id) {
+          alert("Missing movie id");
+          window.location.href = "homepage.html";
+          return;
+        }
+
+        try {
+          const res = await fetch(
+            `/api/public/movies/detail?type=${encodeURIComponent(
+              type,
+            )}&id=${encodeURIComponent(id)}`,
+          );
+          if (!res.ok) {
+            throw new Error("Failed to load detail " + res.status);
+          }
+          const data = await res.json();
+          renderDetail(data);
+        } catch (e) {
+          console.error(e);
+          alert("Không tải được thông tin phim.");
+        }
+      }
+
+      function renderDetail(d) {
+        document.title = `MovieZone | ${d.title || "Movie Detail"}`;
+
+        const poster = document.getElementById("poster");
+        if (poster) {
+          poster.style.backgroundImage = d.posterUrl
+            ? `url('${d.posterUrl}')`
+            : "url('https://via.placeholder.com/400x600?text=No+Image')";
+        }
+
+        const heroTitle = document.getElementById("heroTitle");
+        const heroSubtitle = document.getElementById("heroSubtitle");
+        const heroRating = document.getElementById("heroRating");
+
+        if (heroTitle) {
+          heroTitle.textContent = d.title || "";
+        }
+
+        const bits = [];
+        if (d.year) bits.push(d.year);
+        bits.push(d.type === "tv" ? "TV Series" : "Movie");
+        if (d.runtime) bits.push(`${d.runtime} min`);
+        heroSubtitle.textContent = bits.join(" · ");
+
+        heroRating.innerHTML = "";
+        if (typeof d.rating === "number") {
+          const circle = document.createElement("div");
+          circle.className = "rating-circle";
+          circle.textContent = d.rating.toFixed(1);
+          const text = document.createElement("div");
+          text.innerHTML = `<strong>User Score</strong><br/><span style="font-size:12px;color:#111827">from ${
+            d.voteCount || 0
+          } votes</span>`;
+          heroRating.appendChild(circle);
+          heroRating.appendChild(text);
+        }
+
+        const overviewEl = document.getElementById("heroOverview");
+        if (overviewEl) {
+          overviewEl.textContent = d.overview || "No overview available.";
+        }
+
+        document.getElementById("metaType").textContent =
+          d.type === "tv" ? "TV Series" : "Movie";
+        document.getElementById("metaYear").textContent = d.year || "-";
+        document.getElementById("metaRuntime").textContent = d.runtime
+          ? `${d.runtime} min`
+          : "-";
+        document.getElementById("metaRating").textContent =
+          typeof d.rating === "number" ? d.rating.toFixed(1) : "-";
+        document.getElementById("metaVotes").textContent = d.voteCount || "-";
+
+        const playBtn = document.getElementById("playTrailerBtn");
+        if (d.src && d.src.trim()) {
+          playBtn.classList.remove("disabled");
+          playBtn.disabled = false;
+          playBtn.textContent = "▶ Watch Trailer";
+          playBtn.style.display = "inline-flex";
+          playBtn.addEventListener("click", () => {
+            window.location.href = `movie-trailer.html?id=${encodeURIComponent(
+              d.id,
+            )}&type=${encodeURIComponent(d.type)}`;
+          });
+        } else {
+          // Ẩn nút nếu chưa cấu hình trailer
+          playBtn.style.display = "none";
+        }
+      }
+
+      loadDetail();
+    </script>
+  </body>
+</html>
+

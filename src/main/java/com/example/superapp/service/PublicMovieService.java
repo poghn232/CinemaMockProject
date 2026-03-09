@@ -2,6 +2,7 @@ package com.example.superapp.service;
 
 import com.example.superapp.dto.MovieItemDto;
 import com.example.superapp.dto.MoviePageResponse;
+import com.example.superapp.dto.MovieDetailDto;
 import com.example.superapp.entity.Movie;
 import com.example.superapp.entity.TvSeries;
 import com.example.superapp.repository.MovieRepository;
@@ -68,6 +69,30 @@ public class PublicMovieService {
         return new MoviePageResponse(pageItems, safePage, totalPages);
     }
 
+    @Transactional(readOnly = true)
+    public MovieDetailDto getDetail(String type, long id) {
+        String t = type == null ? "movie" : type.trim().toLowerCase();
+        if (!t.equals("movie") && !t.equals("tv")) {
+            throw new IllegalArgumentException("type must be 'movie' or 'tv'");
+        }
+
+        if (t.equals("movie")) {
+            Movie m = movieRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Movie not found"));
+            if (!Boolean.TRUE.equals(m.getActive()) || !Boolean.TRUE.equals(m.getPublished())) {
+                throw new IllegalArgumentException("Movie is not published");
+            }
+            return mapMovieDetail(m);
+        } else {
+            TvSeries tv = tvSeriesRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("TV series not found"));
+            if (!Boolean.TRUE.equals(tv.getActive()) || !Boolean.TRUE.equals(tv.getPublished())) {
+                throw new IllegalArgumentException("TV series is not published");
+            }
+            return mapTvDetail(tv);
+        }
+    }
+
     private MovieItemDto mapMovie(Movie m) {
         MovieItemDto dto = new MovieItemDto();
         dto.setId(m.getId());
@@ -103,6 +128,57 @@ public class PublicMovieService {
             dto.setImageUrl(imageBaseUrl + tv.getPosterPath());
         }
 
+        return dto;
+    }
+
+    private MovieDetailDto mapMovieDetail(Movie m) {
+        MovieDetailDto dto = new MovieDetailDto();
+        dto.setId(m.getId());
+        dto.setType("movie");
+        dto.setTitle(m.getTitle());
+        dto.setOverview(m.getOverview());
+        dto.setRating(m.getVoteAverage());
+        dto.setVoteCount(m.getVoteCount());
+        dto.setRuntime(m.getRuntime());
+
+        LocalDate release = m.getReleaseDate();
+        if (release != null) {
+            dto.setYear(release.getYear());
+        }
+
+        if (m.getPosterPath() != null && !m.getPosterPath().isBlank()) {
+            dto.setPosterUrl(imageBaseUrl + m.getPosterPath());
+        }
+        if (m.getBackdropPath() != null && !m.getBackdropPath().isBlank()) {
+            dto.setBackdropUrl(imageBaseUrl + m.getBackdropPath());
+        }
+
+        dto.setSrc(m.getSrc());
+        return dto;
+    }
+
+    private MovieDetailDto mapTvDetail(TvSeries tv) {
+        MovieDetailDto dto = new MovieDetailDto();
+        dto.setId(tv.getId());
+        dto.setType("tv");
+        dto.setTitle(tv.getName());
+        dto.setOverview(tv.getOverview());
+        dto.setRating(tv.getVoteAverage());
+        dto.setVoteCount(tv.getVoteCount());
+
+        LocalDate firstAir = tv.getFirstAirDate();
+        if (firstAir != null) {
+            dto.setYear(firstAir.getYear());
+        }
+
+        if (tv.getPosterPath() != null && !tv.getPosterPath().isBlank()) {
+            dto.setPosterUrl(imageBaseUrl + tv.getPosterPath());
+        }
+        if (tv.getBackdropPath() != null && !tv.getBackdropPath().isBlank()) {
+            dto.setBackdropUrl(imageBaseUrl + tv.getBackdropPath());
+        }
+
+        dto.setSrc(tv.getSrc());
         return dto;
     }
 }

@@ -37,6 +37,11 @@ public class TvSeries {
     @Column(nullable = false)
     private Boolean featured = false;
 
+    /**
+     * Nguồn trailer/video (YouTube URL, v.v.)
+     */
+    private String src;
+
     /* ================= RELATIONSHIPS ================= */
 
     @ManyToMany
@@ -172,5 +177,13 @@ public class TvSeries {
 
     public void setFeatured(Boolean featured) {
         this.featured = featured;
+    }
+
+    public String getSrc() {
+        return src;
+    }
+
+    public void setSrc(String src) {
+        this.src = src;
     }
 }

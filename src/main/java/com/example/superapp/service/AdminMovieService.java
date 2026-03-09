@@ -57,7 +57,8 @@ public class AdminMovieService {
                     m.getTitle(),
                     "movie",
                     Boolean.TRUE.equals(m.getPublished()),
-                    Boolean.TRUE.equals(m.getActive())
+                    Boolean.TRUE.equals(m.getActive()),
+                    m.getSrc()
             ));
         }
 
@@ -67,7 +68,8 @@ public class AdminMovieService {
                     tv.getName(),
                     "tv",
                     Boolean.TRUE.equals(tv.getPublished()),
-                    Boolean.TRUE.equals(tv.getActive())
+                    Boolean.TRUE.equals(tv.getActive()),
+                    tv.getSrc()
             ));
         }
 
@@ -136,7 +138,8 @@ public class AdminMovieService {
                 Movie saved = movieRepository.save(existing);
                 return new AdminMovieDto(saved.getId(), saved.getTitle(), "movie",
                         Boolean.TRUE.equals(saved.getPublished()),
-                        Boolean.TRUE.equals(saved.getActive()));
+                        Boolean.TRUE.equals(saved.getActive()),
+                        saved.getSrc());
             }
 
             Map<String, Object> raw = tmdbService.getMovieDetails(tmdbId);
@@ -171,7 +174,7 @@ public class AdminMovieService {
                 movieRepository.save(saved);
             } catch (Exception ignored) {}
             return new AdminMovieDto(saved.getId(), saved.getTitle(), "movie",
-                    true, true);
+                    true, true, saved.getSrc());
         } else {
             TvSeries existing = tvSeriesRepository.findById(tmdbId).orElse(null);
             if (existing != null) {
@@ -228,7 +231,8 @@ public class AdminMovieService {
                 TvSeries saved = tvSeriesRepository.save(existing);
                 return new AdminMovieDto(saved.getId(), saved.getName(), "tv",
                         Boolean.TRUE.equals(saved.getPublished()),
-                        Boolean.TRUE.equals(saved.getActive()));
+                        Boolean.TRUE.equals(saved.getActive()),
+                        saved.getSrc());
             }
 
             Map<String, Object> raw = tmdbService.getTvDetails(tmdbId);
@@ -262,7 +266,7 @@ public class AdminMovieService {
             } catch (Exception ignored) {}
 
             return new AdminMovieDto(saved.getId(), saved.getName(), "tv",
-                    true, true);
+                    true, true, saved.getSrc());
         }
     }
 
@@ -339,6 +343,24 @@ public class AdminMovieService {
         } else if (t.equals("tv")) {
             tvSeriesRepository.findById(tmdbId).ifPresent(tv -> {
                 tv.setPublished(false);
+                tvSeriesRepository.save(tv);
+            });
+        } else {
+            throw new IllegalArgumentException("type must be 'movie' or 'tv'");
+        }
+    }
+
+    @Transactional
+    public void updateSrc(long tmdbId, String type, String src) {
+        String t = type == null ? "movie" : type.trim().toLowerCase();
+        if (t.equals("movie")) {
+            movieRepository.findById(tmdbId).ifPresent(m -> {
+                m.setSrc(src);
+                movieRepository.save(m);
+            });
+        } else if (t.equals("tv")) {
+            tvSeriesRepository.findById(tmdbId).ifPresent(tv -> {
+                tv.setSrc(src);
                 tvSeriesRepository.save(tv);
             });
         } else {

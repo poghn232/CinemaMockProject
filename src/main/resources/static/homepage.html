@@ -1160,9 +1160,17 @@
           return;
         }
 
-        // Đã đăng nhập: sau này sẽ forward sang trang chi tiết phim.
-        // Hiện tại chỉ báo tạm để tránh trống chức năng.
-        alert("Chức năng xem chi tiết phim sẽ được bổ sung sau.");
+        const type = movie.type || "movie";
+        const id = movie.id;
+        if (!id) {
+          alert("Không xác định được phim.");
+          return;
+        }
+        window.location.href =
+          "movie-detail.html?id=" +
+          encodeURIComponent(id) +
+          "&type=" +
+          encodeURIComponent(type);
       }
 
       // ========== NAV / FILTER HANDLERS ==========
