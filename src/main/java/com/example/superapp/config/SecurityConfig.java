@@ -17,6 +17,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.http.HttpStatus;
 
 @Configuration
 @EnableWebSecurity
@@ -75,9 +78,16 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-                .oauth2Login(oauth2 -> oauth2
-                        .successHandler(oAuth2LoginSuccessHandler)
-                )
+        // For browser flows we use OAuth2 redirects, but API clients (AJAX) should get 401 not a redirect.
+        .exceptionHandling(ex -> ex
+            .defaultAuthenticationEntryPointFor(
+                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+                new AntPathRequestMatcher("/api/**")
+            )
+        )
+        .oauth2Login(oauth2 -> oauth2
+            .successHandler(oAuth2LoginSuccessHandler)
+        )
 
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form.disable())

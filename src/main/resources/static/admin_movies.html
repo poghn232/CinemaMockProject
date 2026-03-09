@@ -160,6 +160,23 @@
         });
 
         actions.appendChild(hideBtn);
+        // Details button for already-added movies
+        const detailsBtn = document.createElement("button");
+        detailsBtn.className = "btn ghost";
+        detailsBtn.textContent = "Details";
+        detailsBtn.addEventListener("click", async () => {
+          const msg = document.getElementById("tmdbMessage");
+          msg.textContent = "Loading details...";
+          try {
+            const details = await fetchJson(`/api/movies/details?id=${encodeURIComponent(f.id)}&type=${encodeURIComponent(f.type)}`);
+            msg.textContent = "";
+            // reuse the same modal used for TMDB browse; pass a minimal item object for display
+            showTmdbDetailModal(details, { id: f.id, type: f.type, title: f.title });
+          } catch (e) {
+            msg.textContent = "Failed to load details: " + e;
+          }
+        });
+        actions.appendChild(detailsBtn);
         row.appendChild(info);
         row.appendChild(actions);
         container.appendChild(row);
@@ -195,6 +212,16 @@
 
     function updateExistingSet() {
       existingSet = new Set((filmsCache || []).map((f) => `${f.type}-${f.id}`));
+    }
+
+    // Robust existence check: sometimes id types (string vs number) or item shape differs,
+    // so compare by scanning filmsCache (fallback) to ensure accuracy.
+    function isExistingItem(it) {
+      if (!it) return false;
+      const key = `${it.type}-${it.id}`;
+      if (existingSet.has(key)) return true;
+      // fallback: check filmsCache with loose equality on id
+      return (filmsCache || []).some((f) => f.type === it.type && String(f.id) === String(it.id));
     }
 
     function renderTmdb() {
@@ -247,9 +274,9 @@
         const ratingTd = document.createElement("td");
         ratingTd.textContent = it.rating != null ? it.rating.toFixed(1) : "";
 
-        const actionTd = document.createElement("td");
-        const key = `${it.type}-${it.id}`;
-        if (existingSet.has(key)) {
+  const actionTd = document.createElement("td");
+  const key = `${it.type}-${it.id}`;
+  if (isExistingItem(it)) {
           const added = document.createElement("button");
           added.className = "btn ghost";
           added.textContent = "Added";
@@ -260,22 +287,14 @@
           addBtn.className = "btn";
           addBtn.textContent = "Add";
           addBtn.addEventListener("click", async () => {
-            if (!confirm(`Add '${it.title}' to database and publish?`)) return;
             const msg = document.getElementById("tmdbMessage");
-            msg.textContent = "Adding...";
+            msg.textContent = "Loading details...";
             try {
-              await fetchJson(api.movies + "/import", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ tmdbId: it.id, type: it.type }),
-              });
-              msg.textContent = "Added successfully.";
-              await loadFilms();
-              updateExistingSet();
-              renderTmdb();
-              refreshCounts();
+              const details = await fetchJson(`/api/movies/details?id=${encodeURIComponent(it.id)}&type=${encodeURIComponent(it.type)}`);
+              msg.textContent = "";
+              showTmdbDetailModal(details, it);
             } catch (e) {
-              msg.textContent = "Add failed: " + e;
+              msg.textContent = "Failed to load details: " + e;
             }
           });
           actionTd.appendChild(addBtn);
@@ -310,6 +329,188 @@
         msg.textContent = "Failed to load TMDB: " + e;
         console.error(e);
       }
+    }
+
+    // Render a modal showing TMDB details and allow confirming Add
+    function showTmdbDetailModal(details, item) {
+      const tmdbImageBase = (window.adminApi && window.adminApi.tmdbImageBase) || 'https://image.tmdb.org/t/p/w500';
+      // details: full TMDB response including 'genres' and 'credits'
+      const overlay = document.createElement('div');
+      overlay.style.position = 'fixed';
+      overlay.style.left = '0';
+      overlay.style.top = '0';
+      overlay.style.right = '0';
+      overlay.style.bottom = '0';
+      overlay.style.background = 'rgba(0,0,0,0.6)';
+      overlay.style.display = 'flex';
+      overlay.style.alignItems = 'center';
+      overlay.style.justifyContent = 'center';
+      overlay.style.zIndex = '9999';
+
+      const modal = document.createElement('div');
+      modal.style.background = '#111';
+      modal.style.padding = '18px';
+      modal.style.borderRadius = '10px';
+      modal.style.maxWidth = '820px';
+      modal.style.width = '90%';
+      modal.style.maxHeight = '85%';
+      modal.style.overflow = 'auto';
+      modal.style.color = 'white';
+
+      const img = details.poster_path ? (details.poster_path.startsWith('http') ? details.poster_path : (window.adminApi ? window.adminApi.imageBaseUrl || null : null) ) : null;
+      const posterUrl = details.poster_path ? (details.poster_path.startsWith('http') ? details.poster_path : (details.poster_path ? details.poster_path : null)) : null;
+
+      // prepare genres
+      let genres = [];
+      if (Array.isArray(details.genres)) {
+        genres = details.genres.map(g => g.name).filter(Boolean);
+      }
+
+      // prepare cast
+      let cast = [];
+      try {
+        const credits = details.credits || {};
+        if (Array.isArray(credits.cast)) {
+          cast = credits.cast.slice(0, 8).map(c => ({ name: c.name, character: c.character }));
+        }
+      } catch (ignored) {}
+
+      const title = details.title || details.name || item.title || '';
+      const overview = details.overview || '';
+      const runtime = details.runtime || (Array.isArray(details.episode_run_time) && details.episode_run_time[0]) || '';
+      const year = (details.release_date && details.release_date.slice(0,4)) || (details.first_air_date && details.first_air_date.slice(0,4)) || '';
+
+      const posterSrc = details.poster_path ? (details.poster_path.startsWith('http') ? details.poster_path : (tmdbImageBase + details.poster_path)) : '/static/images/banner.png';
+
+      modal.innerHTML = `
+        <div style="display:flex; gap:12px; align-items:flex-start">
+          <img src="${posterSrc}" alt="poster" style="width:140px; height:210px; object-fit:cover; border-radius:6px" />
+          <div style="flex:1">
+            <h3 style="margin:0 0 8px 0">${title} ${year ? `(${year})` : ''}</h3>
+            <div class="muted">${item.type === 'tv' ? 'TV Series' : 'Movie'} · ${details.vote_average ? ('★ ' + details.vote_average.toFixed ? details.vote_average.toFixed(1) : details.vote_average) : ''} ${runtime ? '· ' + runtime + ' min' : ''}</div>
+            <div style="margin-top:8px">${overview ? `<div style='margin-bottom:8px'>${overview}</div>` : ''}
+              ${genres.length ? `<div class='muted'>Genres: ${genres.join(', ')}</div>` : ''}
+            </div>
+            <div style="margin-top:10px">
+              ${cast.length ? `<div style='font-weight:600; margin-bottom:6px'>Top cast</div>` : ''}
+              ${cast.map(c => `<div class='muted'>${c.name}${c.character ? ' as ' + c.character : ''}</div>`).join('')}
+            </div>
+            ${item.type === 'tv' ? `<div id='tvEpisodesPanel' style='margin-top:10px'></div>` : ''}
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:14px">
+          <button id='tmdbCancel' class='btn ghost'>Cancel</button>
+          <button id='tmdbConfirm' class='btn'>Add this movie</button>
+        </div>
+      `;
+
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+
+      function close() { overlay.remove(); }
+
+      document.getElementById('tmdbCancel').addEventListener('click', close);
+
+      // If the item already exists in DB, disable the Add button and mark as Added.
+      const confirmBtn = document.getElementById('tmdbConfirm');
+      try {
+        if (isExistingItem(item)) {
+          confirmBtn.textContent = 'Added';
+          confirmBtn.className = 'btn ghost';
+          confirmBtn.disabled = true;
+        } else {
+          confirmBtn.addEventListener('click', async () => {
+            const msg = document.getElementById('tmdbMessage');
+            msg.textContent = 'Adding...';
+            try {
+              await fetchJson(api.movies + '/import', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tmdbId: item.id, type: item.type }),
+              });
+              msg.textContent = 'Added successfully.';
+              await loadFilms();
+              updateExistingSet();
+              renderTmdb();
+              refreshCounts();
+              close();
+            } catch (e) {
+              msg.textContent = 'Add failed: ' + e;
+            }
+          });
+        }
+      } catch (ignored) {}
+      // If this is a TV series, render seasons and episodes panel for adding single episodes
+      try {
+        if (item.type === 'tv' && Array.isArray(details.seasons)) {
+          const panel = document.getElementById('tvEpisodesPanel');
+          panel.innerHTML = '';
+          for (const s of details.seasons) {
+            const sn = s.season_number || s.seasonNumber || s.season;
+            const sTitle = s.name || `Season ${sn}`;
+            const seasonDiv = document.createElement('div');
+            seasonDiv.style.marginTop = '8px';
+            seasonDiv.innerHTML = `<div style='font-weight:600'>${sTitle}</div><div class='muted' id='season-${sn}-episodes'>Loading episodes...</div>`;
+            panel.appendChild(seasonDiv);
+            // fetch season details from TMDB to list episodes
+            (async (seasonNumber) => {
+              try {
+                const epContainer = document.getElementById(`season-${seasonNumber}-episodes`);
+                epContainer.innerHTML = '';
+                // attempt episodes count from s.episode_count
+                const epCount = s.episode_count || s.episodeCount || 10;
+
+                // fetch existing episodes from our backend to mark already-imported ones
+                let existing = [];
+                try {
+                  existing = await fetchJson(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(seasonNumber)}/episodes/existing`);
+                } catch (e) {
+                  // ignore - fallback to assuming none exist
+                }
+
+                for (let e = 1; e <= Math.min(epCount, 50); e++) {
+                  const epBtn = document.createElement('div');
+                  epBtn.style.display = 'flex';
+                  epBtn.style.justifyContent = 'space-between';
+                  epBtn.style.gap = '8px';
+                  epBtn.style.marginTop = '6px';
+                  const left = document.createElement('div');
+                  left.className = 'muted';
+                  left.textContent = 'Episode ' + e;
+                  const right = document.createElement('div');
+                  const addBtn = document.createElement('button');
+                  const already = Array.isArray(existing) && existing.includes(e);
+                  addBtn.className = already ? 'btn ghost' : 'btn';
+                  addBtn.textContent = already ? 'Added' : 'Add episode';
+                  addBtn.disabled = !!already;
+                  addBtn.addEventListener('click', async () => {
+                    const msg = document.getElementById('tmdbMessage');
+                    msg.textContent = 'Adding episode...';
+                    try {
+                      await fetchJson(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(seasonNumber)}/episodes/${encodeURIComponent(e)}/import`, { method: 'POST' });
+                      msg.textContent = 'Episode added.';
+                      addBtn.textContent = 'Added';
+                      addBtn.className = 'btn ghost';
+                      addBtn.disabled = true;
+                      await loadFilms();
+                      refreshCounts();
+                    } catch (err) {
+                      msg.textContent = 'Add episode failed: ' + err;
+                    }
+                  });
+                  right.appendChild(addBtn);
+                  epBtn.appendChild(left);
+                  epBtn.appendChild(right);
+                  epContainer.appendChild(epBtn);
+                }
+              } catch (err) {
+                const epContainer = document.getElementById(`season-${seasonNumber}-episodes`);
+                if (epContainer) epContainer.innerHTML = 'Failed to load episodes.';
+              }
+            })(sn);
+          }
+        }
+      } catch (ignored) {}
     }
 
     document.getElementById("tmdbReload").addEventListener("click", async () => {

@@ -30,6 +30,19 @@ public class AdminMovieController {
         adminMovieService.hide(id, type);
     }
 
+    @PostMapping("/tv/{tvId}/seasons/{seasonNumber}/episodes/{episodeNumber}/import")
+    public AdminMovieDto importEpisode(@PathVariable("tvId") long tvId,
+                                       @PathVariable("seasonNumber") int seasonNumber,
+                                       @PathVariable("episodeNumber") int episodeNumber) {
+        return adminMovieService.importEpisodeFromTmdb(tvId, seasonNumber, episodeNumber);
+    }
+
+    @GetMapping("/tv/{tvId}/seasons/{seasonNumber}/episodes/existing")
+    public java.util.List<Integer> existingEpisodes(@PathVariable("tvId") long tvId,
+                                                    @PathVariable("seasonNumber") int seasonNumber) {
+        return adminMovieService.getExistingEpisodeNumbers(tvId, seasonNumber);
+    }
+
     @Data
     public static class ImportRequest {
         private long tmdbId;
