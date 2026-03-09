@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 public class BannerController {
@@ -31,6 +34,19 @@ public class BannerController {
         System.out.println("Data length: " + banner.getData().length);
 
         return new ResponseEntity<>(banner.getData(), headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/api/banner")
+    public ResponseEntity<List<Map<String, Object>>> retrieveAllBanners() {
+        List<Banner> banners = bannerService.getAllBanners();
+        List<Map<String, Object>> result = banners.stream().map(banner -> {
+                                                      Map<String, Object> map = new HashMap<>();
+                                                      map.put("id", banner.getBannerId());
+                                                      map.put("toURL", banner.getToURL());
+                                                      return map;
+                                                  })
+                                                  .toList();
+        return ResponseEntity.ok(result);
     }
 
     // for temporary image upload

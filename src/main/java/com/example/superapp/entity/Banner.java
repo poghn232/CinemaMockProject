@@ -19,4 +19,6 @@ public class Banner {
     @Lob
     @Column(columnDefinition = "MEDIUMBLOB")
     private byte[] data;
+
+    private String type;
 }

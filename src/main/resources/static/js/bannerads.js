@@ -18,55 +18,64 @@ document.head.insertAdjacentHTML("beforeend", `
   </style>
 `);
 
-const ads = [
-    { id: "leftColAd",  src: "/api/image/2" },
-    { id: "rightColAd", src: "/api/image/2" },
-    { id: "botRowAd",   src: "/api/image/1" }
-];
+const elementIds = ["botRowAd", "leftColAd", "rightColAd"];
 
-ads.forEach(ad => {
-    const wrapper = document.createElement("div");
-    wrapper.className = "ad-wrapper";
-    wrapper.id = `${ad.id}-wrap`;
+fetch("/api/banner")
+    .then(res => res.json())
+    .then(banners => {
+        banners.forEach((banner, index) => {
+            const elementId = elementIds[index];
 
-    const img = document.createElement("img");
-    img.id = ad.id;
-    img.alt = "advertisement";
-    img.src = ad.src;
+            const wrapper = document.createElement("div");
+            wrapper.className = "ad-wrapper";
+            wrapper.id = `${elementId}-wrap`;
 
-    wrapper.appendChild(img);
-    document.body.appendChild(wrapper);
+            const link = document.createElement("a");
+            link.href = banner.toURL;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
 
-    const btn = document.createElement("button");
-    btn.className = "ad-close";
-    btn.textContent = "✕";
-    document.body.appendChild(btn);
+            const img = document.createElement("img");
+            img.id = elementId;
+            img.alt = "advertisement";
+            img.src = `/api/image/${banner.id}`;
 
-    function positionBtn() {
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                const rect = wrapper.getBoundingClientRect();
-                const topPos = Math.max(rect.top, 5);
+            link.appendChild(img);
+            wrapper.appendChild(link);
+            document.body.appendChild(wrapper);
 
-                if (ad.id === "leftColAd") {
-                    btn.style.left = (rect.right - 11) + "px";
-                    btn.style.top  = topPos + "px";
-                } else if (ad.id === "rightColAd") {
-                    btn.style.left = (rect.left - 11) + "px";
-                    btn.style.top  = topPos + "px";
-                } else {
-                    btn.style.left = (rect.right - 11) + "px";
-                    btn.style.top  = (rect.top - 22) + "px";
-                }
+            const btn = document.createElement("button");
+            btn.className = "ad-close";
+            btn.textContent = "✕";
+            document.body.appendChild(btn);
+
+            function positionBtn() {
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        const rect = wrapper.getBoundingClientRect();
+                        const topPos = Math.max(rect.top, 5);
+
+                        if (elementId === "leftColAd") {
+                            btn.style.left = (rect.right - 11) + "px";
+                            btn.style.top  = topPos + "px";
+                        } else if (elementId === "rightColAd") {
+                            btn.style.left = (rect.left - 11) + "px";
+                            btn.style.top  = topPos + "px";
+                        } else {
+                            btn.style.left = (rect.right - 11) + "px";
+                            btn.style.top  = (rect.top - 22) + "px";
+                        }
+                    });
+                });
+            }
+
+            img.addEventListener("load", positionBtn);
+            if (img.complete) positionBtn();
+
+            btn.addEventListener("click", (e) => {
+                e.preventDefault();
+                wrapper.remove();
+                btn.remove();
             });
         });
-    }
-
-    img.addEventListener("load", positionBtn);
-    if (img.complete) positionBtn();
-
-    btn.addEventListener("click", () => {
-        wrapper.remove();
-        btn.remove();
     });
-});
