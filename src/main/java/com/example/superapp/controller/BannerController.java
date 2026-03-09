@@ -36,6 +36,7 @@ public class BannerController {
         return new ResponseEntity<>(banner.getData(), headers, HttpStatus.OK);
     }
 
+    // for temporary image upload
     @PostMapping("/api/admin/banner/upload")
     public ResponseEntity<?> uploadBanner(@RequestParam("file") MultipartFile file,
                                           @RequestParam String tourl) throws IOException {

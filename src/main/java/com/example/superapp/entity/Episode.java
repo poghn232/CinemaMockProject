@@ -27,6 +27,8 @@ public class Episode {
 
     private Double voteAverage;
 
+    private String src;
+
     @ManyToOne
     @JoinColumn(name = "season_id")
     private Season season;

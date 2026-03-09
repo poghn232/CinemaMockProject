@@ -5,6 +5,7 @@
   </div>
 
   <!-- ADD FROM TMDB -->
+  <!-- BROWSE TMDB (browse trending & add) -->
   <div
     style="
       margin-top: 16px;
@@ -16,24 +17,38 @@
       gap: 8px;
     "
   >
-    <div style="font-weight: 600">Add film from TMDB</div>
+    <div style="font-weight: 600">Browse TMDB (select to Add)</div>
     <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
-      <input
-        id="tmdbIdInput"
-        type="number"
-        placeholder="TMDB ID (ví dụ: 603692)"
-        style="flex: 1; min-width: 180px; padding: 8px; border-radius: 8px"
-      />
-      <select
-        id="tmdbTypeInput"
-        style="padding: 8px; border-radius: 8px; min-width: 120px"
-      >
+      <select id="tmdbBrowseType" style="padding: 8px; border-radius: 8px; min-width: 140px">
+        <option value="all">All</option>
         <option value="movie">Movie</option>
         <option value="tv">TV Series</option>
       </select>
-      <button id="tmdbAddButton" class="btn">Add</button>
+      <input
+        id="tmdbSearch"
+        type="text"
+        placeholder="Filter title..."
+        style="flex: 1; min-width: 180px; padding: 8px; border-radius: 8px"
+      />
+      <button id="tmdbReload" class="btn ghost">Reload</button>
     </div>
-    <div id="tmdbAddMessage" class="muted"></div>
+    <div id="tmdbMessage" class="muted"></div>
+
+  <div id="tmdbTableContainer" style="margin-top:12px; width:100%; overflow:auto">Loading...</div>
+
+    <div
+      style="
+        margin-top: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+      "
+    >
+      <button id="tmdbPrev" class="btn ghost">← Prev</button>
+      <span id="tmdbPageInfo" class="muted"></span>
+      <button id="tmdbNext" class="btn ghost">Next →</button>
+    </div>
   </div>
 
   <!-- LIST / HIDE -->
@@ -172,44 +187,158 @@
     document
       .getElementById("refreshFilms")
       .addEventListener("click", loadFilms);
-    //Import films from TMDB
-    document
-      .getElementById("tmdbAddButton")
-      .addEventListener("click", async () => {
-        const idInput = document.getElementById("tmdbIdInput");
-        const typeInput = document.getElementById("tmdbTypeInput");
-        const msg = document.getElementById("tmdbAddMessage");
+    // TMDB browsing and add flow
+    let tmdbPage = 1;
+    let tmdbTotalPages = 1;
+    let tmdbCache = [];
+    let existingSet = new Set(); // type-id keys for items already in DB
 
-        const rawId = idInput.value.trim();
-        const type = typeInput.value;
+    function updateExistingSet() {
+      existingSet = new Set((filmsCache || []).map((f) => `${f.type}-${f.id}`));
+    }
 
-        if (!rawId) {
-          msg.textContent = "Vui lòng nhập TMDB ID.";
-          return;
-        }
+    function renderTmdb() {
+      const container = document.getElementById("tmdbTableContainer");
+      const pageInfo = document.getElementById("tmdbPageInfo");
+      const q = (document.getElementById("tmdbSearch").value || "").toLowerCase().trim();
 
-        const tmdbId = parseInt(rawId, 10);
-        if (!tmdbId || tmdbId <= 0) {
-          msg.textContent = "TMDB ID không hợp lệ.";
-          return;
-        }
+      let list = (tmdbCache || []).slice();
+      if (q) {
+        list = list.filter((it) => (it.title || "").toLowerCase().includes(q));
+      }
 
-        msg.textContent = "Đang import từ TMDB...";
+      container.innerHTML = "";
+      if (!list.length) {
+        container.innerHTML = "No results.";
+        pageInfo.textContent = `Page ${tmdbPage} / ${Math.max(1, tmdbTotalPages)}`;
+        return;
+      }
 
-        try {
-          await fetchJson(api.movies + "/import", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ tmdbId, type }),
+  const table = document.createElement("table");
+  table.style.width = "100%";
+  table.style.borderCollapse = "collapse";
+  // Explicit column widths so header aligns with body cells
+  table.innerHTML = `<thead><tr style=\"text-align:left\"><th style=\"width:64px\"></th><th style=\"width:50%\">Title</th><th style=\"width:12%\">Type</th><th style=\"width:8%\">Year</th><th style=\"width:8%\">Rating</th><th style=\"width:12%\"></th></tr></thead>`;
+      const tbody = document.createElement("tbody");
+
+      list.forEach((it) => {
+  const tr = document.createElement("tr");
+        tr.style.borderBottom = "1px solid rgba(255,255,255,0.03)";
+
+        const imgTd = document.createElement("td");
+        imgTd.style.width = "64px";
+        const img = document.createElement("img");
+        img.src = it.imageUrl || "/static/images/banner.png";
+        img.style.width = "48px";
+        img.style.height = "48px";
+        img.style.objectFit = "cover";
+        img.style.borderRadius = "4px";
+        imgTd.appendChild(img);
+
+        const titleTd = document.createElement("td");
+        titleTd.textContent = it.title || "";
+
+        const typeTd = document.createElement("td");
+        typeTd.textContent = it.type === "tv" ? "TV Series" : "Movie";
+
+        const yearTd = document.createElement("td");
+        yearTd.textContent = it.year || "";
+
+        const ratingTd = document.createElement("td");
+        ratingTd.textContent = it.rating != null ? it.rating.toFixed(1) : "";
+
+        const actionTd = document.createElement("td");
+        const key = `${it.type}-${it.id}`;
+        if (existingSet.has(key)) {
+          const added = document.createElement("button");
+          added.className = "btn ghost";
+          added.textContent = "Added";
+          added.disabled = true;
+          actionTd.appendChild(added);
+        } else {
+          const addBtn = document.createElement("button");
+          addBtn.className = "btn";
+          addBtn.textContent = "Add";
+          addBtn.addEventListener("click", async () => {
+            if (!confirm(`Add '${it.title}' to database and publish?`)) return;
+            const msg = document.getElementById("tmdbMessage");
+            msg.textContent = "Adding...";
+            try {
+              await fetchJson(api.movies + "/import", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ tmdbId: it.id, type: it.type }),
+              });
+              msg.textContent = "Added successfully.";
+              await loadFilms();
+              updateExistingSet();
+              renderTmdb();
+              refreshCounts();
+            } catch (e) {
+              msg.textContent = "Add failed: " + e;
+            }
           });
-          msg.textContent = "Import thành công. Phim đã được publish.";
-          idInput.value = "";
-          await loadFilms();
-          refreshCounts();
-        } catch (e) {
-          msg.textContent = "Import thất bại: " + e;
+          actionTd.appendChild(addBtn);
         }
+
+        tr.appendChild(imgTd);
+        tr.appendChild(titleTd);
+        tr.appendChild(typeTd);
+        tr.appendChild(yearTd);
+        tr.appendChild(ratingTd);
+        tr.appendChild(actionTd);
+        tbody.appendChild(tr);
       });
+
+      table.appendChild(tbody);
+      container.appendChild(table);
+      pageInfo.textContent = `Page ${tmdbPage} / ${Math.max(1, tmdbTotalPages)}`;
+    }
+
+    async function loadTmdb() {
+      const msg = document.getElementById("tmdbMessage");
+      msg.textContent = "Loading TMDB...";
+      const type = document.getElementById("tmdbBrowseType").value || "all";
+      try {
+        const resp = await fetchJson(`/api/movies/trending?type=${encodeURIComponent(type)}&page=${tmdbPage}`);
+        tmdbCache = resp.items || [];
+        tmdbTotalPages = resp.totalPages || 1;
+        msg.textContent = "";
+        updateExistingSet();
+        renderTmdb();
+      } catch (e) {
+        msg.textContent = "Failed to load TMDB: " + e;
+        console.error(e);
+      }
+    }
+
+    document.getElementById("tmdbReload").addEventListener("click", async () => {
+      tmdbPage = 1;
+      await loadTmdb();
+    });
+
+    document.getElementById("tmdbPrev").addEventListener("click", async () => {
+      if (tmdbPage > 1) {
+        tmdbPage--;
+        await loadTmdb();
+      }
+    });
+
+    document.getElementById("tmdbNext").addEventListener("click", async () => {
+      if (tmdbPage < tmdbTotalPages) {
+        tmdbPage++;
+        await loadTmdb();
+      }
+    });
+
+    document.getElementById("tmdbBrowseType").addEventListener("change", async () => {
+      tmdbPage = 1;
+      await loadTmdb();
+    });
+
+    document.getElementById("tmdbSearch").addEventListener("input", () => {
+      renderTmdb();
+    });
 
     document.getElementById("filmsPrev").addEventListener("click", () => {
       if (currentPage > 1) {
@@ -227,5 +356,12 @@
     });
 
     await loadFilms();
+    // Load TMDB browse after initial films are loaded so the browse table
+    // knows which items already exist in the database.
+    try {
+      await loadTmdb();
+    } catch (e) {
+      console.error('loadTmdb failed', e);
+    }
   })();
 </script>
