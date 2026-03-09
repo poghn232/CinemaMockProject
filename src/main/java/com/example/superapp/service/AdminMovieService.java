@@ -10,6 +10,8 @@ import com.example.superapp.repository.EpisodeRepository;
 import com.example.superapp.repository.GenreRepository;
 import com.example.superapp.repository.PersonRepository;
 import com.example.superapp.repository.MovieCreditRepository;
+import com.example.superapp.repository.StudioRepository;
+import com.example.superapp.repository.TvCreditRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,8 @@ public class AdminMovieService {
     private final GenreRepository genreRepository;
     private final PersonRepository personRepository;
     private final MovieCreditRepository movieCreditRepository;
+    private final StudioRepository studioRepository;
+    private final TvCreditRepository tvCreditRepository;
     private final TmdbService tmdbService;
 
     @Transactional(readOnly = true)
@@ -171,8 +175,56 @@ public class AdminMovieService {
         } else {
             TvSeries existing = tvSeriesRepository.findById(tmdbId).orElse(null);
             if (existing != null) {
+                // refresh simple metadata
+                Map<String, Object> rawExisting = tmdbService.getTvDetails(tmdbId);
+                TvSeries fresh = mapTvFromRaw(rawExisting);
+                try {
+                    existing.setName(fresh.getName());
+                    existing.setOverview(fresh.getOverview());
+                    existing.setPosterPath(fresh.getPosterPath());
+                    existing.setBackdropPath(fresh.getBackdropPath());
+                    existing.setVoteAverage(fresh.getVoteAverage());
+                    existing.setVoteCount(fresh.getVoteCount());
+                    existing.setFirstAirDate(fresh.getFirstAirDate());
+                } catch (Exception ignored) {}
+
+                // replace genres
+                try {
+                    if (existing.getGenres() != null) existing.getGenres().clear();
+                    if (fresh.getGenres() != null) existing.getGenres().addAll(fresh.getGenres());
+                } catch (Exception ignored) {}
+
+                // replace studios
+                try {
+                    if (existing.getStudios() != null) existing.getStudios().clear();
+                    if (fresh.getStudios() != null) existing.getStudios().addAll(fresh.getStudios());
+                } catch (Exception ignored) {}
+
                 existing.setActive(true);
                 existing.setPublished(true);
+
+                // replace credits: delete old then persist new credits linked to this tv
+                try {
+                    if (existing.getCredits() != null && !existing.getCredits().isEmpty()) {
+                        tvCreditRepository.deleteAll(existing.getCredits());
+                        existing.getCredits().clear();
+                    }
+
+                    if (fresh.getCredits() != null) {
+                        for (com.example.superapp.entity.TvCredit tc : fresh.getCredits()) {
+                            if (tc.getId() == null) tc.setId(new com.example.superapp.entity.TvCreditId());
+                            tc.getId().setTvId(existing.getId());
+                            tc.setTvSeries(existing);
+                            if (tc.getPerson() != null && tc.getPerson().getId() != null) {
+                                com.example.superapp.entity.Person p = personRepository.findById(tc.getPerson().getId()).orElse(tc.getPerson());
+                                tc.setPerson(p);
+                            }
+                            tvCreditRepository.save(tc);
+                            existing.getCredits().add(tc);
+                        }
+                    }
+                } catch (Exception ignored) {}
+
                 TvSeries saved = tvSeriesRepository.save(existing);
                 return new AdminMovieDto(saved.getId(), saved.getName(), "tv",
                         Boolean.TRUE.equals(saved.getPublished()),
@@ -186,7 +238,29 @@ public class AdminMovieService {
             tv.setPublished(true);
             tv.setFeatured(false);
 
+            // detach credits before saving TV so JPA won't try to persist them with null tv refs
+            java.util.Set<com.example.superapp.entity.TvCredit> credits = new java.util.HashSet<>();
+            try {
+                if (tv.getCredits() != null) {
+                    credits.addAll(tv.getCredits());
+                    tv.getCredits().clear();
+                }
+            } catch (Exception ignored) {}
+
             TvSeries saved = tvSeriesRepository.save(tv);
+
+            // persist credits after tv has an id and set proper tv reference + composite id
+            try {
+                for (com.example.superapp.entity.TvCredit tc : credits) {
+                    if (tc.getId() == null) tc.setId(new com.example.superapp.entity.TvCreditId());
+                    tc.getId().setTvId(saved.getId());
+                    tc.setTvSeries(saved);
+                    tvCreditRepository.save(tc);
+                    saved.getCredits().add(tc);
+                }
+                tvSeriesRepository.save(saved);
+            } catch (Exception ignored) {}
+
             return new AdminMovieDto(saved.getId(), saved.getName(), "tv",
                     true, true);
         }
@@ -329,6 +403,38 @@ public class AdminMovieService {
             }
         } catch (Exception ignored) {}
 
+        // Map production companies / studios (upsert by TMDB id)
+        try {
+            Object studiosObj = raw.get("production_companies");
+            if (studiosObj instanceof java.util.List<?> studioList) {
+                for (Object sObj : studioList) {
+                    if (!(sObj instanceof Map)) continue;
+                    Map<String, Object> sm = (Map<String, Object>) sObj;
+                    Object idObj = sm.get("id");
+                    Long sid = null;
+                    if (idObj instanceof Number n) sid = n.longValue();
+                    String sname = TmdbService.stringVal(sm.get("name"));
+                    String logoPath = TmdbService.stringVal(sm.get("logo_path"));
+                    String originCountry = TmdbService.stringVal(sm.get("origin_country"));
+                    if (sid != null && sname != null && !sname.isBlank()) {
+                        com.example.superapp.entity.Studio studio = studioRepository.findById(sid).orElse(null);
+                        if (studio == null) {
+                            studio = com.example.superapp.entity.Studio.builder()
+                                    .id(sid).name(sname).logoPath(logoPath).originCountry(originCountry).build();
+                            studioRepository.save(studio);
+                        } else {
+                            boolean changed = false;
+                            if (!sname.equals(studio.getName())) { studio.setName(sname); changed = true; }
+                            if (logoPath != null && !logoPath.equals(studio.getLogoPath())) { studio.setLogoPath(logoPath); changed = true; }
+                            if (originCountry != null && !originCountry.equals(studio.getOriginCountry())) { studio.setOriginCountry(originCountry); changed = true; }
+                            if (changed) studioRepository.save(studio);
+                        }
+                        m.getStudios().add(studio);
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+
         // Map credits (cast) -> create Person entries and MovieCredit records
         try {
             Object creditsObj = raw.get("credits");
@@ -404,6 +510,112 @@ public class AdminMovieService {
             } catch (Exception ignored) {
             }
         }
+
+        // Map genres (upsert by TMDB id)
+        try {
+            Object genresObj = raw.get("genres");
+            if (genresObj instanceof java.util.List<?> genreList) {
+                for (Object gObj : genreList) {
+                    if (!(gObj instanceof Map)) continue;
+                    Map<String, Object> gm = (Map<String, Object>) gObj;
+                    Object idObj = gm.get("id");
+                    Long gid = null;
+                    if (idObj instanceof Number n) gid = n.longValue();
+                    String gname = TmdbService.stringVal(gm.get("name"));
+                    if (gid != null && gname != null && !gname.isBlank()) {
+                        com.example.superapp.entity.Genre genre = genreRepository.findById(gid).orElse(null);
+                        if (genre == null) {
+                            genre = new com.example.superapp.entity.Genre(gid, gname);
+                            genreRepository.save(genre);
+                        } else if (!gname.equals(genre.getName())) {
+                            genre.setName(gname);
+                            genreRepository.save(genre);
+                        }
+                        tv.getGenres().add(genre);
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+
+        // Map production companies / studios (upsert by TMDB id)
+        try {
+            Object studiosObj = raw.get("production_companies");
+            if (studiosObj == null) studiosObj = raw.get("networks"); // TMDB uses networks for TV
+            if (studiosObj instanceof java.util.List<?> studioList) {
+                for (Object sObj : studioList) {
+                    if (!(sObj instanceof Map)) continue;
+                    Map<String, Object> sm = (Map<String, Object>) sObj;
+                    Object idObj = sm.get("id");
+                    Long sid = null;
+                    if (idObj instanceof Number n) sid = n.longValue();
+                    String sname = TmdbService.stringVal(sm.get("name"));
+                    String logoPath = TmdbService.stringVal(sm.get("logo_path"));
+                    String originCountry = TmdbService.stringVal(sm.get("origin_country"));
+                    if (sid != null && sname != null && !sname.isBlank()) {
+                        com.example.superapp.entity.Studio studio = studioRepository.findById(sid).orElse(null);
+                        if (studio == null) {
+                            studio = com.example.superapp.entity.Studio.builder()
+                                    .id(sid).name(sname).logoPath(logoPath).originCountry(originCountry).build();
+                            studioRepository.save(studio);
+                        } else {
+                            boolean changed = false;
+                            if (!sname.equals(studio.getName())) { studio.setName(sname); changed = true; }
+                            if (logoPath != null && !logoPath.equals(studio.getLogoPath())) { studio.setLogoPath(logoPath); changed = true; }
+                            if (originCountry != null && !originCountry.equals(studio.getOriginCountry())) { studio.setOriginCountry(originCountry); changed = true; }
+                            if (changed) studioRepository.save(studio);
+                        }
+                        tv.getStudios().add(studio);
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+
+        // Map credits (cast) -> create Person entries and TvCredit records
+        try {
+            Object creditsObj = raw.get("credits");
+            if (creditsObj instanceof Map<?, ?> creditsMap) {
+                Object castObj = creditsMap.get("cast");
+                if (castObj instanceof java.util.List<?> castList) {
+                    int order = 0;
+                    for (Object cObj : castList) {
+                        if (!(cObj instanceof Map)) continue;
+                        Map<String, Object> cm = (Map<String, Object>) cObj;
+                        Object pidObj = cm.get("id");
+                        Long pid = null;
+                        if (pidObj instanceof Number n) pid = n.longValue();
+                        String pname = TmdbService.stringVal(cm.get("name"));
+                        String profilePath = TmdbService.stringVal(cm.get("profile_path"));
+                        String character = TmdbService.stringVal(cm.get("character"));
+                        if (pid == null || pname == null) continue;
+
+                        com.example.superapp.entity.Person person = personRepository.findById(pid).orElse(null);
+                        if (person == null) {
+                            person = new com.example.superapp.entity.Person();
+                            person.setId(pid);
+                            person.setName(pname);
+                            person.setProfilePath(profilePath);
+                            personRepository.save(person);
+                        } else {
+                            boolean changed = false;
+                            if (!pname.equals(person.getName())) { person.setName(pname); changed = true; }
+                            if (profilePath != null && !profilePath.equals(person.getProfilePath())) { person.setProfilePath(profilePath); changed = true; }
+                            if (changed) personRepository.save(person);
+                        }
+
+                        // create TvCredit link (TvSeries not persisted yet, so set id later)
+                        com.example.superapp.entity.TvCredit tc = new com.example.superapp.entity.TvCredit();
+                        com.example.superapp.entity.TvCreditId tcid = new com.example.superapp.entity.TvCreditId();
+                        tcid.setTvId(null); // will set after tv has an id
+                        tcid.setPersonId(pid);
+                        tc.setId(tcid);
+                        tc.setPerson(person);
+                        tc.setCharacter(character);
+                        tc.setCreditOrder(order++);
+                        tv.getCredits().add(tc);
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
 
         return tv;
     }
