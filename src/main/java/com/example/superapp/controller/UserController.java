@@ -56,7 +56,7 @@ public class UserController {
                         subMap.put("pack", packMap);
                     }
                     return subMap;
-                }).collect(Collectors.toList());
+                }).toList();
 
         return ResponseEntity.ok(Map.of(
                 "userId", user.getUserId(),
