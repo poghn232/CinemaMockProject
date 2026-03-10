@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="vi">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <title>MovieZone | Movie Detail</title>
@@ -25,21 +25,43 @@
           BlinkMacSystemFont,
           "Segoe UI",
           sans-serif;
-        background: radial-gradient(circle at 0 0, rgba(37, 99, 235, 0.25), transparent 55%),
-          linear-gradient(135deg, #020617, #030712 55%, #020617);
+        background: var(--bg);
         color: var(--text-main);
         min-height: 100vh;
       }
-      .page-shell {
-        max-width: 1320px;
-        margin: 0 auto;
-        padding: 24px 32px 44px;
+
+      /* BACKDROP HEADER */
+      .backdrop-header {
+        position: relative;
+        height: 500px;
+        background-size: cover;
+        background-position: center;
+        background-color: var(--bg-soft);
+        overflow: hidden;
       }
+      .backdrop-header::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 50%, rgba(2,6,23,0.9) 100%);
+      }
+
+      .page-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
       .navbar {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 22px;
+        padding: 16px 0;
+        position: relative;
+        z-index: 10;
       }
       .nav-left {
         display: flex;
@@ -72,233 +94,421 @@
         font-size: 13px;
         color: var(--text-subtle);
         text-decoration: none;
+        cursor: pointer;
       }
       .back-link:hover {
         color: var(--text-main);
       }
 
-      /* HERO */
-      .hero {
-        display: grid;
-        grid-template-columns: 260px minmax(0, 1fr);
-        gap: 26px;
-        padding: 22px 22px 20px;
-        border-radius: 22px;
-        background: radial-gradient(
-            circle at 0 0,
-            rgba(249, 115, 22, 0.45),
-            transparent 60%
-          ),
-          linear-gradient(135deg, #f97316, #facc15 55%, #f97316);
-        color: #111827;
+      /* HERO CONTENT */
+      .hero-content {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 60px 24px 40px;
+        z-index: 5;
       }
+      .hero-layout {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        gap: 32px;
+        align-items: flex-end;
+      }
+
       .poster-wrapper {
-        position: relative;
-        max-width: 240px;
+        flex-shrink: 0;
       }
       .poster {
-        width: 100%;
-        border-radius: 16px;
-        box-shadow:
-          0 20px 40px rgba(15, 23, 42, 0.7),
-          0 0 0 1px rgba(15, 23, 42, 0.2);
+        width: 140px;
+        height: 210px;
+        border-radius: 8px;
         background-size: cover;
         background-position: center;
-        aspect-ratio: 2 / 3;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
       }
-      .hero-meta {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
+
+      .hero-info {
+        flex: 1;
+        min-width: 0;
       }
       .hero-title {
-        font-size: 26px;
+        font-size: 42px;
         font-weight: 800;
+        margin-bottom: 4px;
+        line-height: 1.1;
       }
       .hero-subtitle {
-        font-size: 14px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        color: #111827;
-      }
-      .hero-pill {
-        padding: 4px 10px;
-        border-radius: 999px;
-        border: 1px solid rgba(15, 23, 42, 0.16);
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
+        font-size: 16px;
+        color: var(--text-subtle);
+        margin-bottom: 16px;
       }
       .hero-rating {
         display: flex;
         align-items: center;
-        gap: 8px;
-        font-size: 14px;
+        gap: 16px;
+        margin-bottom: 16px;
       }
-      .rating-circle {
-        width: 40px;
-        height: 40px;
-        border-radius: 999px;
-        background: #111827;
-        color: #facc15;
+      .rating-badge {
         display: flex;
         align-items: center;
-        justify-content: center;
-        font-weight: 700;
+        gap: 8px;
+        background: rgba(249, 115, 22, 0.2);
+        padding: 8px 14px;
+        border-radius: 8px;
       }
-      .hero-buttons {
+      .rating-number {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--accent);
+      }
+      .rating-label {
+        font-size: 12px;
+        color: var(--text-subtle);
+      }
+
+      .action-buttons {
         display: flex;
+        gap: 12px;
         flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 6px;
+        margin-bottom: 0;
       }
       .btn-primary {
-        padding: 10px 16px;
-        border-radius: 999px;
+        padding: 12px 32px;
+        border-radius: 6px;
         border: none;
-        background: linear-gradient(135deg, #111827, #020617);
-        color: #f9fafb;
-        font-size: 13px;
+        background: #ef4444;
+        color: white;
+        font-size: 14px;
         font-weight: 600;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
+        transition: background 0.2s;
       }
-      .btn-primary.disabled {
+      .btn-primary:hover:not(:disabled) {
+        background: #dc2626;
+      }
+      .btn-primary:disabled {
         opacity: 0.5;
-        cursor: default;
+        cursor: not-allowed;
       }
       .btn-secondary {
-        padding: 9px 14px;
-        border-radius: 999px;
-        border: 1px solid rgba(15, 23, 42, 0.5);
+        padding: 10px 20px;
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
         background: transparent;
-        color: #111827;
+        color: var(--text-main);
         font-size: 13px;
         cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn-secondary:hover {
+        border-color: var(--accent);
+        color: var(--accent);
       }
 
-      .hero-overview {
-        margin-top: 10px;
-        padding: 10px 12px;
-        border-radius: 14px;
-        background: rgba(255, 255, 255, 0.14);
-        font-size: 13px;
-        line-height: 1.5;
+      /* DETAIL SECTION */
+      .detail-section {
+        padding: 40px 24px;
+      }
+      .detail-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 40px;
+        max-width: 1200px;
+        margin: 0 auto;
       }
 
-      /* BODY */
-      .detail-body {
-        margin-top: 24px;
+      .detail-column {
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 24px;
       }
+
       .card {
-        background: rgba(15, 23, 42, 0.96);
-        border-radius: 18px;
-        padding: 16px 18px 18px;
-        border: 1px solid rgba(148, 163, 184, 0.4);
+        background: rgba(15, 23, 42, 0.5);
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid rgba(148, 163, 184, 0.15);
       }
-      .card h3 {
+      .card-title {
         font-size: 16px;
-        margin-bottom: 8px;
-      }
-      .overview {
-        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
         color: var(--text-main);
       }
+
       .meta-list {
         list-style: none;
-        font-size: 13px;
-        color: var(--text-subtle);
+        font-size: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
       }
       .meta-list li {
         display: flex;
-        justify-content: space-between;
-        padding: 4px 0;
+        flex-direction: column;
+        gap: 4px;
       }
       .meta-label {
         color: var(--text-subtle);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
       }
       .meta-value {
         color: var(--text-main);
-        text-align: right;
+        font-weight: 500;
       }
 
-      @media (max-width: 900px) {
-        .hero {
-          grid-template-columns: 1fr;
+      .overview-text {
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--text-main);
+      }
+
+      .cast-list {
+        list-style: none;
+        font-size: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .cast-item {
+        color: var(--text-main);
+      }
+      .cast-character {
+        font-size: 12px;
+        color: var(--text-subtle);
+      }
+
+      /* SEASONS SECTION */
+      .seasons-full-width {
+        padding: 40px 24px;
+        border-top: 1px solid rgba(148, 163, 184, 0.15);
+      }
+      .seasons-container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .seasons-title {
+        font-size: 20px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 24px;
+        color: var(--text-main);
+      }
+      .seasons-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .season-item {
+        display: flex;
+        gap: 20px;
+        padding: 16px;
+        background: rgba(15, 23, 42, 0.5);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .season-item:hover {
+        background: rgba(15, 23, 42, 0.7);
+        border-color: var(--accent);
+      }
+      .season-poster {
+        flex-shrink: 0;
+        width: 100px;
+        height: 150px;
+        background-size: cover;
+        background-position: center;
+        border-radius: 8px;
+        background-color: var(--bg-soft);
+      }
+      .season-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .season-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-main);
+      }
+      .season-meta {
+        font-size: 13px;
+        color: var(--text-subtle);
+      }
+      .season-episodes {
+        margin-top: 12px;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+      }
+      .season-episodes.expanded {
+        max-height: 500px;
+      }
+      .episodes-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-top: 12px;
+        border-top: 1px solid rgba(148, 163, 184, 0.15);
+      }
+      .episode-item {
+        padding: 10px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+      }
+      .episode-number {
+        color: var(--text-subtle);
+        font-weight: 600;
+      }
+      .episode-name {
+        flex: 1;
+        margin-left: 12px;
+        color: var(--text-main);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .episode-status {
+        font-size: 12px;
+        color: #10b981;
+        margin-left: 8px;
+      }
+
+      @media (max-width: 768px) {
+        .backdrop-header {
+          height: 300px;
         }
-        .poster-wrapper {
-          max-width: 200px;
-          margin: 0 auto;
-        }
-        .detail-body {
+        .hero-layout {
           flex-direction: column;
+          align-items: center;
+          text-align: center;
+        }
+        .hero-title {
+          font-size: 28px;
+        }
+        .poster {
+          width: 120px;
+          height: 180px;
+        }
+        .detail-row {
+          grid-template-columns: 1fr;
+          gap: 20px;
         }
       }
     </style>
   </head>
   <body>
-    <div class="page-shell">
-      <header class="navbar">
-        <div class="nav-left">
-          <div class="nav-logo">MZ</div>
-          <div>
-            <div class="nav-title-main">MOVIEZONE</div>
-            <div class="nav-title-sub">Movie details</div>
+    <div class="backdrop-header" id="backdropHeader">
+      <div class="page-container">
+        <header class="navbar">
+          <div class="nav-left">
+            <div class="nav-logo">MZ</div>
+            <div>
+              <div class="nav-title-main">MovieZone</div>
+              <div class="nav-title-sub">Movie Details</div>
+            </div>
+          </div>
+          <a href="homepage.html" class="back-link">← Back to Home</a>
+        </header>
+      </div>
+      
+      <div class="hero-content">
+        <div class="hero-layout">
+          <div class="poster-wrapper">
+            <div id="poster" class="poster"></div>
+          </div>
+          <div class="hero-info">
+            <h1 class="hero-title" id="heroTitle">Loading...</h1>
+            <div class="hero-subtitle" id="heroSubtitle"></div>
+            <div class="hero-rating" id="heroRating"></div>
+            <div class="action-buttons">
+              <button id="playBtn" class="btn-primary" style="display:none">
+                ▶ Watch Movie
+              </button>
+            </div>
           </div>
         </div>
-        <a href="homepage.html" class="back-link">← Back to homepage</a>
-      </header>
+      </div>
+    </div>
 
-      <section class="hero" id="hero">
-        <div class="poster-wrapper">
-          <div id="poster" class="poster"></div>
-        </div>
-        <div class="hero-meta">
-          <div id="heroTitle" class="hero-title">Loading...</div>
-          <div id="heroSubtitle" class="hero-subtitle"></div>
-          <div id="heroRating" class="hero-rating"></div>
-          <div class="hero-buttons">
-            <button id="playTrailerBtn" class="btn-primary disabled" disabled>
-              ▶ Play Trailer
-            </button>
+    <div class="detail-section">
+      <div class="detail-row">
+        <div class="detail-column">
+          <div class="card">
+            <div class="card-title">Overview</div>
+            <div id="overviewText" class="overview-text">Loading...</div>
           </div>
-          <div id="heroOverview" class="hero-overview">Loading...</div>
-        </div>
-      </section>
 
-      <section class="detail-body">
-        <aside class="card">
-          <h3>Details</h3>
-          <ul class="meta-list">
-            <li>
-              <span class="meta-label">Type</span>
-              <span class="meta-value" id="metaType"></span>
-            </li>
-            <li>
-              <span class="meta-label">Year</span>
-              <span class="meta-value" id="metaYear"></span>
-            </li>
-            <li>
-              <span class="meta-label">Runtime</span>
-              <span class="meta-value" id="metaRuntime"></span>
-            </li>
-            <li>
-              <span class="meta-label">Rating</span>
-              <span class="meta-value" id="metaRating"></span>
-            </li>
-            <li>
-              <span class="meta-label">Votes</span>
-              <span class="meta-value" id="metaVotes"></span>
-            </li>
-          </ul>
-        </aside>
-      </section>
+          <div class="card">
+            <div class="card-title">Cast</div>
+            <ul id="castList" class="cast-list">
+              <li class="cast-item">Loading...</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="detail-column">
+          <div class="card">
+            <div class="card-title">Details</div>
+            <ul class="meta-list">
+              <li>
+                <span class="meta-label">Type</span>
+                <span class="meta-value" id="metaType"></span>
+              </li>
+              <li>
+                <span class="meta-label">Year</span>
+                <span class="meta-value" id="metaYear"></span>
+              </li>
+              <li>
+                <span class="meta-label">Director</span>
+                <span class="meta-value" id="metaDirector">-</span>
+              </li>
+              <li>
+                <span class="meta-label">Country</span>
+                <span class="meta-value" id="metaCountry">-</span>
+              </li>
+              <li>
+                <span class="meta-label">Release Date</span>
+                <span class="meta-value" id="metaReleaseDate">-</span>
+              </li>
+              <li>
+                <span class="meta-label">Runtime</span>
+                <span class="meta-value" id="metaRuntime"></span>
+              </li>
+              <li>
+                <span class="meta-label">Rating</span>
+                <span class="meta-value" id="metaRating"></span>
+              </li>
+              <li id="seasonEpisodesRow" style="display:none">
+                <span class="meta-label">Seasons & Episodes</span>
+                <span class="meta-value" id="metaSeasonEpisodes">-</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEASONS SECTION FOR TV SERIES -->
+    <div id="seasonsSection" class="seasons-full-width" style="display:none">
+      <div class="seasons-container">
+        <div class="seasons-title">Seasons</div>
+        <div id="seasonsGrid" class="seasons-grid">Loading seasons...</div>
+      </div>
     </div>
 
     <script>
@@ -307,7 +517,7 @@
         const id = params.get("id");
         const type = params.get("type") || "movie";
         if (!id) {
-          alert("Missing movie id");
+          alert("Missing movie ID");
           window.location.href = "homepage.html";
           return;
         }
@@ -322,16 +532,114 @@
             throw new Error("Failed to load detail " + res.status);
           }
           const data = await res.json();
-          renderDetail(data);
+          renderDetail(data, type);
         } catch (e) {
           console.error(e);
-          alert("Không tải được thông tin phim.");
+          alert("Failed to load movie information.");
         }
       }
 
-      function renderDetail(d) {
+      async function getSeasonEpisodeCount(tvId) {
+        try {
+          const res = await fetch(`/api/movies/tv/${encodeURIComponent(tvId)}/seasons`);
+          if (!res.ok) return null;
+          const seasons = await res.json();
+          let totalSeasons = 0;
+          let totalEpisodes = 0;
+          seasons.forEach(s => {
+            totalSeasons++;
+            totalEpisodes += (s.episodes || []).length;
+          });
+          return { seasons: totalSeasons, episodes: totalEpisodes };
+        } catch (e) {
+          console.error("Failed to fetch seasons/episodes", e);
+          return null;
+        }
+      }
+
+      async function loadAndRenderSeasons(tvId, details) {
+        try {
+          const res = await fetch(`/api/movies/tv/${encodeURIComponent(tvId)}/seasons`);
+          if (!res.ok) {
+            console.error("Failed to fetch seasons");
+            return;
+          }
+          
+          const seasons = await res.json();
+          if (!seasons || seasons.length === 0) {
+            document.getElementById("seasonsSection").style.display = "none";
+            return;
+          }
+
+          const grid = document.getElementById("seasonsGrid");
+          grid.innerHTML = "";
+
+          // Sort seasons by season number
+          const sortedSeasons = [...seasons].sort((a, b) => (a.seasonNumber || 0) - (b.seasonNumber || 0));
+
+          sortedSeasons.forEach((season, idx) => {
+            const seasonDiv = document.createElement("div");
+            seasonDiv.className = "season-item";
+
+            // Get season poster from TMDB details if available
+            let seasonPoster = "/static/images/banner.png";
+            if (Array.isArray(details.seasons)) {
+              const tmdbSeason = details.seasons.find(s => (s.season_number || s.seasonNumber) === season.seasonNumber);
+              if (tmdbSeason && tmdbSeason.poster_path) {
+                seasonPoster = "https://image.tmdb.org/t/p/w200" + tmdbSeason.poster_path;
+              }
+            }
+
+            const publishedCount = (season.episodes || []).filter(ep => ep.published).length;
+            const totalCount = (season.episodes || []).length;
+
+            seasonDiv.innerHTML = `
+              <div class="season-poster" style="background-image: url('${seasonPoster}')"></div>
+              <div class="season-info">
+                <div class="season-name">${season.name || `Season ${season.seasonNumber}`}</div>
+                <div class="season-meta">${totalCount} episode${totalCount !== 1 ? 's' : ''} · ${publishedCount} published</div>
+                <div id="episodes-${idx}" class="season-episodes">
+                  <div class="episodes-list">
+                    ${(season.episodes || [])
+                      .filter(ep => ep.published)
+                      .sort((a, b) => (a.episodeNumber || 0) - (b.episodeNumber || 0))
+                      .map(ep => `
+                        <div class="episode-item">
+                          <span class="episode-number">Ep ${ep.episodeNumber}</span>
+                          <span class="episode-name">${ep.name || "Unknown"}</span>
+                          <span class="episode-status">✓</span>
+                        </div>
+                      `).join('')}
+                  </div>
+                </div>
+              </div>
+            `;
+
+            // Toggle episodes on click
+            seasonDiv.addEventListener("click", () => {
+              const epDiv = document.getElementById(`episodes-${idx}`);
+              epDiv.classList.toggle("expanded");
+            });
+
+            grid.appendChild(seasonDiv);
+          });
+
+          document.getElementById("seasonsSection").style.display = "block";
+        } catch (e) {
+          console.error("Error loading seasons:", e);
+        }
+      }
+
+      function renderDetail(d, type) {
         document.title = `MovieZone | ${d.title || "Movie Detail"}`;
 
+        // Backdrop
+        const backdrop = document.getElementById("backdropHeader");
+        if (d.backdropUrl) {
+          backdrop.style.backgroundImage = `url('${d.backdropUrl}')`;
+        }
+
+        // Poster
         const poster = document.getElementById("poster");
         if (poster) {
           poster.style.backgroundImage = d.posterUrl
@@ -339,62 +647,94 @@
             : "url('https://via.placeholder.com/400x600?text=No+Image')";
         }
 
+        // Title
         const heroTitle = document.getElementById("heroTitle");
-        const heroSubtitle = document.getElementById("heroSubtitle");
-        const heroRating = document.getElementById("heroRating");
-
         if (heroTitle) {
-          heroTitle.textContent = d.title || "";
+          heroTitle.textContent = d.title || "Unknown Title";
         }
 
+        // Subtitle (type, year, runtime)
+        const heroSubtitle = document.getElementById("heroSubtitle");
         const bits = [];
-        if (d.year) bits.push(d.year);
-        bits.push(d.type === "tv" ? "TV Series" : "Movie");
+        bits.push(type === "tv" ? "TV Series" : "Movie");
+        if (d.year) bits.push(`${d.year}`);
         if (d.runtime) bits.push(`${d.runtime} min`);
-        heroSubtitle.textContent = bits.join(" · ");
+        if (heroSubtitle) {
+          heroSubtitle.textContent = bits.join(" · ");
+        }
 
+        // Rating
+        const heroRating = document.getElementById("heroRating");
         heroRating.innerHTML = "";
         if (typeof d.rating === "number") {
-          const circle = document.createElement("div");
-          circle.className = "rating-circle";
-          circle.textContent = d.rating.toFixed(1);
-          const text = document.createElement("div");
-          text.innerHTML = `<strong>User Score</strong><br/><span style="font-size:12px;color:#111827">from ${
-            d.voteCount || 0
-          } votes</span>`;
-          heroRating.appendChild(circle);
-          heroRating.appendChild(text);
+          const badge = document.createElement("div");
+          badge.className = "rating-badge";
+          badge.innerHTML = `
+            <div class="rating-number">${d.rating.toFixed(1)}</div>
+            <div>
+              <div style="font-size:12px;font-weight:600">IMDB</div>
+              <div class="rating-label">from ${d.voteCount || 0} votes</div>
+            </div>
+          `;
+          heroRating.appendChild(badge);
         }
 
-        const overviewEl = document.getElementById("heroOverview");
+        // Overview
+        const overviewEl = document.getElementById("overviewText");
         if (overviewEl) {
           overviewEl.textContent = d.overview || "No overview available.";
         }
 
+        // Meta info
         document.getElementById("metaType").textContent =
-          d.type === "tv" ? "TV Series" : "Movie";
+          type === "tv" ? "TV Series" : "Movie";
         document.getElementById("metaYear").textContent = d.year || "-";
+        document.getElementById("metaDirector").textContent = d.director || "-";
+        document.getElementById("metaCountry").textContent = d.country || "-";
+        document.getElementById("metaReleaseDate").textContent = d.releaseDate || "-";
         document.getElementById("metaRuntime").textContent = d.runtime
           ? `${d.runtime} min`
           : "-";
         document.getElementById("metaRating").textContent =
           typeof d.rating === "number" ? d.rating.toFixed(1) : "-";
-        document.getElementById("metaVotes").textContent = d.voteCount || "-";
 
-        const playBtn = document.getElementById("playTrailerBtn");
-        if (d.src && d.src.trim()) {
-          playBtn.classList.remove("disabled");
-          playBtn.disabled = false;
-          playBtn.textContent = "▶ Watch Trailer";
-          playBtn.style.display = "inline-flex";
-          playBtn.addEventListener("click", () => {
-            window.location.href = `movie-trailer.html?id=${encodeURIComponent(
-              d.id,
-            )}&type=${encodeURIComponent(d.type)}`;
+        // Cast
+        const castList = document.getElementById("castList");
+        castList.innerHTML = "";
+        if (Array.isArray(d.cast) && d.cast.length > 0) {
+          d.cast.slice(0, 8).forEach(c => {
+            const li = document.createElement("li");
+            li.className = "cast-item";
+            li.innerHTML = `
+              <div>${c.name || "Unknown"}</div>
+              <div class="cast-character">${c.character ? `as ${c.character}` : ""}</div>
+            `;
+            castList.appendChild(li);
           });
         } else {
-          // Ẩn nút nếu chưa cấu hình trailer
-          playBtn.style.display = "none";
+          castList.innerHTML = '<li class="cast-item">No cast information available.</li>';
+        }
+
+        // Watch button
+        const playBtn = document.getElementById("playBtn");
+        playBtn.style.display = "inline-flex";
+        playBtn.addEventListener("click", () => {
+          window.location.href = `movie-watch.html?id=${encodeURIComponent(
+            d.id,
+          )}&type=${encodeURIComponent(type)}`;
+        });
+
+        // TV series: load and render seasons section
+        if (type === "tv") {
+          (async () => {
+            const counts = await getSeasonEpisodeCount(d.id);
+            if (counts) {
+              document.getElementById("metaSeasonEpisodes").textContent =
+                `${counts.seasons} season${counts.seasons !== 1 ? "s" : ""} · ${counts.episodes} episode${counts.episodes !== 1 ? "s" : ""}`;
+              document.getElementById("seasonEpisodesRow").style.display = "flex";
+            }
+            await loadAndRenderSeasons(d.id, d);
+          })();
         }
       }
 

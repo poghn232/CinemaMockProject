@@ -24,6 +24,7 @@
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
 
+<<<<<<< HEAD
   security:
     oauth2:
       client:
@@ -35,6 +36,8 @@
               - openid
               - profile
               - email
+=======
+>>>>>>> fbee45f (Watch film func)
 
 server:
   port: 8080

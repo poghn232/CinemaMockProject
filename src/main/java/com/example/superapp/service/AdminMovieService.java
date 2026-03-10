@@ -40,6 +40,7 @@ public class AdminMovieService {
     @Transactional(readOnly = true)
     public List<AdminMovieDto> listPublished(String query) {
         String q = query == null ? "" : query.trim();
+        System.out.println("[AdminMovieService] listPublished query='" + q + "'");
 
         List<Movie> movies = q.isBlank()
                 ? movieRepository.findByActiveTrueAndPublishedTrue()
@@ -73,7 +74,10 @@ public class AdminMovieService {
             ));
         }
 
-        result.sort(Comparator.comparing(AdminMovieDto::getTitle, String.CASE_INSENSITIVE_ORDER));
+        result.sort(Comparator.comparing(
+                AdminMovieDto::getTitle,
+                Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)
+        ));
         return result;
     }
 
@@ -316,9 +320,10 @@ public class AdminMovieService {
         try { if (air != null && !air.isBlank()) episode.setAirDate(java.time.LocalDate.parse(air)); } catch (Exception ignored) {}
         Object va = epRaw.get("vote_average"); if (va instanceof Number nv) episode.setVoteAverage(nv.doubleValue());
         episode.setSeason(season);
+        episode.setPublished(true); // Set published by default when importing
         episodeRepository.save(episode);
 
-        return new AdminMovieDto(existing.getId(), existing.getName(), "tv", Boolean.TRUE.equals(existing.getPublished()), Boolean.TRUE.equals(existing.getActive()));
+        return new AdminMovieDto(existing.getId(), existing.getName(), "tv", Boolean.TRUE.equals(existing.getPublished()), Boolean.TRUE.equals(existing.getActive()), existing.getSrc());
     }
 
     @Transactional(readOnly = true)
@@ -351,20 +356,31 @@ public class AdminMovieService {
     }
 
     @Transactional
-    public void updateSrc(long tmdbId, String type, String src) {
-        String t = type == null ? "movie" : type.trim().toLowerCase();
-        if (t.equals("movie")) {
-            movieRepository.findById(tmdbId).ifPresent(m -> {
-                m.setSrc(src);
-                movieRepository.save(m);
-            });
-        } else if (t.equals("tv")) {
-            tvSeriesRepository.findById(tmdbId).ifPresent(tv -> {
-                tv.setSrc(src);
-                tvSeriesRepository.save(tv);
-            });
-        } else {
-            throw new IllegalArgumentException("type must be 'movie' or 'tv'");
+    public void toggleEpisodePublished(long tvId, int seasonNumber, int episodeNumber) {
+        Long seasonId = tvId * 1000 + seasonNumber;
+        Long epId = tvId * 100000L + seasonNumber * 1000L + episodeNumber;
+        com.example.superapp.entity.Episode episode = episodeRepository.findById(epId).orElse(null);
+        if (episode != null) {
+            episode.setPublished(Boolean.TRUE.equals(episode.getPublished()) ? false : true);
+            episodeRepository.save(episode);
+        }
+    }
+
+    @Transactional
+    public void setEpisodeTrailer(long tvId, int seasonNumber, int episodeNumber, String src) {
+        Long epId = tvId * 100000L + seasonNumber * 1000L + episodeNumber;
+        com.example.superapp.entity.Episode episode = episodeRepository.findById(epId).orElse(null);
+        if (episode != null) {
+            episode.setSrc(src);
+            episodeRepository.save(episode);
+        }
+    }
+
+    public void setMovieTrailer(long movieId, String src) {
+        Movie movie = movieRepository.findById(movieId).orElse(null);
+        if (movie != null) {
+            movie.setSrc(src);
+            movieRepository.save(movie);
         }
     }
 

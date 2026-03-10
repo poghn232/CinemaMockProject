@@ -2,7 +2,7 @@
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <title>MovieZone | Trailer</title>
+    <title>MovieZone | Watch</title>
     <style>
       body {
         margin: 0;
@@ -96,13 +96,13 @@
     <header class="top-bar">
       <div class="brand">
         <div class="brand-logo">MZ</div>
-        <div class="brand-title">MovieZone Trailer</div>
+        <div class="brand-title">MovieZone Player</div>
       </div>
       <a href="javascript:history.back()" class="back-link">← Back</a>
     </header>
 
     <main class="player-shell">
-      <div id="trailerTitle" class="title">Loading trailer...</div>
+      <div id="trailerTitle" class="title">Loading film...</div>
       <div class="frame-wrap" id="frameWrap">
         <div class="msg" id="frameMessage">Loading...</div>
       </div>
@@ -137,7 +137,7 @@
         const token = localStorage.getItem("token");
         if (!token) {
           const go = confirm(
-            "Bạn cần đăng nhập để xem trailer. Chuyển tới trang đăng nhập?",
+            "Bạn cần đăng nhập để xem phim. Chuyển tới trang đăng nhập?",
           );
           if (go) window.location.href = "login.html";
           return;
@@ -155,7 +155,7 @@
         } catch (e) {
           console.error(e);
           document.getElementById("frameMessage").textContent =
-            "Không tải được thông tin trailer.";
+            "Không tải được thông tin phim.";
         }
       }
 
@@ -163,12 +163,12 @@
         const titleEl = document.getElementById("trailerTitle");
         if (titleEl) {
           titleEl.textContent = d.title
-            ? `Trailer · ${d.title}`
-            : "Trailer";
+            ? `Watch · ${d.title}`
+            : "Watch film";
         }
         document.title = d.title
-          ? `MovieZone | Trailer · ${d.title}`
-          : "MovieZone | Trailer";
+          ? `MovieZone | Watch · ${d.title}`
+          : "MovieZone | Watch";
 
         const wrap = document.getElementById("frameWrap");
         wrap.innerHTML = "";
@@ -176,7 +176,7 @@
         if (!d.src) {
           const msg = document.createElement("div");
           msg.className = "msg";
-          msg.textContent = "Trailer chưa được cấu hình cho phim này.";
+          msg.textContent = "Nguồn phim chưa được cấu hình cho nội dung này.";
           wrap.appendChild(msg);
           return;
         }

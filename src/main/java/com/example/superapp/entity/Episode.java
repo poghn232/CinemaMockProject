@@ -29,6 +29,8 @@ public class Episode {
 
     private String src;
 
+    private Boolean published = false;
+
     @ManyToOne
     @JoinColumn(name = "season_id")
     private Season season;
