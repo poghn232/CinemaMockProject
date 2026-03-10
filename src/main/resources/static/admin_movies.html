@@ -357,7 +357,7 @@
     }
 
     // Render a modal showing TMDB details and allow confirming Add
-    function showTmdbDetailModal(details, item) {
+    async function showTmdbDetailModal(details, item) {
       const tmdbImageBase = (window.adminApi && window.adminApi.tmdbImageBase) || 'https://image.tmdb.org/t/p/w500';
       // details: full TMDB response including 'genres' and 'credits'
       const overlay = document.createElement('div');
@@ -470,6 +470,24 @@
         if (item.type === 'tv' && Array.isArray(details.seasons)) {
           const panel = document.getElementById('tvEpisodesPanel');
           panel.innerHTML = '';
+          
+          // Fetch backend seasons info for existing episodes and sources
+          let backendSeasons = [];
+          if (item.id) {
+            try {
+              backendSeasons = await fetchJson(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons`);
+            } catch (e) {
+              console.warn('failed to fetch backend seasons', e);
+            }
+          }
+          const backendMap = {};
+          backendSeasons.forEach(s => {
+            backendMap[s.seasonNumber] = {};
+            (s.episodes || []).forEach(ep => {
+              backendMap[s.seasonNumber][ep.episodeNumber] = ep;
+            });
+          });
+          
           for (const s of details.seasons) {
             const sn = s.season_number || s.seasonNumber || s.season;
             const sTitle = s.name || `Season ${sn}`;
@@ -503,27 +521,75 @@
                   left.className = 'muted';
                   left.textContent = 'Episode ' + e;
                   const right = document.createElement('div');
-                  const addBtn = document.createElement('button');
+                  right.style.display = 'flex';
+                  right.style.gap = '8px';
+                  
                   const already = Array.isArray(existing) && existing.includes(e);
-                  addBtn.className = already ? 'btn ghost' : 'btn';
-                  addBtn.textContent = already ? 'Added' : 'Add episode';
-                  addBtn.disabled = !!already;
-                  addBtn.addEventListener('click', async () => {
-                    const msg = document.getElementById('tmdbMessage');
-                    msg.textContent = 'Adding episode...';
-                    try {
-                      await fetchJson(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(seasonNumber)}/episodes/${encodeURIComponent(e)}/import`, { method: 'POST' });
-                      msg.textContent = 'Episode added.';
-                      addBtn.textContent = 'Added';
-                      addBtn.className = 'btn ghost';
-                      addBtn.disabled = true;
-                      await loadFilms();
-                      refreshCounts();
-                    } catch (err) {
-                      msg.textContent = 'Add episode failed: ' + err;
-                    }
-                  });
-                  right.appendChild(addBtn);
+                  
+                  if (!already) {
+                    // Episode not added - show "Add episode" button
+                    const addBtn = document.createElement('button');
+                    addBtn.className = 'btn';
+                    addBtn.textContent = 'Add episode';
+                    addBtn.addEventListener('click', async () => {
+                      const msg = document.getElementById('tmdbMessage');
+                      msg.textContent = 'Adding episode...';
+                      try {
+                        await fetchJson(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(seasonNumber)}/episodes/${encodeURIComponent(e)}/import`, { method: 'POST' });
+                        msg.textContent = 'Episode added.';
+                        addBtn.textContent = 'Added';
+                        addBtn.className = 'btn ghost';
+                        addBtn.disabled = true;
+                        await loadFilms();
+                        refreshCounts();
+                      } catch (err) {
+                        msg.textContent = 'Add episode failed: ' + err;
+                      }
+                    });
+                    right.appendChild(addBtn);
+                  } else {
+                    // Episode already added - show "Add/Edit trailer" button
+                    const epInfo = backendMap[seasonNumber] && backendMap[seasonNumber][e];
+                    const trailerBtn = document.createElement('button');
+                    trailerBtn.className = 'btn ghost';
+                    trailerBtn.textContent = (epInfo && epInfo.src) ? 'Edit trailer' : 'Set trailer';
+                    trailerBtn.addEventListener('click', async () => {
+                      const current = (epInfo && epInfo.src) || "";
+                      const input = prompt("Enter episode trailer URL:", current);
+                      if (input === null) return;
+                      try {
+                        await fetchJson(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(seasonNumber)}/episodes/${encodeURIComponent(e)}/trailer`, {
+                          method: "PUT",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ src: input.trim() || null }),
+                        });
+                        alert("Trailer updated.");
+                        trailerBtn.textContent = input.trim() ? 'Edit trailer' : 'Set trailer';
+                      } catch (e) {
+                        alert("Save trailer failed: " + e);
+                      }
+                    });
+                    right.appendChild(trailerBtn);
+
+                    // Add publish toggle button
+                    const publishBtn = document.createElement('button');
+                    publishBtn.className = 'btn ghost';
+                    publishBtn.textContent = (epInfo && epInfo.published) ? 'Unpublish' : 'Publish';
+                    publishBtn.addEventListener('click', async () => {
+                      try {
+                        await fetchJson(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(seasonNumber)}/episodes/${encodeURIComponent(e)}/publish`, {
+                          method: "PUT",
+                        });
+                        alert("Episode " + ((epInfo && epInfo.published) ? 'unpublished' : 'published') + ".");
+                        publishBtn.textContent = (epInfo && epInfo.published) ? 'Publish' : 'Unpublish';
+                        epInfo.published = !(epInfo && epInfo.published);
+                      } catch (e) {
+                        alert("Toggle publish failed: " + e);
+                      }
+                    });
+                    right.appendChild(publishBtn);
+                  }
+                  
                   epBtn.appendChild(left);
                   epBtn.appendChild(right);
                   epContainer.appendChild(epBtn);

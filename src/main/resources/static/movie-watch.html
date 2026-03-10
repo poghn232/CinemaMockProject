@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>MovieZone | Watch Movie</title>
+    <style>
+      :root {
+        --bg: #020617;
+        --bg-soft: #0f172a;
+        --accent: #f97316;
+        --accent2: #ec4899;
+        --text-main: #e5e7eb;
+        --text-subtle: #9ca3af;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family:
+          "Poppins",
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        background: var(--bg);
+        color: var(--text-main);
+        min-height: 100vh;
+      }
+
+      .page-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+
+      .navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+      }
+      .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .nav-logo {
+        width: 30px;
+        height: 30px;
+        border-radius: 999px;
+        background: radial-gradient(circle at 30% 20%, #f97316, #e11d48 55%, #4f46e5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 25px rgba(248, 113, 113, 0.55);
+        font-size: 14px;
+        font-weight: 700;
+      }
+      .nav-title-main {
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-size: 12px;
+      }
+      .nav-title-sub {
+        font-size: 11px;
+        color: var(--text-subtle);
+      }
+      .back-link {
+        font-size: 13px;
+        color: var(--text-subtle);
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .back-link:hover {
+        color: var(--text-main);
+      }
+
+      /* VIDEO PLAYER */
+      .video-section {
+        margin-bottom: 24px;
+      }
+      .video-container {
+        position: relative;
+        width: 100%;
+        background: #000;
+        border-radius: 12px;
+        overflow: hidden;
+        aspect-ratio: 16 / 9;
+      }
+      .video-player {
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+
+      /* EPISODE SELECTOR */
+      .episode-selector {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin-top: 24px;
+        padding: 20px;
+        background: rgba(15, 23, 42, 0.5);
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+      }
+      .episode-selector.hidden {
+        display: none;
+      }
+      .episode-label {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 8px;
+      }
+      .episode-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .episode-button {
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(0, 0, 0, 0.3);
+        color: var(--text-main);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        min-width: 60px;
+        text-align: center;
+      }
+      .episode-button:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--accent);
+      }
+      .episode-button.active {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: white;
+      }
+      .episode-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .season-header {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-subtle);
+        margin-bottom: 8px;
+        margin-top: 12px;
+        width: 100%;
+      }
+
+      /* MOVIE INFO */
+      .movie-info {
+        display: flex;
+        gap: 24px;
+        align-items: flex-start;
+      }
+      .poster-wrapper {
+        flex-shrink: 0;
+      }
+      .poster {
+        width: 140px;
+        height: 210px;
+        border-radius: 8px;
+        background-size: cover;
+        background-position: center;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      }
+      .info-content {
+        flex: 1;
+      }
+      .movie-title {
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 8px;
+        line-height: 1.2;
+      }
+      .movie-subtitle {
+        font-size: 16px;
+        color: var(--text-subtle);
+        margin-bottom: 16px;
+      }
+      .movie-overview {
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--text-main);
+        margin-bottom: 16px;
+      }
+
+      /* LOADING */
+      .loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 400px;
+        font-size: 16px;
+        color: var(--text-subtle);
+      }
+
+      @media (max-width: 768px) {
+        .movie-info {
+          flex-direction: column;
+          text-align: center;
+        }
+        .poster {
+          width: 120px;
+          height: 180px;
+          margin: 0 auto;
+        }
+        .episode-selector {
+          flex-direction: column;
+          gap: 12px;
+          align-items: stretch;
+        }
+      }
+
+      /* AD BANNER */
+      .ad-banner {
+        margin: 24px 0;
+        padding: 16px;
+        background: linear-gradient(135deg, #f97316, #ec4899);
+        border-radius: 12px;
+        text-align: center;
+        color: white;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+      }
+      .ad-banner.hidden {
+        display: none;
+      }
+      .ad-text {
+        font-size: 18px;
+        margin-bottom: 8px;
+      }
+      .ad-subtext {
+        font-size: 14px;
+        opacity: 0.9;
+      }
+
+      /* COMMENTS SECTION */
+      .comments-section {
+        margin-top: 32px;
+        padding: 24px;
+        background: rgba(15, 23, 42, 0.5);
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+      }
+      .comments-title {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: var(--text-main);
+      }
+      .comment-input-container {
+        margin-bottom: 20px;
+      }
+      .comment-input {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(0, 0, 0, 0.3);
+        color: var(--text-main);
+        font-size: 14px;
+        resize: vertical;
+        min-height: 80px;
+      }
+      .comment-input:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+      .comment-input::placeholder {
+        color: var(--text-subtle);
+      }
+      .comment-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .comment-submit {
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: none;
+        background: var(--accent);
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .comment-submit:hover {
+        background: #ea580c;
+      }
+      .comment-submit:disabled {
+        background: var(--text-subtle);
+        cursor: not-allowed;
+      }
+      .comment-char-count {
+        font-size: 12px;
+        color: var(--text-subtle);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-container">
+      <header class="navbar">
+        <div class="nav-left">
+          <div class="nav-logo">MZ</div>
+          <div>
+            <div class="nav-title-main">MovieZone</div>
+            <div class="nav-title-sub">Watch Movie</div>
+          </div>
+        </div>
+        <a href="javascript:history.back()" class="back-link">← Back</a>
+      </header>
+
+      <div id="loading" class="loading">Loading...</div>
+
+      <div id="content" style="display:none">
+        <!-- VIDEO PLAYER -->
+        <div class="video-section">
+          <div class="video-container">
+            <iframe id="videoPlayer" class="video-player" allowfullscreen></iframe>
+          </div>
+        </div>
+
+        <!-- EPISODE SELECTOR (hidden for movies) -->
+        <div id="episodeSelector" class="episode-selector hidden">
+          <div class="episode-label">Select Episode:</div>
+          <div id="episodeButtons" class="episode-buttons">
+            <!-- Episode buttons will be generated here -->
+          </div>
+        </div>
+
+        <!-- MOVIE INFO -->
+        <div class="movie-info">
+          <div class="poster-wrapper">
+            <div id="poster" class="poster"></div>
+          </div>
+          <div class="info-content">
+            <h1 id="movieTitle" class="movie-title">Loading...</h1>
+            <div id="movieSubtitle" class="movie-subtitle"></div>
+            <div id="movieOverview" class="movie-overview">Loading...</div>
+          </div>
+        </div>
+
+        <!-- AD BANNER (shown for non-premium users) -->
+        <div id="adBanner" class="ad-banner hidden">
+          <div class="ad-text">🎬 Upgrade to Premium for Ad-Free Experience!</div>
+          <div class="ad-subtext">Remove ads and enjoy unlimited streaming</div>
+        </div>
+
+        <!-- COMMENTS SECTION -->
+        <div class="comments-section">
+          <h3 class="comments-title">Comments</h3>
+          <div class="comment-input-container">
+            <textarea
+              id="commentInput"
+              class="comment-input"
+              placeholder="Share your thoughts about this movie..."
+              maxlength="500"
+            ></textarea>
+            <div class="comment-actions">
+              <div id="charCount" class="comment-char-count">0/500</div>
+              <button id="submitComment" class="comment-submit" disabled>Post Comment</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      async function loadWatchPage() {
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get("id");
+        const type = params.get("type") || "movie";
+        const season = params.get("season");
+        const episode = params.get("episode");
+
+        if (!id) {
+          alert("Missing movie ID");
+          window.location.href = "homepage.html";
+          return;
+        }
+
+        try {
+          // Load movie details
+          const res = await fetch(`/api/public/movies/detail?type=${encodeURIComponent(type)}&id=${encodeURIComponent(id)}`);
+          if (!res.ok) {
+            throw new Error("Failed to load movie details");
+          }
+          const movieData = await res.json();
+
+          // For TV series, load seasons and episodes
+          let seasonsData = [];
+          if (type === "tv") {
+            try {
+              const seasonsRes = await fetch(`/api/movies/tv/${encodeURIComponent(id)}/seasons`);
+              if (seasonsRes.ok) {
+                seasonsData = await seasonsRes.json();
+              }
+            } catch (e) {
+              console.error("Failed to load seasons:", e);
+            }
+          }
+
+          renderWatchPage(movieData, type, seasonsData, season, episode);
+        } catch (e) {
+          console.error(e);
+          document.getElementById("loading").textContent = "Failed to load movie.";
+        }
+      }
+
+      function renderWatchPage(movieData, type, seasonsData, selectedSeason, selectedEpisode) {
+        document.title = `MovieZone | Watch ${movieData.title || "Movie"}`;
+
+        // Hide loading, show content
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("content").style.display = "block";
+
+        // Set poster
+        const poster = document.getElementById("poster");
+        if (poster) {
+          poster.style.backgroundImage = movieData.posterUrl
+            ? `url('${movieData.posterUrl}')`
+            : "url('https://via.placeholder.com/400x600?text=No+Image')";
+        }
+
+        // Set title and subtitle
+        const titleEl = document.getElementById("movieTitle");
+        const subtitleEl = document.getElementById("movieSubtitle");
+        const overviewEl = document.getElementById("movieOverview");
+
+        if (titleEl) {
+          titleEl.textContent = movieData.title || "Unknown Title";
+        }
+
+        const bits = [];
+        bits.push(type === "tv" ? "TV Series" : "Movie");
+        if (movieData.year) bits.push(`${movieData.year}`);
+        if (movieData.runtime) bits.push(`${movieData.runtime} min`);
+        if (subtitleEl) {
+          subtitleEl.textContent = bits.join(" · ");
+        }
+
+        if (overviewEl) {
+          overviewEl.textContent = movieData.overview || "No overview available.";
+        }
+
+        // Handle TV series vs Movie
+        if (type === "tv") {
+          setupTVSeries(movieData, seasonsData, selectedSeason, selectedEpisode);
+        } else {
+          setupMovie(movieData);
+        }
+
+        // Check premium status and show/hide ad banner
+        checkUserPremiumStatus().then(isPremium => {
+          const adBanner = document.getElementById('adBanner');
+          if (isPremium) {
+            adBanner.classList.add('hidden');
+          } else {
+            adBanner.classList.remove('hidden');
+          }
+        });
+
+        // Initialize comments functionality
+        initializeComments();
+      }
+
+      function setupMovie(movieData) {
+        // For movies, use trailer as video source
+        const videoUrl = movieData.src || "";
+        loadVideo(videoUrl);
+      }
+
+      function setupTVSeries(movieData, seasonsData, selectedSeason, selectedEpisode) {
+        const selector = document.getElementById("episodeSelector");
+        const buttonsContainer = document.getElementById("episodeButtons");
+
+        // Show episode selector
+        selector.classList.remove("hidden");
+
+        // Clear existing buttons
+        buttonsContainer.innerHTML = "";
+
+        // Sort seasons
+        const sortedSeasons = [...seasonsData].sort((a, b) => (a.seasonNumber || 0) - (b.seasonNumber || 0));
+
+        // Group episodes by season for better organization
+        const episodesBySeason = {};
+        sortedSeasons.forEach(season => {
+          const publishedEpisodes = (season.episodes || []).filter(ep => ep.published);
+          if (publishedEpisodes.length > 0) {
+            episodesBySeason[season.seasonNumber] = publishedEpisodes.sort((a, b) => (a.episodeNumber || 0) - (b.episodeNumber || 0));
+          }
+        });
+
+        // Create buttons for each season's episodes
+        Object.keys(episodesBySeason).sort((a, b) => Number(a) - Number(b)).forEach(seasonNum => {
+          const episodes = episodesBySeason[seasonNum];
+
+          // Add season header if there are multiple seasons
+          if (Object.keys(episodesBySeason).length > 1) {
+            const seasonHeader = document.createElement("div");
+            seasonHeader.className = "season-header";
+            seasonHeader.textContent = `Season ${seasonNum}`;
+            seasonHeader.style.fontSize = "14px";
+            seasonHeader.style.fontWeight = "600";
+            seasonHeader.style.color = "var(--text-subtle)";
+            seasonHeader.style.marginBottom = "8px";
+            seasonHeader.style.marginTop = "12px";
+            buttonsContainer.appendChild(seasonHeader);
+          }
+
+          // Create episode buttons
+          episodes.forEach(ep => {
+            const button = document.createElement("button");
+            button.className = "episode-button";
+            button.textContent = `Ep ${ep.episodeNumber}`;
+            button.dataset.season = seasonNum;
+            button.dataset.episode = ep.episodeNumber;
+
+            // Check if this is the selected episode
+            if (selectedSeason == seasonNum && selectedEpisode == ep.episodeNumber) {
+              button.classList.add("active");
+            }
+
+            button.addEventListener("click", () => {
+              // Remove active class from all buttons
+              document.querySelectorAll(".episode-button").forEach(btn => {
+                btn.classList.remove("active");
+              });
+
+              // Add active class to clicked button
+              button.classList.add("active");
+
+              // Load the episode video
+              if (ep && ep.src) {
+                loadVideo(ep.src);
+              } else {
+                loadVideo("");
+              }
+            });
+
+            buttonsContainer.appendChild(button);
+          });
+        });
+
+        // Auto-select first episode if no specific episode selected
+        if (!selectedSeason || !selectedEpisode) {
+          const firstSeasonNum = Object.keys(episodesBySeason)[0];
+          const firstEpisode = episodesBySeason[firstSeasonNum]?.[0];
+
+          if (firstEpisode) {
+            // Find and click the first episode button
+            const firstButton = buttonsContainer.querySelector(`[data-season="${firstSeasonNum}"][data-episode="${firstEpisode.episodeNumber}"]`);
+            if (firstButton) {
+              firstButton.click();
+            } else if (firstEpisode.src) {
+              loadVideo(firstEpisode.src);
+            }
+          }
+        } else {
+          // Load the specified episode
+          const season = sortedSeasons.find(s => s.seasonNumber == selectedSeason);
+          const ep = season?.episodes?.find(e => e.episodeNumber == selectedEpisode && e.published);
+          if (ep && ep.src) {
+            loadVideo(ep.src);
+          }
+        }
+      }
+
+      function loadVideo(videoUrl) {
+        const player = document.getElementById("videoPlayer");
+
+        if (!videoUrl || videoUrl.trim() === "") {
+          player.src = "";
+          return;
+        }
+
+        // Handle different video sources
+        let embedUrl = "";
+
+        if (videoUrl.includes("youtube.com") || videoUrl.includes("youtu.be")) {
+          // YouTube video
+          const videoId = extractYouTubeId(videoUrl);
+          if (videoId) {
+            embedUrl = `https://www.youtube.com/embed/${videoId}`;
+          }
+        } else if (videoUrl.includes("vimeo.com")) {
+          // Vimeo video
+          const videoId = extractVimeoId(videoUrl);
+          if (videoId) {
+            embedUrl = `https://player.vimeo.com/video/${videoId}`;
+          }
+        } else {
+          // Direct video URL or other embed
+          embedUrl = videoUrl;
+        }
+
+        player.src = embedUrl;
+      }
+
+      function extractYouTubeId(url) {
+        const patterns = [
+          /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/,
+          /youtube\.com\/embed\/([^&\n?#]+)/
+        ];
+
+        for (const pattern of patterns) {
+          const match = url.match(pattern);
+          if (match) return match[1];
+        }
+        return null;
+      }
+
+      function extractVimeoId(url) {
+        const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+        return match ? match[1] : null;
+      }
+
+      // Check if user is premium
+      async function checkUserPremiumStatus() {
+        try {
+          const response = await fetch('/api/user/profile');
+          if (response.ok) {
+            const userData = await response.json();
+            return isUserPremium(userData);
+          }
+        } catch (e) {
+          console.error('Failed to check premium status:', e);
+        }
+        return false; // Default to non-premium if check fails
+      }
+
+      function isUserPremium(userData) {
+        if (!userData.subscriptions || userData.subscriptions.length === 0) {
+          return false;
+        }
+
+        const now = new Date();
+        return userData.subscriptions.some(sub => {
+          return sub.status === 'ACTIVE' &&
+                 sub.endDate &&
+                 new Date(sub.endDate) > now;
+        });
+      }
+
+      // Initialize comment functionality
+      function initializeComments() {
+        const commentInput = document.getElementById('commentInput');
+        const charCount = document.getElementById('charCount');
+        const submitButton = document.getElementById('submitComment');
+
+        commentInput.addEventListener('input', () => {
+          const length = commentInput.value.length;
+          charCount.textContent = `${length}/500`;
+
+          // Enable/disable submit button
+          submitButton.disabled = length === 0 || length > 500;
+        });
+
+        submitButton.addEventListener('click', () => {
+          const comment = commentInput.value.trim();
+          if (comment) {
+            // For now, just show a success message
+            // In a real app, this would send to backend
+            alert('Comment posted! (This is a demo - backend integration needed)');
+            commentInput.value = '';
+            charCount.textContent = '0/500';
+            submitButton.disabled = true;
+          }
+        });
+      }
+
+      loadWatchPage();
+    </script>
+  </body>
+</html>
