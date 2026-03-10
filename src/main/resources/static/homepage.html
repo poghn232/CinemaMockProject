@@ -954,6 +954,7 @@
           throw new Error("Profile error " + res.status);
         }
 
+<<<<<<< HEAD
         const data = await res.json();
         const subs = Array.isArray(data.subscriptions)
           ? data.subscriptions
@@ -990,6 +991,19 @@
 
       if (usernameEl) {
         usernameEl.textContent = "Hello " + info.username;
+=======
+        const type = movie.type || "movie";
+        const id = movie.id;
+        if (!id) {
+          alert("Không xác định được phim.");
+          return;
+        }
+        window.location.href =
+          "movie-detail.html?id=" +
+          encodeURIComponent(id) +
+          "&type=" +
+          encodeURIComponent(type);
+>>>>>>> a3d0bad (save part 2)
       }
 
       // Ẩn/hiện các mục navbar theo trạng thái đăng nhập

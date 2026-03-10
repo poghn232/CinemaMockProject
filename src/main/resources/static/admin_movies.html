@@ -133,14 +133,38 @@
         const info = document.createElement("div");
         const typeLabel = f.type === "tv" ? "TV Series" : "Movie";
         const status = f.published ? "Published" : "Hidden";
+        const trailerStatus = f.src ? "Trailer: set" : "Trailer: not set";
 
         info.innerHTML = `
       <div style="font-weight:600">${f.title}</div>
-      <div class="muted">${typeLabel} · ${status}</div>
+      <div class="muted">${typeLabel} · ${status} · ${trailerStatus}</div>
     `;
 
         const actions = document.createElement("div");
-        // Hide button (only if published
+        actions.style.display = "flex";
+        actions.style.gap = "6px";
+
+        // Trailer button
+        const trailerBtn = document.createElement("button");
+        trailerBtn.className = "btn ghost";
+        trailerBtn.textContent = f.src ? "Edit trailer" : "Set trailer";
+        trailerBtn.addEventListener("click", async () => {
+          const current = f.src || "";
+          const input = prompt("Enter YouTube trailer URL:", current);
+          if (input === null) return;
+          try {
+            await fetchJson(api.movies + "/" + f.type + "/" + f.id + "/trailer", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ src: input.trim() || null }),
+            });
+            await loadFilms();
+            refreshCounts();
+          } catch (e) {
+            alert("Save trailer failed: " + e);
+          }
+        });
+
         const hideBtn = document.createElement("button");
         hideBtn.className = "btn ghost";
         hideBtn.textContent = f.published ? "Hide" : "Hidden";
@@ -159,6 +183,7 @@
           }
         });
 
+        actions.appendChild(trailerBtn);
         actions.appendChild(hideBtn);
         // Details button for already-added movies
         const detailsBtn = document.createElement("button");

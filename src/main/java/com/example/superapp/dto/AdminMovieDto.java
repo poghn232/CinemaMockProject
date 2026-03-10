@@ -7,16 +7,18 @@ public class AdminMovieDto {
     private String type; // "movie" | "tv"
     private boolean published;
     private boolean active;
+    private String src; // trailer / video source URL
 
     public AdminMovieDto() {
     }
 
-    public AdminMovieDto(Long id, String title, String type, boolean published, boolean active) {
+    public AdminMovieDto(Long id, String title, String type, boolean published, boolean active, String src) {
         this.id = id;
         this.title = title;
         this.type = type;
         this.published = published;
         this.active = active;
+        this.src = src;
     }
 
     public Long getId() {
@@ -57,6 +59,14 @@ public class AdminMovieDto {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public String getSrc() {
+        return src;
+    }
+
+    public void setSrc(String src) {
+        this.src = src;
     }
 }
 
