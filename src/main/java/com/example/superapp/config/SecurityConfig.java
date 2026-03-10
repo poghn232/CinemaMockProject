@@ -60,7 +60,7 @@ public class SecurityConfig {
                                 "/api/payment/**",      // nếu dùng path này
                                 "/api/payments/**",
                                 "/api/banner",
-                                "/api/images/**"
+                                "/api/image/**"
                         ).permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
