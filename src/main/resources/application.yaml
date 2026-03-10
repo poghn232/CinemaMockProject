@@ -23,6 +23,8 @@
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
+      
+
 
 server:
   port: 8080

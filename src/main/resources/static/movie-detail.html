@@ -282,6 +282,25 @@
       .cast-item {
         color: var(--text-main);
       }
+      .cast-row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .cast-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 999px;
+        overflow: hidden;
+        background-color: #0b1220;
+        flex-shrink: 0;
+      }
+      .cast-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
       .cast-character {
         font-size: 12px;
         color: var(--text-subtle);
@@ -705,10 +724,19 @@
           d.cast.slice(0, 8).forEach(c => {
             const li = document.createElement("li");
             li.className = "cast-item";
+
+            const avatarSrc = c.profilePath || 'https://via.placeholder.com/48x48?text=No';
+
             li.innerHTML = `
-              <div>${c.name || "Unknown"}</div>
-              <div class="cast-character">${c.character ? `as ${c.character}` : ""}</div>
+              <div class="cast-row">
+                <div class="cast-avatar"><img src="${avatarSrc}" alt="${(c.name||'')}" onerror="this.src='https://via.placeholder.com/48x48?text=No'"></div>
+                <div>
+                  <div>${c.name || "Unknown"}</div>
+                  <div class="cast-character">${c.character ? `as ${c.character}` : ""}</div>
+                </div>
+              </div>
             `;
+
             castList.appendChild(li);
           });
         } else {

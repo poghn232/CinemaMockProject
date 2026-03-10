@@ -13,6 +13,7 @@ public class MovieDetailDto {
     private String posterUrl;
     private String backdropUrl;
     private String src; // trailer url
+    private java.util.List<CastMemberDto> cast;
 
     public Long getId() {
         return id;
@@ -100,6 +101,14 @@ public class MovieDetailDto {
 
     public void setSrc(String src) {
         this.src = src;
+    }
+
+    public java.util.List<CastMemberDto> getCast() {
+        return cast;
+    }
+
+    public void setCast(java.util.List<CastMemberDto> cast) {
+        this.cast = cast;
     }
 }
 
