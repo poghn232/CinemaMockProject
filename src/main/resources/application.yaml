@@ -24,7 +24,17 @@
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
 
- 
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 1082967874633-8ps129q8fub0m6fsa01h2855d3ujuevr.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - openid
+              - profile
+              - email
 
 server:
   port: 8080

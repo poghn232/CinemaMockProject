@@ -1,7 +1,7 @@
 document.head.insertAdjacentHTML("beforeend", `
   <style>
-    .ad-wrapper { position: fixed; z-index: 9999; }
-    .ad-wrapper img { display: block; }
+    .banner-ad-wrapper { position: fixed; z-index: 9999; }
+    .banner-ad-wrapper img { display: block; }
     .ad-close {
       position: fixed;
       z-index: 10000;
@@ -27,7 +27,7 @@ fetch("/api/banner")
             const elementId = elementIds[index];
 
             const wrapper = document.createElement("div");
-            wrapper.className = "ad-wrapper";
+            wrapper.className = "banner-ad-wrapper";
             wrapper.id = `${elementId}-wrap`;
 
             const link = document.createElement("a");
