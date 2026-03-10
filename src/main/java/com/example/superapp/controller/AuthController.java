@@ -140,15 +140,4 @@ public class AuthController {
         );
     }
 
-    @PostMapping("/google/complete-profile")
-    public ResponseEntity<LoginResponse> completeGoogleProfile(
-            @RequestBody GoogleCompleteProfileRequest request) {
-
-        LoginResponse response = authService.createGoogleUserAfterChooseUsername(
-                request.getEmail(),
-                request.getUsername()
-        );
-
-        return ResponseEntity.ok(response);
-    }
 }

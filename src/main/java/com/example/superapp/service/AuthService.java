@@ -145,52 +145,5 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
-    public LoginResponse createGoogleUserAfterChooseUsername(String email, String username) {
 
-        if (email == null || email.isBlank()) {
-            throw new RuntimeException("Email không được để trống");
-        }
-
-        if (username == null || username.isBlank()) {
-            throw new RuntimeException("Username không được để trống");
-        }
-
-        String cleanUsername = username.trim().toLowerCase();
-
-        if (userRepository.findByEmail(email).isPresent()) {
-            throw new RuntimeException("Email này đã có tài khoản");
-        }
-
-        if (userRepository.findByUsername(cleanUsername).isPresent()) {
-            throw new RuntimeException("Username đã tồn tại");
-        }
-
-        User user = new User();
-        user.setEmail(email.trim().toLowerCase());
-        user.setUsername(cleanUsername);
-
-        // password random vì login Google không dùng password local
-        user.setPassword(passwordEncoder.encode(java.util.UUID.randomUUID().toString()));
-
-        user.setRole("CUSTOMER");
-        user.setEnabled(true);
-
-        userRepository.save(user);
-
-        org.springframework.security.core.userdetails.UserDetails userDetails =
-                org.springframework.security.core.userdetails.User
-                        .withUsername(user.getUsername())
-                        .password(user.getPassword())
-                        .roles(user.getRole())
-                        .disabled(user.getEnabled() == null ? false : !user.getEnabled())
-                        .build();
-
-        String jwt = jwtUtil.generateToken(userDetails);
-
-        LoginResponse resp = new LoginResponse(jwt);
-        resp.setRole(user.getRole());
-        resp.setUsername(user.getUsername());
-
-        return resp;
-    }
 }
