@@ -14,9 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.http.HttpStatus;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
@@ -44,37 +42,28 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // ✅ JWT stateless
                 .authorizeHttpRequests(auth -> auth
+                        // admin page requires ADMIN
+
                         .requestMatchers(
                                 "/login.html", "/register.html", "/forgot-password.html",
-                                "/homepage.html", "/home.html",
-                                "/movie-detail.html", "/movie-trailer.html",
-                                "/packs.html", "/contact.html",
+                                "/homepage.html", "/home.html", "/packs.html", "/contact.html",
                                 "/", "/index.html", "/admin.html", "/profile.html",
-
                                 "/css/**", "/js/**", "/images/**", "/favicon.ico",
-
                                 "/api/auth/**",
-                                "/api/movies/**", "/api/contact",
+                                "/api/movies/**","/api/contact",
                                 "/api/public/**",
-                                "/api/image/**",
-                                "/api/admin/banner/upload",
-                                "/api/banner",
+
+                                // ✅ VNPay callbacks
                                 "/api/vnpay/**",
+                                "/api/payment/**",      // nếu dùng path này
                                 "/api/payments/**",
-                                "/error"
+                                "/api/banner",
+                                "/api/images/**"
                         ).permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
-                )
-
-                .exceptionHandling(ex -> ex
-                        .defaultAuthenticationEntryPointFor(
-                                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-                                new AntPathRequestMatcher("/api/**")
-                        )
                 )
 
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

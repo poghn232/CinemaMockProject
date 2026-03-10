@@ -1,10 +1,15 @@
 package com.example.superapp.controller;
 
-import com.example.superapp.dto.*;
+import com.example.superapp.dto.LoginRequest;
+import com.example.superapp.dto.LoginResponse;
+import com.example.superapp.dto.ForgotPasswordRequest;
+import com.example.superapp.dto.RegisterRequest;
+import com.example.superapp.dto.VerifyRequest;
 import com.example.superapp.service.AuthService;
 import com.example.superapp.service.CustomUserDetailsService;
 import com.example.superapp.service.OtpService;
 import com.example.superapp.utils.JwtUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -55,26 +59,20 @@ public class AuthController {
         UserDetails userDetails =
                 userDetailsService.loadUserByUsername(request.getUsername());
 
-                String jwt = jwtUtil.generateToken(userDetails);
+        String jwt = jwtUtil.generateToken(userDetails);
 
-                // include role in response for frontend redirect decisions
-                // load from userDetailsService / repository
-                String role = null;
-                try {
-                        var u = userDetailsService.loadUserByUsername(request.getUsername());
-                        // fetch first authority and normalize to include ROLE_ prefix for frontend
-                        role = u.getAuthorities().stream()
-                                .findFirst()
-                                .map(Object::toString)
-                                .map(r -> r.startsWith("ROLE_") ? r : "ROLE_" + r)
-                                .orElse(null);
-                                } catch (UsernameNotFoundException ignore) {
-                                        // user not found - role remains null
-                                }
-            LoginResponse resp = new LoginResponse(jwt);
-            resp.setRole(role);
-            resp.setUsername(request.getUsername());
-            return ResponseEntity.ok(resp);
+        // include role in response for frontend redirect decisions
+        // load from userDetailsService / repository
+        String role = null;
+        try {
+            var u = userDetailsService.loadUserByUsername(request.getUsername());
+            // userDetailsService returns Spring Security User with roles prefixed, fetch authorities
+            role = u.getAuthorities().stream().findFirst().map(Object::toString).orElse(null);
+        } catch (Exception ignore) {}
+
+        LoginResponse resp = new LoginResponse(jwt);
+        if (role != null) resp.setRole(role);
+        return ResponseEntity.ok(resp);
     }
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
@@ -139,5 +137,4 @@ public class AuthController {
                 Map.of("message", "Đổi mật khẩu thành công")
         );
     }
-
 }

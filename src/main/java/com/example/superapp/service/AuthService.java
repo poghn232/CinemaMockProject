@@ -1,11 +1,9 @@
 package com.example.superapp.service;
 
-import com.example.superapp.dto.LoginResponse;
 import com.example.superapp.dto.RegisterRequest;
 import com.example.superapp.entity.PendingUser;
 import com.example.superapp.entity.User;
 import com.example.superapp.repository.UserRepository;
-import com.example.superapp.utils.JwtUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,17 +18,15 @@ public class AuthService {
     private final OtpService otpService;
     private final EmailService emailService;
     private final SecureRandom secureRandom = new SecureRandom();
-    private final JwtUtils jwtUtil;
 
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
                        OtpService otpService,
-                       EmailService emailService, JwtUtils jwtUtil) {
+                       EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.otpService = otpService;
         this.emailService = emailService;
-        this.jwtUtil = jwtUtil;
     }
 
     public void register(RegisterRequest request) {
@@ -145,5 +141,4 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
-
 }

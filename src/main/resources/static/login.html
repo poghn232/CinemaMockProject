@@ -398,7 +398,6 @@
                 <span>Don't have account? <a href="register.html">Sign Up</a></span>
                 <a href="forgot-password.html">Forgot Password?</a>
             </div>
-
         </form>
 
         <p id="error" class="error"></p>
@@ -406,8 +405,6 @@
 </div>
 
 <script>
-
-
     document.getElementById("loginForm").addEventListener("submit", async function (e) {
         e.preventDefault();
 
@@ -432,7 +429,7 @@
             localStorage.setItem("token", data.token);
             localStorage.setItem("username", username);
             localStorage.setItem("role", data.role);
-            
+
 
             const role = (data.role || '').toUpperCase();
             // role might be like 'ROLE_ADMIN' or 'ADMIN'
@@ -446,5 +443,6 @@
         }
     });
 </script>
+
 </body>
 </html>
