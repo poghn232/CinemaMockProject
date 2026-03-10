@@ -35,7 +35,6 @@ public class PaymentController {
                 req.getSubscriptionId(),
                 clientIp
         );
-
         return Map.of("paymentUrl", paymentUrl);
     }
 }
