@@ -15,7 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -73,8 +75,10 @@ class BannerControllerTest {
 
         // --- ACT ---
         ResponseEntity<byte[]> response = bannerController.retrieveImage(1, mockUserDetails);
+        ResponseEntity<List<Map<String, Object>>> bannerInfoResponse = bannerController.retrieveAllBanners(mockUserDetails);
 
         // --- ASSERT ---
-        assertNull(response);
+        assertEquals(response, ResponseEntity.ok(new byte[0]));
+        assertEquals(bannerInfoResponse, ResponseEntity.ok(Collections.emptyList()));
     }
 }
