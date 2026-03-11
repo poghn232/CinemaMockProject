@@ -488,12 +488,33 @@
             });
           });
           
-          for (const s of details.seasons) {
-            const sn = s.season_number || s.seasonNumber || s.season;
-            const sTitle = s.name || `Season ${sn}`;
+          for (let _idx = 0; _idx < details.seasons.length; _idx++) {
+            const s = details.seasons[_idx];
+            // Raw season identifier from TMDB may be a name like 'Specials' when season_number is missing.
+            const snRaw = s.season_number || s.seasonNumber || s.season;
+            // Ensure we use a numeric seasonNumber for API routes. Try several fallbacks:
+            // 1) TMDB's numeric field (season_number / seasonNumber / season)
+            // 2) extract a number from the season name (e.g., "Season 12")
+            // 3) 'Specials' -> 0
+            // 4) deterministic fallback to index (_idx + 1)
+            let seasonNumber = parseInt(snRaw, 10);
+            if (isNaN(seasonNumber)) {
+              // Try to extract a number from the name (useful for named seasons like "Season 12" or "Part 3")
+              const nameToInspect = String(s.name || snRaw || '');
+              const m = nameToInspect.match(/(\d+)/);
+              if (m) {
+                seasonNumber = parseInt(m[1], 10);
+              } else if (s.name && nameToInspect.toLowerCase().includes('special')) {
+                // TMDB often represents specials as season 0 but may provide a name like "Specials".
+                seasonNumber = 0;
+              } else {
+                seasonNumber = _idx + 1; // deterministic fallback for unnamed/non-numeric seasons
+              }
+            }
+            const sTitle = s.name || `Season ${snRaw}`;
             const seasonDiv = document.createElement('div');
             seasonDiv.style.marginTop = '8px';
-            seasonDiv.innerHTML = `<div style='font-weight:600'>${sTitle}</div><div class='muted' id='season-${sn}-episodes'>Loading episodes...</div>`;
+            seasonDiv.innerHTML = `<div style='font-weight:600'>${sTitle}</div><div class='muted' id='season-${seasonNumber}-episodes'>Loading episodes...</div>`;
             panel.appendChild(seasonDiv);
             // fetch season details from TMDB to list episodes
             (async (seasonNumber) => {
@@ -535,7 +556,7 @@
                       const msg = document.getElementById('tmdbMessage');
                       msg.textContent = 'Adding episode...';
                       try {
-                        await fetchJson(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(seasonNumber)}/episodes/${encodeURIComponent(e)}/import`, { method: 'POST' });
+                       await fetchJson(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(seasonNumber)}/episodes/${encodeURIComponent(e)}/import`, { method: 'POST' });
                         msg.textContent = 'Episode added.';
                         addBtn.textContent = 'Added';
                         addBtn.className = 'btn ghost';
@@ -598,7 +619,7 @@
                 const epContainer = document.getElementById(`season-${seasonNumber}-episodes`);
                 if (epContainer) epContainer.innerHTML = 'Failed to load episodes.';
               }
-            })(sn);
+            })(seasonNumber);
           }
         }
       } catch (ignored) {}
