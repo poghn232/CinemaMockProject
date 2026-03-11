@@ -2,16 +2,16 @@ package com.example.superapp.service;
 
 import com.example.superapp.entity.Banner;
 import com.example.superapp.repository.BannerRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class BannerService {
 
-    @Autowired
-    private BannerRepository bannerRepository;
+    private final BannerRepository bannerRepository;
 
     public List<Banner> getAllBanners() {
         return bannerRepository.findAll();

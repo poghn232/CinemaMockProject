@@ -66,7 +66,6 @@ public class AuthController {
         String role = null;
         try {
             var u = userDetailsService.loadUserByUsername(request.getUsername());
-            // userDetailsService returns Spring Security User with roles prefixed, fetch authorities
             role = u.getAuthorities().stream().findFirst().map(Object::toString).orElse(null);
         } catch (Exception ignore) {}
 

@@ -6,6 +6,7 @@ import com.example.superapp.entity.User;
 import com.example.superapp.service.BannerService;
 import com.example.superapp.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,10 +35,11 @@ public class BannerController {
     public ResponseEntity<byte[]> retrieveImage(@PathVariable int id, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails != null) {
             User user = userService.getUserByUsername(userDetails.getUsername());
-            Subscription lastSub = user.getSubscriptions().getLast();
-
-            if (lastSub != null && lastSub.getEndDate().isAfter(LocalDateTime.now())) {
-                return ResponseEntity.ok(new byte[0]);
+            if (!user.getSubscriptions().isEmpty()) {
+                Subscription lastSub = user.getSubscriptions().getLast();
+                if (lastSub.getEndDate().isAfter(LocalDateTime.now())) {
+                    return ResponseEntity.ok(new byte[0]);
+                }
             }
         }
         Banner banner = bannerService.getBannerById(id);
@@ -50,12 +52,15 @@ public class BannerController {
 
     @GetMapping("/api/banner")
     public ResponseEntity<List<Map<String, Object>>> retrieveAllBanners(@AuthenticationPrincipal UserDetails userDetails) {
+        System.out.println("=== /api/banner called ==="); // thêm dòng này
+        System.out.println("userDetails: " + userDetails);
         if (userDetails != null) {
             User user = userService.getUserByUsername(userDetails.getUsername());
-            Subscription lastSub = user.getSubscriptions().getLast();
-
-            if (lastSub != null && lastSub.getEndDate().isAfter(LocalDateTime.now())) {
-                return ResponseEntity.ok(Collections.emptyList());
+            if (!user.getSubscriptions().isEmpty()) {
+                Subscription lastSub = user.getSubscriptions().getLast();
+                if (lastSub.getEndDate().isAfter(LocalDateTime.now())) {
+                    return ResponseEntity.ok(Collections.emptyList());
+                }
             }
         }
         List<Banner> banners = bannerService.getAllBanners();
