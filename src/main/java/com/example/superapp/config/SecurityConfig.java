@@ -48,7 +48,9 @@ public class SecurityConfig {
 
                         .requestMatchers(
                                 "/login.html", "/register.html", "/forgot-password.html",
-                                "/homepage.html", "/home.html", "/packs.html", "/contact.html",
+                                "/homepage.html", "/home.html",
+                                "/movie-detail.html", "/movie-trailer.html", "/movie-watch.html",
+                                "/packs.html", "/contact.html",
                                 "/", "/index.html", "/admin.html", "/profile.html",
                                 "/css/**", "/js/**", "/images/**", "/favicon.ico",
                                 "/api/auth/**",
@@ -60,7 +62,7 @@ public class SecurityConfig {
                                 "/api/payment/**",      // nếu dùng path này
                                 "/api/payments/**",
                                 "/api/banner",
-                                "/api/images/**"
+                                "/api/image/**"
                         ).permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()

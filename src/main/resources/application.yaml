@@ -2,7 +2,7 @@
   datasource:
     url: jdbc:mysql://localhost:3306/mock_project_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Ho_Chi_Minh
     username: root
-    password: 123456
+    password: 12345678
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -23,21 +23,8 @@
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
+      
 
-<<<<<<< HEAD
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: 1082967874633-8ps129q8fub0m6fsa01h2855d3ujuevr.apps.googleusercontent.com
-            client-secret: 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
-            scope:
-              - openid
-              - profile
-              - email
-=======
->>>>>>> fbee45f (Watch film func)
 
 server:
   port: 8080

@@ -15,6 +15,8 @@ import com.example.superapp.repository.TvCreditRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -289,6 +291,10 @@ public class AdminMovieService {
 
         // fetch episode details via TMDB API: /tv/{tv_id}/season/{season_number}/episode/{episode_number}
         Map<String, Object> epRaw = tmdbService.getTvEpisodeDetails(tvId, seasonNumber, episodeNumber);
+        // If TMDB didn't return details (404), fail the import so front-end doesn't mark as added.
+        if (epRaw == null || epRaw.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "TMDB episode not found");
+        }
 
         // upsert season
         Object seasonIdObj = epRaw.get("_season_id"); // TMDB doesn't provide a global season id in this payload; fall back to composite id
@@ -315,7 +321,19 @@ public class AdminMovieService {
         episode.setId(epId);
         episode.setName(TmdbService.stringVal(epRaw.get("name")));
         episode.setOverview(TmdbService.stringVal(epRaw.get("overview")));
-        Object en = epRaw.get("episode_number"); if (en instanceof Number n) episode.setEpisodeNumber(n.intValue());
+       // episode_number must be present and numeric - fail import otherwise so UI doesn't show a false 'Added'
+        Integer episodeNum = null;
+        Object en = epRaw.get("episode_number");
+        if (en instanceof Number n) {
+            episodeNum = n.intValue();
+        } else if (en instanceof String s) {
+            try { episodeNum = Integer.parseInt(s.trim()); } catch (Exception ignored) {}
+        }
+        if (episodeNum == null) {
+            // TMDB returned no usable episode number - fail the import
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "TMDB episode missing episode_number");
+        }
+        episode.setEpisodeNumber(episodeNum);
         String air = TmdbService.stringVal(epRaw.get("air_date"));
         try { if (air != null && !air.isBlank()) episode.setAirDate(java.time.LocalDate.parse(air)); } catch (Exception ignored) {}
         Object va = epRaw.get("vote_average"); if (va instanceof Number nv) episode.setVoteAverage(nv.doubleValue());

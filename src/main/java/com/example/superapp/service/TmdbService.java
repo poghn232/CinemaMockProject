@@ -5,6 +5,10 @@ import com.example.superapp.dto.MoviePageResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -18,6 +22,7 @@ public class TmdbService {
     private final String baseUrl;
     private final String imageBaseUrl;
     private final RestTemplate restTemplate = new RestTemplate();
+    private static final Logger log = LoggerFactory.getLogger(TmdbService.class);
 
     public TmdbService(
             @Value("${tmdb.api-key}") String apiKey,
@@ -136,22 +141,40 @@ public class TmdbService {
     public Map<String, Object> getMovieDetails(long tmdbId) {
     // include credits (cast) in the response to support admin detail view
     String url = baseUrl + "/movie/" + tmdbId + "?language=en-US&api_key=" + apiKey + "&append_to_response=credits";
-        Map<String, Object> response = restTemplate.getForObject(url, Map.class);
-        return response == null ? Map.of() : response;
+        Map<String, Object> response = safeGetMap(url);
+    return response == null ? Map.of() : response;
     }
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> getTvDetails(long tmdbId) {
     // include credits (cast) for TV as well
     String url = baseUrl + "/tv/" + tmdbId + "?language=en-US&api_key=" + apiKey + "&append_to_response=credits";
-        Map<String, Object> response = restTemplate.getForObject(url, Map.class);
-        return response == null ? Map.of() : response;
+        Map<String, Object> response = safeGetMap(url);
+    return response == null ? Map.of() : response;
     }
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> getTvEpisodeDetails(long tvId, int seasonNumber, int episodeNumber) {
         String url = baseUrl + "/tv/" + tvId + "/season/" + seasonNumber + "/episode/" + episodeNumber + "?language=en-US&api_key=" + apiKey + "&append_to_response=credits";
-        Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+        Map<String, Object> response = safeGetMap(url);
         return response == null ? Map.of() : response;
+    }
+
+    /**
+     * Wrapper to call TMDB and return an empty map when resource not found (404).
+     */
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> safeGetMap(String url) {
+        try {
+            Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+            return response == null ? Map.of() : response;
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                log.warn("TMDB resource not found (404) for URL: {}", url);
+                return Map.of();
+            }
+            // rethrow other client errors
+            throw e;
+        }
     }
 }

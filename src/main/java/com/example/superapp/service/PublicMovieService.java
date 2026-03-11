@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -23,6 +24,7 @@ public class PublicMovieService {
 
     private final MovieRepository movieRepository;
     private final TvSeriesRepository tvSeriesRepository;
+    private final com.example.superapp.service.TmdbService tmdbService;
 
     @Value("${tmdb.image-base-url}")
     private String imageBaseUrl;
@@ -154,6 +156,29 @@ public class PublicMovieService {
         }
 
         dto.setSrc(m.getSrc());
+        // populate cast from MovieCredit relationships
+        try {
+            java.util.List<com.example.superapp.dto.CastMemberDto> cast = new java.util.ArrayList<>();
+            if (m.getCredits() != null) {
+                m.getCredits().stream()
+                        .sorted(java.util.Comparator.comparing(mc -> mc.getCreditOrder() == null ? 0 : mc.getCreditOrder()))
+                        .forEach(mc -> {
+                            com.example.superapp.entity.Person p = mc.getPerson();
+                            if (p == null) return;
+                            com.example.superapp.dto.CastMemberDto c = new com.example.superapp.dto.CastMemberDto();
+                            c.setId(p.getId());
+                            c.setName(p.getName());
+                            c.setCharacter(mc.getCharacter());
+                            if (p.getProfilePath() != null && !p.getProfilePath().isBlank()) {
+                                c.setProfilePath(imageBaseUrl + p.getProfilePath());
+                            } else {
+                                c.setProfilePath(null);
+                            }
+                            cast.add(c);
+                        });
+            }
+            dto.setCast(cast);
+        } catch (Exception ignored) {}
         return dto;
     }
 
@@ -179,6 +204,57 @@ public class PublicMovieService {
         }
 
         dto.setSrc(tv.getSrc());
+        // populate cast from TvCredit relationships; if none, fall back to TMDB credits
+        try {
+            java.util.List<com.example.superapp.dto.CastMemberDto> cast = new java.util.ArrayList<>();
+            if (tv.getCredits() != null && !tv.getCredits().isEmpty()) {
+                tv.getCredits().stream()
+                        .sorted(java.util.Comparator.comparing(tc -> tc.getCreditOrder() == null ? 0 : tc.getCreditOrder()))
+                        .forEach(tc -> {
+                            com.example.superapp.entity.Person p = tc.getPerson();
+                            if (p == null) return;
+                            com.example.superapp.dto.CastMemberDto c = new com.example.superapp.dto.CastMemberDto();
+                            c.setId(p.getId());
+                            c.setName(p.getName());
+                            c.setCharacter(tc.getCharacter());
+                            c.setProfilePath(p.getProfilePath());
+                            cast.add(c);
+                        });
+            } else {
+                // try TMDB fallback (getTvDetails includes credits)
+                try {
+                    java.util.Map<String, Object> raw = tmdbService.getTvDetails(tv.getId());
+                    if (raw != null) {
+                        Object creditsObj = raw.get("credits");
+                        if (creditsObj instanceof java.util.Map<?, ?> creditsMap) {
+                            Object castObj = creditsMap.get("cast");
+                            if (castObj instanceof java.util.List<?> castList) {
+                                for (Object item : castList) {
+                                    if (!(item instanceof java.util.Map)) continue;
+                                    java.util.Map<String, Object> cm = (java.util.Map<String, Object>) item;
+                                    Object pidObj = cm.get("id");
+                                    Long pid = null;
+                                    if (pidObj instanceof Number n) pid = n.longValue();
+                                    String pname = TmdbService.stringVal(cm.get("name"));
+                                    String character = TmdbService.stringVal(cm.get("character"));
+                                    String profilePath = TmdbService.stringVal(cm.get("profile_path"));
+                                    if (pname == null) continue;
+                                    com.example.superapp.dto.CastMemberDto c = new com.example.superapp.dto.CastMemberDto();
+                                    c.setId(pid);
+                                    c.setName(pname);
+                                    c.setCharacter(character);
+                                    if (profilePath != null && !profilePath.isBlank()) {
+                                        c.setProfilePath(imageBaseUrl + profilePath);
+                                    }
+                                    cast.add(c);
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception ignored2) {}
+            }
+            dto.setCast(cast);
+        } catch (Exception ignored) {}
         return dto;
     }
 }
