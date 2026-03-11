@@ -1,6 +1,7 @@
 package com.example.superapp.controller;
 
 import com.example.superapp.dto.MoviePageResponse;
+import com.example.superapp.dto.MovieDetailDto;
 import com.example.superapp.service.PublicMovieService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,14 @@ public class PublicMovieController {
             @RequestParam(name = "page", defaultValue = "1") int page
     ) {
         return publicMovieService.listForHomepage(type, page);
+    }
+
+    @GetMapping("/detail")
+    public MovieDetailDto detail(
+            @RequestParam(name = "type") String type,
+            @RequestParam(name = "id") long id
+    ) {
+        return publicMovieService.getDetail(type, id);
     }
 }
 

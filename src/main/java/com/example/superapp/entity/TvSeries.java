@@ -37,6 +37,11 @@ public class TvSeries {
     @Column(nullable = false)
     private Boolean featured = false;
 
+    /**
+     * Nguồn trailer/video (YouTube URL, v.v.)
+     */
+    private String src;
+
     /* ================= RELATIONSHIPS ================= */
 
     @ManyToMany
@@ -60,6 +65,31 @@ public class TvSeries {
 
     @OneToMany(mappedBy = "tvSeries", cascade = CascadeType.ALL)
     private Set<Season> seasons = new HashSet<>();
+
+    // genres and studios are many-to-many defined earlier; add accessors so service can modify them
+    public Set<Genre> getGenres() {
+        return genres;
+    }
+
+    public void setGenres(Set<Genre> genres) {
+        this.genres = genres;
+    }
+
+    public Set<Studio> getStudios() {
+        return studios;
+    }
+
+    public void setStudios(Set<Studio> studios) {
+        this.studios = studios;
+    }
+
+    public Set<TvCredit> getCredits() {
+        return credits;
+    }
+
+    public void setCredits(Set<TvCredit> credits) {
+        this.credits = credits;
+    }
 
     public Long getId() {
         return id;
@@ -147,5 +177,13 @@ public class TvSeries {
 
     public void setFeatured(Boolean featured) {
         this.featured = featured;
+    }
+
+    public String getSrc() {
+        return src;
+    }
+
+    public void setSrc(String src) {
+        this.src = src;
     }
 }

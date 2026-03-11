@@ -25,10 +25,23 @@ public class CustomUserDetailsService implements UserDetailsService {
         System.out.println("DB password = " + user.getPassword());
         System.out.println("DB pass len = " + (user.getPassword() == null ? 0 : user.getPassword().length()));
 
+    // Normalize role: Spring's .roles(...) will add the "ROLE_" prefix.
+    // If the role stored in DB already contains "ROLE_", strip it first to avoid "ROLE_ROLE_...".
+    String rawRole = user.getRole();
+    String roleForSpring = "CUSTOMER"; // default
+    if (rawRole != null && !rawRole.isBlank()) {
+        rawRole = rawRole.trim();
+        if (rawRole.startsWith("ROLE_")) {
+            roleForSpring = rawRole.substring(5);
+        } else {
+            roleForSpring = rawRole;
+        }
+    }
+
     return org.springframework.security.core.userdetails.User
         .withUsername(user.getUsername())
         .password(user.getPassword())
-        .roles(user.getRole())
+        .roles(roleForSpring)
         .disabled(user.getEnabled() == null ? false : !user.getEnabled())
         .build();
     }

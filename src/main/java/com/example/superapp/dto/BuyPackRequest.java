@@ -7,4 +7,7 @@ import lombok.Setter;
 @Setter
 public class BuyPackRequest {
     private Long packId;
+    private Long subscriptionId; // null nếu mua mới, có giá trị nếu gia hạn
+
+
 }

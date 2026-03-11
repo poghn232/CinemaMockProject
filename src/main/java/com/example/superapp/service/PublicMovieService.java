@@ -2,6 +2,7 @@ package com.example.superapp.service;
 
 import com.example.superapp.dto.MovieItemDto;
 import com.example.superapp.dto.MoviePageResponse;
+import com.example.superapp.dto.MovieDetailDto;
 import com.example.superapp.entity.Movie;
 import com.example.superapp.entity.TvSeries;
 import com.example.superapp.repository.MovieRepository;
@@ -22,6 +23,7 @@ public class PublicMovieService {
 
     private final MovieRepository movieRepository;
     private final TvSeriesRepository tvSeriesRepository;
+    private final com.example.superapp.service.TmdbService tmdbService;
 
     @Value("${tmdb.image-base-url}")
     private String imageBaseUrl;
@@ -68,6 +70,30 @@ public class PublicMovieService {
         return new MoviePageResponse(pageItems, safePage, totalPages);
     }
 
+    @Transactional(readOnly = true)
+    public MovieDetailDto getDetail(String type, long id) {
+        String t = type == null ? "movie" : type.trim().toLowerCase();
+        if (!t.equals("movie") && !t.equals("tv")) {
+            throw new IllegalArgumentException("type must be 'movie' or 'tv'");
+        }
+
+        if (t.equals("movie")) {
+            Movie m = movieRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Movie not found"));
+            if (!Boolean.TRUE.equals(m.getActive()) || !Boolean.TRUE.equals(m.getPublished())) {
+                throw new IllegalArgumentException("Movie is not published");
+            }
+            return mapMovieDetail(m);
+        } else {
+            TvSeries tv = tvSeriesRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("TV series not found"));
+            if (!Boolean.TRUE.equals(tv.getActive()) || !Boolean.TRUE.equals(tv.getPublished())) {
+                throw new IllegalArgumentException("TV series is not published");
+            }
+            return mapTvDetail(tv);
+        }
+    }
+
     private MovieItemDto mapMovie(Movie m) {
         MovieItemDto dto = new MovieItemDto();
         dto.setId(m.getId());
@@ -103,6 +129,131 @@ public class PublicMovieService {
             dto.setImageUrl(imageBaseUrl + tv.getPosterPath());
         }
 
+        return dto;
+    }
+
+    private MovieDetailDto mapMovieDetail(Movie m) {
+        MovieDetailDto dto = new MovieDetailDto();
+        dto.setId(m.getId());
+        dto.setType("movie");
+        dto.setTitle(m.getTitle());
+        dto.setOverview(m.getOverview());
+        dto.setRating(m.getVoteAverage());
+        dto.setVoteCount(m.getVoteCount());
+        dto.setRuntime(m.getRuntime());
+
+        LocalDate release = m.getReleaseDate();
+        if (release != null) {
+            dto.setYear(release.getYear());
+        }
+
+        if (m.getPosterPath() != null && !m.getPosterPath().isBlank()) {
+            dto.setPosterUrl(imageBaseUrl + m.getPosterPath());
+        }
+        if (m.getBackdropPath() != null && !m.getBackdropPath().isBlank()) {
+            dto.setBackdropUrl(imageBaseUrl + m.getBackdropPath());
+        }
+
+        dto.setSrc(m.getSrc());
+        // populate cast from MovieCredit relationships
+        try {
+            java.util.List<com.example.superapp.dto.CastMemberDto> cast = new java.util.ArrayList<>();
+            if (m.getCredits() != null) {
+                m.getCredits().stream()
+                        .sorted(java.util.Comparator.comparing(mc -> mc.getCreditOrder() == null ? 0 : mc.getCreditOrder()))
+                        .forEach(mc -> {
+                            com.example.superapp.entity.Person p = mc.getPerson();
+                            if (p == null) return;
+                            com.example.superapp.dto.CastMemberDto c = new com.example.superapp.dto.CastMemberDto();
+                            c.setId(p.getId());
+                            c.setName(p.getName());
+                            c.setCharacter(mc.getCharacter());
+                            if (p.getProfilePath() != null && !p.getProfilePath().isBlank()) {
+                                c.setProfilePath(imageBaseUrl + p.getProfilePath());
+                            } else {
+                                c.setProfilePath(null);
+                            }
+                            cast.add(c);
+                        });
+            }
+            dto.setCast(cast);
+        } catch (Exception ignored) {}
+        return dto;
+    }
+
+    private MovieDetailDto mapTvDetail(TvSeries tv) {
+        MovieDetailDto dto = new MovieDetailDto();
+        dto.setId(tv.getId());
+        dto.setType("tv");
+        dto.setTitle(tv.getName());
+        dto.setOverview(tv.getOverview());
+        dto.setRating(tv.getVoteAverage());
+        dto.setVoteCount(tv.getVoteCount());
+
+        LocalDate firstAir = tv.getFirstAirDate();
+        if (firstAir != null) {
+            dto.setYear(firstAir.getYear());
+        }
+
+        if (tv.getPosterPath() != null && !tv.getPosterPath().isBlank()) {
+            dto.setPosterUrl(imageBaseUrl + tv.getPosterPath());
+        }
+        if (tv.getBackdropPath() != null && !tv.getBackdropPath().isBlank()) {
+            dto.setBackdropUrl(imageBaseUrl + tv.getBackdropPath());
+        }
+
+        dto.setSrc(tv.getSrc());
+        // populate cast from TvCredit relationships; if none, fall back to TMDB credits
+        try {
+            java.util.List<com.example.superapp.dto.CastMemberDto> cast = new java.util.ArrayList<>();
+            if (tv.getCredits() != null && !tv.getCredits().isEmpty()) {
+                tv.getCredits().stream()
+                        .sorted(java.util.Comparator.comparing(tc -> tc.getCreditOrder() == null ? 0 : tc.getCreditOrder()))
+                        .forEach(tc -> {
+                            com.example.superapp.entity.Person p = tc.getPerson();
+                            if (p == null) return;
+                            com.example.superapp.dto.CastMemberDto c = new com.example.superapp.dto.CastMemberDto();
+                            c.setId(p.getId());
+                            c.setName(p.getName());
+                            c.setCharacter(tc.getCharacter());
+                            c.setProfilePath(p.getProfilePath());
+                            cast.add(c);
+                        });
+            } else {
+                // try TMDB fallback (getTvDetails includes credits)
+                try {
+                    java.util.Map<String, Object> raw = tmdbService.getTvDetails(tv.getId());
+                    if (raw != null) {
+                        Object creditsObj = raw.get("credits");
+                        if (creditsObj instanceof java.util.Map<?, ?> creditsMap) {
+                            Object castObj = creditsMap.get("cast");
+                            if (castObj instanceof java.util.List<?> castList) {
+                                for (Object item : castList) {
+                                    if (!(item instanceof java.util.Map)) continue;
+                                    java.util.Map<String, Object> cm = (java.util.Map<String, Object>) item;
+                                    Object pidObj = cm.get("id");
+                                    Long pid = null;
+                                    if (pidObj instanceof Number n) pid = n.longValue();
+                                    String pname = TmdbService.stringVal(cm.get("name"));
+                                    String character = TmdbService.stringVal(cm.get("character"));
+                                    String profilePath = TmdbService.stringVal(cm.get("profile_path"));
+                                    if (pname == null) continue;
+                                    com.example.superapp.dto.CastMemberDto c = new com.example.superapp.dto.CastMemberDto();
+                                    c.setId(pid);
+                                    c.setName(pname);
+                                    c.setCharacter(character);
+                                    if (profilePath != null && !profilePath.isBlank()) {
+                                        c.setProfilePath(imageBaseUrl + profilePath);
+                                    }
+                                    cast.add(c);
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception ignored2) {}
+            }
+            dto.setCast(cast);
+        } catch (Exception ignored) {}
         return dto;
     }
 }

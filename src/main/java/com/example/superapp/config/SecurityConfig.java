@@ -45,28 +45,29 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // ✅ JWT stateless
                 .authorizeHttpRequests(auth -> auth
                         // admin page requires ADMIN
-                        
+
                         .requestMatchers(
                                 "/login.html", "/register.html", "/forgot-password.html",
-                                "/homepage.html", "/home.html", "/packs.html", "/contact.html",
+                                "/homepage.html", "/home.html",
+                                "/movie-detail.html", "/movie-trailer.html", "/movie-watch.html",
+                                "/packs.html", "/contact.html",
                                 "/", "/index.html", "/admin.html", "/profile.html",
                                 "/css/**", "/js/**", "/images/**", "/favicon.ico",
                                 "/api/auth/**",
                                 "/api/movies/**","/api/contact",
                                 "/api/public/**",
-                                "/api/image/**",
-                        "/api/admin/banner/upload",
-                                "/api/banner",
 
                                 // ✅ VNPay callbacks
                                 "/api/vnpay/**",
                                 "/api/payment/**",      // nếu dùng path này
-                                "/api/payments/**"
+                                "/api/payments/**",
+                                "/api/banner",
+                                "/api/image/**"
                         ).permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                
+
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable());

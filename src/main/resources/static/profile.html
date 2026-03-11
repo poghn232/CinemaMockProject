@@ -422,51 +422,53 @@
             const subContainer = document.getElementById('subscriptionContainer');
             subContainer.innerHTML = '';
 
-            if (!subs || subs.length === 0) {
-                subContainer.innerHTML = '<p style="color: var(--text-secondary);">You have not subscribed to any plan.</p>';
+            const successfulSubs = (subs || []).filter(sub => sub.status === 'ACTIVE');
+
+            if (successfulSubs.length === 0) {
+                subContainer.innerHTML = '<p style="color: var(--text-secondary);">You have not purchased any successful subscription yet.</p>';
                 return;
             }
 
-            subs.forEach((sub) => {
+            successfulSubs.forEach((sub) => {
                 let statusClass = sub.status ? sub.status.toLowerCase() : 'pending';
-                let actionsHtml = '';
-                
-                if (sub.status === 'FAILED') {
-                    actionsHtml = `
-                        <div class="sub-actions">
-                            <button class="btn btn-save" onclick="handleSubAction(${sub.subId}, 'RETRY', event)">Thử thanh toán lại</button>
-                        </div>`;
-                } else if (sub.status === 'PENDING') {
-                    actionsHtml = `
-                        <div class="sub-actions">
-                            <button class="btn btn-save" onclick="handleSubAction(${sub.subId}, 'COMPLETE', event)">Hoàn tất thanh toán</button>
-                            <button class="btn btn-cancel" onclick="handleSubAction(${sub.subId}, 'CANCEL_REQ', event)">Hủy yêu cầu</button>
-                        </div>`;
-                }
 
                 let dateHtml = '';
                 if (sub.startDate && sub.endDate) {
                     dateHtml = `
-                        <div class="sub-details">
-                            <p><strong>Start Date:</strong> ${new Date(sub.startDate).toLocaleDateString()}</p>
-                            <p><strong>End Date:</strong> ${new Date(sub.endDate).toLocaleDateString()}</p>
-                        </div>`;
+                <div class="sub-details">
+                    <p><strong>Start Date:</strong> ${new Date(sub.startDate).toLocaleDateString()}</p>
+                    <p><strong>End Date:</strong> ${new Date(sub.endDate).toLocaleDateString()}</p>
+                </div>
+            `;
                 }
 
                 let price = (sub.pack && sub.pack.packPrice) ? sub.pack.packPrice : 0;
                 let packName = (sub.pack && sub.pack.packName) ? sub.pack.packName : 'Unknown Plan';
 
+                let actionsHtml = '';
+                if (sub.status === 'ACTIVE') {
+                    actionsHtml = `
+                <div class="sub-actions">
+                    <button class="btn btn-save" onclick="extendSubscription(${sub.subId})">
+                        Extend Subscription
+                    </button>
+                </div>
+            `;
+                }
+
                 subContainer.innerHTML += `
-                    <div class="subscription-card ${sub.status === 'ACTIVE' ? 'premium' : ''}">
-                        <div class="sub-header">
-                            <h4>Subscription Plan #${sub.subId} - ${packName}</h4>
-                            <span class="badge ${statusClass}">${sub.status}</span>
-                        </div>
-                        <p class="sub-desc" style="font-weight: bold; color: #fff;">Price: ${price.toLocaleString('vi-VN')}đ</p>
-                        ${dateHtml}
-                        ${actionsHtml}
-                    </div>
-                `;
+            <div class="subscription-card premium">
+                <div class="sub-header">
+                    <h4>Subscription Plan #${sub.subId} - ${packName}</h4>
+                    <span class="badge ${statusClass}">${sub.status}</span>
+                </div>
+                <p class="sub-desc" style="font-weight: bold; color: #fff;">
+                    Price: ${price.toLocaleString('vi-VN')}đ
+                </p>
+                ${dateHtml}
+                ${actionsHtml}
+            </div>
+        `;
             });
         }
 
@@ -651,6 +653,9 @@
             }
         });
     });
+    window.extendSubscription = function(subscriptionId) {
+        window.location.href = `packs.html?mode=extend&subscriptionId=${subscriptionId}`;
+    };
     </script>
     </body>
 </html>

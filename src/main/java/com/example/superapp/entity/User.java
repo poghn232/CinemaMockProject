@@ -38,4 +38,5 @@ public class User {
 
     @Column(nullable = false)
     private Boolean enabled = true; // if false, user cannot authenticate
+
 }

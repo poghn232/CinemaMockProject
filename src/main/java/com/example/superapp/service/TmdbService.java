@@ -134,14 +134,23 @@ public class TmdbService {
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> getMovieDetails(long tmdbId) {
-        String url = baseUrl + "/movie/" + tmdbId + "?language=en-US&api_key=" + apiKey;
+    // include credits (cast) in the response to support admin detail view
+    String url = baseUrl + "/movie/" + tmdbId + "?language=en-US&api_key=" + apiKey + "&append_to_response=credits";
         Map<String, Object> response = restTemplate.getForObject(url, Map.class);
         return response == null ? Map.of() : response;
     }
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> getTvDetails(long tmdbId) {
-        String url = baseUrl + "/tv/" + tmdbId + "?language=en-US&api_key=" + apiKey;
+    // include credits (cast) for TV as well
+    String url = baseUrl + "/tv/" + tmdbId + "?language=en-US&api_key=" + apiKey + "&append_to_response=credits";
+        Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+        return response == null ? Map.of() : response;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getTvEpisodeDetails(long tvId, int seasonNumber, int episodeNumber) {
+        String url = baseUrl + "/tv/" + tvId + "/season/" + seasonNumber + "/episode/" + episodeNumber + "?language=en-US&api_key=" + apiKey + "&append_to_response=credits";
         Map<String, Object> response = restTemplate.getForObject(url, Map.class);
         return response == null ? Map.of() : response;
     }
