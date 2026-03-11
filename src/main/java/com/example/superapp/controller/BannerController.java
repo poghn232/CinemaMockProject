@@ -31,13 +31,14 @@ public class BannerController {
 
     @GetMapping("/api/image/{id}")
     public ResponseEntity<byte[]> retrieveImage(@PathVariable int id, @AuthenticationPrincipal UserDetails userDetails) {
-        User user = userService.getUserByUsername(userDetails.getUsername());
-        Subscription lastSub = user.getSubscriptions().getLast();
+        if (userDetails != null) {
+            User user = userService.getUserByUsername(userDetails.getUsername());
+            Subscription lastSub = user.getSubscriptions().getLast();
 
-        if (lastSub.getEndDate().isAfter(LocalDateTime.now())) {
-            return null;
+            if (lastSub != null && lastSub.getEndDate().isAfter(LocalDateTime.now())) {
+                return null;
+            }
         }
-
         Banner banner = bannerService.getBannerById(id);
 
         HttpHeaders headers = new HttpHeaders();
@@ -48,11 +49,13 @@ public class BannerController {
 
     @GetMapping("/api/banner")
     public ResponseEntity<List<Map<String, Object>>> retrieveAllBanners(@AuthenticationPrincipal UserDetails userDetails) {
-        User user = userService.getUserByUsername(userDetails.getUsername());
-        Subscription lastSub = user.getSubscriptions().getLast();
+        if (userDetails != null) {
+            User user = userService.getUserByUsername(userDetails.getUsername());
+            Subscription lastSub = user.getSubscriptions().getLast();
 
-        if (lastSub.getEndDate().isAfter(LocalDateTime.now())) {
-            return null;
+            if (lastSub != null && lastSub.getEndDate().isAfter(LocalDateTime.now())) {
+                return null;
+            }
         }
         List<Banner> banners = bannerService.getAllBanners();
         List<Map<String, Object>> result = banners.stream().map(banner -> {
