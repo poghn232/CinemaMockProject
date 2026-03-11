@@ -19,8 +19,13 @@ document.head.insertAdjacentHTML("beforeend", `
 `);
 
 const elementIds = ["botRowAd", "leftColAd", "rightColAd"];
+const token = localStorage.getItem("token");
 
-fetch("/api/banner")
+fetch("/api/banner", {
+    headers: {
+        "Authorization": `Bearer ${token}`
+    }
+})
     .then(res => res.json())
     .then(banners => {
         banners.forEach((banner, index) => {
@@ -38,7 +43,17 @@ fetch("/api/banner")
             const img = document.createElement("img");
             img.id = elementId;
             img.alt = "advertisement";
-            img.src = `/api/image/${banner.id}`;
+
+            // Fetch ảnh kèm token
+            fetch(`/api/image/${banner.id}`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+                .then(res => res.blob())
+                .then(blob => {
+                    img.src = URL.createObjectURL(blob);
+                });
 
             link.appendChild(img);
             wrapper.appendChild(link);

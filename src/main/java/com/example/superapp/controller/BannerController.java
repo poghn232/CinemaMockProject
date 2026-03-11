@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,7 @@ public class BannerController {
             Subscription lastSub = user.getSubscriptions().getLast();
 
             if (lastSub != null && lastSub.getEndDate().isAfter(LocalDateTime.now())) {
-                return null;
+                return ResponseEntity.ok(new byte[0]);
             }
         }
         Banner banner = bannerService.getBannerById(id);
@@ -54,7 +55,7 @@ public class BannerController {
             Subscription lastSub = user.getSubscriptions().getLast();
 
             if (lastSub != null && lastSub.getEndDate().isAfter(LocalDateTime.now())) {
-                return null;
+                return ResponseEntity.ok(Collections.emptyList());
             }
         }
         List<Banner> banners = bannerService.getAllBanners();
