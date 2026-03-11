@@ -68,7 +68,7 @@ public class EmailService {
                 new MimeMessageHelper(message, true, "UTF-8");
 
         // Đổi sang mail admin ở đây
-        helper.setTo("hieuden690@gmail.com");
+        helper.setTo("manh12345678n@gmail.com");
         helper.setSubject("📩 New Contact From MovieZone");
 
         String html = """
@@ -128,14 +128,15 @@ public class EmailService {
 
             if (file.getContentType() == null ||
                     !file.getContentType().startsWith("image/")) {
-                throw new RuntimeException("Chỉ được upload file ảnh!");
+                throw new RuntimeException("Upload image file only!");
             }
 
             if (file.getData().length > 5 * 1024 * 1024) {
-                throw new RuntimeException("Ảnh vượt quá 5MB!");
+                throw new RuntimeException("Image can not greater than 5MB!");
             }
         }
     }
+
     public void sendSubscriptionSuccessEmail(
             String to,
             String username,
@@ -153,23 +154,23 @@ public class EmailService {
         helper.setSubject("🎬 MovieZone - Thanh toán thành công");
 
         String html = """
-        <div style="font-family:Arial;padding:24px;background:#0b1220;color:#e5e7eb">
-            <h2 style="color:#22c55e">🎉 Thanh toán thành công!</h2>
-            
-            <p>Xin chào <b>%s</b>,</p>
-            
-            <p>Bạn đã mua thành công gói <b>%s</b>.</p>
-            
-            <hr>
-            
-            <p><b>💰 Giá:</b> %s VND</p>
-            <p><b>📅 Bắt đầu:</b> %s</p>
-            <p><b>⏳ Kết thúc:</b> %s</p>
-            
-            <br>
-            <p>Chúc bạn xem phim vui vẻ tại <b>MovieZone</b> 🍿</p>
-        </div>
-        """.formatted(
+                <div style="font-family:Arial;padding:24px;background:#0b1220;color:#e5e7eb">
+                    <h2 style="color:#22c55e">🎉 Thanh toán thành công!</h2>
+                
+                    <p>Xin chào <b>%s</b>,</p>
+                
+                    <p>Bạn đã mua thành công gói <b>%s</b>.</p>
+                
+                    <hr>
+                
+                    <p><b>💰 Giá:</b> %s VND</p>
+                    <p><b>📅 Bắt đầu:</b> %s</p>
+                    <p><b>⏳ Kết thúc:</b> %s</p>
+                
+                    <br>
+                    <p>Chúc bạn xem phim vui vẻ tại <b>MovieZone</b> 🍿</p>
+                </div>
+                """.formatted(
                 username,
                 packName,
                 price,
@@ -189,15 +190,16 @@ public class EmailService {
                 new MimeMessageHelper(message, false, "UTF-8");
 
         helper.setTo(email);
-        helper.setSubject("🎬 MovieZone - Chúng tôi đã nhận được liên hệ");
+        helper.setSubject("🎬 MovieZone - We have received your contact.");
 
         String html = """
                 <div style="font-family:Arial;padding:24px;background:#0b1220;color:#e5e7eb">
-                    <h2 style="color:#f97316">Xin chào %s 👋</h2>
-                    <p>Cảm ơn bạn đã liên hệ với MovieZone.</p>
-                    <p>Chúng tôi sẽ phản hồi trong vòng 24 giờ.</p>
-                    <br> <p style="font-size:13px;color:#94a3b8"> 
-                    Đây là email tự động, vui lòng không trả lời trực tiếp. 
+                    <h2 style="color:#f97316">Hi %s 👋</h2>
+                    <p>Thank you for contacting MovieZone.</p>
+                    <p>We have received your message and will respond as soon as possible, usually within 24 hours.</p>
+                    <br>
+                    <p style="font-size:13px;color:#94a3b8">
+                        This is an automated message. Please do not reply directly to this email.
                     </p>
                 </div>
                 """.formatted(name);

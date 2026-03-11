@@ -1,6 +1,6 @@
 <div class="card">
-  <h2>Films</h2>
-  <div class="muted">
+  <h2 data-i18n="admin.films">Films</h2>
+  <div class="muted" data-i18n="admin.films_manage">
     Manage the list of movies displayed on the homepage. Use Add to import from TMDB and Hide to hide published movies.
   </div>
 
@@ -17,12 +17,12 @@
       gap: 8px;
     "
   >
-    <div style="font-weight: 600">Browse TMDB (select to Add)</div>
+    <div style="font-weight: 600" data-i18n="admin.browse_tmdb">Browse TMDB (select to Add)</div>
     <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
       <select id="tmdbBrowseType" style="padding: 8px; border-radius: 8px; min-width: 140px">
-        <option value="all">All</option>
-        <option value="movie">Movie</option>
-        <option value="tv">TV Series</option>
+        <option value="all" data-i18n="admin.all">All</option>
+        <option value="movie" data-i18n="nav.movie">Movie</option>
+        <option value="tv" data-i18n="nav.tv">TV Series</option>
       </select>
       <input
         id="tmdbSearch"
@@ -30,11 +30,11 @@
         placeholder="Filter title..."
         style="flex: 1; min-width: 180px; padding: 8px; border-radius: 8px"
       />
-      <button id="tmdbReload" class="btn ghost">Reload</button>
+      <button id="tmdbReload" class="btn ghost" data-i18n="admin.reload">Reload</button>
     </div>
     <div id="tmdbMessage" class="muted"></div>
 
-  <div id="tmdbTableContainer" style="margin-top:12px; width:100%; overflow:auto">Loading...</div>
+  <div id="tmdbTableContainer" style="margin-top:12px; width:100%; overflow:auto" data-i18n="common.loading">Loading...</div>
 
     <div
       style="
@@ -45,9 +45,9 @@
         gap: 12px;
       "
     >
-      <button id="tmdbPrev" class="btn ghost">← Prev</button>
+      <button id="tmdbPrev" class="btn ghost" data-i18n="admin.prev">← Prev</button>
       <span id="tmdbPageInfo" class="muted"></span>
-      <button id="tmdbNext" class="btn ghost">Next →</button>
+      <button id="tmdbNext" class="btn ghost" data-i18n="admin.next">Next →</button>
     </div>
   </div>
 
@@ -67,10 +67,10 @@
       placeholder="Search by title..."
       style="flex: 1; min-width: 200px; padding: 8px; border-radius: 8px"
     />
-    <button id="refreshFilms" class="btn ghost">Reload</button>
+    <button id="refreshFilms" class="btn ghost" data-i18n="admin.reload">Reload</button>
   </div>
 
-  <div id="filmsList" class="packs" style="margin-top: 12px">Loading...</div>
+  <div id="filmsList" class="packs" style="margin-top: 12px" data-i18n="common.loading">Loading...</div>
 
   <div
     id="filmsPagination"
@@ -82,9 +82,9 @@
       gap: 12px;
     "
   >
-    <button id="filmsPrev" class="btn ghost">← Prev</button>
+    <button id="filmsPrev" class="btn ghost" data-i18n="admin.prev">← Prev</button>
     <span id="filmsPageInfo" class="muted"></span>
-    <button id="filmsNext" class="btn ghost">Next →</button>
+    <button id="filmsNext" class="btn ghost" data-i18n="admin.next">Next →</button>
   </div>
 </div>
 
@@ -678,3 +678,4 @@
     }
   })();
 </script>
+<script src="/js/i18n.js"></script>

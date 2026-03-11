@@ -1,22 +1,23 @@
 <div class="card">
-  <h2>Users</h2>
-  <div class="muted">Toggle to disable login for an user</div>
+  <h2 data-i18n="admin.users">Users</h2>
+  <div class="muted" data-i18n="admin.user_toggle">Toggle to disable login for an user</div>
   <div style="display: flex; gap: 8px; margin-top: 12px; align-items: center">
     <input
       id="userSearch"
       type="text"
+      data-i18n-placeholder="admin.search_user"
       placeholder="Search by username or email"
       style="flex: 1; padding: 8px; border-radius: 8px"
     />
     <select id="userSortField" style="padding: 8px; border-radius: 8px">
-      <option value="username">Username</option>
-      <option value="role">Role</option>
-      <option value="enabled">Enabled</option>
+      <option value="username" data-i18n="profile.username">Username</option>
+      <option value="role" data-i18n="profile.username">Role</option>
+      <option value="enabled" data-i18n="admin.enabled">Enabled</option>
     </select>
 
     <button id="userSortDir" class="btn ghost" data-dir="asc">↑</button>
   </div>
-  <div id="users" class="users-list" style="margin-top: 12px">Loading...</div>
+  <div id="users" class="users-list" style="margin-top: 12px"  data-i18n="common.loading">Loading...</div>
   <div
     id="userPagination"
     style="margin-top: 12px; display: flex; gap: 8px; align-items: center"
@@ -173,3 +174,4 @@
     await loadUsers();
   })();
 </script>
+<script src="/js/i18n.js"></script>

@@ -47,6 +47,6 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .badRequest()
-                .body("Ảnh quá lớn! Vui lòng chọn ảnh nhỏ hơn 5MB.");
+                .body("The image is too large! Please choose an image smaller than 5MB.");
     }
 }

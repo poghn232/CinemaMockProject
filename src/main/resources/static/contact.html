@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>MovieZone | Liên hệ</title>
+    <title>MovieZone | Contact</title>
 
     <style>
         :root {
@@ -52,7 +52,6 @@
             position: sticky;
             top: 12px;
             z-index: 20;
-            margin-bottom: 40px;
         }
 
         .nav-left {
@@ -72,6 +71,8 @@
             box-shadow: 0 0 25px rgba(248, 113, 113, 0.55);
             font-size: 14px;
             font-weight: 700;
+            text-decoration: none;
+            color: white;
         }
 
         .nav-title {
@@ -90,6 +91,107 @@
         .nav-title-sub {
             font-size: 11px;
             color: var(--text-subtle);
+        }
+
+        .nav-center {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+            margin-right: 10px;
+
+        }
+
+        .nav-link {
+            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            color: var(--text-subtle);
+            text-decoration: none;
+            border: 1px solid transparent;
+            transition: all 0.16s ease;
+            cursor: pointer;
+            background: none;
+            white-space: nowrap;
+        }
+
+        .nav-link:hover {
+            color: var(--text-main);
+            border-color: rgba(148, 163, 184, 0.6);
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, #f97316, #ec4899);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 12px 22px rgba(248, 113, 113, 0.6),
+            0 0 0 1px rgba(248, 113, 113, 0.7);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .nav-username {
+            color: var(--text-subtle);
+        }
+
+        .nav-link-logout {
+            text-transform: none;
+            font-weight: 500;
+            border-color: rgba(248, 113, 22, 0.6);
+            color: #e91000;
+        }
+
+        .nav-link-logout:hover {
+            background: rgba(15, 23, 42, 1);
+            border-color: rgba(248, 113, 22, 0.9);
+        }
+
+        /* PREMIUM BADGE */
+
+        .badge-premium {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            background: rgba(234, 179, 8, 0.12);
+            border: 1px solid rgba(250, 204, 21, 0.7);
+            color: #facc15;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .badge-premium-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: #facc15;
+            box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.32);
+        }
+
+        /* RESPONSIVE NAVBAR */
+
+        @media (max-width: 900px) {
+            .navbar {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .nav-center {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .page-shell {
+                padding-inline: 14px;
+            }
         }
 
         /* CONTACT CARD */
@@ -250,32 +352,161 @@
                 margin: 20px;
             }
         }
+
+        .lang-dropdown {
+            position: relative;
+        }
+
+        .lang-current {
+            width: 36px;
+            height: 36px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+            background: rgba(15, 23, 42, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+
+        }
+
+        .lang-current img {
+            width: 20px;
+            height: 20px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .lang-current:hover {
+            border-color: var(--accent);
+        }
+
+        /* dropdown */
+
+        .lang-menu {
+            position: absolute;
+            top: 42px;
+            right: 0;
+            background: rgba(15, 23, 42, 0.98);
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            border-radius: 12px;
+            width: 150px;
+            padding: 6px;
+            display: none;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+        }
+
+        .lang-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .lang-item img {
+            width: 20px;
+            height: 20px;
+            object-fit: cover;
+            border-radius: 50%;
+
+        }
+
+        .lang-item:hover {
+            background: rgba(148, 163, 184, 0.12);
+        }
+
+        .lang-dropdown.open .lang-menu {
+            display: block;
+        }
     </style>
 </head>
 <body>
 
 <div class="page-shell">
     <header class="navbar">
-        <div class="nav-left">
+
+        <a href="homepage.html" class="nav-left" style="text-decoration:none;color:inherit;">
             <div class="nav-logo">MZ</div>
             <div class="nav-title">
                 <span class="nav-title-main">MOVIEZONE</span>
-                <span class="nav-title-sub">Find movies, series &amp; more</span>
+                <span class="nav-title-sub" data-i18n="hero.subtitle">
+                Find movies, series & more
+            </span>
             </div>
+        </a>
+
+        <nav class="nav-center">
+            <a href="homepage.html" class="nav-link" data-i18n="nav.home">Home</a>
+
+            <a href="packs.html" class="nav-link" data-i18n="nav.premium_plan">
+                Premium Plan
+            </a>
+
+            <a href="profile.html"
+               class="nav-link nav-link-profile"
+               id="profileButton"
+               data-i18n="nav.profile">
+                Profile
+            </a>
+
+            <a href="contact.html"
+               class="nav-link active nav-link-contact"
+               id="contactButton"
+               data-i18n="nav.contact">
+                Contact
+            </a>
+
+            <div class="lang-dropdown">
+                <button class="lang-current" id="langCurrent">
+                    <img id="langFlag" src="https://flagcdn.com/w40/gb.png">
+                </button>
+
+                <div class="lang-menu" id="langMenu">
+                    <div class="lang-item" onclick="changeLanguage('vi')">
+                        <img src="https://flagcdn.com/w40/vn.png">
+                        <span>Tiếng Việt</span>
+                    </div>
+
+                    <div class="lang-item" onclick="changeLanguage('en')">
+                        <img src="https://flagcdn.com/w40/gb.png">
+                        <span>English</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="nav-link nav-link-logout"
+                    type="button"
+                    id="logoutButton"
+                    data-i18n="nav.logout">
+                Logout
+            </button>
+        </nav>
+
+        <div class="nav-right">
+            <span class="nav-username" id="navUsername"></span>
+
+            <span class="badge-premium" id="premiumBadge" style="display:none;">
+            <span class="badge-premium-dot"></span>
+            Premium
+        </span>
         </div>
     </header>
 
     <div class="card">
-        <div class="title">Contact Us</div>
+        <div class="title" data-i18n="contact.title">Contact Us</div>
 
         <form id="contactForm" enctype="multipart/form-data">
-            <input type="text" id="name" placeholder="Your Name" required>
-            <input type="email" id="email" placeholder="Email" required>
-            <input type="text" id="phone" placeholder="Phone Number">
-            <textarea id="content" placeholder="Message" required></textarea>
+            <input type="text" id="name" data-i18n-placeholder="contact.name" placeholder="Your Name" required>
+            <input type="email" id="email" data-i18n-placeholder="contact.email" placeholder="Email" required>
+            <input type="text" id="phone" data-i18n-placeholder="contact.phone" placeholder="Phone Number">
+            <textarea id="content" data-i18n-placeholder="contact.message" placeholder="Message" required></textarea>
             <input type="file" id="images" multiple accept="image/*">
 
-            <button type="submit">Send Contact</button>
+            <button type="submit" data-i18n="contact.send">Send Contact</button>
         </form>
 
         <div id="message"></div>
@@ -288,19 +519,16 @@
                 <span class="footer-title">MOVIEZONE</span>
             </div>
             <div class="footer-links">
-                <a href="homepage.html">Home</a>
-                <a href="login.html">Login</a>
-                <a href="register.html">Signup</a>
-                <a href="packs.html">Go Premium</a>
-                <a href="contact.html">Contact</a>
+                <a href="homepage.html" data-i18n="nav.home">Home</a>
+                <a href="packs.html" data-i18n="nav.premium_plan">Go Premium</a>
             </div>
         </div>
-        <div class="footer-bottom">
+        <div class="footer-bottom" data-i18n="footer.bottom">
             © 2025 MovieZone. Demo Project — Login/Sign Up to experience.
         </div>
     </footer>
 </div>
-
+<script src="/js/i18n.js"></script>
 <script>
 
     const token = localStorage.getItem("token");
@@ -361,6 +589,93 @@
         } finally {
             btn.disabled = false;
         }
+    });
+
+    async function fetchPremiumInfo() {
+
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            return {
+                isLoggedIn: false,
+                isPremium: false,
+                username: "Guest"
+            };
+        }
+
+        try {
+
+            const res = await fetch("/api/user/profile", {
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
+            });
+
+            const data = await res.json();
+
+            const subs = Array.isArray(data.subscriptions) ? data.subscriptions : [];
+
+            const hasActive = subs.some(s => s && s.status === "ACTIVE");
+
+            return {
+                isLoggedIn: true,
+                isPremium: hasActive,
+                username: data.username || localStorage.getItem("username") || "User"
+            };
+
+        } catch (e) {
+
+            return {
+                isLoggedIn: true,
+                isPremium: false,
+                username: localStorage.getItem("username") || "User"
+            };
+
+        }
+    }
+
+    async function initUserUi() {
+
+        const usernameEl = document.getElementById("navUsername");
+        const premiumBadge = document.getElementById("premiumBadge");
+        const logoutButton = document.getElementById("logoutButton");
+
+        const info = await fetchPremiumInfo();
+
+        if (usernameEl) {
+            usernameEl.textContent = "👋 " + translations.nav.hello + ", " + info.username;
+        }
+
+        if (info.isPremium && premiumBadge) {
+            premiumBadge.style.display = "inline-flex";
+        }
+
+        if (!info.isLoggedIn && logoutButton) {
+            logoutButton.style.display = "none";
+        }
+    }
+
+    function initLogout() {
+
+        const logoutButton = document.getElementById("logoutButton");
+
+        if (!logoutButton) return;
+
+        logoutButton.addEventListener("click", () => {
+
+            localStorage.removeItem("token");
+            localStorage.removeItem("username");
+
+            window.location.href = "login.html";
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+
+        await initUserUi();
+
+        initLogout();
+
     });
 </script>
 

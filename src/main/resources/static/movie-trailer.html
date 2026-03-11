@@ -98,16 +98,16 @@
         <div class="brand-logo">MZ</div>
         <div class="brand-title">MovieZone Player</div>
       </div>
-      <a href="javascript:history.back()" class="back-link">← Back</a>
+      <a href="javascript:history.back()" class="back-link" data-i18n="movie_detail.back">← Back</a>
     </header>
 
     <main class="player-shell">
-      <div id="trailerTitle" class="title">Loading film...</div>
+      <div id="trailerTitle" class="title" data-i18n="movie_detail.loading_film">Loading film...</div>
       <div class="frame-wrap" id="frameWrap">
-        <div class="msg" id="frameMessage">Loading...</div>
+        <div class="msg" id="frameMessage" data-i18n="common.loading">Loading...</div>
       </div>
     </main>
-
+    <script src="/js/i18n.js"></script>
     <script>
       function toEmbedUrl(url) {
         if (!url) return null;

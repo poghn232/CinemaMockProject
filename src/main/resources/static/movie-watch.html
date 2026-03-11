@@ -316,13 +316,13 @@
           <div class="nav-logo">MZ</div>
           <div>
             <div class="nav-title-main">MovieZone</div>
-            <div class="nav-title-sub">Watch Movie</div>
+            <div class="nav-title-sub"  data-i18n="movie_player.watch_movie">Watch Movie</div>
           </div>
         </div>
-        <a href="javascript:history.back()" class="back-link">← Back</a>
+        <a href="javascript:history.back()" class="back-link" data-i18n="movie_detail.back">← Back</a>
       </header>
 
-      <div id="loading" class="loading">Loading...</div>
+      <div id="loading" class="loading" data-i18n="common.loading">Loading...</div>
 
       <div id="content" style="display:none">
         <!-- VIDEO PLAYER -->
@@ -334,7 +334,7 @@
 
         <!-- EPISODE SELECTOR (hidden for movies) -->
         <div id="episodeSelector" class="episode-selector hidden">
-          <div class="episode-label">Select Episode:</div>
+          <div class="episode-label"  data-i18n="movie_player.select_episode">Select Episode:</div>
           <div id="episodeButtons" class="episode-buttons">
             <!-- Episode buttons will be generated here -->
           </div>
@@ -346,37 +346,38 @@
             <div id="poster" class="poster"></div>
           </div>
           <div class="info-content">
-            <h1 id="movieTitle" class="movie-title">Loading...</h1>
+            <h1 id="movieTitle" class="movie-title" data-i18n="movie_detail.loading_film">Loading...</h1>
             <div id="movieSubtitle" class="movie-subtitle"></div>
-            <div id="movieOverview" class="movie-overview">Loading...</div>
+            <div id="movieOverview" class="movie-overview" data-i18n="common.loading">Loading...</div>
           </div>
         </div>
 
         <!-- AD BANNER (shown for non-premium users) -->
         <div id="adBanner" class="ad-banner hidden">
-          <div class="ad-text">🎬 Upgrade to Premium for Ad-Free Experience!</div>
-          <div class="ad-subtext">Remove ads and enjoy unlimited streaming</div>
+          <div class="ad-text" data-i18n="ads.title">🎬 Upgrade to Premium for Ad-Free Experience!</div>
+          <div class="ad-subtext" data-i18n="ads.subtitle">Remove ads and enjoy unlimited streaming</div>
         </div>
 
         <!-- COMMENTS SECTION -->
         <div class="comments-section">
-          <h3 class="comments-title">Comments</h3>
+          <h3 class="comments-title" data-i18n="movie_player.comments">Comments</h3>
           <div class="comment-input-container">
             <textarea
               id="commentInput"
               class="comment-input"
+              data-i18n-placeholder="movie_player.comment_placeholder"
               placeholder="Share your thoughts about this movie..."
               maxlength="500"
             ></textarea>
             <div class="comment-actions">
               <div id="charCount" class="comment-char-count">0/500</div>
-              <button id="submitComment" class="comment-submit" disabled>Post Comment</button>
+              <button id="submitComment" class="comment-submit" data-i18n="movie_player.post_comment" disabled>Post Comment</button>
             </div>
           </div>
         </div>
       </div>
     </div>
-
+    <script src="/js/i18n.js"></script>
     <script>
       async function loadWatchPage() {
         const params = new URLSearchParams(window.location.search);

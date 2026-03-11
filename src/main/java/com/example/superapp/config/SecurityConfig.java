@@ -55,7 +55,7 @@ public class SecurityConfig {
                                 "/css/**", "/js/**", "/images/**", "/favicon.ico",
                                 "/api/auth/**",
                                 "/api/movies/**","/api/contact",
-                                "/api/public/**",
+                                "/api/public/**", "/i18n/**",
 
                                 // ✅ VNPay callbacks
                                 "/api/vnpay/**",
