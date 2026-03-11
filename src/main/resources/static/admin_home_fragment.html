@@ -1,12 +1,12 @@
 <div class="card">
-    <h2>Admin Home</h2>
+    <h2 data-i18n="nav.home">Admin Home</h2>
     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 12px">
         <div style="
         background: rgba(255, 255, 255, 0.02);
         padding: 12px;
         border-radius: 8px;
       ">
-            <div class="muted">Users (non-admin)</div>
+            <div class="muted" data-i18n="admin.users">Users (non-admin)</div>
             <div id="homeUsers" style="font-weight: 700; font-size: 20px; margin-top: 8px">
                 --
             </div>
@@ -16,7 +16,7 @@
         padding: 12px;
         border-radius: 8px;
       ">
-            <div class="muted">Subscription packs</div>
+            <div class="muted" data-i18n="admin.packs">Subscription packs</div>
             <div id="homePacks" style="font-weight: 700; font-size: 20px; margin-top: 8px">
                 --
             </div>
@@ -28,7 +28,7 @@
       padding: 12px;
       border-radius: 8px;
     ">
-            <div class="muted">Published Films</div>
+            <div class="muted" data-i18n="admin.films">Published Films</div>
             <div id="homeMovies" style="font-weight: 700; font-size: 20px; margin-top: 8px">
                 --
             </div>
@@ -37,15 +37,15 @@
     </div>
 
 
-    <button class="btn" onclick="window.adminApi.loadFragment('admin_users.html')">
+    <button class="btn" onclick="window.adminApi.loadFragment('admin_users.html')" data-i18n="admin.manage_users">>
         Manage Users
     </button>
 
-    <button class="btn ghost" onclick="window.adminApi.loadFragment('admin_packs.html')">
+    <button class="btn ghost" onclick="window.adminApi.loadFragment('admin_packs.html')" data-i18n="admin.manage_packs">
         Manage Packs
     </button>
 
-    <button class="btn" onclick="window.adminApi.loadFragment('admin_movies.html')">
+    <button class="btn" onclick="window.adminApi.loadFragment('admin_movies.html')" data-i18n="admin.manage_films">
         Manage Films
     </button>
 <!-- Fragment script executed after this HTML is loaded -->
@@ -68,4 +68,5 @@
             }
         })();
     </script>
+    <script src="/js/i18n.js"></script>
 </div>

@@ -1,15 +1,15 @@
 <div class="card">
-    <h2>Subscription packs</h2>
-    <div class="muted">View/Edit/Delete Subscription Packs</div>
+    <h2 data-i18n="admin.packs">Subscription packs</h2>
+    <div class="muted" data-i18n="admin.manage_packs">View/Edit/Delete Subscription Packs</div>
     <div style="display: flex; gap: 8px; margin-top: 12px; align-items: center">
 
-        <input id="packSearch" type="text" placeholder="Search by pack name"
+        <input id="packSearch" type="text"  data-i18n-placeholder="admin.search_title" placeholder="Search by pack name"
             style="flex: 1; padding: 8px; border-radius: 8px" />
 
         <select id="packSortField" style="padding: 8px; border-radius: 8px">
-            <option value="name">Name</option>
-            <option value="price">Price</option>
-            <option value="days">Duration</option>
+            <option value="name" data-i18n="admin.pack_name">Name</option>
+            <option value="price" data-i18n="admin.price">Price</option>
+            <option value="days" data-i18n="admin.duration">Duration</option>
         </select>
 
         <button id="packSortDir" class="btn ghost" data-dir="asc">
@@ -18,20 +18,20 @@
     </div>
 
 
-    <div id="packs" class="packs" style="margin-top: 12px">Loading...</div>
+    <div id="packs" class="packs" style="margin-top: 12px" data-i18n="common.loading">Loading...</div>
     <div id="packPagination" style="margin-top:12px; display:flex; gap:8px; align-items:center;">
     </div>
 </div>
 <div class="card" style="margin-top: 16px">
-    <h2>Create / Edit Pack</h2>
+    <h2 data-i18n="admin.create_pack">Create / Edit Pack</h2>
     <form id="packForm" class="pack-form">
         <input type="hidden" id="packId" />
-        <input type="text" id="packName" placeholder="Pack name" required />
-        <input id="packPrice" type="number" step="0.01" placeholder="Price" required />
-        <input id="packDays" type="number" placeholder="Duration days" required />
+        <input type="text" id="packName" data-i18n-placeholder="admin.pack_name" placeholder="Pack name" required />
+        <input id="packPrice" type="number" step="0.01"  data-i18n-placeholder="admin.price" placeholder="Price" required />
+        <input id="packDays" type="number"  data-i18n-placeholder="admin.duration" placeholder="Duration days" required />
         <div style="display: flex; gap: 8px; margin-top: 8px">
-            <button class="btn" id="savePack">Save</button>
-            <button class="btn ghost" id="resetPack" type="button">Reset</button>
+            <button class="btn" id="savePack"  data-i18n="common.save">Save</button>
+            <button class="btn ghost" id="resetPack" type="button" data-i18n="common.reset">Reset</button>
         </div>
     </form>
 
@@ -270,5 +270,5 @@
             await loadPacks();
         })();
     </script>
-</div>
+    <script src="/js/i18n.js"></script>
 </div>

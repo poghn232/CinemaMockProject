@@ -7,10 +7,9 @@
     <style>
         body {
             font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background:
-                    radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.08), transparent 50%),
-                    radial-gradient(circle at 100% 100%, rgba(255, 255, 255, 0.05), transparent 55%),
-                    linear-gradient(135deg, #050816, #0b1220 50%, #020617);
+            background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.08), transparent 50%),
+            radial-gradient(circle at 100% 100%, rgba(255, 255, 255, 0.05), transparent 55%),
+            linear-gradient(135deg, #050816, #0b1220 50%, #020617);
             height: 100vh;
             display: flex;
             justify-content: center;
@@ -23,10 +22,8 @@
         .backdrop-blur {
             position: fixed;
             inset: 0;
-            background:
-                    linear-gradient(to right, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.7)),
-                    url("https://images.pexels.com/photos/7991377/pexels-photo-7991377.jpeg?auto=compress&cs=tinysrgb&w=1600")
-                    center/cover no-repeat;
+            background: linear-gradient(to right, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.7)),
+            url("https://images.pexels.com/photos/7991377/pexels-photo-7991377.jpeg?auto=compress&cs=tinysrgb&w=1600") center/cover no-repeat;
             filter: brightness(0.9);
             z-index: -1;
         }
@@ -81,7 +78,7 @@
             line-height: 1.15;
         }
 
-        .brand-title span {
+        .highlight {
             color: #f97316;
         }
 
@@ -171,9 +168,8 @@
             padding: 30px 28px 26px;
             width: 340px;
             border-radius: 18px;
-            box-shadow:
-                    0 0 0 1px rgba(148, 163, 184, 0.35),
-                    0 18px 45px rgba(15, 23, 42, 0.95);
+            box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.35),
+            0 18px 45px rgba(15, 23, 42, 0.95);
             text-align: left;
             backdrop-filter: blur(22px);
         }
@@ -268,25 +264,22 @@
             font-weight: 600;
             letter-spacing: 0.03em;
             text-transform: uppercase;
-            box-shadow:
-                    0 12px 25px rgba(34, 197, 94, 0.5),
-                    0 0 0 1px rgba(34, 197, 94, 0.55);
+            box-shadow: 0 12px 25px rgba(34, 197, 94, 0.5),
+            0 0 0 1px rgba(34, 197, 94, 0.55);
             transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
         }
 
         button:hover {
             filter: brightness(1.05);
             transform: translateY(-1px);
-            box-shadow:
-                    0 16px 30px rgba(34, 197, 94, 0.7),
-                    0 0 0 1px rgba(34, 197, 94, 0.8);
+            box-shadow: 0 16px 30px rgba(34, 197, 94, 0.7),
+            0 0 0 1px rgba(34, 197, 94, 0.8);
         }
 
         button:active {
             transform: translateY(0);
-            box-shadow:
-                    0 8px 18px rgba(34, 197, 94, 0.5),
-                    0 0 0 1px rgba(34, 197, 94, 0.8);
+            box-shadow: 0 8px 18px rgba(34, 197, 94, 0.5),
+            0 0 0 1px rgba(34, 197, 94, 0.8);
         }
 
         .helper-row {
@@ -327,17 +320,17 @@
             <span>MovieZone</span>
         </div>
         <h1 class="brand-title">
-            Sign up<br/>
-            to not miss any movies.
+            <span class="highlight" data-i18n="auth.signup">Sign up</span><br/>
+            <span data-i18n="register_hero.title_line2">to not miss any movies.</span>
         </h1>
-        <p class="brand-subtitle">
+        <p class="brand-subtitle" data-i18n="register_hero.subtitle">
             Sign up for free, receive OTP via email, and start saving your favorite movies and watch history.
         </p>
 
         <div class="tagline-chips">
-            <div class="tagline-chip">Free account creation</div>
-            <div class="tagline-chip">Personalized recommendations</div>
-            <div class="tagline-chip">Watch on any device</div>
+            <div class="tagline-chip" data-i18n="register_hero.chip_free">Free account creation</div>
+            <div class="tagline-chip" data-i18n="register_hero.chip_recommend">Personalized recommendations</div>
+            <div class="tagline-chip" data-i18n="register_hero.chip_device">Watch on any device</div>
         </div>
 
         <div class="poster-row">
@@ -365,12 +358,14 @@
     <section class="register-container">
         <div class="register-header">
             <div>
-                <h2>Sign up an account</h2>
-                <p class="register-caption">Email for OTP code.</p>
+                <h2 data-i18n="auth.register_title">Sign up an account</h2>
+                <p class="register-caption" data-i18n="auth.register_caption">Email for OTP code.</p>
             </div>
             <div class="badge">
                 <span class="badge-dot"></span>
-                OTP Security
+                <span data-i18n="register_hero.otp_security">
+                    OTP Security
+                </span>
             </div>
         </div>
 
@@ -378,36 +373,40 @@
         <div id="registerSection">
             <form id="registerForm">
                 <div class="field">
-                    <div class="field-label">Email</div>
-                    <input type="email" id="email" placeholder="Enter your email" required>
+                    <div class="field-label" data-i18n="auth.email">Email</div>
+                    <input type="email" id="email" placeholder="Enter your email"
+                           data-i18n-placeholder="auth.email_placeholder" required>
                 </div>
                 <div class="field">
-                    <div class="field-label">Username</div>
-                    <input type="text" id="username" placeholder="Enter username" required>
+                    <div class="field-label" data-i18n="auth.username">Username</div>
+                    <input type="text" id="username" data-i18n-placeholder="auth.username_placeholder"
+                           placeholder="Enter username" required>
                 </div>
                 <div class="field">
-                    <div class="field-label">Password</div>
-                    <input type="password" id="password" placeholder="At least 6 characters" required>
+                    <div class="field-label" data-i18n="auth.password">Password</div>
+                    <input type="password" id="password" data-i18n-placeholder="auth.password_placeholder"
+                           placeholder="At least 6 characters" required>
                 </div>
-                <button type="submit">Send OTP</button>
+                <button type="submit" data-i18n="auth.send_otp">Send OTP</button>
             </form>
         </div>
 
         <!-- FORM VERIFY OTP -->
         <div id="otpSection" style="display:none; margin-top: 10px;">
-            <div class="field-label">Enter the OTP sent to your email</div>
+            <div class="field-label" data-i18n="auth.enter_otp">Enter the OTP sent to your email</div>
             <form id="verifyForm">
                 <div class="field">
-                    <input type="text" id="otp" placeholder="Enter OTP" required>
+                    <input type="text" id="otp" data-i18n-placeholder="auth.enter_otp" placeholder="Enter OTP" required>
                 </div>
-                <button type="submit">Confirm OTP</button>
+                <button type="submit" data-i18n="auth.confirm_otp">Confirm OTP</button>
             </form>
         </div>
 
         <p id="msg"></p>
 
         <div class="helper-row">
-            <span>Already have an account? <a href="login.html">Log in</a></span>
+            <span data-i18n="auth.already_account">Already have an account?</span>
+            <a href="login.html" data-i18n="auth.login">Log in</a>
         </div>
     </section>
 </div>
@@ -506,6 +505,6 @@
     });
 
 </script>
-
+<script src="/js/i18n.js"></script>
 </body>
 </html>

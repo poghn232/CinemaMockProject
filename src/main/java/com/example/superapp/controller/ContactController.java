@@ -47,7 +47,7 @@ public class ContactController {
 
         emailService.sendContactMail(request, attachments);
 
-        return ResponseEntity.ok("Gửi liên hệ thành công!");
+        return ResponseEntity.ok("Contact sent successfully!");
     }
 }
 

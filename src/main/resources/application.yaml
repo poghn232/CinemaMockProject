@@ -23,8 +23,11 @@
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
-      
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 20MB
 
 server:
   port: 8080

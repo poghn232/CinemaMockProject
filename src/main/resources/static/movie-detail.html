@@ -438,10 +438,10 @@
             <div class="nav-logo">MZ</div>
             <div>
               <div class="nav-title-main">MovieZone</div>
-              <div class="nav-title-sub">Movie Details</div>
+              <div class="nav-title-sub" data-i18n="movie_detail.page_title">Movie Details</div>
             </div>
           </div>
-          <a href="homepage.html" class="back-link">← Back to Home</a>
+          <a href="homepage.html" class="back-link" data-i18n="movie_detail.back_home">← Back to Home</a>
         </header>
       </div>
       
@@ -451,11 +451,11 @@
             <div id="poster" class="poster"></div>
           </div>
           <div class="hero-info">
-            <h1 class="hero-title" id="heroTitle">Loading...</h1>
+            <h1 class="hero-title" id="heroTitle" data-i18n="common.loading">Loading...</h1>
             <div class="hero-subtitle" id="heroSubtitle"></div>
             <div class="hero-rating" id="heroRating"></div>
             <div class="action-buttons">
-              <button id="playBtn" class="btn-primary" style="display:none">
+              <button id="playBtn" class="btn-primary" style="display:none" data-i18n="movie_detail.watch_movie">
                 ▶ Watch Movie
               </button>
             </div>
@@ -468,52 +468,52 @@
       <div class="detail-row">
         <div class="detail-column">
           <div class="card">
-            <div class="card-title">Overview</div>
-            <div id="overviewText" class="overview-text">Loading...</div>
+            <div class="card-title" data-i18n="movie_detail.overview">Overview</div>
+            <div id="overviewText" class="overview-text" data-i18n="common.loading">Loading...</div>
           </div>
 
           <div class="card">
-            <div class="card-title">Cast</div>
+            <div class="card-title" data-i18n="movie_detail.cast">Cast</div>
             <ul id="castList" class="cast-list">
-              <li class="cast-item">Loading...</li>
+              <li class="cast-item" data-i18n="common.loading">Loading...</li>
             </ul>
           </div>
         </div>
 
         <div class="detail-column">
           <div class="card">
-            <div class="card-title">Details</div>
+            <div class="card-title" data-i18n="movie_detail.details">Details</div>
             <ul class="meta-list">
               <li>
-                <span class="meta-label">Type</span>
+                <span class="meta-label" data-i18n="movie_detail.type">Type</span>
                 <span class="meta-value" id="metaType"></span>
               </li>
               <li>
-                <span class="meta-label">Year</span>
+                <span class="meta-label" data-i18n="movie_detail.year">Year</span>
                 <span class="meta-value" id="metaYear"></span>
               </li>
               <li>
-                <span class="meta-label">Director</span>
+                <span class="meta-label" data-i18n="movie_detail.director">Director</span>
                 <span class="meta-value" id="metaDirector">-</span>
               </li>
               <li>
-                <span class="meta-label">Country</span>
+                <span class="meta-label" data-i18n="movie_detail.country">Country</span>
                 <span class="meta-value" id="metaCountry">-</span>
               </li>
               <li>
-                <span class="meta-label">Release Date</span>
+                <span class="meta-label" data-i18n="movie_detail.release_date">Release Date</span>
                 <span class="meta-value" id="metaReleaseDate">-</span>
               </li>
               <li>
-                <span class="meta-label">Runtime</span>
+                <span class="meta-label" data-i18n="movie_detail.runtime">Runtime</span>
                 <span class="meta-value" id="metaRuntime"></span>
               </li>
               <li>
-                <span class="meta-label">Rating</span>
+                <span class="meta-label" data-i18n="movie_detail.rating">Rating</span>
                 <span class="meta-value" id="metaRating"></span>
               </li>
               <li id="seasonEpisodesRow" style="display:none">
-                <span class="meta-label">Seasons & Episodes</span>
+                <span class="meta-label" data-i18n="movie_detail.seasons_episodes">Seasons & Episodes</span>
                 <span class="meta-value" id="metaSeasonEpisodes">-</span>
               </li>
             </ul>
@@ -525,11 +525,11 @@
     <!-- SEASONS SECTION FOR TV SERIES -->
     <div id="seasonsSection" class="seasons-full-width" style="display:none">
       <div class="seasons-container">
-        <div class="seasons-title">Seasons</div>
-        <div id="seasonsGrid" class="seasons-grid">Loading seasons...</div>
+        <div class="seasons-title" data-i18n="movie_detail.seasons">Seasons</div>
+        <div id="seasonsGrid" class="seasons-grid" data-i18n="movie_detail.loading_seasons">Loading seasons...</div>
       </div>
     </div>
-
+    <script src="/js/i18n.js"></script>
     <script>
       async function loadDetail() {
         const params = new URLSearchParams(window.location.search);
