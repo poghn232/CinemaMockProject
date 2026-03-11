@@ -34,7 +34,7 @@ public class BannerController {
         User user = userService.getUserByUsername(userDetails.getUsername());
         Subscription lastSub = user.getSubscriptions().getLast();
 
-        if (lastSub.getEndDate().isAfter(LocalDateTime.now())) {
+        if (lastSub != null && lastSub.getEndDate().isAfter(LocalDateTime.now())) {
             return null;
         }
 
