@@ -1,51 +1,3 @@
-//
-// let translations = {};
-//
-// function applyTranslations() {
-//
-//     document.querySelectorAll("[data-i18n]").forEach(el => {
-//         const key = el.getAttribute("data-i18n");
-//
-//         const keys = key.split(".");
-//         let value = translations;
-//
-//         keys.forEach(k => {
-//             if (value) value = value[k];
-//         });
-//
-//         if (value) el.innerText = value;
-//     });
-//
-//     document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
-//         const key = el.getAttribute("data-i18n-placeholder");
-//
-//         const keys = key.split(".");
-//         let value = translations;
-//
-//         keys.forEach(k => {
-//             if (value) value = value[k];
-//         });
-//
-//         if (value) el.placeholder = value;
-//     });
-// }
-//
-// async function loadLanguage(lang) {
-//     const res = await fetch(`/i18n/${lang}.json`);
-//     translations = await res.json();
-//
-//     applyTranslations();   // dùng lại function
-// }
-//
-// function changeLanguage(lang) {
-//     localStorage.setItem("lang", lang);
-//     loadLanguage(lang);
-// }
-//
-// document.addEventListener("DOMContentLoaded", () => {
-//     const lang = localStorage.getItem("lang") || "en";
-//     loadLanguage(lang);
-// });
 let translations = {};
 
 // lấy value từ key dạng nav.home
@@ -98,10 +50,28 @@ async function loadLanguage(lang) {
 
 // đổi language
 function changeLanguage(lang) {
-
+    // lưu ngôn ngữ
     localStorage.setItem("lang", lang);
 
-    loadLanguage(lang);
+    // load file ngôn ngữ rồi apply lại translation
+    loadLanguage(lang).then(() => {
+
+        // dịch lại toàn bộ DOM hiện tại
+        if (typeof applyTranslations === "function") {
+            applyTranslations();
+        }
+
+        // nếu đang ở trang admin thì reload fragment đang mở
+        if (window.adminApi && window.adminApi.loadFragment) {
+            const active = document.querySelector(".side-item.active");
+            if (active) {
+                const frag = active.getAttribute("data-fragment");
+                if (frag) {
+                    window.adminApi.loadFragment(frag);
+                }
+            }
+        }
+    });
 
     // đóng dropdown nếu có
     const dropdown = document.querySelector(".lang-dropdown");
@@ -116,11 +86,20 @@ function updateLangFlag() {
 
     const lang = localStorage.getItem("lang") || "en";
 
-    if (lang === "vi") {
-        flag.src = "https://flagcdn.com/w20/vn.png";
-    } else {
-        flag.src = "https://flagcdn.com/w20/gb.png";
-    }
+    // if (lang === "vi") {
+    //     flag.src = "https://flagcdn.com/w20/vn.png";
+    // } else {
+    //     flag.src = "https://flagcdn.com/w20/gb.png";
+    // }
+    const flags = {
+        vi: "vn",
+        en: "gb",
+        my: "mm",
+        ja: "jp",
+        de: "de"
+    };
+
+    flag.src = `https://flagcdn.com/w20/${flags[lang] || "gb"}.png`;
 }
 
 // dropdown toggle
