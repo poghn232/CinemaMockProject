@@ -1,13 +1,17 @@
 package com.example.superapp.entity;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.Check;
-
+import lombok.Data;              // QUAN TRỌNG: Phải có dòng này
+import lombok.NoArgsConstructor;   // QUAN TRỌNG: Phải có dòng này
+import lombok.AllArgsConstructor;  // QUAN TRỌNG: Phải có dòng này
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "watch_history")
-@Check(constraints = "(movie_id IS NOT NULL AND episode_id IS NULL) OR (movie_id IS NULL AND episode_id IS NOT NULL)")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@org.hibernate.annotations.Check(constraints = "(movie_id IS NOT NULL AND episode_id IS NULL) OR (movie_id IS NULL AND episode_id IS NOT NULL)")
 public class WatchHistory {
 
     @Id
