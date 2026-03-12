@@ -316,25 +316,25 @@
           <div class="nav-logo">MZ</div>
           <div>
             <div class="nav-title-main">MovieZone</div>
-            <div class="nav-title-sub"  data-i18n="movie_player.watch_movie">Watch Movie</div>
+            <div class="nav-title-sub">Watch Movie</div>
           </div>
         </div>
-        <a href="javascript:history.back()" class="back-link" data-i18n="movie_detail.back">← Back</a>
+        <a href="javascript:history.back()" class="back-link">← Back</a>
       </header>
 
-      <div id="loading" class="loading" data-i18n="common.loading">Loading...</div>
+      <div id="loading" class="loading">Loading...</div>
 
       <div id="content" style="display:none">
         <!-- VIDEO PLAYER -->
         <div class="video-section">
           <div class="video-container">
-            <iframe id="videoPlayer" class="video-player" allowfullscreen></iframe>
+            <div id="videoPlayer" class="video-player"></div>
           </div>
         </div>
 
         <!-- EPISODE SELECTOR (hidden for movies) -->
         <div id="episodeSelector" class="episode-selector hidden">
-          <div class="episode-label"  data-i18n="movie_player.select_episode">Select Episode:</div>
+          <div class="episode-label">Select Episode:</div>
           <div id="episodeButtons" class="episode-buttons">
             <!-- Episode buttons will be generated here -->
           </div>
@@ -346,38 +346,38 @@
             <div id="poster" class="poster"></div>
           </div>
           <div class="info-content">
-            <h1 id="movieTitle" class="movie-title" data-i18n="movie_detail.loading_film">Loading...</h1>
+            <h1 id="movieTitle" class="movie-title">Loading...</h1>
             <div id="movieSubtitle" class="movie-subtitle"></div>
-            <div id="movieOverview" class="movie-overview" data-i18n="common.loading">Loading...</div>
+            <div id="movieOverview" class="movie-overview">Loading...</div>
           </div>
         </div>
 
         <!-- AD BANNER (shown for non-premium users) -->
         <div id="adBanner" class="ad-banner hidden">
-          <div class="ad-text" data-i18n="ads.title">🎬 Upgrade to Premium for Ad-Free Experience!</div>
-          <div class="ad-subtext" data-i18n="ads.subtitle">Remove ads and enjoy unlimited streaming</div>
+          <div class="ad-text">🎬 Upgrade to Premium for Ad-Free
+            Experience!</div>
+          <div class="ad-subtext">Remove ads and enjoy unlimited streaming</div>
         </div>
 
         <!-- COMMENTS SECTION -->
         <div class="comments-section">
-          <h3 class="comments-title" data-i18n="movie_player.comments">Comments</h3>
+          <h3 class="comments-title">Comments</h3>
           <div class="comment-input-container">
             <textarea
               id="commentInput"
               class="comment-input"
-              data-i18n-placeholder="movie_player.comment_placeholder"
               placeholder="Share your thoughts about this movie..."
-              maxlength="500"
-            ></textarea>
+              maxlength="500"></textarea>
             <div class="comment-actions">
               <div id="charCount" class="comment-char-count">0/500</div>
-              <button id="submitComment" class="comment-submit" data-i18n="movie_player.post_comment" disabled>Post Comment</button>
+              <button id="submitComment" class="comment-submit" disabled>Post
+                Comment</button>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <script src="/js/i18n.js"></script>
+
     <script>
       async function loadWatchPage() {
         const params = new URLSearchParams(window.location.search);
@@ -473,14 +473,21 @@
           }
         });
 
+        // Start the elapsed-time tracker now that we have a video loaded.
+        // Use runtime (minutes → seconds) when available; TV episodes default to 45 min.
+        const runtimeSec = movieData.runtime
+          ? movieData.runtime * 60
+          : (type === 'tv' ? 45 * 60 : 0);
+        if (window._startHistoryTracker) window._startHistoryTracker(runtimeSec);
+
         // Initialize comments functionality
         initializeComments();
       }
 
       function setupMovie(movieData) {
-        // For movies, use trailer as video source
         const videoUrl = movieData.src || "";
-        loadVideo(videoUrl);
+        // _resumeSec is set by the tracker block below before loadWatchPage() runs
+        loadVideo(videoUrl, window._resumeSec || 0);
       }
 
       function setupTVSeries(movieData, seasonsData, selectedSeason, selectedEpisode) {
@@ -544,11 +551,14 @@
               // Add active class to clicked button
               button.classList.add("active");
 
-              // Load the episode video
+              // Load the episode video — only resume on the initial auto-click,
+              // not when the user manually picks a different episode
+              const resumeOnLoad = window._resumeSec || 0;
+              window._resumeSec = 0; // clear after first use
               if (ep && ep.src) {
-                loadVideo(ep.src);
+                loadVideo(ep.src, resumeOnLoad);
               } else {
-                loadVideo("");
+                loadVideo("", 0);
               }
             });
 
@@ -567,7 +577,8 @@
             if (firstButton) {
               firstButton.click();
             } else if (firstEpisode.src) {
-              loadVideo(firstEpisode.src);
+              loadVideo(firstEpisode.src, window._resumeSec || 0);
+              window._resumeSec = 0;
             }
           }
         } else {
@@ -575,115 +586,271 @@
           const season = sortedSeasons.find(s => s.seasonNumber == selectedSeason);
           const ep = season?.episodes?.find(e => e.episodeNumber == selectedEpisode && e.published);
           if (ep && ep.src) {
-            loadVideo(ep.src);
+            loadVideo(ep.src, window._resumeSec || 0);
+            window._resumeSec = 0;
           }
         }
       }
 
-      function loadVideo(videoUrl) {
-        const player = document.getElementById("videoPlayer");
+      // ── YouTube IFrame Player API ──────────────────────────────────────
+      // We use the official YT.Player API (not a plain iframe) because it is
+      // the ONLY way to receive play/pause/end state change events reliably.
+      // A plain iframe with enablejsapi=1 does NOT fire postMessage events
+      // unless the player was created through new YT.Player() and has had
+      // addEventListener() called on it. Without the API the tracker never
+      // fires and nothing is ever saved to the database.
 
-        if (!videoUrl || videoUrl.trim() === "") {
-          player.src = "";
-          return;
-        }
+      let _ytPlayer     = null;   // YT.Player instance
+      let _ytReady      = false;  // true once onReady fires
+      let _pendingLoad  = null;   // { videoId, startSec } queued before API ready
+      let _ytStartSec   = 0;      // start position for the current video
 
-        // Handle different video sources
-        let embedUrl = "";
-
-        if (videoUrl.includes("youtube.com") || videoUrl.includes("youtu.be")) {
-          // YouTube video
-          const videoId = extractYouTubeId(videoUrl);
-          if (videoId) {
-            embedUrl = `https://www.youtube.com/embed/${videoId}`;
+      // Called by the YT API script once it has loaded
+      window.onYouTubeIframeAPIReady = function() {
+          _ytReady = true;
+          if (_pendingLoad) {
+              _createPlayer(_pendingLoad.videoId, _pendingLoad.startSec);
+              _pendingLoad = null;
           }
-        } else if (videoUrl.includes("vimeo.com")) {
-          // Vimeo video
-          const videoId = extractVimeoId(videoUrl);
-          if (videoId) {
-            embedUrl = `https://player.vimeo.com/video/${videoId}`;
-          }
-        } else {
-          // Direct video URL or other embed
-          embedUrl = videoUrl;
-        }
+      };
 
-        player.src = embedUrl;
+      function _createPlayer(videoId, startSec) {
+          _ytStartSec = Math.floor(startSec || 0);  // saved for onReady seekTo()
+
+          // Destroy previous player if one exists (e.g. episode switch)
+          if (_ytPlayer) {
+              try { _ytPlayer.destroy(); } catch(e) {}
+              _ytPlayer = null;
+              const container = document.querySelector('.video-container');
+              const div = document.createElement('div');
+              div.id = 'videoPlayer';
+              div.className = 'video-player';
+              container.appendChild(div);
+          }
+          _ytPlayer = new YT.Player('videoPlayer', {
+              width:  '100%',
+              height: '100%',
+              videoId: videoId,
+              playerVars: {
+                  rel:            0,
+                  modestbranding: 1
+              },
+              events: {
+                  onReady:       _onPlayerReady,
+                  onStateChange: _onStateChange
+              }
+          });
+      }
+
+      function _onPlayerReady(event) {
+          // Get exact duration straight from the YouTube player API
+          const ytDuration = event.target.getDuration();
+          if (ytDuration && ytDuration > 0) {
+              _durationSec = Math.floor(ytDuration);
+          }
+
+          // Seek to saved position — seekTo() is reliable without autoplay,
+          // unlike playerVars.start which YouTube ignores when paused on load
+          if (_ytStartSec > 0) {
+              event.target.seekTo(_ytStartSec, true);
+          }
+      }
+
+      function _onStateChange(event) {
+          const state = event.data;
+          // YT.PlayerState: PLAYING=1, PAUSED=2, ENDED=0, BUFFERING=3
+          if (state === YT.PlayerState.PLAYING) {
+              if (_firstPlay) {
+                  _firstPlay = false;
+                  _doSave();   // immediate save creates the DB record right away
+              }
+          } else if (state === YT.PlayerState.PAUSED || state === YT.PlayerState.ENDED) {
+              _doSave();       // save the exact position whenever user pauses or video ends
+          }
+      }
+
+      function loadVideo(videoUrl, startSec) {
+          const start = Math.floor(startSec || 0);
+
+          if (!videoUrl || videoUrl.trim() === '') {
+              // No URL — show blank player area
+              if (_ytPlayer) { try { _ytPlayer.stopVideo(); } catch(e) {} }
+              return;
+          }
+
+          // Start wall-clock counter the moment a real video URL is loaded
+
+          if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+              const videoId = extractYouTubeId(videoUrl);
+              if (!videoId) return;
+              if (_ytReady) {
+                  _createPlayer(videoId, start);
+              } else {
+                  // API script not loaded yet — queue and load the script now
+                  _pendingLoad = { videoId, startSec: start };
+                  if (!document.getElementById('yt-api-script')) {
+                      const tag = document.createElement('script');
+                      tag.id  = 'yt-api-script';
+                      tag.src = 'https://www.youtube.com/iframe_api';
+                      document.head.appendChild(tag);
+                  }
+              }
+          } else if (videoUrl.includes('vimeo.com')) {
+              // Vimeo: fall back to plain iframe (Vimeo Player SDK is separate)
+              const videoId = extractVimeoId(videoUrl);
+              if (videoId) {
+                  const container = document.querySelector('.video-container');
+                  container.innerHTML =
+                      `<iframe class="video-player" allowfullscreen
+                          src="https://player.vimeo.com/video/${videoId}?api=1#t=${start}">
+                       </iframe>`;
+                  // For Vimeo: fall back to time-based tracking (no state events)
+                  _isPlaying = true;
+                  if (_firstPlay) { _firstPlay = false; _doSave(); }
+              }
+          } else {
+              // Direct URL — plain iframe, fall back to time-based tracking
+              const container = document.querySelector('.video-container');
+              container.innerHTML =
+                  `<iframe class="video-player" allowfullscreen
+                      src="${start > 0 ? videoUrl + '#t=' + start : videoUrl}">
+                   </iframe>`;
+              _isPlaying = true;
+              if (_firstPlay) { _firstPlay = false; _doSave(); }
+          }
       }
 
       function extractYouTubeId(url) {
-        const patterns = [
-          /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/,
-          /youtube\.com\/embed\/([^&\n?#]+)/
-        ];
-
-        for (const pattern of patterns) {
-          const match = url.match(pattern);
-          if (match) return match[1];
-        }
-        return null;
+          const patterns = [
+              /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/,
+              /youtube\.com\/embed\/([^&\n?#]+)/
+          ];
+          for (const pattern of patterns) {
+              const match = url.match(pattern);
+              if (match) return match[1];
+          }
+          return null;
       }
 
       function extractVimeoId(url) {
-        const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
-        return match ? match[1] : null;
+          const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+          return match ? match[1] : null;
       }
 
-      // Check if user is premium
-      async function checkUserPremiumStatus() {
-        try {
-          const response = await fetch('/api/user/profile');
-          if (response.ok) {
-            const userData = await response.json();
-            return isUserPremium(userData);
+      // ── Watch History Tracker ──────────────────────────────────────────
+      // getCurrentTime() returns the absolute playback position in the video
+      // (e.g. 1200 if the user is at the 20-minute mark), so it is saved
+      // directly as progressSec — no offset needed.
+      //
+      // _savedProgress must NOT be added to getCurrentTime() because
+      // seekTo(_savedProgress) already moves the player to that position,
+      // so getCurrentTime() already reflects the full cumulative position.
+      // Adding _savedProgress would double-count it on every session.
+
+      const _histParams = new URLSearchParams(window.location.search);
+      const _histId     = _histParams.get("id");
+      const _histType   = _histParams.get("type") || "movie";
+      const _histToken  = localStorage.getItem("token");
+      const _tParam     = _histParams.get("t"); // seek position only
+
+      let _durationSec  = 0;     // set from getDuration() in _onPlayerReady
+      let _firstPlay    = true;  // triggers immediate DB insert on first play
+
+      window._resumeSec = 0;
+
+      window._startHistoryTracker = function(durationSeconds) {
+          _durationSec = durationSeconds || 0;
+      };
+
+      // Returns the exact playback position from YouTube — already absolute
+      function _getCurrentTime() {
+          try {
+              if (_ytPlayer && typeof _ytPlayer.getCurrentTime === "function") {
+                  return Math.floor(_ytPlayer.getCurrentTime()) || 0;
+              }
+          } catch(e) {}
+          return 0;
+      }
+
+      function _buildPayload() {
+          const currentTime = _getCurrentTime();  // absolute — no offset needed
+          const duration    = Math.floor(_durationSec);
+          const progress    = (duration > 0) ? Math.min(currentTime, duration) : currentTime;
+          return {
+              progressSec: progress,
+              durationSec: duration,
+              ...(_histType === "movie"
+                  ? { movieId:   parseInt(_histId) }
+                  : { episodeId: parseInt(_histId) })
+          };
+      }
+
+      function _doSave() {
+          if (!_histId || !_histToken) return;
+          fetch("http://localhost:8080/api/user/history/save", {
+              method : "POST",
+              headers: {
+                  "Content-Type" : "application/json",
+                  "Authorization": "Bearer " + _histToken
+              },
+              body: JSON.stringify(_buildPayload())
+          }).catch(() => {});
+      }
+
+      // Periodic save every 15 seconds (only when player exists)
+      setInterval(() => {
+          if (_ytPlayer && !_firstPlay) _doSave();
+      }, 15_000);
+
+      // Save on tab close using sync XHR (sendBeacon can't send Authorization header)
+      window.addEventListener("beforeunload", () => {
+          if (!_histId || !_histToken || _firstPlay) return;
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", "http://localhost:8080/api/user/history/save", false);
+          xhr.setRequestHeader("Content-Type", "application/json");
+          xhr.setRequestHeader("Authorization", "Bearer " + _histToken);
+          try { xhr.send(JSON.stringify(_buildPayload())); } catch(e) {}
+      });
+
+      async function _initAndStart() {
+          // ?t= sets the video seek position only — do NOT use it for _savedProgress.
+          // Always fetch from DB so cumulative progress is never lost.
+          if (_tParam !== null && _tParam !== "") {
+              window._resumeSec = parseFloat(_tParam) || 0;
           }
-        } catch (e) {
-          console.error('Failed to check premium status:', e);
-        }
-        return false; // Default to non-premium if check fails
-      }
 
-      function isUserPremium(userData) {
-        if (!userData.subscriptions || userData.subscriptions.length === 0) {
-          return false;
-        }
-
-        const now = new Date();
-        return userData.subscriptions.some(sub => {
-          return sub.status === 'ACTIVE' &&
-                 sub.endDate &&
-                 new Date(sub.endDate) > now;
-        });
-      }
-
-      // Initialize comment functionality
-      function initializeComments() {
-        const commentInput = document.getElementById('commentInput');
-        const charCount = document.getElementById('charCount');
-        const submitButton = document.getElementById('submitComment');
-
-        commentInput.addEventListener('input', () => {
-          const length = commentInput.value.length;
-          charCount.textContent = `${length}/500`;
-
-          // Enable/disable submit button
-          submitButton.disabled = length === 0 || length > 500;
-        });
-
-        submitButton.addEventListener('click', () => {
-          const comment = commentInput.value.trim();
-          if (comment) {
-            // For now, just show a success message
-            // In a real app, this would send to backend
-            alert('Comment posted! (This is a demo - backend integration needed)');
-            commentInput.value = '';
-            charCount.textContent = '0/500';
-            submitButton.disabled = true;
+          // Always fetch saved progress from DB regardless of ?t=
+          if (_histId && _histToken) {
+              try {
+                  const res = await fetch("http://localhost:8080/api/user/history", {
+                      headers: { "Authorization": "Bearer " + _histToken }
+                  });
+                  if (res.ok) {
+                      const list = await res.json();
+                      const rec  = list.find(h =>
+                          (_histType === "movie" && String(h.movieId)   === String(_histId)) ||
+                          (_histType === "tv"    && String(h.episodeId) === String(_histId))
+                      );
+                      if (rec) {
+                          // Use saved position to seek the player — getCurrentTime()
+                          // will then return this absolute position directly, so no
+                          // _savedProgress offset is needed in _buildPayload()
+                          const savedPos = rec.progressSec || 0;
+                          _durationSec   = rec.durationSec || 0;
+                          if (!window._resumeSec) {
+                              window._resumeSec = savedPos;
+                          }
+                      }
+                  }
+              } catch (e) {
+                  console.warn("Could not load saved progress:", e);
+              }
           }
-        });
+          loadWatchPage();
       }
 
-      loadWatchPage();
+      _initAndStart();
+
     </script>
   </body>
 </html>
