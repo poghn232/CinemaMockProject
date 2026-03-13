@@ -2,6 +2,7 @@ package com.example.superapp.controller;
 
 import com.example.superapp.entity.Banner;
 import com.example.superapp.entity.Subscription;
+import com.example.superapp.entity.SubscriptionStatus;
 import com.example.superapp.entity.User;
 import com.example.superapp.service.BannerService;
 import com.example.superapp.service.UserService;
@@ -34,12 +35,9 @@ public class BannerController {
     @GetMapping("/api/image/{id}")
     public ResponseEntity<byte[]> retrieveImage(@PathVariable int id, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails != null) {
-            User user = userService.getUserByUsername(userDetails.getUsername());
-            if (!user.getSubscriptions().isEmpty()) {
-                Subscription lastSub = user.getSubscriptions().getLast();
-                if (lastSub.getEndDate().isAfter(LocalDateTime.now())) {
-                    return ResponseEntity.ok(new byte[0]);
-                }
+            List<Subscription> subs = userService.getUserByUsername(userDetails.getUsername()).getSubscriptions();
+            if (!subs.isEmpty() && subs.getLast().getStatus() == SubscriptionStatus.ACTIVE) {
+                return ResponseEntity.ok(new byte[0]);
             }
         }
         Banner banner = bannerService.getBannerById(id);
@@ -52,15 +50,11 @@ public class BannerController {
 
     @GetMapping("/api/banner")
     public ResponseEntity<List<Map<String, Object>>> retrieveAllBanners(@AuthenticationPrincipal UserDetails userDetails) {
-        System.out.println("=== /api/banner called ==="); // thêm dòng này
-        System.out.println("userDetails: " + userDetails);
+
         if (userDetails != null) {
-            User user = userService.getUserByUsername(userDetails.getUsername());
-            if (!user.getSubscriptions().isEmpty()) {
-                Subscription lastSub = user.getSubscriptions().getLast();
-                if (lastSub.getEndDate().isAfter(LocalDateTime.now())) {
-                    return ResponseEntity.ok(Collections.emptyList());
-                }
+            List<Subscription> subs = userService.getUserByUsername(userDetails.getUsername()).getSubscriptions();
+            if (!subs.isEmpty() && subs.getLast().getStatus() == SubscriptionStatus.ACTIVE) {
+                return ResponseEntity.ok(Collections.emptyList());
             }
         }
         List<Banner> banners = bannerService.getAllBanners();
