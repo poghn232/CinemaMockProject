@@ -12,6 +12,11 @@ function getTranslation(key) {
     return value;
 }
 
+function t(key) {
+    const value = getTranslation(key);
+    return value || key;
+}
+
 // áp dụng text
 function applyTranslations() {
 
@@ -19,7 +24,7 @@ function applyTranslations() {
         const key = el.getAttribute("data-i18n");
         const value = getTranslation(key);
 
-        if (value) el.innerText = value;
+        if (value) el.textContent = value;
     });
 
     document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {

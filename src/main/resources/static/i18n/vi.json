@@ -203,5 +203,13 @@
     "chip_recommend": "Gợi ý cá nhân hóa",
     "chip_device": "Xem trên mọi thiết bị",
     "otp_security": "Bảo mật OTP"
+  },
+  "wishlist": {
+    "add": "🤍 Thêm vào danh sách yêu thích",
+    "added": "❤️ Đã thêm vào yêu thích",
+    "added_toast": "❤️ Đã thêm vào danh sách yêu thích!",
+    "removed_toast": "💔 Đã xóa khỏi danh sách yêu thích",
+    "login_required": "Vui lòng đăng nhập để dùng danh sách yêu thích.",
+    "error": "Đã xảy ra lỗi."
   }
 }

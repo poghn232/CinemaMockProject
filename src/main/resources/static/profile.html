@@ -589,6 +589,33 @@
         .lang-dropdown.open .lang-menu {
             display: block;
         }
+        .wishlist-remove-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.7);
+            border: none;
+            color: #ef4444;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 2;
+        }
+        .history-card:hover .wishlist-remove-btn {
+            opacity: 1;
+        }
+        .wishlist-empty {
+            color: var(--text-secondary);
+            font-size: 14px;
+            padding: 20px 0;
+        }
     </style>
     </head>
 
@@ -693,6 +720,10 @@
                         <span
                             data-i18n="profile.subscriptions">Subscriptions</span>
                     </li>
+                    <li class="sidebar-item" data-target="section-wishlist">
+                        <i class="fas fa-heart"></i>
+                        <span>My Wishlist</span>
+                    </li>
                     <li class="sidebar-item" data-target="section-password">
                         <i class="fas fa-lock"></i>
                         <span data-i18n="profile.change_password">Change
@@ -747,6 +778,11 @@
                         Subscriptions</h3>
                     <div id="subscriptionContainer">
                     </div>
+                </section>
+
+                <section id="section-wishlist" class="content-section">
+                    <h3>My Wishlist</h3>
+                    <div id="wishlistContainer" class="history-grid"></div>
                 </section>
 
                 <section id="section-password" class="content-section">
@@ -1143,6 +1179,10 @@ sidebarItems.forEach(item => {
             loadHistory();
         }
 
+        if (targetId === 'section-wishlist') {
+            loadWishlist();
+        }
+
     });
 });
 
@@ -1267,6 +1307,111 @@ sidebarItems.forEach(item => {
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;');
+    }
+
+    async function loadWishlist() {
+        const container = document.getElementById('wishlistContainer');
+        container.innerHTML = `
+        <div class="history-loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading wishlist...</p>
+        </div>`;
+
+        try {
+            const res = await fetch('/api/user/wishlist', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            if (res.status === 401 || res.status === 403) {
+                localStorage.removeItem('token');
+                window.location.replace('login.html');
+                return;
+            }
+
+            if (!res.ok) throw new Error('Failed to load wishlist');
+            const items = await res.json();
+
+            container.innerHTML = '';
+
+            if (!items || items.length === 0) {
+                container.innerHTML = '<p class="wishlist-empty">You have no wishlisted movies yet.</p>';
+                return;
+            }
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'history-card';
+                card.style.cursor = 'pointer';
+                card.style.position = 'relative';
+
+                const posterUrl = item.posterUrl || 'https://via.placeholder.com/160x240?text=No+Image';
+                const ratingText = item.rating ? item.rating.toFixed(1) : 'N/A';
+                const typeLabel = item.contentType === 'tv' ? 'TV Series' : 'Movie';
+
+                card.innerHTML = `
+                <div class="history-thumb" style="
+                    aspect-ratio: 2/3;
+                    background-image: url('${posterUrl}');
+                    background-size: cover;
+                    background-position: center;
+                    border-radius: 8px 8px 0 0;
+                    position: relative;
+                ">
+                    <span style="
+                        position:absolute; bottom:8px; left:8px;
+                        background:rgba(0,0,0,0.7);
+                        color:#e5e7eb; font-size:10px;
+                        padding:2px 7px; border-radius:999px;
+                    ">${typeLabel}</span>
+                    <button class="wishlist-remove-btn" title="Remove from wishlist">✕</button>
+                </div>
+                <div style="padding: 10px 10px 12px;">
+                    <div style="font-weight:600; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                        ${item.title || 'Unknown'}
+                    </div>
+                    <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">
+                        ★ ${ratingText} · ${item.year || ''}
+                    </div>
+                </div>
+            `;
+
+                // Click card → đi tới trang detail
+                card.addEventListener('click', (e) => {
+                    if (e.target.closest('.wishlist-remove-btn')) return;
+                    window.location.href = `movie-detail.html?id=${item.contentId}&type=${item.contentType}`;
+                });
+
+                // Click nút X → remove khỏi wishlist
+                card.querySelector('.wishlist-remove-btn').addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    try {
+                        const r = await fetch('/api/user/wishlist/toggle', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                            },
+                            body: JSON.stringify({ contentId: item.contentId, contentType: item.contentType })
+                        });
+                        if (r.ok) {
+                            card.remove();
+                            if (container.children.length === 0) {
+                                container.innerHTML = '<p class="wishlist-empty">You have no wishlisted movies yet.</p>';
+                            }
+                        }
+                    } catch { /* ignore */ }
+                });
+
+                container.appendChild(card);
+            });
+
+        } catch (e) {
+            container.innerHTML = '<p class="wishlist-empty">Failed to load wishlist.</p>';
+            console.error(e);
+        }
     }
     </script>
     </body>

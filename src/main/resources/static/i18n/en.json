@@ -218,5 +218,13 @@
     "chip_recommend": "Personalized recommendations",
     "chip_device": "Watch on any device",
     "otp_security": "OTP Security"
+  },
+  "wishlist": {
+    "add": "🤍 Add to Wishlist",
+    "added": "❤️ Wishlisted",
+    "added_toast": "❤️ Added to Wishlist!",
+    "removed_toast": "💔 Removed from Wishlist",
+    "login_required": "Please log in to use wishlist.",
+    "error": "Something went wrong."
   }
 }

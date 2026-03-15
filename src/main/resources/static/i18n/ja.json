@@ -218,5 +218,13 @@
     "chip_recommend": "パーソナライズ推薦",
     "chip_device": "どのデバイスでも視聴",
     "otp_security": "OTPセキュリティ"
+  },
+  "wishlist": {
+    "add": "🤍 お気に入りに追加",
+    "added": "❤️ お気に入り済み",
+    "added_toast": "❤️ お気に入りに追加しました！",
+    "removed_toast": "💔 お気に入りから削除しました",
+    "login_required": "お気に入りを使うにはログインしてください。",
+    "error": "エラーが発生しました。"
   }
 }
