@@ -42,6 +42,15 @@ public class TvSeries {
      */
     private String src;
 
+    @OneToMany(mappedBy = "tvSeries", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<TvRegionBlock> regionBlocks = new HashSet<>();
+    public Set<TvRegionBlock> getRegionBlocks() {
+        return regionBlocks;
+    }
+    public void setRegionBlocks(Set<TvRegionBlock> regionBlocks) {
+        this.regionBlocks = regionBlocks;
+    }
+
     /* ================= RELATIONSHIPS ================= */
 
     @ManyToMany

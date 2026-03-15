@@ -3,6 +3,7 @@ package com.example.superapp.controller;
 import com.example.superapp.dto.MoviePageResponse;
 import com.example.superapp.dto.MovieDetailDto;
 import com.example.superapp.service.PublicMovieService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,17 +20,19 @@ public class PublicMovieController {
     @GetMapping
     public MoviePageResponse list(
             @RequestParam(name = "type", defaultValue = "all") String type,
-            @RequestParam(name = "page", defaultValue = "1") int page
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            HttpServletRequest request
     ) {
-        return publicMovieService.listForHomepage(type, page);
+        return publicMovieService.listForHomepage(type, page, request);
     }
 
     @GetMapping("/detail")
     public MovieDetailDto detail(
             @RequestParam(name = "type") String type,
-            @RequestParam(name = "id") long id
+            @RequestParam(name = "id") long id,
+            HttpServletRequest request
     ) {
-        return publicMovieService.getDetail(type, id);
+        return publicMovieService.getDetail(type, id, request);
     }
 }
 

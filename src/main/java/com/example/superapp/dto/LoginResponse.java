@@ -4,6 +4,25 @@ public class LoginResponse {
     private String token;
     private String role;
     private String username;
+    private String region;
+    private boolean requirePublicIp;
+
+    public boolean isRequirePublicIp() {
+        return requirePublicIp;
+    }
+
+    public void setRequirePublicIp(boolean requirePublicIp) {
+        this.requirePublicIp = requirePublicIp;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
     public LoginResponse(String token) {
         this.token = token;
     }

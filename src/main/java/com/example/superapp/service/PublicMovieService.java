@@ -1,22 +1,28 @@
 package com.example.superapp.service;
 
+import com.example.superapp.dto.MovieDetailDto;
 import com.example.superapp.dto.MovieItemDto;
 import com.example.superapp.dto.MoviePageResponse;
-import com.example.superapp.dto.MovieDetailDto;
 import com.example.superapp.entity.Movie;
+import com.example.superapp.entity.MovieRegionBlock;
+import com.example.superapp.entity.TvRegionBlock;
 import com.example.superapp.entity.TvSeries;
 import com.example.superapp.repository.MovieRepository;
 import com.example.superapp.repository.TvSeriesRepository;
+import com.example.superapp.utils.JwtUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -24,17 +30,20 @@ public class PublicMovieService {
 
     private final MovieRepository movieRepository;
     private final TvSeriesRepository tvSeriesRepository;
-    private final com.example.superapp.service.TmdbService tmdbService;
+    private final TmdbService tmdbService;
+    private final JwtUtils jwtUtils;
 
     @Value("${tmdb.image-base-url}")
     private String imageBaseUrl;
 
     @Transactional(readOnly = true)
-    public MoviePageResponse listForHomepage(String type, int page) {
+    public MoviePageResponse listForHomepage(String type, int page, HttpServletRequest request) {
         String t = type == null ? "all" : type.trim().toLowerCase();
         if (!t.equals("movie") && !t.equals("tv")) {
             t = "all";
         }
+
+        String userRegion = extractRegionFromRequest(request);
 
         int pageSize = 20;
         int safePage = Math.max(1, page);
@@ -43,13 +52,17 @@ public class PublicMovieService {
 
         if (t.equals("movie") || t.equals("all")) {
             for (Movie m : movieRepository.findByActiveTrueAndPublishedTrue()) {
-                allItems.add(mapMovie(m));
+                if (!isMovieBlockedForRegion(m, userRegion)) {
+                    allItems.add(mapMovie(m));
+                }
             }
         }
 
         if (t.equals("tv") || t.equals("all")) {
             for (TvSeries tv : tvSeriesRepository.findByActiveTrueAndPublishedTrue()) {
-                allItems.add(mapTv(tv));
+                if (!isTvBlockedForRegion(tv, userRegion)) {
+                    allItems.add(mapTv(tv));
+                }
             }
         }
 
@@ -60,6 +73,7 @@ public class PublicMovieService {
 
         int fromIndex = (safePage - 1) * pageSize;
         int toIndex = Math.min(fromIndex + pageSize, total);
+
         if (fromIndex >= total) {
             fromIndex = 0;
             toIndex = Math.min(pageSize, total);
@@ -72,27 +86,103 @@ public class PublicMovieService {
     }
 
     @Transactional(readOnly = true)
-    public MovieDetailDto getDetail(String type, long id) {
+    public MovieDetailDto getDetail(String type, long id, HttpServletRequest request) {
         String t = type == null ? "movie" : type.trim().toLowerCase();
         if (!t.equals("movie") && !t.equals("tv")) {
             throw new IllegalArgumentException("type must be 'movie' or 'tv'");
         }
 
+        String userRegion = extractRegionFromRequest(request);
+
         if (t.equals("movie")) {
             Movie m = movieRepository.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Movie not found"));
+
             if (!Boolean.TRUE.equals(m.getActive()) || !Boolean.TRUE.equals(m.getPublished())) {
                 throw new IllegalArgumentException("Movie is not published");
             }
+
+            if (isMovieBlockedForRegion(m, userRegion)) {
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "Nội dung này không khả dụng tại khu vực của bạn"
+                );
+            }
+
             return mapMovieDetail(m);
         } else {
             TvSeries tv = tvSeriesRepository.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("TV series not found"));
+
             if (!Boolean.TRUE.equals(tv.getActive()) || !Boolean.TRUE.equals(tv.getPublished())) {
                 throw new IllegalArgumentException("TV series is not published");
             }
+
+            if (isTvBlockedForRegion(tv, userRegion)) {
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "Nội dung này không khả dụng tại khu vực của bạn"
+                );
+            }
+
             return mapTvDetail(tv);
         }
+    }
+
+    private String extractRegionFromRequest(HttpServletRequest request) {
+        if (request == null) {
+            return null;
+        }
+
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return null;
+        }
+
+        try {
+            String token = authHeader.substring(7);
+            String region = jwtUtils.extractRegion(token);
+
+            if (region == null || region.isBlank()) {
+                return null;
+            }
+
+            return region.trim().toUpperCase();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private boolean isMovieBlockedForRegion(Movie movie, String userRegion) {
+        if (userRegion == null || userRegion.isBlank()) {
+            return false;
+        }
+
+        Set<MovieRegionBlock> blocks = movie.getRegionBlocks();
+        if (blocks == null || blocks.isEmpty()) {
+            return false;
+        }
+
+        return blocks.stream()
+                .map(MovieRegionBlock::getRegionCode)
+                .filter(code -> code != null && !code.isBlank())
+                .anyMatch(code -> code.trim().equalsIgnoreCase(userRegion));
+    }
+
+    private boolean isTvBlockedForRegion(TvSeries tvSeries, String userRegion) {
+        if (userRegion == null || userRegion.isBlank()) {
+            return false;
+        }
+
+        Set<TvRegionBlock> blocks = tvSeries.getRegionBlocks();
+        if (blocks == null || blocks.isEmpty()) {
+            return false;
+        }
+
+        return blocks.stream()
+                .map(TvRegionBlock::getRegionCode)
+                .filter(code -> code != null && !code.isBlank())
+                .anyMatch(code -> code.trim().equalsIgnoreCase(userRegion));
     }
 
     private MovieItemDto mapMovie(Movie m) {
@@ -156,9 +246,9 @@ public class PublicMovieService {
         }
 
         dto.setSrc(m.getSrc());
-        // populate cast from MovieCredit relationships
+
         try {
-            java.util.List<com.example.superapp.dto.CastMemberDto> cast = new java.util.ArrayList<>();
+            List<com.example.superapp.dto.CastMemberDto> cast = new ArrayList<>();
             if (m.getCredits() != null) {
                 m.getCredits().stream()
                         .sorted(java.util.Comparator.comparing(mc -> mc.getCreditOrder() == null ? 0 : mc.getCreditOrder()))
@@ -178,7 +268,9 @@ public class PublicMovieService {
                         });
             }
             dto.setCast(cast);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
+
         return dto;
     }
 
@@ -204,9 +296,9 @@ public class PublicMovieService {
         }
 
         dto.setSrc(tv.getSrc());
-        // populate cast from TvCredit relationships; if none, fall back to TMDB credits
+
         try {
-            java.util.List<com.example.superapp.dto.CastMemberDto> cast = new java.util.ArrayList<>();
+            List<com.example.superapp.dto.CastMemberDto> cast = new ArrayList<>();
             if (tv.getCredits() != null && !tv.getCredits().isEmpty()) {
                 tv.getCredits().stream()
                         .sorted(java.util.Comparator.comparing(tc -> tc.getCreditOrder() == null ? 0 : tc.getCreditOrder()))
@@ -221,7 +313,6 @@ public class PublicMovieService {
                             cast.add(c);
                         });
             } else {
-                // try TMDB fallback (getTvDetails includes credits)
                 try {
                     java.util.Map<String, Object> raw = tmdbService.getTvDetails(tv.getId());
                     if (raw != null) {
@@ -251,11 +342,13 @@ public class PublicMovieService {
                             }
                         }
                     }
-                } catch (Exception ignored2) {}
+                } catch (Exception ignored2) {
+                }
             }
             dto.setCast(cast);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
+
         return dto;
     }
 }
-
