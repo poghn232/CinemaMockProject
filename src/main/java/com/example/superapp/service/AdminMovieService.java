@@ -38,28 +38,48 @@ public class AdminMovieService {
     private final StudioRepository studioRepository;
     private final TvCreditRepository tvCreditRepository;
     private final TmdbService tmdbService;
-    private final org.springframework.context.ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
     public List<AdminMovieDto> listPublished(String query) {
         String q = query == null ? "" : query.trim();
         System.out.println("[AdminMovieService] listPublished query='" + q + "'");
 
-        List<Movie> movies = q.isBlank() ? movieRepository.findByActiveTrueAndPublishedTrue() : movieRepository.findByActiveTrueAndPublishedTrueAndTitleContainingIgnoreCase(q);
+        List<Movie> movies = q.isBlank()
+                ? movieRepository.findByActiveTrueAndPublishedTrue()
+                : movieRepository.findByActiveTrueAndPublishedTrueAndTitleContainingIgnoreCase(q);
 
-        List<TvSeries> tvs = q.isBlank() ? tvSeriesRepository.findByActiveTrueAndPublishedTrue() : tvSeriesRepository.findByActiveTrueAndPublishedTrueAndNameContainingIgnoreCase(q);
+        List<TvSeries> tvs = q.isBlank()
+                ? tvSeriesRepository.findByActiveTrueAndPublishedTrue()
+                : tvSeriesRepository.findByActiveTrueAndPublishedTrueAndNameContainingIgnoreCase(q);
 
         List<AdminMovieDto> result = new ArrayList<>();
 
         for (Movie m : movies) {
-            result.add(new AdminMovieDto(m.getId(), m.getTitle(), "movie", Boolean.TRUE.equals(m.getPublished()), Boolean.TRUE.equals(m.getActive()), m.getSrc()));
+            result.add(new AdminMovieDto(
+                    m.getId(),
+                    m.getTitle(),
+                    "movie",
+                    Boolean.TRUE.equals(m.getPublished()),
+                    Boolean.TRUE.equals(m.getActive()),
+                    m.getSrc()
+            ));
         }
 
         for (TvSeries tv : tvs) {
-            result.add(new AdminMovieDto(tv.getId(), tv.getName(), "tv", Boolean.TRUE.equals(tv.getPublished()), Boolean.TRUE.equals(tv.getActive()), tv.getSrc()));
+            result.add(new AdminMovieDto(
+                    tv.getId(),
+                    tv.getName(),
+                    "tv",
+                    Boolean.TRUE.equals(tv.getPublished()),
+                    Boolean.TRUE.equals(tv.getActive()),
+                    tv.getSrc()
+            ));
         }
 
-        result.sort(Comparator.comparing(AdminMovieDto::getTitle, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)));
+        result.sort(Comparator.comparing(
+                AdminMovieDto::getTitle,
+                Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)
+        ));
         return result;
     }
 
@@ -87,15 +107,13 @@ public class AdminMovieService {
                     existing.setVoteCount(fresh.getVoteCount());
                     existing.setReleaseDate(fresh.getReleaseDate());
                     existing.setRuntime(fresh.getRuntime());
-                } catch (Exception ignored) {
-                }
+                } catch (Exception ignored) {}
 
                 // replace genres
                 try {
                     if (existing.getGenres() != null) existing.getGenres().clear();
                     if (fresh.getGenres() != null) existing.getGenres().addAll(fresh.getGenres());
-                } catch (Exception ignored) {
-                }
+                } catch (Exception ignored) {}
 
                 existing.setActive(true);
                 existing.setPublished(true);
@@ -121,11 +139,13 @@ public class AdminMovieService {
                             existing.getCredits().add(mc);
                         }
                     }
-                } catch (Exception ignored) {
-                }
+                } catch (Exception ignored) {}
 
                 Movie saved = movieRepository.save(existing);
-                return new AdminMovieDto(saved.getId(), saved.getTitle(), "movie", Boolean.TRUE.equals(saved.getPublished()), Boolean.TRUE.equals(saved.getActive()), saved.getSrc());
+                return new AdminMovieDto(saved.getId(), saved.getTitle(), "movie",
+                        Boolean.TRUE.equals(saved.getPublished()),
+                        Boolean.TRUE.equals(saved.getActive()),
+                        saved.getSrc());
             }
 
             Map<String, Object> raw = tmdbService.getMovieDetails(tmdbId);
@@ -142,8 +162,7 @@ public class AdminMovieService {
                     credits.addAll(movie.getCredits());
                     movie.getCredits().clear();
                 }
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) {}
 
             Movie saved = movieRepository.save(movie);
 
@@ -159,10 +178,9 @@ public class AdminMovieService {
                 }
                 // save movie again to update relationship if needed
                 movieRepository.save(saved);
-            } catch (Exception ignored) {
-            }
-            eventPublisher.publishEvent(new com.example.superapp.event.ContentAddedEvent(saved.getId(), "movie", saved.getTitle(), saved.getPosterPath(), "NEW_MOVIE"));
-            return new AdminMovieDto(saved.getId(), saved.getTitle(), "movie", true, true, saved.getSrc());
+            } catch (Exception ignored) {}
+            return new AdminMovieDto(saved.getId(), saved.getTitle(), "movie",
+                    true, true, saved.getSrc());
         } else {
             TvSeries existing = tvSeriesRepository.findById(tmdbId).orElse(null);
             if (existing != null) {
@@ -177,22 +195,19 @@ public class AdminMovieService {
                     existing.setVoteAverage(fresh.getVoteAverage());
                     existing.setVoteCount(fresh.getVoteCount());
                     existing.setFirstAirDate(fresh.getFirstAirDate());
-                } catch (Exception ignored) {
-                }
+                } catch (Exception ignored) {}
 
                 // replace genres
                 try {
                     if (existing.getGenres() != null) existing.getGenres().clear();
                     if (fresh.getGenres() != null) existing.getGenres().addAll(fresh.getGenres());
-                } catch (Exception ignored) {
-                }
+                } catch (Exception ignored) {}
 
                 // replace studios
                 try {
                     if (existing.getStudios() != null) existing.getStudios().clear();
                     if (fresh.getStudios() != null) existing.getStudios().addAll(fresh.getStudios());
-                } catch (Exception ignored) {
-                }
+                } catch (Exception ignored) {}
 
                 existing.setActive(true);
                 existing.setPublished(true);
@@ -217,10 +232,13 @@ public class AdminMovieService {
                             existing.getCredits().add(tc);
                         }
                     }
-                } catch (Exception ignored) {
-                }
+                } catch (Exception ignored) {}
+
                 TvSeries saved = tvSeriesRepository.save(existing);
-                return new AdminMovieDto(saved.getId(), saved.getName(), "tv", Boolean.TRUE.equals(saved.getPublished()), Boolean.TRUE.equals(saved.getActive()), saved.getSrc());
+                return new AdminMovieDto(saved.getId(), saved.getName(), "tv",
+                        Boolean.TRUE.equals(saved.getPublished()),
+                        Boolean.TRUE.equals(saved.getActive()),
+                        saved.getSrc());
             }
 
             Map<String, Object> raw = tmdbService.getTvDetails(tmdbId);
@@ -237,8 +255,8 @@ public class AdminMovieService {
                     credits.addAll(tv.getCredits());
                     tv.getCredits().clear();
                 }
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) {}
+
             TvSeries saved = tvSeriesRepository.save(tv);
 
             // persist credits after tv has an id and set proper tv reference + composite id
@@ -251,11 +269,10 @@ public class AdminMovieService {
                     saved.getCredits().add(tc);
                 }
                 tvSeriesRepository.save(saved);
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) {}
 
-            eventPublisher.publishEvent(new com.example.superapp.event.ContentAddedEvent(saved.getId(), "tv", saved.getName(), saved.getPosterPath(), "NEW_MOVIE"));
-            return new AdminMovieDto(saved.getId(), saved.getName(), "tv", true, true, saved.getSrc());
+            return new AdminMovieDto(saved.getId(), saved.getName(), "tv",
+                    true, true, saved.getSrc());
         }
     }
 
@@ -285,8 +302,7 @@ public class AdminMovieService {
         try {
             // derive a stable id: tvId * 1000 + seasonNumber (simple deterministic scheme)
             seasonId = tvId * 1000 + seasonNumber;
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
 
         com.example.superapp.entity.Season season = null;
         if (seasonId != null) season = seasonRepository.findById(seasonId).orElse(null);
@@ -305,16 +321,13 @@ public class AdminMovieService {
         episode.setId(epId);
         episode.setName(TmdbService.stringVal(epRaw.get("name")));
         episode.setOverview(TmdbService.stringVal(epRaw.get("overview")));
-        // episode_number must be present and numeric - fail import otherwise so UI doesn't show a false 'Added'
+       // episode_number must be present and numeric - fail import otherwise so UI doesn't show a false 'Added'
         Integer episodeNum = null;
         Object en = epRaw.get("episode_number");
         if (en instanceof Number n) {
             episodeNum = n.intValue();
         } else if (en instanceof String s) {
-            try {
-                episodeNum = Integer.parseInt(s.trim());
-            } catch (Exception ignored) {
-            }
+            try { episodeNum = Integer.parseInt(s.trim()); } catch (Exception ignored) {}
         }
         if (episodeNum == null) {
             // TMDB returned no usable episode number - fail the import
@@ -322,18 +335,12 @@ public class AdminMovieService {
         }
         episode.setEpisodeNumber(episodeNum);
         String air = TmdbService.stringVal(epRaw.get("air_date"));
-        try {
-            if (air != null && !air.isBlank()) episode.setAirDate(java.time.LocalDate.parse(air));
-        } catch (Exception ignored) {
-        }
-        Object va = epRaw.get("vote_average");
-        if (va instanceof Number nv) episode.setVoteAverage(nv.doubleValue());
+        try { if (air != null && !air.isBlank()) episode.setAirDate(java.time.LocalDate.parse(air)); } catch (Exception ignored) {}
+        Object va = epRaw.get("vote_average"); if (va instanceof Number nv) episode.setVoteAverage(nv.doubleValue());
         episode.setSeason(season);
         episode.setPublished(true); // Set published by default when importing
         episodeRepository.save(episode);
-        eventPublisher.publishEvent(new com.example.superapp.event.ContentAddedEvent(
-                existing.getId(), "tv", existing.getName(), existing.getPosterPath(), "NEW_SOURCE", epId, episode.getName()
-        ));
+
         return new AdminMovieDto(existing.getId(), existing.getName(), "tv", Boolean.TRUE.equals(existing.getPublished()), Boolean.TRUE.equals(existing.getActive()), existing.getSrc());
     }
 
@@ -366,16 +373,16 @@ public class AdminMovieService {
         }
     }
 
-//    @Transactional
-//    public void toggleEpisodePublished(long tvId, int seasonNumber, int episodeNumber) {
-//        Long seasonId = tvId * 1000 + seasonNumber;
-//        Long epId = tvId * 100000L + seasonNumber * 1000L + episodeNumber;
-//        com.example.superapp.entity.Episode episode = episodeRepository.findById(epId).orElse(null);
-//        if (episode != null) {
-//            episode.setPublished(Boolean.TRUE.equals(episode.getPublished()) ? false : true);
-//            episodeRepository.save(episode);
-//        }
-//    }
+    @Transactional
+    public void toggleEpisodePublished(long tvId, int seasonNumber, int episodeNumber) {
+        Long seasonId = tvId * 1000 + seasonNumber;
+        Long epId = tvId * 100000L + seasonNumber * 1000L + episodeNumber;
+        com.example.superapp.entity.Episode episode = episodeRepository.findById(epId).orElse(null);
+        if (episode != null) {
+            episode.setPublished(Boolean.TRUE.equals(episode.getPublished()) ? false : true);
+            episodeRepository.save(episode);
+        }
+    }
 
     @Transactional
     public void setEpisodeTrailer(long tvId, int seasonNumber, int episodeNumber, String src) {
@@ -384,32 +391,16 @@ public class AdminMovieService {
         if (episode != null) {
             episode.setSrc(src);
             episodeRepository.save(episode);
-            if (src != null && !src.isBlank()) {
-                String epName = episode.getName(); // lấy trước khi vào lambda
-                tvSeriesRepository.findById(tvId).ifPresent(tv ->
-                        eventPublisher.publishEvent(new com.example.superapp.event.ContentAddedEvent(
-                                tv.getId(), "tv", tv.getName(), tv.getPosterPath(),
-                                "NEW_TRAILER", epId, epName  // ✅
-                        ))
-                );
-            }
         }
     }
 
-    @Transactional
     public void setMovieTrailer(long movieId, String src) {
         Movie movie = movieRepository.findById(movieId).orElse(null);
         if (movie != null) {
             movie.setSrc(src);
-            movieRepository.save(movie); // ✅ save TRƯỚC
-            if (src != null && !src.isBlank()) {
-                eventPublisher.publishEvent(new com.example.superapp.event.ContentAddedEvent(
-                        movie.getId(), "movie", movie.getTitle(), movie.getPosterPath(), "NEW_TRAILER"
-                ));
-            }
+            movieRepository.save(movie);
         }
     }
-
 
     @SuppressWarnings("unchecked")
     private Movie mapMovieFromRaw(Map<String, Object> raw) {
@@ -466,8 +457,7 @@ public class AdminMovieService {
                     }
                 }
             }
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
 
         // Map production companies / studios (upsert by TMDB id)
         try {
@@ -485,30 +475,21 @@ public class AdminMovieService {
                     if (sid != null && sname != null && !sname.isBlank()) {
                         com.example.superapp.entity.Studio studio = studioRepository.findById(sid).orElse(null);
                         if (studio == null) {
-                            studio = com.example.superapp.entity.Studio.builder().id(sid).name(sname).logoPath(logoPath).originCountry(originCountry).build();
+                            studio = com.example.superapp.entity.Studio.builder()
+                                    .id(sid).name(sname).logoPath(logoPath).originCountry(originCountry).build();
                             studioRepository.save(studio);
                         } else {
                             boolean changed = false;
-                            if (!sname.equals(studio.getName())) {
-                                studio.setName(sname);
-                                changed = true;
-                            }
-                            if (logoPath != null && !logoPath.equals(studio.getLogoPath())) {
-                                studio.setLogoPath(logoPath);
-                                changed = true;
-                            }
-                            if (originCountry != null && !originCountry.equals(studio.getOriginCountry())) {
-                                studio.setOriginCountry(originCountry);
-                                changed = true;
-                            }
+                            if (!sname.equals(studio.getName())) { studio.setName(sname); changed = true; }
+                            if (logoPath != null && !logoPath.equals(studio.getLogoPath())) { studio.setLogoPath(logoPath); changed = true; }
+                            if (originCountry != null && !originCountry.equals(studio.getOriginCountry())) { studio.setOriginCountry(originCountry); changed = true; }
                             if (changed) studioRepository.save(studio);
                         }
                         m.getStudios().add(studio);
                     }
                 }
             }
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
 
         // Map credits (cast) -> create Person entries and MovieCredit records
         try {
@@ -537,14 +518,8 @@ public class AdminMovieService {
                             personRepository.save(person);
                         } else {
                             boolean changed = false;
-                            if (!pname.equals(person.getName())) {
-                                person.setName(pname);
-                                changed = true;
-                            }
-                            if (profilePath != null && !profilePath.equals(person.getProfilePath())) {
-                                person.setProfilePath(profilePath);
-                                changed = true;
-                            }
+                            if (!pname.equals(person.getName())) { person.setName(pname); changed = true; }
+                            if (profilePath != null && !profilePath.equals(person.getProfilePath())) { person.setProfilePath(profilePath); changed = true; }
                             if (changed) personRepository.save(person);
                         }
 
@@ -562,8 +537,7 @@ public class AdminMovieService {
                     }
                 }
             }
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
 
         return m;
     }
@@ -617,8 +591,7 @@ public class AdminMovieService {
                     }
                 }
             }
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
 
         // Map production companies / studios (upsert by TMDB id)
         try {
@@ -637,30 +610,21 @@ public class AdminMovieService {
                     if (sid != null && sname != null && !sname.isBlank()) {
                         com.example.superapp.entity.Studio studio = studioRepository.findById(sid).orElse(null);
                         if (studio == null) {
-                            studio = com.example.superapp.entity.Studio.builder().id(sid).name(sname).logoPath(logoPath).originCountry(originCountry).build();
+                            studio = com.example.superapp.entity.Studio.builder()
+                                    .id(sid).name(sname).logoPath(logoPath).originCountry(originCountry).build();
                             studioRepository.save(studio);
                         } else {
                             boolean changed = false;
-                            if (!sname.equals(studio.getName())) {
-                                studio.setName(sname);
-                                changed = true;
-                            }
-                            if (logoPath != null && !logoPath.equals(studio.getLogoPath())) {
-                                studio.setLogoPath(logoPath);
-                                changed = true;
-                            }
-                            if (originCountry != null && !originCountry.equals(studio.getOriginCountry())) {
-                                studio.setOriginCountry(originCountry);
-                                changed = true;
-                            }
+                            if (!sname.equals(studio.getName())) { studio.setName(sname); changed = true; }
+                            if (logoPath != null && !logoPath.equals(studio.getLogoPath())) { studio.setLogoPath(logoPath); changed = true; }
+                            if (originCountry != null && !originCountry.equals(studio.getOriginCountry())) { studio.setOriginCountry(originCountry); changed = true; }
                             if (changed) studioRepository.save(studio);
                         }
                         tv.getStudios().add(studio);
                     }
                 }
             }
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
 
         // Map credits (cast) -> create Person entries and TvCredit records
         try {
@@ -689,14 +653,8 @@ public class AdminMovieService {
                             personRepository.save(person);
                         } else {
                             boolean changed = false;
-                            if (!pname.equals(person.getName())) {
-                                person.setName(pname);
-                                changed = true;
-                            }
-                            if (profilePath != null && !profilePath.equals(person.getProfilePath())) {
-                                person.setProfilePath(profilePath);
-                                changed = true;
-                            }
+                            if (!pname.equals(person.getName())) { person.setName(pname); changed = true; }
+                            if (profilePath != null && !profilePath.equals(person.getProfilePath())) { person.setProfilePath(profilePath); changed = true; }
                             if (changed) personRepository.save(person);
                         }
 
@@ -713,30 +671,9 @@ public class AdminMovieService {
                     }
                 }
             }
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
 
         return tv;
-    }
-
-    @Transactional
-    public void toggleEpisodePublished(long tvId, int seasonNumber, int episodeNumber) {
-        Long epId = tvId * 100000L + seasonNumber * 1000L + episodeNumber;
-        com.example.superapp.entity.Episode episode = episodeRepository.findById(epId).orElse(null);
-        if (episode != null) {
-            boolean newState = !Boolean.TRUE.equals(episode.getPublished());
-            episode.setPublished(newState);
-            episodeRepository.save(episode);
-
-            String eventType = newState ? "NEW_SOURCE" : "UNPUBLISHED";
-            String epName = episode.getName(); // lấy trước khi vào lambda
-            tvSeriesRepository.findById(tvId).ifPresent(tv ->
-                    eventPublisher.publishEvent(new com.example.superapp.event.ContentAddedEvent(
-                            tv.getId(), "tv", tv.getName(), tv.getPosterPath(),
-                            eventType, epId, epName  // ✅
-                    ))
-            );
-        }
     }
 }
 
