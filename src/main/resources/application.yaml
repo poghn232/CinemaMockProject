@@ -14,13 +14,19 @@
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 20MB
+
+
   sql:
     init:
       mode: always
 
 
   mail:
-    host: smtp.gmail.comp
+    host: smtp.gmail.com
     port: 587
     username: anbui1435@gmail.com
     password: mryw jzak rhrg aiqb
