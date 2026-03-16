@@ -22,11 +22,6 @@ public class Studio {
     private String logoPath;
     private String originCountry;
 
-    @PostPersist
-    private void addLog() {
-        AdminLogsRepository.class.getMethod("save", AdminLogs.class).invoke(new AdminLogs(""));
-    }
-
     @Override
     public String toString() {
         return "Studio " + name;
