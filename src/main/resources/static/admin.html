@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="vi">
-<script>
+    <script>
     const token = localStorage.getItem("token");
 
     if (!token) {
@@ -14,10 +14,10 @@
         }
     }
 </script>
-<head>
-    <meta charset="UTF-8"/>
-    <title>MovieZone | Admin</title>
-    <style>
+    <head>
+        <meta charset="UTF-8" />
+        <title>MovieZone | Admin</title>
+        <style>
 
         :root {
             --bg-primary: #020617;
@@ -462,106 +462,126 @@
             display: block;
         }
     </style>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
-</head>
-<body>
-<div class="page-shell">
-    <div class="navbar">
-        <div class="nav-left">
-            <div class="nav-logo">MZ</div>
-            <div class="nav-title">
-                <div class="nav-title-main" data-i18n="admin.title">MovieZone Admin</div>
-                <div class="nav-title-sub" data-i18n="admin.subtitle">Manage users & packs</div>
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+    </head>
+    <body>
+        <div class="page-shell">
+            <div class="navbar">
+                <div class="nav-left">
+                    <div class="nav-logo">MZ</div>
+                    <div class="nav-title">
+                        <div class="nav-title-main"
+                            data-i18n="admin.title">MovieZone Admin</div>
+                        <div class="nav-title-sub"
+                            data-i18n="admin.subtitle">Manage users &
+                            packs</div>
+                    </div>
+                </div>
+                <div class="nav-center">
+                    <a class="nav-link active" href="/admin.html"
+                        data-i18n="nav.home">Home</a>
+                </div>
+                <div class="lang-dropdown">
+                    <button class="lang-current" id="langCurrent">
+                        <img id="langFlag" src="https://flagcdn.com/w40/gb.png">
+                    </button>
+
+                    <div class="lang-menu" id="langMenu">
+                        <div class="lang-item" onclick="changeLanguage('vi')">
+                            <img src="https://flagcdn.com/w40/vn.png">
+                            <span>Tiếng Việt</span>
+                        </div>
+
+                        <div class="lang-item" onclick="changeLanguage('en')">
+                            <img src="https://flagcdn.com/w40/gb.png">
+                            <span>English</span>
+                        </div>
+                        <div class="lang-item" onclick="changeLanguage('my')">
+                            <img src="https://flagcdn.com/w40/mm.png">
+                            <span>မြန်မာဘာသာ</span>
+                        </div>
+
+                        <div class="lang-item" onclick="changeLanguage('ja')">
+                            <img src="https://flagcdn.com/w40/jp.png">
+                            <span>日本語</span>
+                        </div>
+
+                        <div class="lang-item" onclick="changeLanguage('de')">
+                            <img src="https://flagcdn.com/w40/de.png">
+                            <span>Deutsch</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="nav-right">
+                    <div class="nav-username">
+                        <span data-i18n="admin.welcome">Welcome</span>
+                        <span id="usernameDisplay"></span>
+                    </div>
+                    <button id="logoutBtn" class="nav-button nav-button-primary"
+                        data-i18n="nav.logout">
+                        Sign out
+                    </button>
+                </div>
+            </div>
+
+            <div class="layout">
+                <aside class="sidebar" id="sidebar">
+                    <div class="side-section">
+                        <div class="stat">
+                            <div class="stat-label"
+                                data-i18n="admin.users">Users (non-admin)</div>
+                            <div class="stat-value" id="countUsers">--</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label"
+                                data-i18n="admin.packs">Subscription packs</div>
+                            <div class="stat-value" id="countPacks">--</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label"
+                                data-i18n="admin.films">Published films</div>
+                            <div class="stat-value" id="countFilms">--</div>
+                        </div>
+                    </div>
+                    <nav class="side-menu">
+                        <button class="side-item"
+                            data-fragment="admin_home_fragment.html"
+                            data-i18n="nav.home">
+                            Home
+                        </button>
+                        <button class="side-item"
+                            data-fragment="admin_dashboard_fragment.html">
+                            Analytics
+                        </button>
+                        <button class="side-item"
+                            data-fragment="admin_users.html"
+                            data-i18n="admin.users">
+                            Users
+                        </button>
+                        <button class="side-item"
+                            data-fragment="admin_packs.html"
+                            data-i18n="admin.packs">
+                            Packs
+                        </button>
+                        <button class="side-item"
+                            data-fragment="admin_movies.html"
+                            data-i18n="admin.films">
+                            Films
+                        </button>
+                    </nav>
+                </aside>
+
+                <main class="content" id="content">
+                    <!-- dynamic content loaded here -->
+                    <div class="card">
+                        <h2 data-i18n="common.loading">Loading...</h2>
+                    </div>
+                </main>
             </div>
         </div>
-        <div class="nav-center">
-            <a class="nav-link active" href="/admin.html" data-i18n="nav.home">Home</a>
-        </div>
-        <div class="lang-dropdown">
-            <button class="lang-current" id="langCurrent">
-                <img id="langFlag" src="https://flagcdn.com/w40/gb.png">
-            </button>
 
-            <div class="lang-menu" id="langMenu">
-                <div class="lang-item" onclick="changeLanguage('vi')">
-                    <img src="https://flagcdn.com/w40/vn.png">
-                    <span>Tiếng Việt</span>
-                </div>
-
-                <div class="lang-item" onclick="changeLanguage('en')">
-                    <img src="https://flagcdn.com/w40/gb.png">
-                    <span>English</span>
-                </div>
-                <div class="lang-item" onclick="changeLanguage('my')">
-                    <img src="https://flagcdn.com/w40/mm.png">
-                    <span>မြန်မာဘာသာ</span>
-                </div>
-
-                <div class="lang-item" onclick="changeLanguage('ja')">
-                    <img src="https://flagcdn.com/w40/jp.png">
-                    <span>日本語</span>
-                </div>
-
-                <div class="lang-item" onclick="changeLanguage('de')">
-                    <img src="https://flagcdn.com/w40/de.png">
-                    <span>Deutsch</span>
-                </div>
-            </div>
-        </div>
-        <div class="nav-right">
-            <div class="nav-username">
-                <span data-i18n="admin.welcome">Welcome</span>
-                <span id="usernameDisplay"></span>
-            </div>
-            <button id="logoutBtn" class="nav-button nav-button-primary" data-i18n="nav.logout">
-                Sign out
-            </button>
-        </div>
-    </div>
-
-    <div class="layout">
-        <aside class="sidebar" id="sidebar">
-            <div class="side-section">
-                <div class="stat">
-                    <div class="stat-label" data-i18n="admin.users">Users (non-admin)</div>
-                    <div class="stat-value" id="countUsers">--</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-label" data-i18n="admin.packs">Subscription packs</div>
-                    <div class="stat-value" id="countPacks">--</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-label" data-i18n="admin.films">Published films</div>
-                    <div class="stat-value" id="countFilms">--</div>
-                </div>
-            </div>
-            <nav class="side-menu">
-                <button class="side-item" data-fragment="admin_home_fragment.html" data-i18n="nav.home">
-                    Home
-                </button>
-                <button class="side-item" data-fragment="admin_users.html" data-i18n="admin.users">
-                    Users
-                </button>
-                <button class="side-item" data-fragment="admin_packs.html" data-i18n="admin.packs">
-                    Packs
-                </button>
-                <button class="side-item" data-fragment="admin_movies.html" data-i18n="admin.films">
-                    Films
-                </button>
-            </nav>
-        </aside>
-
-        <main class="content" id="content">
-            <!-- dynamic content loaded here -->
-            <div class="card">
-                <h2 data-i18n="common.loading">Loading...</h2>
-            </div>
-        </main>
-    </div>
-</div>
-
-<script src="/js/i18n.js"></script>
-<script>
+        <script src="/js/i18n.js"></script>
+        <script>
     // Shared admin JS: loads fragments and provides APIs for user/pack/film screens
     const api = {
         users: "/api/admin/users",
@@ -728,5 +748,5 @@
         footerYear.textContent = new Date().getFullYear().toString();
     }
 </script>
-</body>
+    </body>
 </html>

@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,8 +37,11 @@ public class BannerController {
     public ResponseEntity<byte[]> retrieveImage(@PathVariable int id, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails != null) {
             List<Subscription> subs = userService.getUserByUsername(userDetails.getUsername()).getSubscriptions();
-            if (!subs.isEmpty() && subs.getLast().getStatus() == SubscriptionStatus.ACTIVE) {
-                return ResponseEntity.ok(new byte[0]);
+            if (!subs.isEmpty()) {
+                List<Subscription> activeSubs = subs.stream()
+                                                    .filter(sub -> sub.getStatus() == SubscriptionStatus.ACTIVE)
+                                                    .toList();
+                if (!activeSubs.isEmpty()) return ResponseEntity.ok(new byte[0]);
             }
         }
         Banner banner = bannerService.getBannerById(id);
@@ -53,8 +57,11 @@ public class BannerController {
 
         if (userDetails != null) {
             List<Subscription> subs = userService.getUserByUsername(userDetails.getUsername()).getSubscriptions();
-            if (!subs.isEmpty() && subs.getLast().getStatus() == SubscriptionStatus.ACTIVE) {
-                return ResponseEntity.ok(Collections.emptyList());
+            if (!subs.isEmpty()) {
+                List<Subscription> activeSubs = subs.stream()
+                                                    .filter(sub -> sub.getStatus() == SubscriptionStatus.ACTIVE)
+                                                    .toList();
+                if (!activeSubs.isEmpty()) return ResponseEntity.ok(Collections.emptyList());
             }
         }
         List<Banner> banners = bannerService.getAllBanners();
