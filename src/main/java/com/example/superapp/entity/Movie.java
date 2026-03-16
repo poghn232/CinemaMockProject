@@ -59,6 +59,15 @@ public class Movie {
 
     private String src;
 
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<MovieRegionBlock> regionBlocks = new HashSet<>();
+    public Set<MovieRegionBlock> getRegionBlocks() {
+        return regionBlocks;
+    }
+    public void setRegionBlocks(Set<MovieRegionBlock> regionBlocks) {
+        this.regionBlocks = regionBlocks;
+    }
+
     /* ================= RELATIONSHIPS ================= */
 
     @ManyToMany

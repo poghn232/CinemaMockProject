@@ -790,6 +790,31 @@
         .lang-dropdown.open .lang-menu {
             display: block;
         }
+        .welcome-region-card {
+            margin-top: 18px;
+            padding: 16px 18px;
+            border-radius: 18px;
+            background:
+                    radial-gradient(circle at 0 0, rgba(148, 163, 184, 0.2), transparent 55%),
+                    radial-gradient(circle at 100% 100%, rgba(249, 115, 22, 0.2), transparent 55%),
+                    rgba(15, 23, 42, 0.96);
+            box-shadow:
+                    0 0 0 1px rgba(148, 163, 184, 0.35),
+                    0 18px 40px rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+        }
+
+        .welcome-region-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .welcome-region-sub {
+            margin-top: 6px;
+            font-size: 13px;
+            color: var(--text-subtle);
+        }
     </style>
 </head>
 <body>
@@ -853,7 +878,7 @@
                     </div>
                     <div class="lang-item" onclick="changeLanguage('my')">
                         <img src="https://flagcdn.com/w40/mm.png">
-                        <span>မြန်မာဘာသာ</span>
+                        <span>မြန်မာ</span>
                     </div>
 
                     <div class="lang-item" onclick="changeLanguage('ja')">
@@ -929,6 +954,11 @@
                     </a>
                 </div>
             </div>
+        </div>
+
+        <div class="welcome-region-card" id="welcomeRegionCard">
+            <div class="welcome-region-title" id="welcomeMessage">Xin chào, Guest</div>
+            <div class="welcome-region-sub" id="regionMessage">Bạn đang ở: Unknown region</div>
         </div>
 
         <!-- ADS: chỉ hiện với user chưa premium -->
@@ -1012,21 +1042,34 @@
         }
 
         try {
+            const token = localStorage.getItem("token");
+
+            const headers = {};
+            if (token) {
+                headers["Authorization"] = "Bearer " + token;
+            }
+
             const res = await fetch(
                 `/api/public/movies?type=${encodeURIComponent(normalizedType)}&page=${targetPage}`,
+                {
+                    method: "GET",
+                    headers: headers
+                }
             );
+
             if (!res.ok) {
                 throw new Error("Không tải được dữ liệu (" + res.status + ")");
             }
+
             const data = await res.json();
 
             movies = Array.isArray(data.items) ? data.items : [];
             currentPage = typeof data.page === "number" ? data.page : targetPage;
-            totalPages =
-                typeof data.totalPages === "number" ? data.totalPages : 1;
+            totalPages = typeof data.totalPages === "number" ? data.totalPages : 1;
 
             renderMovies();
         } catch (e) {
+            console.error(e);
             movies = [];
             if (countEl) {
                 countEl.textContent = "Không tải được danh sách phim từ server.";
@@ -1043,6 +1086,7 @@
                 isLoggedIn: false,
                 isPremium: false,
                 username: "Guest",
+                region: "Unknown",
             };
         }
 
@@ -1070,6 +1114,7 @@
                 isLoggedIn: true,
                 isPremium: hasActive,
                 username: usernameFromApi,
+                region: localStorage.getItem("region") || "Unknown",
             };
         } catch (e) {
             const fallbackName = localStorage.getItem("username") || "User";
@@ -1077,6 +1122,7 @@
                 isLoggedIn: true,
                 isPremium: false,
                 username: fallbackName,
+                region: localStorage.getItem("region") || "Unknown",
             };
         }
     }
@@ -1093,6 +1139,7 @@
 
         if (usernameEl) {
             usernameEl.textContent = "👋 " + translations.nav.hello + ", " + info.username;
+            renderWelcomeRegion(info.username, info.region);
         }
 
         // Ẩn/hiện các mục navbar theo trạng thái đăng nhập
@@ -1357,6 +1404,18 @@
             }
         });
     }
+    function renderWelcomeRegion(username, region) {
+        const welcomeEl = document.getElementById("welcomeMessage");
+        const regionEl = document.getElementById("regionMessage");
+
+        if (welcomeEl) {
+            welcomeEl.textContent = `Xin chào, ${username || "Guest"}`;
+        }
+
+        if (regionEl) {
+            regionEl.textContent = `Bạn đang ở: ${region || "Unknown"}`;
+        }
+    }
 
     function showPaymentPopup(message) {
         const popup = document.getElementById("paymentPopup");
@@ -1413,6 +1472,8 @@
             logoutButton.addEventListener("click", () => {
                 localStorage.removeItem("token");
                 localStorage.removeItem("username");
+                localStorage.removeItem("role");
+                localStorage.removeItem("region");
                 // giữ isPremium để dev test; nếu muốn xoá thì bỏ comment dòng dưới
                 // localStorage.removeItem("isPremium");
                 window.location.href = "login.html";

@@ -50,11 +50,11 @@ public class SecurityConfig {
                                 "/login.html", "/register.html", "/forgot-password.html",
                                 "/homepage.html", "/home.html",
                                 "/movie-detail.html", "/movie-trailer.html", "/movie-watch.html",
-                                "/packs.html", "/contact.html",
-                                "/", "/index.html", "/admin.html", "/profile.html",
+                                "/packs.html", "/contact.html", "/detect-region.html"
+                                , "/index.html", "/admin.html", "/profile.html",
                                 "/css/**", "/js/**", "/images/**", "/favicon.ico",
                                 "/api/auth/**",
-                                "/api/movies/**","/api/contact",
+                                "/api/movies/**", "/api/contact",
                                 "/api/public/**", "/i18n/**",
                                 "/api/user/history/**",
 

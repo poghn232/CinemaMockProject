@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Check;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(
     name = "reviews",
@@ -34,15 +36,18 @@ public class Review {
     @Column(length = 1000)
     private String comment;
 
+    @Column(nullable = false)
+    private LocalDateTime createdDate;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "episode_id")
+    @JoinColumn(name = "episode_id", nullable = true)
     private Episode episode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "movie_id")
+    @JoinColumn(name = "movie_id", nullable = true)
     private Movie movie;
 }

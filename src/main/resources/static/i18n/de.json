@@ -218,5 +218,13 @@
     "chip_recommend": "Personalisierte Empfehlungen",
     "chip_device": "Auf jedem Gerät ansehen",
     "otp_security": "OTP-Sicherheit"
+  },
+  "wishlist": {
+    "add": "🤍 Zur Wunschliste hinzufügen",
+    "added": "❤️ Auf der Wunschliste",
+    "added_toast": "❤️ Zur Wunschliste hinzugefügt!",
+    "removed_toast": "💔 Von der Wunschliste entfernt",
+    "login_required": "Bitte melden Sie sich an, um die Wunschliste zu verwenden.",
+    "error": "Etwas ist schief gelaufen."
   }
 }

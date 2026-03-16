@@ -1,14 +1,10 @@
 package com.example.superapp.controller;
 
-import com.example.superapp.dto.LoginRequest;
-import com.example.superapp.dto.LoginResponse;
-import com.example.superapp.dto.ForgotPasswordRequest;
-import com.example.superapp.dto.RegisterRequest;
-import com.example.superapp.dto.VerifyRequest;
-import com.example.superapp.service.AuthService;
-import com.example.superapp.service.CustomUserDetailsService;
-import com.example.superapp.service.OtpService;
+import com.example.superapp.dto.*;
+import com.example.superapp.service.*;
+import com.example.superapp.utils.IpUtil;
 import com.example.superapp.utils.JwtUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,13 +26,16 @@ public class AuthController {
     private final JwtUtils jwtUtil;
     private final AuthService authService;
     private final OtpService otpService;
+    private final GeoIpService geoIpService;
+    private final LoginHistoryService loginHistoryService;
+
 
     // ✅ CONSTRUCTOR INJECTION – RẤT QUAN TRỌNG
     public AuthController(
             AuthenticationManager authenticationManager,
             CustomUserDetailsService userDetailsService,
             JwtUtils jwtUtil,
-            AuthService authService, OtpService otpService
+            AuthService authService, OtpService otpService, GeoIpService geoIpService, LoginHistoryService loginHistoryService
 
     ) {
         this.authenticationManager = authenticationManager;
@@ -44,11 +43,15 @@ public class AuthController {
         this.jwtUtil = jwtUtil;
         this.authService = authService;
         this.otpService = otpService;
+        this.geoIpService = geoIpService;
+        this.loginHistoryService = loginHistoryService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
-
+    public ResponseEntity<LoginResponse> login(
+            @RequestBody LoginRequest request,
+            HttpServletRequest httpRequest
+    ) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getUsername(),
@@ -59,18 +62,36 @@ public class AuthController {
         UserDetails userDetails =
                 userDetailsService.loadUserByUsername(request.getUsername());
 
-        String jwt = jwtUtil.generateToken(userDetails);
+        String role = userDetails.getAuthorities()
+                .stream()
+                .findFirst()
+                .map(Object::toString)
+                .orElse("ROLE_CUSTOMER");
 
-        // include role in response for frontend redirect decisions
-        // load from userDetailsService / repository
-        String role = null;
-        try {
-            var u = userDetailsService.loadUserByUsername(request.getUsername());
-            role = u.getAuthorities().stream().findFirst().map(Object::toString).orElse(null);
-        } catch (Exception ignore) {}
+        String clientIp = IpUtil.getClientIp(httpRequest);
+        String region = geoIpService.resolveRegion(clientIp);
+
+        String jwt = jwtUtil.generateToken(userDetails, region, clientIp);
 
         LoginResponse resp = new LoginResponse(jwt);
-        if (role != null) resp.setRole(role);
+        resp.setRole(role);
+        resp.setRegion(region);
+
+        boolean requirePublicIp = geoIpService.isLocalIp(clientIp)
+                || "LOCAL-LOCAL".equalsIgnoreCase(region)
+                || "LOCAL".equalsIgnoreCase(region);
+
+        resp.setRequirePublicIp(requirePublicIp);
+
+        // Chỉ lưu luôn nếu IP hiện tại đã là public / region hợp lệ
+        if (!requirePublicIp && role.toUpperCase().contains("CUSTOMER")) {
+            loginHistoryService.saveLoginHistory(
+                    request.getUsername(),
+                    clientIp,
+                    region
+            );
+        }
+
         return ResponseEntity.ok(resp);
     }
     @PostMapping("/register")
@@ -135,5 +156,47 @@ public class AuthController {
         return ResponseEntity.ok(
                 Map.of("message", "Đổi mật khẩu thành công")
         );
+    }
+    @PostMapping("/resolve-region")
+    public ResponseEntity<?> resolveRegionFromPublicIp(
+            @RequestBody ResolveRegionRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        String authHeader = httpRequest.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(401).body(Map.of("message", "Thiếu token"));
+        }
+
+        String token = authHeader.substring(7);
+        String username = jwtUtil.extractUsername(token);
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+        String publicIp = request.getPublicIp();
+        if (publicIp == null || publicIp.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Public IP không được để trống"));
+        }
+
+        String region = geoIpService.resolveRegion(publicIp);
+
+        String newToken = jwtUtil.generateToken(userDetails, region, publicIp);
+
+        String role = userDetails.getAuthorities()
+                .stream()
+                .findFirst()
+                .map(Object::toString)
+                .orElse("ROLE_CUSTOMER");
+
+        LoginResponse resp = new LoginResponse(newToken);
+        resp.setRole(role);
+        resp.setRegion(region);
+        resp.setRequirePublicIp(false);
+
+        // Lưu lịch sử login sau khi đã có public IP thật
+        if (role.toUpperCase().contains("CUSTOMER")) {
+            loginHistoryService.saveLoginHistory(username, publicIp, region);
+        }
+
+        return ResponseEntity.ok(resp);
     }
 }

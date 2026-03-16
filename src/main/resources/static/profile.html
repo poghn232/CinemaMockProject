@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="vi">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>MovieZone | User Profile</title>
-        <link rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieZone | User Profile</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-        <script>
+    <script>
         if (!localStorage.getItem('token')) {
             window.location.replace('login.html');
         }
     </script>
 
-        <style>
+    <style>
         :root {
             --bg-main: #0b1120;
             --bg-secondary: #161d2d;
@@ -25,6 +25,10 @@
             --gradient-orange: linear-gradient(to right, #f97316, #ef4444);
             --gradient-btn: linear-gradient(to right, #ff7a18, #af002d 100%);
             --accent: #f97316;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-orange: #f97316;
+            --gradient-brand: linear-gradient(135deg, #f97316, #ec4899);
+
         }
 
         * {
@@ -50,15 +54,22 @@
         /* NAVBAR & HEADER */
         .navbar-wrapper {
             padding: 12px 20px 0;
-            position: sticky; top: 0; z-index: 20;
+            position: sticky;
+            top: 0;
+            z-index: 20;
             background: var(--bg-main);
         }
+
         .navbar {
-            max-width: 1200px; margin: 0 auto;
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 10px 20px; border-radius: 18px;
-            background: radial-gradient(circle at 0 0, rgba(148,163,184,0.35), transparent 58%), rgba(15,23,42,0.96);
-            box-shadow: 0 0 0 1px rgba(148,163,184,0.45), 0 18px 40px rgba(15,23,42,0.95);
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            border-radius: 18px;
+            background: radial-gradient(circle at 0 0, rgba(148, 163, 184, 0.35), transparent 58%), rgba(15, 23, 42, 0.96);
+            box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.45), 0 18px 40px rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(18px);
         }
 
@@ -152,8 +163,18 @@
             background: rgba(15, 23, 42, 1);
             border-color: rgba(248, 113, 22, 0.9);
         }
-        .nav-link-premium { border-color: rgba(250,204,21,0.5); color: var(--accent-yellow); }
-        .nav-link-premium:hover { background: rgba(250,204,21,0.08); border-color: var(--accent-yellow); color: var(--accent-yellow); }
+
+        .nav-link-premium {
+            border-color: rgba(250, 204, 21, 0.5);
+            color: var(--accent-yellow);
+        }
+
+        .nav-link-premium:hover {
+            background: rgba(250, 204, 21, 0.08);
+            border-color: var(--accent-yellow);
+            color: var(--accent-yellow);
+        }
+
         /* PROFILE BANNER */
         .profile-banner {
             background-color: var(--accent-yellow);
@@ -451,73 +472,192 @@
             display: flex;
             gap: 15px;
         }
-         /* ── History Grid & Cards ────────────────────────────────────────── */
+
+        /* ── History Grid & Cards ────────────────────────────────────────── */
         .history-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             gap: 20px;
         }
+
         .history-card {
-            background: rgba(255,255,255,0.04);
-            border-radius: 12px; border: 1px solid var(--glass-border);
-            overflow: hidden; display: flex; flex-direction: column;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
             transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
         }
+
         .history-card:hover {
-            transform: translateY(-5px); border-color: var(--accent-orange);
-            box-shadow: 0 8px 24px rgba(249,115,22,0.2);
+            transform: translateY(-5px);
+            border-color: var(--accent-orange);
+            box-shadow: 0 8px 24px rgba(249, 115, 22, 0.2);
         }
-        .history-poster { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; border-bottom: 1px solid var(--glass-border); }
-        .history-info   { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .history-title  {
-            font-weight: 700; font-size: 13px; margin-bottom: 6px; color: #fff; line-height: 1.4;
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+
+        .history-poster {
+            width: 100%;
+            aspect-ratio: 2/3;
+            object-fit: cover;
+            display: block;
+            border-bottom: 1px solid var(--glass-border);
         }
-        .history-meta   { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
-        .history-type   { color: var(--accent-orange); font-weight: 600; margin-bottom: 2px; }
+
+        .history-info {
+            padding: 12px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .history-title {
+            font-weight: 700;
+            font-size: 13px;
+            margin-bottom: 6px;
+            color: #fff;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .history-meta {
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .history-type {
+            color: var(--accent-orange);
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
         .history-play-btn {
-            margin-top: 10px; width: 100%; height: 34px; border-radius: 8px;
-            background: var(--gradient-brand); color: white; text-decoration: none;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 600; font-size: 12px; transition: filter 0.2s;
+            margin-top: 10px;
+            width: 100%;
+            height: 34px;
+            border-radius: 8px;
+            background: var(--gradient-brand);
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 12px;
+            transition: filter 0.2s;
         }
-        .history-play-btn:hover { filter: brightness(1.15); }
+
+        .history-play-btn:hover {
+            filter: brightness(1.15);
+        }
+
         .history-empty {
-            grid-column: 1 / -1; text-align: center;
-            padding: 60px 20px; color: var(--text-secondary);
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
         }
-        .history-empty i { font-size: 36px; opacity: 0.25; display: block; margin-bottom: 14px; }
-        .history-empty a { color: var(--accent-orange); text-decoration: none; font-weight: 600; display: inline-block; margin-top: 10px; }
-        .history-empty a:hover { text-decoration: underline; }
+
+        .history-empty i {
+            font-size: 36px;
+            opacity: 0.25;
+            display: block;
+            margin-bottom: 14px;
+        }
+
+        .history-empty a {
+            color: var(--accent-orange);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .history-empty a:hover {
+            text-decoration: underline;
+        }
+
         .history-loading {
-            grid-column: 1 / -1; text-align: center;
-            padding: 60px 20px; color: var(--text-secondary);
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
         }
-        .history-loading i { font-size: 28px; display: block; margin-bottom: 12px; }
+
+        .history-loading i {
+            font-size: 28px;
+            display: block;
+            margin-bottom: 12px;
+        }
 
 
         /* ── Footer ──────────────────────────────────────────────────────── */
         .site-footer {
-            max-width: 1200px; margin: 48px auto 0;
+            max-width: 1200px;
+            margin: 48px auto 0;
             padding: 24px 20px 32px;
-            border-top: 1px solid rgba(148,163,184,0.2);
+            border-top: 1px solid rgba(148, 163, 184, 0.2);
         }
+
         .footer-inner {
-            display: flex; flex-wrap: wrap;
-            justify-content: space-between; align-items: center;
-            gap: 16px; margin-bottom: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
         }
-        .footer-brand { display: flex; align-items: center; gap: 10px; }
-        .footer-logo  {
-            width: 28px; height: 28px; border-radius: 999px; font-size: 12px; font-weight: 700;
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-logo {
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
             background: radial-gradient(circle at 30% 20%, #f97316, #e11d48 55%, #4f46e5);
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .footer-title  { font-weight: 700; letter-spacing: 0.06em; font-size: 13px; }
-        .footer-links  { display: flex; flex-wrap: wrap; gap: 20px; }
-        .footer-links a { color: var(--text-subtle); text-decoration: none; font-size: 13px; transition: color 0.15s; }
-        .footer-links a:hover { color: var(--accent); }
-        .footer-bottom { font-size: 12px; color: var(--text-subtle); }
+
+        .footer-title {
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            font-size: 13px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: var(--text-subtle);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.15s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        .footer-bottom {
+            font-size: 12px;
+            color: var(--text-subtle);
+        }
 
         .lang-dropdown {
             position: relative;
@@ -589,220 +729,259 @@
         .lang-dropdown.open .lang-menu {
             display: block;
         }
+
+        .wishlist-remove-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.7);
+            border: none;
+            color: #ef4444;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 2;
+        }
+
+        .history-card:hover .wishlist-remove-btn {
+            opacity: 1;
+        }
+
+        .wishlist-empty {
+            color: var(--text-secondary);
+            font-size: 14px;
+            padding: 20px 0;
+        }
     </style>
-    </head>
+</head>
 
-    <body>
-        <div id="toastNotification" class="toast">
-            <i id="toastIcon" class="fas fa-check-circle"></i> <span
-                id="toastMessage">Success!</span>
-        </div>
+<body>
+<div id="toastNotification" class="toast">
+    <i id="toastIcon" class="fas fa-check-circle"></i> <span
+        id="toastMessage">Success!</span>
+</div>
 
-        <header class="navbar">
-            <div class="nav-left">
-                <div class="nav-logo">MZ</div>
-                <div class="nav-title">
-                    <span class="nav-title-main">MOVIEZONE</span>
-                    <span class="nav-title-sub" data-i18n="hero.subtitle">Find
+<header class="navbar">
+    <div class="nav-left">
+        <div class="nav-logo">MZ</div>
+        <div class="nav-title">
+            <span class="nav-title-main">MOVIEZONE</span>
+            <span class="nav-title-sub" data-i18n="hero.subtitle">Find
                         movies, series &amp;
                         more</span>
+        </div>
+    </div>
+    <nav class="nav-center">
+        <a href="homepage.html" class="nav-link"
+           data-i18n="nav.home">Home</a>
+        <a href="packs.html" class="nav-link nav-link-premium"
+           id="premiumButton" data-i18n="nav.premium">Go Premium</a>
+        <button class="nav-link active" data-nav="profile"
+                data-i18n="nav.profile"
+                disabled>Profile
+        </button>
+        <a
+                href="contact.html"
+                class="nav-link nav-link-contact"
+                id="contactButton"
+                data-i18n="nav.contact">
+            Contact
+        </a>
+        <div class="lang-dropdown">
+            <button class="lang-current" id="langCurrent">
+                <img id="langFlag" src="https://flagcdn.com/w40/gb.png">
+            </button>
+
+            <div class="lang-menu" id="langMenu">
+                <div class="lang-item" onclick="changeLanguage('vi')">
+                    <img src="https://flagcdn.com/w40/vn.png">
+                    <span>Tiếng Việt</span>
                 </div>
-            </div>
-            <nav class="nav-center">
-                <a href="homepage.html" class="nav-link"
-                    data-i18n="nav.home">Home</a>
-                <a href="packs.html" class="nav-link nav-link-premium"
-                    id="premiumButton" data-i18n="nav.premium">Go Premium</a>
-                <button class="nav-link active" data-nav="profile"
-                    data-i18n="nav.profile"
-                    disabled>Profile
-                </button>
-                <a
-                    href="contact.html"
-                    class="nav-link nav-link-contact"
-                    id="contactButton"
-                    data-i18n="nav.contact">
-                    Contact
-                </a>
-                <div class="lang-dropdown">
-                    <button class="lang-current" id="langCurrent">
-                        <img id="langFlag" src="https://flagcdn.com/w40/gb.png">
-                    </button>
 
-                    <div class="lang-menu" id="langMenu">
-                        <div class="lang-item" onclick="changeLanguage('vi')">
-                            <img src="https://flagcdn.com/w40/vn.png">
-                            <span>Tiếng Việt</span>
-                        </div>
-
-                        <div class="lang-item" onclick="changeLanguage('en')">
-                            <img src="https://flagcdn.com/w40/gb.png">
-                            <span>English</span>
-                        </div>
-                        <div class="lang-item" onclick="changeLanguage('my')">
-                            <img src="https://flagcdn.com/w40/mm.png">
-                            <span>မြန်မာဘာသာ</span>
-                        </div>
-
-                        <div class="lang-item" onclick="changeLanguage('ja')">
-                            <img src="https://flagcdn.com/w40/jp.png">
-                            <span>日本語</span>
-                        </div>
-
-                        <div class="lang-item" onclick="changeLanguage('de')">
-                            <img src="https://flagcdn.com/w40/de.png">
-                            <span>Deutsch</span>
-                        </div>
-                    </div>
+                <div class="lang-item" onclick="changeLanguage('en')">
+                    <img src="https://flagcdn.com/w40/gb.png">
+                    <span>English</span>
                 </div>
-                <button class="nav-link nav-link-logout" id="logoutButton"
-                    data-i18n="nav.logout"
-                    type="button">Logout
-                </button>
-            </nav>
-            <div class="nav-right">
-                <span class="nav-username" id="navUsername"
-                    data-i18n="common.loading">Loading...</span>
-            </div>
-        </header>
+                <div class="lang-item" onclick="changeLanguage('my')">
+                    <img src="https://flagcdn.com/w40/mm.png">
+                    <span>မြန်မာဘာသာ</span>
+                </div>
 
-        <div class="profile-banner">
-            <div class="banner-container">
-                <div class="user-info">
-                    <h2 id="bannerName"
-                        data-i18n="common.loading">Loading...</h2>
-                    <p id="bannerRole" data-i18n="common.loading">Loading...</p>
+                <div class="lang-item" onclick="changeLanguage('ja')">
+                    <img src="https://flagcdn.com/w40/jp.png">
+                    <span>日本語</span>
+                </div>
+
+                <div class="lang-item" onclick="changeLanguage('de')">
+                    <img src="https://flagcdn.com/w40/de.png">
+                    <span>Deutsch</span>
                 </div>
             </div>
         </div>
+        <button class="nav-link nav-link-logout" id="logoutButton"
+                data-i18n="nav.logout"
+                type="button">Logout
+        </button>
+    </nav>
+    <div class="nav-right">
+                <span class="nav-username" id="navUsername"
+                      data-i18n="common.loading">Loading...</span>
+    </div>
+</header>
 
-        <main class="main-container">
-            <aside class="sidebar">
-                <ul class="sidebar-menu">
-                    <li class="sidebar-item active" data-target="section-info">
-                        <i class="fas fa-user-circle"></i>
-                        <span data-i18n="profile.user_information">User
+<div class="profile-banner">
+    <div class="banner-container">
+        <div class="user-info">
+            <h2 id="bannerName"
+                data-i18n="common.loading">Loading...</h2>
+            <p id="bannerRole" data-i18n="common.loading">Loading...</p>
+        </div>
+    </div>
+</div>
+
+<main class="main-container">
+    <aside class="sidebar">
+        <ul class="sidebar-menu">
+            <li class="sidebar-item active" data-target="section-info">
+                <i class="fas fa-user-circle"></i>
+                <span data-i18n="profile.user_information">User
                             Information</span>
-                    </li>
-                    <li class="sidebar-item" data-target="section-history">
-                        <i class="fas fa-history"></i>
-                        <span data-i18n="profile.history">History</span>
-                    </li>
-                    <li class="sidebar-item" data-target="section-subscription">
-                        <i class="fas fa-credit-card"></i>
-                        <span
-                            data-i18n="profile.subscriptions">Subscriptions</span>
-                    </li>
-                    <li class="sidebar-item" data-target="section-password">
-                        <i class="fas fa-lock"></i>
-                        <span data-i18n="profile.change_password">Change
+            </li>
+            <li class="sidebar-item" data-target="section-history">
+                <i class="fas fa-history"></i>
+                <span data-i18n="profile.history">History</span>
+            </li>
+            <li class="sidebar-item" data-target="section-subscription">
+                <i class="fas fa-credit-card"></i>
+                <span
+                        data-i18n="profile.subscriptions">Subscriptions</span>
+            </li>
+            <li class="sidebar-item" data-target="section-wishlist">
+                <i class="fas fa-heart"></i>
+                <span>My Wishlist</span>
+            </li>
+            <li class="sidebar-item" data-target="section-password">
+                <i class="fas fa-lock"></i>
+                <span data-i18n="profile.change_password">Change
                             password</span>
-                    </li>
-                </ul>
-                <button class="btn btn-logout-full"><i
-                        class="fas fa-sign-out-alt"></i>
-                    <span data-i18n="nav.logout">Log out</span>
-                </button>
-            </aside>
+            </li>
+        </ul>
+        <button class="btn btn-logout-full"><i
+                class="fas fa-sign-out-alt"></i>
+            <span data-i18n="nav.logout">Log out</span>
+        </button>
+    </aside>
 
-            <div class="content-area">
+    <div class="content-area">
 
-                <section id="section-info" class="content-section active">
-                    <h3 data-i18n="profile.user_information">User
-                        Information</h3>
-                    <form id="profileForm">
-                        <div class="form-group" style="max-width: 600px;">
-                            <label data-i18n="profile.username">Username</label>
-                            <input type="text" id="inputUsername" required
-                                title="You can edit your username">
-                        </div>
-                        <div class="form-group" style="max-width: 600px;">
-                            <label data-i18n="profile.email">Email</label>
-                            <input type="email" id="inputEmail" readonly
-                                title="Email cannot be changed">
-                        </div>
-                        <div class="form-group" style="max-width: 600px;">
-                            <label data-i18n="profile.role">Role</label>
-                            <input type="text" id="inputRole" readonly
-                                title="Role cannot be changed">
-                        </div>
-                        <div class="form-actions"
-                            style="max-width: 600px; justify-content: flex-start;">
-                            <button type="submit" class="btn btn-save"
-                                id="saveProfileBtn"
-                                data-i18n="profile.save_changes">>Save changes
-                            </button>
-                        </div>
-                    </form>
-                </section>
-
-                <!-- History Tab -->
-                <section id="section-history" class="content-section">
-                    <h3>Watch History</h3>
-                    <div id="historyContainer" class="history-grid"></div>
-                </section>
-
-                <section id="section-subscription" class="content-section">
-                    <h3 data-i18n="profile.my_subscriptions">My
-                        Subscriptions</h3>
-                    <div id="subscriptionContainer">
-                    </div>
-                </section>
-
-                <section id="section-password" class="content-section">
-                    <h3 data-i18n="profile.change_password">Change password</h3>
-                    <form id="passwordForm">
-                        <div class="form-group">
-                            <label data-i18n="profile.current_password">Current
-                                password</label>
-                            <input type="password" id="oldPassword"
-                                data-i18n-placeholder="profile.current_password"
-                                placeholder="Enter current password" required>
-                        </div>
-                        <div class="form-group">
-                            <label data-i18n="profile.new_password">New
-                                password</label>
-                            <input type="password" id="newPassword"
-                                data-i18n-placeholder="auth.enter_new_password"
-                                placeholder="Enter new password" minlength="6"
-                                required>
-                        </div>
-                        <div class="form-group">
-                            <label data-i18n="profile.confirm_password">Confirm
-                                new password</label>
-                            <input type="password" id="confirmPassword"
-                                data-i18n-placeholder="profile.confirm_password"
-                                placeholder="Confirm new password" minlength="6"
-                                required>
-                        </div>
-                        <div class="form-actions" style="margin-top: 30px;">
-                            <button type="submit" class="btn btn-save"
-                                data-i18n="profile.update_password"
-                                id="updatePassBtn">Update password
-                            </button>
-                        </div>
-                    </form>
-                </section>
-            </div>
-        </main>
-        <script src="/js/i18n.js"></script>
-        <footer class="site-footer">
-            <div class="footer-inner">
-                <div class="footer-brand">
-                    <div class="footer-logo">MZ</div>
-                    <span class="footer-title">MOVIEZONE</span>
+        <section id="section-info" class="content-section active">
+            <h3 data-i18n="profile.user_information">User
+                Information</h3>
+            <form id="profileForm">
+                <div class="form-group" style="max-width: 600px;">
+                    <label data-i18n="profile.username">Username</label>
+                    <input type="text" id="inputUsername" required
+                           title="You can edit your username">
                 </div>
-                <div class="footer-links">
-                    <a href="homepage.html">Home</a>
-                    <a href="packs.html">Premium Plan</a>
-                    <a href="contact.html">Contact</a>
+                <div class="form-group" style="max-width: 600px;">
+                    <label data-i18n="profile.email">Email</label>
+                    <input type="email" id="inputEmail" readonly
+                           title="Email cannot be changed">
                 </div>
+                <div class="form-group" style="max-width: 600px;">
+                    <label data-i18n="profile.role">Role</label>
+                    <input type="text" id="inputRole" readonly
+                           title="Role cannot be changed">
+                </div>
+                <div class="form-actions"
+                     style="max-width: 600px; justify-content: flex-start;">
+                    <button type="submit" class="btn btn-save"
+                            id="saveProfileBtn"
+                            data-i18n="profile.save_changes">>Save changes
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- History Tab -->
+        <section id="section-history" class="content-section">
+            <h3>Watch History</h3>
+            <div id="historyContainer" class="history-grid"></div>
+        </section>
+
+        <section id="section-subscription" class="content-section">
+            <h3 data-i18n="profile.my_subscriptions">My
+                Subscriptions</h3>
+            <div id="subscriptionContainer">
             </div>
-            <div class="footer-bottom">
-                © 2025 MovieZone. Demo Project.
-            </div>
-        </footer>
-        <script>
+        </section>
+
+        <section id="section-wishlist" class="content-section">
+            <h3>My Wishlist</h3>
+            <div id="wishlistContainer" class="history-grid"></div>
+        </section>
+
+        <section id="section-password" class="content-section">
+            <h3 data-i18n="profile.change_password">Change password</h3>
+            <form id="passwordForm">
+                <div class="form-group">
+                    <label data-i18n="profile.current_password">Current
+                        password</label>
+                    <input type="password" id="oldPassword"
+                           data-i18n-placeholder="profile.current_password"
+                           placeholder="Enter current password" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="profile.new_password">New
+                        password</label>
+                    <input type="password" id="newPassword"
+                           data-i18n-placeholder="auth.enter_new_password"
+                           placeholder="Enter new password" minlength="6"
+                           required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="profile.confirm_password">Confirm
+                        new password</label>
+                    <input type="password" id="confirmPassword"
+                           data-i18n-placeholder="profile.confirm_password"
+                           placeholder="Confirm new password" minlength="6"
+                           required>
+                </div>
+                <div class="form-actions" style="margin-top: 30px;">
+                    <button type="submit" class="btn btn-save"
+                            data-i18n="profile.update_password"
+                            id="updatePassBtn">Update password
+                    </button>
+                </div>
+            </form>
+        </section>
+    </div>
+</main>
+<script src="/js/i18n.js"></script>
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <div class="footer-logo">MZ</div>
+            <span class="footer-title">MOVIEZONE</span>
+        </div>
+        <div class="footer-links">
+            <a href="homepage.html">Home</a>
+            <a href="packs.html">Premium Plan</a>
+            <a href="contact.html">Contact</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        © 2025 MovieZone. Demo Project.
+    </div>
+</footer>
+<script>
     document.addEventListener('DOMContentLoaded', () => {
 
         // --- CẤU HÌNH API ---
@@ -1121,30 +1300,34 @@
 
         // Chuyển Tab Sidebar
         const sidebarItems = document.querySelectorAll('.sidebar-item');
-const contentSections = document.querySelectorAll('.content-section');
+        const contentSections = document.querySelectorAll('.content-section');
 
-sidebarItems.forEach(item => {
-    item.addEventListener('click', function () {
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', function () {
 
-        sidebarItems.forEach(i => i.classList.remove('active'));
-        this.classList.add('active');
+                sidebarItems.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
 
-        contentSections.forEach(section => section.classList.remove('active'));
+                contentSections.forEach(section => section.classList.remove('active'));
 
-        const targetId = this.getAttribute('data-target');
-        const targetSection = document.getElementById(targetId);
+                const targetId = this.getAttribute('data-target');
+                const targetSection = document.getElementById(targetId);
 
-        if (targetSection) {
-            targetSection.classList.add('active');
-        }
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                }
 
-        // ⭐ LOAD HISTORY WHEN HISTORY TAB OPEN
-        if (targetId === 'section-history') {
-            loadHistory();
-        }
+                // ⭐ LOAD HISTORY WHEN HISTORY TAB OPEN
+                if (targetId === 'section-history') {
+                    loadHistory();
+                }
 
-    });
-});
+                if (targetId === 'section-wishlist') {
+                    loadWishlist();
+                }
+
+            });
+        });
 
         // Navbar Links
         const navLinks = document.querySelectorAll('.nav-link');
@@ -1160,7 +1343,7 @@ sidebarItems.forEach(item => {
     window.extendSubscription = function (subscriptionId) {
         window.location.href = `packs.html?mode=extend&subscriptionId=${subscriptionId}`;
     };
-   /* ── History functions — global scope so sidebar click can reach them ── */
+    /* ── History functions — global scope so sidebar click can reach them ── */
 
     /* ── History functions ──────────────────────────────────────────────── */
 
@@ -1174,7 +1357,7 @@ sidebarItems.forEach(item => {
             </div>`;
 
         try {
-           // Cập nhật đúng Endpoint từ WatchHistoryController
+            // Cập nhật đúng Endpoint từ WatchHistoryController
             const res = await fetch('http://localhost:8080/api/user/history', {
                 headers: {
                     'Content-Type': 'application/json',
@@ -1189,7 +1372,7 @@ sidebarItems.forEach(item => {
             }
 
             if (!res.ok) throw new Error('Failed to fetch history from server');
-        
+
             const data = await res.json();
             renderHistory(data);
         } catch (err) {
@@ -1199,38 +1382,38 @@ sidebarItems.forEach(item => {
     }
 
     function renderHistory(items) {
-    const container = document.getElementById('historyContainer');
+        const container = document.getElementById('historyContainer');
 
-    if (!items || items.length === 0) {
-        container.innerHTML = `
+        if (!items || items.length === 0) {
+            container.innerHTML = `
             <div class="history-empty">
                 <i class="fas fa-film"></i>
                 <p>You haven't watched anything recently.</p>
                 <a href="homepage.html">Browse movies now →</a>
             </div>`;
-        return;
-    }
+            return;
+        }
 
-    container.innerHTML = items.map(item => {
-        // Lấy tiêu đề: ưu tiên movieTitle, nếu không có thì dùng tvSeriesName
-        const mainTitle = item.movieTitle || item.tvSeriesName || 'Unknown Movie';
-        
-        // Nhãn phụ: Nếu là phim bộ thì hiện tên tập, ngược lại hiện "Movie"
-        const typeLabel = item.episodeName ? `Episode: ${item.episodeName}` : 'Movie';
-        
-        const progress = item.progressSec || 0;
-        const duration = item.durationSec || 1; // Tránh chia cho 0
-        const percent = Math.min(100, Math.round((progress / duration) * 100));
-        
-        // posterPath is now a full URL built by WatchHistoryController
-        const poster = item.posterPath || 'https://placehold.co/200x300/1f2937/9ca3af?text=No+Poster';
-        
-        // Tạo link quay lại trang movie-watch.html kèm tham số t (thời gian đã xem)
-        const link = item.movieId
-            ? `movie-watch.html?id=${item.movieId}&type=movie&t=${progress}`
-            : `movie-watch.html?id=${item.episodeId}&type=tv&t=${progress}`;
+        container.innerHTML = items.map(item => {
+            // Lấy tiêu đề: ưu tiên movieTitle, nếu không có thì dùng tvSeriesName
+            const mainTitle = item.movieTitle || item.tvSeriesName || 'Unknown Movie';
 
-        return `
+            // Nhãn phụ: Nếu là phim bộ thì hiện tên tập, ngược lại hiện "Movie"
+            const typeLabel = item.episodeName ? `Episode: ${item.episodeName}` : 'Movie';
+
+            const progress = item.progressSec || 0;
+            const duration = item.durationSec || 1; // Tránh chia cho 0
+            const percent = Math.min(100, Math.round((progress / duration) * 100));
+
+            // posterPath is now a full URL built by WatchHistoryController
+            const poster = item.posterPath || 'https://placehold.co/200x300/1f2937/9ca3af?text=No+Poster';
+
+            // Tạo link quay lại trang movie-watch.html kèm tham số t (thời gian đã xem)
+            const link = item.movieId
+                ? `movie-watch.html?id=${item.movieId}&type=movie&t=${progress}`
+                : `movie-watch.html?id=${item.episodeId}&type=tv&t=${progress}`;
+
+            return `
             <div class="history-card">
                 <img src="${poster}" class="history-poster" alt="${escHtml(mainTitle)}" 
                      onerror="this.src='https://placehold.co/200x300/1f2937/9ca3af?text=No+Poster';this.onerror=null;">
@@ -1247,14 +1430,14 @@ sidebarItems.forEach(item => {
                     </a>
                 </div>
             </div>`;
-    }).join('');
-}
+        }).join('');
+    }
 
     function formatTime(sec) {
         if (!sec || isNaN(sec) || sec < 0) return '00:00';
-        const h  = Math.floor(sec / 3600);
-        const m  = Math.floor((sec % 3600) / 60);
-        const s  = Math.floor(sec % 60);
+        const h = Math.floor(sec / 3600);
+        const m = Math.floor((sec % 3600) / 60);
+        const s = Math.floor(sec % 60);
         const mm = String(m).padStart(2, '0');
         const ss = String(s).padStart(2, '0');
         return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
@@ -1268,6 +1451,112 @@ sidebarItems.forEach(item => {
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;');
     }
-    </script>
-    </body>
+
+    async function loadWishlist() {
+        const container = document.getElementById('wishlistContainer');
+        container.innerHTML = `
+        <div class="history-loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading wishlist...</p>
+        </div>`;
+
+        try {
+            const res = await fetch('/api/user/wishlist', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            if (res.status === 401 || res.status === 403) {
+                localStorage.removeItem('token');
+                window.location.replace('login.html');
+                return;
+            }
+
+            if (!res.ok) throw new Error('Failed to load wishlist');
+            const items = await res.json();
+
+            container.innerHTML = '';
+
+            if (!items || items.length === 0) {
+                container.innerHTML = '<p class="wishlist-empty">You have no wishlisted movies yet.</p>';
+                return;
+            }
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'history-card';
+                card.style.cursor = 'pointer';
+                card.style.position = 'relative';
+
+                const posterUrl = item.posterUrl || 'https://via.placeholder.com/160x240?text=No+Image';
+                const ratingText = item.rating ? item.rating.toFixed(1) : 'N/A';
+                const typeLabel = item.contentType === 'tv' ? 'TV Series' : 'Movie';
+
+                card.innerHTML = `
+                <div class="history-thumb" style="
+                    aspect-ratio: 2/3;
+                    background-image: url('${posterUrl}');
+                    background-size: cover;
+                    background-position: center;
+                    border-radius: 8px 8px 0 0;
+                    position: relative;
+                ">
+                    <span style="
+                        position:absolute; bottom:8px; left:8px;
+                        background:rgba(0,0,0,0.7);
+                        color:#e5e7eb; font-size:10px;
+                        padding:2px 7px; border-radius:999px;
+                    ">${typeLabel}</span>
+                    <button class="wishlist-remove-btn" title="Remove from wishlist">✕</button>
+                </div>
+                <div style="padding: 10px 10px 12px;">
+                    <div style="font-weight:600; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                        ${item.title || 'Unknown'}
+                    </div>
+                    <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">
+                        ★ ${ratingText} · ${item.year || ''}
+                    </div>
+                </div>
+            `;
+
+                // Click card → đi tới trang detail
+                card.addEventListener('click', (e) => {
+                    if (e.target.closest('.wishlist-remove-btn')) return;
+                    window.location.href = `movie-detail.html?id=${item.contentId}&type=${item.contentType}`;
+                });
+
+                // Click nút X → remove khỏi wishlist
+                card.querySelector('.wishlist-remove-btn').addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    try {
+                        const r = await fetch('/api/user/wishlist/toggle', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                            },
+                            body: JSON.stringify({contentId: item.contentId, contentType: item.contentType})
+                        });
+                        if (r.ok) {
+                            card.remove();
+                            if (container.children.length === 0) {
+                                container.innerHTML = '<p class="wishlist-empty">You have no wishlisted movies yet.</p>';
+                            }
+                        }
+                    } catch { /* ignore */
+                    }
+                });
+
+                container.appendChild(card);
+            });
+
+        } catch (e) {
+            container.innerHTML = '<p class="wishlist-empty">Failed to load wishlist.</p>';
+            console.error(e);
+        }
+    }
+</script>
+</body>
 </html>

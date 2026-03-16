@@ -431,13 +431,18 @@
             }
 
             const data = await response.json();
+
             localStorage.setItem("token", data.token);
             localStorage.setItem("username", username);
-            localStorage.setItem("role", data.role);
+            localStorage.setItem("role", data.role || "");
+            localStorage.setItem("region", data.region || "");
 
+            if (data.requirePublicIp === true) {
+                window.location.href = "detect-region.html";
+                return;
+            }
 
             const role = (data.role || '').toUpperCase();
-            // role might be like 'ROLE_ADMIN' or 'ADMIN'
             if (role.includes('ADMIN')) {
                 window.location.href = 'admin.html';
             } else {
