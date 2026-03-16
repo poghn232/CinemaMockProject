@@ -72,6 +72,7 @@ public class MovieController {
                         .filter(e -> Boolean.TRUE.equals(e.getPublished())) // Only published episodes
                         .map(e -> {
                     java.util.Map<String, Object> em = new java.util.HashMap<>();
+                    em.put("id", e.getId());
                     em.put("episodeNumber", e.getEpisodeNumber());
                     em.put("name", e.getName());
                     em.put("src", e.getSrc());
