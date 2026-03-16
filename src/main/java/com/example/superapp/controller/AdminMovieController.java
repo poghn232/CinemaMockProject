@@ -85,7 +85,7 @@ public class AdminMovieController {
     public void toggleEpisodePublish(@PathVariable("tvId") long tvId,
                                      @PathVariable("seasonNumber") int seasonNumber,
                                      @PathVariable("episodeNumber") int episodeNumber) {
-        adminMovieService.toggleEpisodePublished(tvId, seasonNumber, episodeNumber);
+        adminMovieService.toggleEpisodePublished(tvId, seasonNumber,episodeNumber);
     }
 
     @PutMapping("/{type}/{id}/trailer")

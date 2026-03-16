@@ -2,7 +2,7 @@
   datasource:
     url: jdbc:mysql://localhost:3306/mock_project_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Ho_Chi_Minh
     username: root
-    password: 1234
+    password: 12345678
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -20,7 +20,7 @@
 
 
   mail:
-    host: smtp.gmail.comp
+    host: smtp.gmail.com
     port: 587
     username: anbui1435@gmail.com
     password: mryw jzak rhrg aiqb
@@ -28,6 +28,10 @@
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 20MB
 
 server:
   port: 8080
