@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Đăng nhập | MovieZone</title>
+    <head>
+        <meta charset="UTF-8">
+        <title>Đăng nhập | MovieZone</title>
+        <script src="https://accounts.google.com/gsi/client" async
+            defer></script>
 
-    <style>
+        <style>
         body {
             font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             background:
@@ -259,11 +261,7 @@
             margin-bottom: 4px;
         }
 
-        .login-container input {
-            margin: 0;
-        }
-
-        .login-container button {
+        .btn-primary {
             width: 100%;
             padding: 11px;
             margin-top: 6px;
@@ -282,7 +280,7 @@
             transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
         }
 
-        .login-container button:hover {
+        .btn-primary:hover {
             filter: brightness(1.05);
             transform: translateY(-1px);
             box-shadow:
@@ -290,11 +288,78 @@
                     0 0 0 1px rgba(248, 113, 113, 0.75);
         }
 
-        .login-container button:active {
+        .btn-primary:active {
             transform: translateY(0);
             box-shadow:
                     0 8px 18px rgba(248, 113, 113, 0.5),
                     0 0 0 1px rgba(248, 113, 113, 0.75);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ── Divider ── */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 14px 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: rgba(148, 163, 184, 0.25);
+        }
+
+        .divider span {
+            font-size: 11px;
+            color: #6b7280;
+            white-space: nowrap;
+        }
+
+        /* ── Google button ── */
+        .btn-google {
+            width: 100%;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            border-radius: 999px;
+            color: #e5e7eb;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+            font-family: inherit;
+        }
+
+        .btn-google:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(148, 163, 184, 0.6);
+            transform: translateY(-1px);
+        }
+
+        .btn-google:active {
+            transform: translateY(0);
+        }
+
+        .btn-google:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-google svg {
+            flex-shrink: 0;
         }
 
         .helper-row {
@@ -323,136 +388,249 @@
             min-height: 16px;
         }
     </style>
-</head>
-<body>
+    </head>
+    <body>
 
-<div class="backdrop-blur"></div>
+        <div class="backdrop-blur"></div>
 
-<div class="login-wrapper">
-    <section class="brand-section">
-        <div class="brand-logo">
-            <span>MZ</span>
-            <span>MovieZone</span>
-        </div>
-        <h1 class="brand-title">
-            <span data-i18n="login_hero.title_line1">Online</span>
-            <span class="highlight" data-i18n="login_hero.title_highlight">Cinema</span><br/>
-            <span data-i18n="login_hero.title_line2">for every movie night.</span>
-        </h1>
-        <p class="brand-subtitle" data-i18n="login_hero.subtitle">
-            Log in to continue watching the movies you're currently viewing, discover new trends, and save your favorite list.
-        </p>
-
-        <div class="tagline-chips">
-            <div class="tagline-chip" data-i18n="login_hero.chip_hd">Full HD &amp; 4K</div>
-            <div class="tagline-chip" data-i18n="login_hero.chip_episode">Unlimited Episodes</div>
-            <div class="tagline-chip" data-i18n="login_hero.chip_recommend">Personalized Recommendations</div>
-        </div>
-
-        <div class="poster-row">
-            <article class="poster poster-1">
-                <div class="poster-info">
-                    <div class="poster-title">Night City Stories</div>
-                    <div class="poster-tag" data-i18n="login_hero.poster1_tag">Action · 2025</div>
+        <div class="login-wrapper">
+            <section class="brand-section">
+                <div class="brand-logo">
+                    <span>MZ</span>
+                    <span>MovieZone</span>
                 </div>
-            </article>
-            <article class="poster poster-2">
-                <div class="poster-info">
-                    <div class="poster-title">Echoes of Stars</div>
-                    <div class="poster-tag" data-i18n="login_hero.poster2_tag">Science Fiction</div>
+                <h1 class="brand-title">
+                    <span data-i18n="login_hero.title_line1">Online</span>
+                    <span class="highlight"
+                        data-i18n="login_hero.title_highlight">Cinema</span><br />
+                    <span data-i18n="login_hero.title_line2">for every movie
+                        night.</span>
+                </h1>
+                <p class="brand-subtitle" data-i18n="login_hero.subtitle">
+                    Log in to continue watching the movies you're currently
+                    viewing, discover new trends, and save your favorite list.
+                </p>
+
+                <div class="tagline-chips">
+                    <div class="tagline-chip"
+                        data-i18n="login_hero.chip_hd">Full HD &amp; 4K</div>
+                    <div class="tagline-chip"
+                        data-i18n="login_hero.chip_episode">Unlimited
+                        Episodes</div>
+                    <div class="tagline-chip"
+                        data-i18n="login_hero.chip_recommend">Personalized
+                        Recommendations</div>
                 </div>
-            </article>
-            <article class="poster poster-3">
-                <div class="poster-info">
-                    <div class="poster-title">Hidden Notes</div>
-                    <div class="poster-tag" data-i18n="login_hero.poster3_tag">Psychological · Music</div>
+
+                <div class="poster-row">
+                    <article class="poster poster-1">
+                        <div class="poster-info">
+                            <div class="poster-title">Night City Stories</div>
+                            <div class="poster-tag"
+                                data-i18n="login_hero.poster1_tag">Action ·
+                                2025</div>
+                        </div>
+                    </article>
+                    <article class="poster poster-2">
+                        <div class="poster-info">
+                            <div class="poster-title">Echoes of Stars</div>
+                            <div class="poster-tag"
+                                data-i18n="login_hero.poster2_tag">Science
+                                Fiction</div>
+                        </div>
+                    </article>
+                    <article class="poster poster-3">
+                        <div class="poster-info">
+                            <div class="poster-title">Hidden Notes</div>
+                            <div class="poster-tag"
+                                data-i18n="login_hero.poster3_tag">Psychological
+                                · Music</div>
+                        </div>
+                    </article>
                 </div>
-            </article>
+            </section>
+
+            <section class="login-container">
+                <div class="login-header">
+                    <div>
+                        <h2 data-i18n="auth.login">Login</h2>
+                        <p class="login-caption"
+                            data-i18n="auth.login_caption">Continue your movie
+                            journey.</p>
+                    </div>
+                    <div class="badge">
+                        <span class="badge-dot"></span>
+                        Online 24/7
+                    </div>
+                </div>
+
+                <form id="loginForm">
+                    <div class="field">
+                        <div class="field-label" data-i18n="auth.username">User
+                            Name</div>
+                        <input type="text" id="username"
+                            data-i18n-placeholder="auth.username_placeholder"
+                            placeholder="Your Username" required>
+                    </div>
+                    <div class="field">
+                        <div class="field-label"
+                            data-i18n="auth.password">Password</div>
+                        <input type="password" id="password"
+                            placeholder="••••••••" required>
+                    </div>
+
+                    <button type="submit" id="loginBtn" class="btn-primary"
+                        data-i18n="auth.login_button">Start Watching
+                        Now</button>
+
+                    <div class="helper-row">
+                        <span data-i18n="auth.no_account">Don't have an
+                            account?</span>
+                        <a href="register.html" data-i18n="auth.signup">Sign
+                            Up</a>
+                        <a href="forgot-password.html"
+                            data-i18n="auth.forgot_password">Forgot
+                            Password?</a>
+                    </div>
+                </form>
+
+                <div class="divider"><span>or</span></div>
+
+                <button class="btn-google" id="googleBtn" type="button">
+                    <svg width="18" height="18" viewBox="0 0 48 48"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#EA4335"
+                            d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+                        <path fill="#4285F4"
+                            d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+                        <path fill="#FBBC05"
+                            d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+                        <path fill="#34A853"
+                            d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+                        <path fill="none" d="M0 0h48v48H0z" />
+                    </svg>
+                    Continue with Google
+                </button>
+
+                <p id="error" class="error"></p>
+            </section>
         </div>
-    </section>
 
-    <section class="login-container">
-        <div class="login-header">
-            <div>
-                <h2 data-i18n="auth.login">Login</h2>
-                <p class="login-caption" data-i18n="auth.login_caption">Continue your movie journey.</p>
-            </div>
-            <div class="badge">
-                <span class="badge-dot"></span>
-                Online 24/7
-            </div>
+        <!-- Hidden Google Identity Services container (used for token callback) -->
+        <div id="g_id_onload"
+            data-client_id="849376005522-l2oe13172l2o9dklrqstm6i5mmcahukg.apps.googleusercontent.com"
+            data-callback="handleGoogleCredential"
+            data-auto_prompt="false">
         </div>
 
-        <form id="loginForm">
-            <div class="field">
-                <div class="field-label" data-i18n="auth.username">User Name</div>
-                <input type="text" id="username" data-i18n-placeholder="auth.username_placeholder" placeholder="Your Username" required>
-            </div>
-            <div class="field">
-                <div class="field-label" data-i18n="auth.password">Password</div>
-                <input type="password" id="password" placeholder="••••••••" required>
-            </div>
+        <script src="/js/i18n.js"></script>
+        <script>
+    // ── Helpers ──────────────────────────────────────────────────────────────
 
-            <button type="submit" data-i18n="auth.login_button">Start Watching Now</button>
+    function setLoading(loading) {
+        document.getElementById("loginBtn").disabled = loading;
+        document.getElementById("googleBtn").disabled = loading;
+        document.getElementById("loginBtn").textContent = loading ? "Signing in..." : "Start Watching Now";
+    }
 
-            <div class="helper-row">
-                <span data-i18n="auth.no_account">Don't have an account?</span>
-                <a href="register.html" data-i18n="auth.signup">Sign Up</a>
+    function showError(msg) {
+        document.getElementById("error").innerText = msg;
+    }
 
-                <a href="forgot-password.html" data-i18n="auth.forgot_password">
-                    Forgot Password?
-                </a>
-            </div>
-        </form>
+    function clearError() {
+        document.getElementById("error").innerText = "";
+    }
 
-        <p id="error" class="error"></p>
-    </section>
-</div>
-<script src="/js/i18n.js"></script>
-<script>
+    function handleLoginResponse(data, usernameHint) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("username", usernameHint || data.username || "");
+        localStorage.setItem("role", data.role || "");
+        localStorage.setItem("region", data.region || "");
+
+        if (data.requirePublicIp === true) {
+            window.location.href = "detect-region.html";
+            return;
+        }
+
+        const role = (data.role || "").toUpperCase();
+        window.location.href = role.includes("ADMIN") ? "admin.html" : "homepage.html";
+    }
+
+    // ── Normal login ─────────────────────────────────────────────────────────
+
     document.getElementById("loginForm").addEventListener("submit", async function (e) {
         e.preventDefault();
+        clearError();
 
-        const username = document.getElementById("username").value;
+        const username = document.getElementById("username").value.trim();
         const password = document.getElementById("password").value;
 
+        if (!username || !password) {
+            showError("Please enter both username and password.");
+            return;
+        }
+
+        setLoading(true);
         try {
             const response = await fetch("/api/auth/login", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password })
             });
 
             if (!response.ok) {
-                document.getElementById("error").innerText = "Invalid username or password";
+                const body = await response.json().catch(() => ({}));
+                showError(body.message || "Invalid username or password.");
                 return;
             }
 
             const data = await response.json();
+            handleLoginResponse(data, username);
+        } catch (err) {
+            showError("Có lỗi xảy ra, vui lòng thử lại.");
+        } finally {
+            setLoading(false);
+        }
+    });
 
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("username", username);
-            localStorage.setItem("role", data.role || "");
-            localStorage.setItem("region", data.region || "");
+    // ── Google login ──────────────────────────────────────────────────────────
 
-            if (data.requirePublicIp === true) {
-                window.location.href = "detect-region.html";
+    // Called by the Google Identity Services library after the user picks an account
+    async function handleGoogleCredential(response) {
+        clearError();
+        setLoading(true);
+        try {
+            const res = await fetch("/api/auth/google", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ idToken: response.credential })
+            });
+
+            if (!res.ok) {
+                const body = await res.json().catch(() => ({}));
+                showError(body.message || "Google login failed. Please try again.");
                 return;
             }
 
-            const role = (data.role || '').toUpperCase();
-            if (role.includes('ADMIN')) {
-                window.location.href = 'admin.html';
-            } else {
-                window.location.href = 'homepage.html';
-            }
+            const data = await res.json();
+            handleLoginResponse(data, null);
         } catch (err) {
-            document.getElementById("error").innerText = "Có lỗi xảy ra, vui lòng thử lại.";
+            showError("Google login error. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    // Trigger the Google One Tap / popup when the button is clicked
+    document.getElementById("googleBtn").addEventListener("click", function () {
+        clearError();
+        if (typeof google !== "undefined" && google.accounts) {
+            google.accounts.id.prompt();
+        } else {
+            showError("Google Sign-In is not available. Please try again shortly.");
         }
     });
 </script>
 
-</body>
+    </body>
 </html>

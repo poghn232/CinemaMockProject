@@ -57,6 +57,7 @@ public class SecurityConfig {
                                 "/api/movies/**", "/api/contact",
                                 "/api/public/**", "/i18n/**",
                                 "/api/user/history/**",
+                                "/api/auth/google",
 
                                 // ✅ VNPay callbacks
                                 "/api/vnpay/**",

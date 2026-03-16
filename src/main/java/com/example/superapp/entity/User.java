@@ -24,8 +24,11 @@ public class User {
     @Column(nullable = false, unique = true)
     private String username;
 
-    @Column(nullable = false)
-    private String password; // hashed password
+    @Column(nullable = true)  // null for Google-login users
+    private String password;
+
+    @Column(nullable = true, unique = true)
+    private String googleId;  // set only for Google-login users
 
     @Column(nullable = false)
     private String role;
@@ -37,6 +40,6 @@ public class User {
     private List<Review> reviews;
 
     @Column(nullable = false)
-    private Boolean enabled = true; // if false, user cannot authenticate
+    private Boolean enabled = true;
 
 }

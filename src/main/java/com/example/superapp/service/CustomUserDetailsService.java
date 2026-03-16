@@ -17,7 +17,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        String u = username.trim(); // rất nên trim
+        String u = username.trim();
         User user = userRepository.findByUsername(u)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
@@ -25,24 +25,23 @@ public class CustomUserDetailsService implements UserDetailsService {
         System.out.println("DB password = " + user.getPassword());
         System.out.println("DB pass len = " + (user.getPassword() == null ? 0 : user.getPassword().length()));
 
-    // Normalize role: Spring's .roles(...) will add the "ROLE_" prefix.
-    // If the role stored in DB already contains "ROLE_", strip it first to avoid "ROLE_ROLE_...".
-    String rawRole = user.getRole();
-    String roleForSpring = "CUSTOMER"; // default
-    if (rawRole != null && !rawRole.isBlank()) {
-        rawRole = rawRole.trim();
-        if (rawRole.startsWith("ROLE_")) {
-            roleForSpring = rawRole.substring(5);
-        } else {
-            roleForSpring = rawRole;
+        String rawRole = user.getRole();
+        String roleForSpring = "CUSTOMER";
+        if (rawRole != null && !rawRole.isBlank()) {
+            rawRole = rawRole.trim();
+            roleForSpring = rawRole.startsWith("ROLE_") ? rawRole.substring(5) : rawRole;
         }
-    }
 
-    return org.springframework.security.core.userdetails.User
-        .withUsername(user.getUsername())
-        .password(user.getPassword())
-        .roles(roleForSpring)
-        .disabled(user.getEnabled() == null ? false : !user.getEnabled())
-        .build();
+        // Google-login users have no password — use a blank placeholder.
+        // Spring Security won't check it because we issue our JWT directly
+        // in AuthController without going through AuthenticationManager.
+        String password = user.getPassword() != null ? user.getPassword() : "";
+
+        return org.springframework.security.core.userdetails.User
+                .withUsername(user.getUsername())
+                .password(password)
+                .roles(roleForSpring)
+                .disabled(user.getEnabled() == null ? false : !user.getEnabled())
+                .build();
     }
 }
