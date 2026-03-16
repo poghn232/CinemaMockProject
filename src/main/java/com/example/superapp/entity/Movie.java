@@ -79,4 +79,9 @@ public class Movie {
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
     private Set<MovieCredit> credits = new HashSet<>();
+
+    @Override
+    public String toString() {
+        return "Movie " + title;
+    }
 }

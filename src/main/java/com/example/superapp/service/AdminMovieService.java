@@ -1,17 +1,11 @@
 package com.example.superapp.service;
 
 import com.example.superapp.dto.AdminMovieDto;
+import com.example.superapp.entity.AdminLogs;
+import com.example.superapp.entity.Episode;
 import com.example.superapp.entity.Movie;
 import com.example.superapp.entity.TvSeries;
-import com.example.superapp.repository.MovieRepository;
-import com.example.superapp.repository.TvSeriesRepository;
-import com.example.superapp.repository.SeasonRepository;
-import com.example.superapp.repository.EpisodeRepository;
-import com.example.superapp.repository.GenreRepository;
-import com.example.superapp.repository.PersonRepository;
-import com.example.superapp.repository.MovieCreditRepository;
-import com.example.superapp.repository.StudioRepository;
-import com.example.superapp.repository.TvCreditRepository;
+import com.example.superapp.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +32,7 @@ public class AdminMovieService {
     private final StudioRepository studioRepository;
     private final TvCreditRepository tvCreditRepository;
     private final TmdbService tmdbService;
+    private final AdminLogsRepository adminLogsRepository;
 
     @Transactional(readOnly = true)
     public List<AdminMovieDto> listPublished(String query) {
@@ -258,6 +253,7 @@ public class AdminMovieService {
             } catch (Exception ignored) {}
 
             TvSeries saved = tvSeriesRepository.save(tv);
+            adminLogsRepository.save(new AdminLogs(saved.toString() + "is added to database"));
 
             // persist credits after tv has an id and set proper tv reference + composite id
             try {
@@ -287,6 +283,7 @@ public class AdminMovieService {
             tv.setActive(true);
             tv.setPublished(true);
             existing = tvSeriesRepository.save(tv);
+            adminLogsRepository.save(new AdminLogs(existing.toString() + "is added to database"));
         }
 
         // fetch episode details via TMDB API: /tv/{tv_id}/season/{season_number}/episode/{episode_number}
@@ -311,6 +308,7 @@ public class AdminMovieService {
             season.setId(seasonId);
             season.setSeasonNumber(seasonNumber);
             season.setTvSeries(existing);
+            adminLogsRepository.save(new AdminLogs(season.toString()));
             seasonRepository.save(season);
         }
 
@@ -339,7 +337,8 @@ public class AdminMovieService {
         Object va = epRaw.get("vote_average"); if (va instanceof Number nv) episode.setVoteAverage(nv.doubleValue());
         episode.setSeason(season);
         episode.setPublished(true); // Set published by default when importing
-        episodeRepository.save(episode);
+        Episode saved = episodeRepository.save(episode);
+        adminLogsRepository.save(new AdminLogs(saved.toString() + " - " + saved.getSeason().toString() + " - " + saved.getSeason().getTvSeries().toString() + " is added to database"));
 
         return new AdminMovieDto(existing.getId(), existing.getName(), "tv", Boolean.TRUE.equals(existing.getPublished()), Boolean.TRUE.equals(existing.getActive()), existing.getSrc());
     }
@@ -361,11 +360,13 @@ public class AdminMovieService {
         if (t.equals("movie")) {
             movieRepository.findById(tmdbId).ifPresent(m -> {
                 m.setPublished(false);
+                adminLogsRepository.save(new AdminLogs(m.toString() + " is now hidden"));
                 movieRepository.save(m);
             });
         } else if (t.equals("tv")) {
             tvSeriesRepository.findById(tmdbId).ifPresent(tv -> {
                 tv.setPublished(false);
+                adminLogsRepository.save(new AdminLogs(tv.toString() + " is now hidden"));
                 tvSeriesRepository.save(tv);
             });
         } else {
@@ -380,6 +381,13 @@ public class AdminMovieService {
         com.example.superapp.entity.Episode episode = episodeRepository.findById(epId).orElse(null);
         if (episode != null) {
             episode.setPublished(Boolean.TRUE.equals(episode.getPublished()) ? false : true);
+
+            if (episode.getPublished()) {
+                adminLogsRepository.save(new AdminLogs(episode.toString() + "is now publish"));
+            } else {
+                adminLogsRepository.save(new AdminLogs(episode.toString() + "is now private"));
+            }
+
             episodeRepository.save(episode);
         }
     }
@@ -390,6 +398,7 @@ public class AdminMovieService {
         com.example.superapp.entity.Episode episode = episodeRepository.findById(epId).orElse(null);
         if (episode != null) {
             episode.setSrc(src);
+            adminLogsRepository.save(new AdminLogs(episode.toString() + "is now private"));
             episodeRepository.save(episode);
         }
     }
@@ -398,6 +407,7 @@ public class AdminMovieService {
         Movie movie = movieRepository.findById(movieId).orElse(null);
         if (movie != null) {
             movie.setSrc(src);
+            adminLogsRepository.save(new AdminLogs(movie.toString() + "'s trailer initialized"));
             movieRepository.save(movie);
         }
     }
@@ -449,9 +459,11 @@ public class AdminMovieService {
                         if (genre == null) {
                             genre = new com.example.superapp.entity.Genre(gid, gname);
                             genreRepository.save(genre);
+                            adminLogsRepository.save(new AdminLogs(genre.toString() + "is added to database"));
                         } else if (!gname.equals(genre.getName())) {
                             genre.setName(gname);
                             genreRepository.save(genre);
+                            adminLogsRepository.save(new AdminLogs(genre.toString() + "is added to database"));
                         }
                         m.getGenres().add(genre);
                     }
@@ -477,6 +489,7 @@ public class AdminMovieService {
                         if (studio == null) {
                             studio = com.example.superapp.entity.Studio.builder()
                                     .id(sid).name(sname).logoPath(logoPath).originCountry(originCountry).build();
+                            adminLogsRepository.save(new AdminLogs(studio.toString() + "is added to database"));
                             studioRepository.save(studio);
                         } else {
                             boolean changed = false;
@@ -484,6 +497,7 @@ public class AdminMovieService {
                             if (logoPath != null && !logoPath.equals(studio.getLogoPath())) { studio.setLogoPath(logoPath); changed = true; }
                             if (originCountry != null && !originCountry.equals(studio.getOriginCountry())) { studio.setOriginCountry(originCountry); changed = true; }
                             if (changed) studioRepository.save(studio);
+                            adminLogsRepository.save(new AdminLogs(studio.toString() + "is modified"));
                         }
                         m.getStudios().add(studio);
                     }
@@ -516,11 +530,13 @@ public class AdminMovieService {
                             person.setName(pname);
                             person.setProfilePath(profilePath);
                             personRepository.save(person);
+                            adminLogsRepository.save(new AdminLogs(person.getName() + " is added to database"));
                         } else {
                             boolean changed = false;
                             if (!pname.equals(person.getName())) { person.setName(pname); changed = true; }
                             if (profilePath != null && !profilePath.equals(person.getProfilePath())) { person.setProfilePath(profilePath); changed = true; }
                             if (changed) personRepository.save(person);
+                            adminLogsRepository.save(new AdminLogs(person.getName() + " is modified"));
                         }
 
                         // create MovieCredit link (Movie not persisted yet, so set id later by save cascade)
@@ -583,9 +599,11 @@ public class AdminMovieService {
                         if (genre == null) {
                             genre = new com.example.superapp.entity.Genre(gid, gname);
                             genreRepository.save(genre);
+                            adminLogsRepository.save(new AdminLogs(genre.toString() + "is added to database"));
                         } else if (!gname.equals(genre.getName())) {
                             genre.setName(gname);
                             genreRepository.save(genre);
+                            adminLogsRepository.save(new AdminLogs(genre.toString() + "is added to database"));
                         }
                         tv.getGenres().add(genre);
                     }
@@ -613,12 +631,14 @@ public class AdminMovieService {
                             studio = com.example.superapp.entity.Studio.builder()
                                     .id(sid).name(sname).logoPath(logoPath).originCountry(originCountry).build();
                             studioRepository.save(studio);
+                            adminLogsRepository.save(new AdminLogs(studio.toString() + "is added to database"));
                         } else {
                             boolean changed = false;
                             if (!sname.equals(studio.getName())) { studio.setName(sname); changed = true; }
                             if (logoPath != null && !logoPath.equals(studio.getLogoPath())) { studio.setLogoPath(logoPath); changed = true; }
                             if (originCountry != null && !originCountry.equals(studio.getOriginCountry())) { studio.setOriginCountry(originCountry); changed = true; }
                             if (changed) studioRepository.save(studio);
+                            adminLogsRepository.save(new AdminLogs(studio.toString() + "is modified"));
                         }
                         tv.getStudios().add(studio);
                     }
@@ -651,11 +671,13 @@ public class AdminMovieService {
                             person.setName(pname);
                             person.setProfilePath(profilePath);
                             personRepository.save(person);
+                            adminLogsRepository.save(new AdminLogs(person.getName() + " is added to database"));
                         } else {
                             boolean changed = false;
                             if (!pname.equals(person.getName())) { person.setName(pname); changed = true; }
                             if (profilePath != null && !profilePath.equals(person.getProfilePath())) { person.setProfilePath(profilePath); changed = true; }
                             if (changed) personRepository.save(person);
+                            adminLogsRepository.save(new AdminLogs(person.getName() + " is modified"));
                         }
 
                         // create TvCredit link (TvSeries not persisted yet, so set id later)

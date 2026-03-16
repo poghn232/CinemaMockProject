@@ -1,7 +1,9 @@
 package com.example.superapp.controller;
 
 import com.example.superapp.dto.UserAdminDto;
+import com.example.superapp.entity.AdminLogs;
 import com.example.superapp.entity.User;
+import com.example.superapp.repository.AdminLogsRepository;
 import com.example.superapp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class AdminUserController {
 
     private final UserRepository userRepository;
+    private final AdminLogsRepository adminLogsRepository;
 
     @GetMapping
     public List<UserAdminDto> all() {
@@ -36,6 +39,7 @@ public class AdminUserController {
     }
     u.setEnabled(enabled);
         User saved = userRepository.save(u);
+        adminLogsRepository.save(new AdminLogs("User" + saved.getUsername() + "is enabled"));
         return new UserAdminDto(saved.getUserId(), saved.getUsername(), saved.getEmail(), saved.getRole(), saved.getEnabled());
     }
 }

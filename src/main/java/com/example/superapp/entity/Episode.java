@@ -34,4 +34,9 @@ public class Episode {
     @ManyToOne
     @JoinColumn(name = "season_id")
     private Season season;
+
+    @Override
+    public String toString() {
+        return "Episode " + episodeNumber;
+    }
 }

@@ -2,6 +2,10 @@ package com.example.superapp.entity;
 
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -9,6 +13,10 @@ import java.util.Set;
 
 @Entity
 @Table(name = "tv_series")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class TvSeries {
 
     @Id
@@ -66,124 +74,8 @@ public class TvSeries {
     @OneToMany(mappedBy = "tvSeries", cascade = CascadeType.ALL)
     private Set<Season> seasons = new HashSet<>();
 
-    // genres and studios are many-to-many defined earlier; add accessors so service can modify them
-    public Set<Genre> getGenres() {
-        return genres;
-    }
-
-    public void setGenres(Set<Genre> genres) {
-        this.genres = genres;
-    }
-
-    public Set<Studio> getStudios() {
-        return studios;
-    }
-
-    public void setStudios(Set<Studio> studios) {
-        this.studios = studios;
-    }
-
-    public Set<TvCredit> getCredits() {
-        return credits;
-    }
-
-    public void setCredits(Set<TvCredit> credits) {
-        this.credits = credits;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getOverview() {
-        return overview;
-    }
-
-    public void setOverview(String overview) {
-        this.overview = overview;
-    }
-
-    public String getPosterPath() {
-        return posterPath;
-    }
-
-    public void setPosterPath(String posterPath) {
-        this.posterPath = posterPath;
-    }
-
-    public String getBackdropPath() {
-        return backdropPath;
-    }
-
-    public void setBackdropPath(String backdropPath) {
-        this.backdropPath = backdropPath;
-    }
-
-    public Double getVoteAverage() {
-        return voteAverage;
-    }
-
-    public void setVoteAverage(Double voteAverage) {
-        this.voteAverage = voteAverage;
-    }
-
-    public Integer getVoteCount() {
-        return voteCount;
-    }
-
-    public void setVoteCount(Integer voteCount) {
-        this.voteCount = voteCount;
-    }
-
-    public LocalDate getFirstAirDate() {
-        return firstAirDate;
-    }
-
-    public void setFirstAirDate(LocalDate firstAirDate) {
-        this.firstAirDate = firstAirDate;
-    }
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
-    public Boolean getPublished() {
-        return published;
-    }
-
-    public void setPublished(Boolean published) {
-        this.published = published;
-    }
-
-    public Boolean getFeatured() {
-        return featured;
-    }
-
-    public void setFeatured(Boolean featured) {
-        this.featured = featured;
-    }
-
-    public String getSrc() {
-        return src;
-    }
-
-    public void setSrc(String src) {
-        this.src = src;
+    @Override
+    public String toString() {
+        return "TV Series " + name;
     }
 }
