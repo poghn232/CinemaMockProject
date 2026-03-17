@@ -202,6 +202,19 @@
           }
         });
         actions.appendChild(detailsBtn);
+
+        // Region block button
+        const regionBtn = document.createElement("button");
+        regionBtn.className = "btn ghost";
+        regionBtn.textContent = "Region block";
+        regionBtn.addEventListener("click", async () => {
+          try {
+            await showRegionModal(f.type, f.id, f.title);
+          } catch (err) {
+            alert('Failed to open region modal: ' + err);
+          }
+        });
+        actions.appendChild(regionBtn);
         row.appendChild(info);
         row.appendChild(actions);
         container.appendChild(row);
@@ -337,6 +350,102 @@
       table.appendChild(tbody);
       container.appendChild(table);
       pageInfo.textContent = `Page ${tmdbPage} / ${Math.max(1, tmdbTotalPages)}`;
+    }
+
+    // --- Region modal support ---
+    // Minimal country list (ISO code -> name). Expand as needed.
+    const countryList = [
+      {code: 'US', name: 'United States'},
+      {code: 'GB', name: 'United Kingdom'},
+      {code: 'CA', name: 'Canada'},
+      {code: 'AU', name: 'Australia'},
+      {code: 'DE', name: 'Germany'},
+      {code: 'FR', name: 'France'},
+      {code: 'JP', name: 'Japan'},
+      {code: 'VN', name: 'Vietnam'},
+      {code: 'IN', name: 'India'},
+      {code: 'BR', name: 'Brazil'}
+    ];
+
+    async function showRegionModal(type, id, title) {
+      // fetch existing blocked regions
+      const listUrl = `/api/admin/movies/${encodeURIComponent(type)}/${encodeURIComponent(id)}/regions`;
+      const existing = await fetchJson(listUrl);
+      const blockedSet = new Set((existing || []).map(r => (r.region || '').toUpperCase()));
+
+      const overlay = document.createElement('div');
+      overlay.style.position = 'fixed';
+      overlay.style.left = '0';
+      overlay.style.top = '0';
+      overlay.style.right = '0';
+      overlay.style.bottom = '0';
+      overlay.style.background = 'rgba(0,0,0,0.6)';
+      overlay.style.display = 'flex';
+      overlay.style.alignItems = 'center';
+      overlay.style.justifyContent = 'center';
+      overlay.style.zIndex = '10000';
+
+      const modal = document.createElement('div');
+      modal.style.background = '#111';
+      modal.style.padding = '18px';
+      modal.style.borderRadius = '10px';
+      modal.style.maxWidth = '720px';
+      modal.style.width = '90%';
+      modal.style.maxHeight = '80%';
+      modal.style.overflow = 'auto';
+      modal.style.color = 'white';
+
+      modal.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-weight:700">Region block for: ${title}</div><button id="closeRegionModal" class="btn ghost">Close</button></div><div id="regionGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px"></div>`;
+
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+
+      document.getElementById('closeRegionModal').addEventListener('click', () => overlay.remove());
+
+      const grid = modal.querySelector('#regionGrid');
+      grid.innerHTML = '';
+      countryList.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'btn ghost';
+        btn.style.display = 'flex';
+        btn.style.justifyContent = 'space-between';
+        btn.style.alignItems = 'center';
+        btn.textContent = c.name;
+        const codeSpan = document.createElement('span');
+        codeSpan.style.marginLeft = '8px';
+        codeSpan.textContent = c.code;
+
+        if (blockedSet.has(c.code)) {
+          btn.style.background = '#b91c1c';
+          btn.style.color = 'white';
+          btn.dataset.blocked = '1';
+        } else {
+          btn.dataset.blocked = '0';
+        }
+
+        btn.appendChild(codeSpan);
+
+        btn.addEventListener('click', async () => {
+          try {
+            const toggleUrl = `/api/admin/movies/${encodeURIComponent(type)}/${encodeURIComponent(id)}/regions/${encodeURIComponent(c.code)}`;
+            await fetchJson(toggleUrl, { method: 'PUT' });
+            // flip UI state
+            if (btn.dataset.blocked === '1') {
+              btn.dataset.blocked = '0';
+              btn.style.background = '';
+              btn.style.color = '';
+            } else {
+              btn.dataset.blocked = '1';
+              btn.style.background = '#b91c1c';
+              btn.style.color = 'white';
+            }
+          } catch (err) {
+            alert('Failed to toggle region: ' + err);
+          }
+        });
+
+        grid.appendChild(btn);
+      });
     }
 
     async function loadTmdb() {

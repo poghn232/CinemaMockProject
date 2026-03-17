@@ -97,6 +97,17 @@ public class AdminMovieController {
         }
     }
 
+    // REGION BLOCK endpoints
+    @GetMapping("/{type}/{id}/regions")
+    public java.util.List<java.util.Map<String, Object>> listRegions(@PathVariable("type") String type, @PathVariable("id") long id) {
+        return adminMovieService.listRegionBlocks(type, id);
+    }
+
+    @PutMapping("/{type}/{id}/regions/{regionCode}")
+    public void toggleRegionBlock(@PathVariable("type") String type, @PathVariable("id") long id, @PathVariable("regionCode") String regionCode) {
+        adminMovieService.toggleRegionBlock(type, id, regionCode);
+    }
+
     @PutMapping("/tv/{tvId}/seasons/{seasonNumber}/episodes/{episodeNumber}/trailer")
     public void setEpisodeTrailer(@PathVariable("tvId") long tvId,
                                   @PathVariable("seasonNumber") int seasonNumber,

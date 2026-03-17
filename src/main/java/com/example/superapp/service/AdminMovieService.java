@@ -39,6 +39,8 @@ public class AdminMovieService {
     private final TvCreditRepository tvCreditRepository;
     private final TmdbService tmdbService;
     private final org.springframework.context.ApplicationEventPublisher eventPublisher;
+    private final com.example.superapp.repository.MovieRegionBlockRepository movieRegionBlockRepository;
+    private final com.example.superapp.repository.TvRegionBlockRepository tvRegionBlockRepository;
 
     @Transactional(readOnly = true)
     public List<AdminMovieDto> listPublished(String query) {
@@ -397,6 +399,65 @@ public class AdminMovieService {
                         movie.getId(), "movie", movie.getTitle(), movie.getPosterPath(), "NEW_TRAILER"
                 ));
             }
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public java.util.List<java.util.Map<String, Object>> listRegionBlocks(String type, long id) {
+        String t = (type == null ? "movie" : type.trim().toLowerCase());
+        java.util.List<java.util.Map<String, Object>> out = new java.util.ArrayList<>();
+        if (t.equals("movie")) {
+            java.util.List<com.example.superapp.entity.MovieRegionBlock> blocks = movieRegionBlockRepository.findByMovie_Id(id);
+            for (com.example.superapp.entity.MovieRegionBlock b : blocks) {
+                java.util.Map<String, Object> m = new java.util.HashMap<>();
+                m.put("region", b.getRegionCode());
+                m.put("blocked", true);
+                out.add(m);
+            }
+        } else if (t.equals("tv")) {
+            java.util.List<com.example.superapp.entity.TvRegionBlock> blocks = tvRegionBlockRepository.findByTvSeries_Id(id);
+            for (com.example.superapp.entity.TvRegionBlock b : blocks) {
+                java.util.Map<String, Object> m = new java.util.HashMap<>();
+                m.put("region", b.getRegionCode());
+                m.put("blocked", true);
+                out.add(m);
+            }
+        } else {
+            throw new IllegalArgumentException("type must be 'movie' or 'tv'");
+        }
+        return out;
+    }
+
+    @Transactional
+    public void toggleRegionBlock(String type, long id, String regionCode) {
+        if (regionCode == null || regionCode.isBlank()) return;
+        String region = regionCode.trim().toUpperCase();
+        String t = (type == null ? "movie" : type.trim().toLowerCase());
+
+        if (t.equals("movie")) {
+            com.example.superapp.entity.Movie m = movieRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Movie not found"));
+            java.util.Optional<com.example.superapp.entity.MovieRegionBlock> existing = movieRegionBlockRepository.findByMovie_IdAndRegionCode(id, region);
+            if (existing.isPresent()) {
+                movieRegionBlockRepository.deleteByMovie_IdAndRegionCode(id, region);
+            } else {
+                com.example.superapp.entity.MovieRegionBlock b = new com.example.superapp.entity.MovieRegionBlock();
+                b.setRegionCode(region);
+                b.setMovie(m);
+                movieRegionBlockRepository.save(b);
+            }
+        } else if (t.equals("tv")) {
+            com.example.superapp.entity.TvSeries tv = tvSeriesRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("TV not found"));
+            java.util.Optional<com.example.superapp.entity.TvRegionBlock> existing = tvRegionBlockRepository.findByTvSeries_IdAndRegionCode(id, region);
+            if (existing.isPresent()) {
+                tvRegionBlockRepository.deleteById(existing.get().getId());
+            } else {
+                com.example.superapp.entity.TvRegionBlock b = new com.example.superapp.entity.TvRegionBlock();
+                b.setRegionCode(region);
+                b.setTvSeries(tv);
+                tvRegionBlockRepository.save(b);
+            }
+        } else {
+            throw new IllegalArgumentException("type must be 'movie' or 'tv'");
         }
     }
 

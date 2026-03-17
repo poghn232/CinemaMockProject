@@ -31,7 +31,21 @@ public class ApiExceptionHandler {
                 }
             }
         }
-        if (reason == null) reason = statusCode.getReasonPhrase();
+        if (reason == null) {
+            // HttpStatusCode may not expose a reason phrase method; try to resolve to HttpStatus
+            String rp = null;
+            try {
+                if (statusCode instanceof HttpStatus hs) {
+                    rp = hs.getReasonPhrase();
+                } else {
+                    HttpStatus resolved = HttpStatus.resolve(statusCode.value());
+                    if (resolved != null) rp = resolved.getReasonPhrase();
+                }
+            } catch (Exception ignored) {
+            }
+            if (rp == null || rp.isBlank()) rp = statusCode.toString();
+            reason = rp;
+        }
         Map<String, Object> body = Map.of(
                 "message", reason,
                 "timestamp", LocalDateTime.now().toString(),
