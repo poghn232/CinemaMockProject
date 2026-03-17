@@ -2,6 +2,7 @@ package com.example.superapp.controller;
 
 import com.example.superapp.entity.Banner;
 import com.example.superapp.service.BannerService;
+import com.example.superapp.utils.ImageUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +21,8 @@ public class AdminBannerController {
     public void replaceLeftBanner(@RequestParam("file")MultipartFile file,
                                   @RequestParam String toURL) throws IOException {
         Banner left = service.getBannerById(2);
-        left.setData(file.getBytes());
+        byte[] resizedImage = ImageUtil.resizeImage(file, 160, 600);
+        left.setData(resizedImage);
         left.setToURL(toURL);
         service.save(left);
     }
@@ -30,7 +32,8 @@ public class AdminBannerController {
     public void replaceRightBanner(@RequestParam("file")MultipartFile file,
                                   @RequestParam String toURL) throws IOException {
         Banner right = service.getBannerById(3);
-        right.setData(file.getBytes());
+        byte[] resizedImage = ImageUtil.resizeImage(file, 160, 600);
+        right.setData(resizedImage);
         right.setToURL(toURL);
         service.save(right);
     }
@@ -40,7 +43,8 @@ public class AdminBannerController {
     public void replaceBottomBanner(@RequestParam("file")MultipartFile file,
                                   @RequestParam String toURL) throws IOException {
         Banner bottom = service.getBannerById(1);
-        bottom.setData(file.getBytes());
+        byte[] resizedImage = ImageUtil.resizeImage(file, 728, 90);
+        bottom.setData(resizedImage);
         bottom.setToURL(toURL);
         service.save(bottom);
     }
