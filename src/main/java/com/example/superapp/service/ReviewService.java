@@ -14,6 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -52,25 +56,30 @@ public class ReviewService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        Review review;
-        if (movieId != null) {
-            Movie movie = movieRepository.findById(movieId)
-                    .orElseThrow(() -> new IllegalArgumentException("Movie not found"));
-            Optional<Review> existing = reviewRepository.findByMovieIdAndUser_Username(movieId, username);
-            review = existing.orElseGet(Review::new);
-            review.setMovie(movie);
-        } else {
-            Episode episode = episodeRepository.findById(episodeId)
-                    .orElseThrow(() -> new IllegalArgumentException("Episode not found"));
-            Optional<Review> existing = reviewRepository.findByEpisodeIdAndUser_Username(episodeId, username);
-            review = existing.orElseGet(Review::new);
-            review.setEpisode(episode);
+        // Block commenting for users flagged as commentDisabled
+        if (Boolean.TRUE.equals(user.getCommentDisabled())) {
+            // friendlier, more natural message returned to clients
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't post comments right now.");
         }
 
-        review.setUser(user);
+    // Always create a new Review row so a user can post multiple comments
+    Review review = new Review();
+    if (movieId != null) {
+        Movie movie = movieRepository.findById(movieId)
+            .orElseThrow(() -> new IllegalArgumentException("Movie not found"));
+        review.setMovie(movie);
+    } else {
+        Episode episode = episodeRepository.findById(episodeId)
+            .orElseThrow(() -> new IllegalArgumentException("Episode not found"));
+        review.setEpisode(episode);
+    }
+
+    review.setUser(user);
         // keep rating field present to satisfy schema; default to 0 for comments
         review.setRating(0);
-        review.setComment(comment == null ? null : comment.trim());
+    review.setComment(comment == null ? null : comment.trim());
+    // When a user posts or updates a comment, ensure it's visible (clear hidden flag)
+    review.setHidden(false);
         if (review.getReviewId() == null) {
             review.setCreatedDate(LocalDateTime.now());
         }
@@ -88,7 +97,9 @@ public class ReviewService {
         } else {
             return List.of();
         }
-        reviews = new java.util.ArrayList<>(reviews); // Make mutable
+    reviews = new java.util.ArrayList<>(reviews); // Make mutable
+    // Remove hidden reviews so they don't appear to viewers
+    reviews.removeIf(r -> Boolean.TRUE.equals(r.getHidden()));
         reviews.sort(java.util.Comparator.comparing(Review::getCreatedDate, java.util.Comparator.nullsLast(java.util.Comparator.reverseOrder())));
         return reviews;
     }

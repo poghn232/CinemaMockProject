@@ -7,17 +7,7 @@ import org.hibernate.annotations.Check;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(
-    name = "reviews",
-    uniqueConstraints = {
-        @UniqueConstraint(
-            columnNames = {"user_id", "episode_id"}
-        ),
-        @UniqueConstraint(
-            columnNames = {"user_id", "movie_id"}
-        )
-    }
-)
+@Table(name = "reviews")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -38,6 +28,10 @@ public class Review {
 
     @Column(nullable = false)
     private LocalDateTime createdDate;
+
+    @Column(name = "hidden")
+    @Builder.Default
+    private Boolean hidden = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

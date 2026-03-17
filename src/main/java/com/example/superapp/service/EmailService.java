@@ -208,4 +208,14 @@ public class EmailService {
 
         mailSender.send(message);
     }
+
+    // small helper to send arbitrary HTML email
+    public void sendCustomHtml(String to, String subject, String html) throws Exception {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(html, true);
+        mailSender.send(message);
+    }
 }

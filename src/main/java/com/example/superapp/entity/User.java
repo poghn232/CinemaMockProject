@@ -42,4 +42,8 @@ public class User {
     @Column(nullable = false)
     private Boolean enabled = true;
 
+    @Column(name = "comment_disabled", nullable = false)
+    @Builder.Default
+    private Boolean commentDisabled = false; // if true, user cannot post comments
+
 }

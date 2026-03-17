@@ -1,6 +1,6 @@
 <div class="card">
   <h2 data-i18n="admin.users">Users</h2>
-  <div class="muted" data-i18n="admin.user_toggle">Toggle to disable login for an user</div>
+  <div class="muted" data-i18n="admin.user_toggle">Use the switch to allow or prevent a user from commenting (ON = comments allowed)</div>
   <div style="display: flex; gap: 8px; margin-top: 12px; align-items: center">
     <input
       id="userSearch"
@@ -12,7 +12,7 @@
     <select id="userSortField" style="padding: 8px; border-radius: 8px">
       <option value="username" data-i18n="profile.username">Username</option>
       <option value="role" data-i18n="profile.username">Role</option>
-      <option value="enabled" data-i18n="admin.enabled">Enabled</option>
+  <option value="commentDisabled" data-i18n="admin.enabled">Commenting disabled</option>
     </select>
 
     <button id="userSortDir" class="btn ghost" data-dir="asc">↑</button>
@@ -56,8 +56,8 @@
         list.sort((a, b) => (a.username || "").localeCompare(b.username || ""));
       } else if (field === "role") {
         list.sort((a, b) => (a.role || "").localeCompare(b.role || ""));
-      } else if (field === "enabled") {
-        list.sort((a, b) => (a.enabled ? 1 : 0) - (b.enabled ? 1 : 0));
+      } else if (field === "commentDisabled") {
+        list.sort((a, b) => (a.commentDisabled ? 1 : 0) - (b.commentDisabled ? 1 : 0));
       }
 
       if (dir === "desc") {
@@ -83,23 +83,27 @@
         meta.className = "user-meta";
         meta.innerHTML = `<div class="user-name">${u.username} <span class="muted">(${u.role})</span></div><div class="user-email">${u.email}</div>`;
         // Toggle switch for enabling/disabling user
-        const toggle = document.createElement("div");
-        toggle.className = "toggle" + (u.enabled ? " on" : "");
+  const toggle = document.createElement("div");
+  // visual: ON means user CAN comment (i.e. commentDisabled == false)
+  toggle.className = "toggle" + (!u.commentDisabled ? " on" : "");
         const knob = document.createElement("div");
         knob.className = "knob";
         toggle.appendChild(knob);
         // Toggle click event (enable/disable user)
         toggle.addEventListener("click", async () => {
           try {
-            toggle.classList.toggle("on");
-            await fetchJson(api.users + "/" + u.userId + "/enabled", {
+            // Determine the new stored value for commentDisabled
+            const newCommentDisabled = !u.commentDisabled;
+            // Send the desired value to server (do not invert)
+            const updated = await fetchJson(api.users + "/" + u.userId + "/enabled", {
               method: "PUT",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(!u.enabled),
+              body: JSON.stringify(newCommentDisabled),
             });
-            u.enabled = !u.enabled;
-            window.adminApi.refreshCounts();// Update dashboard counts
-            renderUsers();// Re-render list
+            // Update UI from the server response to reflect persisted state
+            u.commentDisabled = Boolean(updated && updated.commentDisabled);
+            window.adminApi.refreshCounts(); // Update dashboard counts
+            renderUsers(); // Re-render list
           } catch (e) {
             alert("Error toggling user: " + e);
             loadUsers();
