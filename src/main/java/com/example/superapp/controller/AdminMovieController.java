@@ -85,7 +85,7 @@ public class AdminMovieController {
     public void toggleEpisodePublish(@PathVariable("tvId") long tvId,
                                      @PathVariable("seasonNumber") int seasonNumber,
                                      @PathVariable("episodeNumber") int episodeNumber) {
-        adminMovieService.toggleEpisodePublished(tvId, seasonNumber, episodeNumber);
+        adminMovieService.toggleEpisodePublished(tvId, seasonNumber,episodeNumber);
     }
 
     @PutMapping("/{type}/{id}/trailer")
@@ -95,6 +95,17 @@ public class AdminMovieController {
         } else {
             throw new IllegalArgumentException("Trailer setting only supported for movies");
         }
+    }
+
+    // REGION BLOCK endpoints
+    @GetMapping("/{type}/{id}/regions")
+    public java.util.List<java.util.Map<String, Object>> listRegions(@PathVariable("type") String type, @PathVariable("id") long id) {
+        return adminMovieService.listRegionBlocks(type, id);
+    }
+
+    @PutMapping("/{type}/{id}/regions/{regionCode}")
+    public void toggleRegionBlock(@PathVariable("type") String type, @PathVariable("id") long id, @PathVariable("regionCode") String regionCode) {
+        adminMovieService.toggleRegionBlock(type, id, regionCode);
     }
 
     @PutMapping("/tv/{tvId}/seasons/{seasonNumber}/episodes/{episodeNumber}/trailer")

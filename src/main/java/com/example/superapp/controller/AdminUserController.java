@@ -4,6 +4,8 @@ import com.example.superapp.dto.UserAdminDto;
 import com.example.superapp.entity.User;
 import com.example.superapp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,7 +17,10 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 public class AdminUserController {
 
+    private static final Logger log = LoggerFactory.getLogger(AdminUserController.class);
+
     private final UserRepository userRepository;
+    private final com.example.superapp.repository.ReviewRepository reviewRepository;
 
     @GetMapping
     public List<UserAdminDto> all() {
@@ -23,19 +28,36 @@ public class AdminUserController {
         .stream()
         // only return non-admin users to the admin UI
         .filter(u -> u.getRole() == null || !u.getRole().toUpperCase().contains("ADMIN"))
-        .map(u -> new UserAdminDto(u.getUserId(), u.getUsername(), u.getEmail(), u.getRole(), u.getEnabled()))
+        .map(u -> new UserAdminDto(u.getUserId(), u.getUsername(), u.getEmail(), u.getRole(), u.getCommentDisabled()))
         .toList();
     }
 
     @PutMapping("/{id}/enabled")
     public UserAdminDto setEnabled(@PathVariable Long id, @RequestBody Boolean enabled) {
+    log.info("AdminUserController.setEnabled called for id={} enabled={}", id, enabled);
         User u = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
     // disallow changing admin accounts
     if (u.getRole() != null && u.getRole().toUpperCase().contains("ADMIN")) {
         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot modify admin account");
     }
-    u.setEnabled(enabled);
+    // Toggle commenting instead of login
+    u.setCommentDisabled(enabled);
         User saved = userRepository.save(u);
-        return new UserAdminDto(saved.getUserId(), saved.getUsername(), saved.getEmail(), saved.getRole(), saved.getEnabled());
+        // If we re-enable commenting for this user, unhide their previously hidden reviews
+        if (Boolean.FALSE.equals(saved.getCommentDisabled())) {
+            try {
+                var reviews = reviewRepository.findByUser_UserId(saved.getUserId());
+                for (var r : reviews) {
+                    if (Boolean.TRUE.equals(r.getHidden())) {
+                        r.setHidden(false);
+                    }
+                }
+                reviewRepository.saveAll(reviews);
+            } catch (Exception ex) {
+                log.warn("Failed to unhide reviews for user {}: {}", saved.getUsername(), ex.getMessage());
+            }
+        }
+        log.info("User {} saved commentDisabled={}", saved.getUsername(), saved.getCommentDisabled());
+        return new UserAdminDto(saved.getUserId(), saved.getUsername(), saved.getEmail(), saved.getRole(), saved.getCommentDisabled());
     }
 }

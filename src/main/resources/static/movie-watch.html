@@ -51,7 +51,12 @@
         width: 30px;
         height: 30px;
         border-radius: 999px;
-        background: radial-gradient(circle at 30% 20%, #f97316, #e11d48 55%, #4f46e5);
+        background: radial-gradient(
+          circle at 30% 20%,
+          #f97316,
+          #e11d48 55%,
+          #4f46e5
+        );
         display: flex;
         align-items: center;
         justify-content: center;
@@ -76,6 +81,22 @@
         cursor: pointer;
       }
       .back-link:hover {
+        color: var(--text-main);
+      }
+
+      /* site button styles (shared across pages) */
+      .btn {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: none;
+        background: var(--accent);
+        color: white;
+        cursor: pointer;
+      }
+
+      .btn.ghost {
+        background: transparent;
+        border: 1px solid rgba(148, 163, 184, 0.2);
         color: var(--text-main);
       }
 
@@ -393,7 +414,7 @@
 
       <div id="loading" class="loading">Loading...</div>
 
-      <div id="content" style="display:none">
+      <div id="content" style="display: none">
         <!-- VIDEO PLAYER -->
         <div class="video-section">
           <div class="video-container">
@@ -423,8 +444,9 @@
 
         <!-- AD BANNER (shown for non-premium users) -->
         <div id="adBanner" class="ad-banner hidden">
-          <div class="ad-text">🎬 Upgrade to Premium for Ad-Free
-            Experience!</div>
+          <div class="ad-text">
+            🎬 Upgrade to Premium for Ad-Free Experience!
+          </div>
           <div class="ad-subtext">Remove ads and enjoy unlimited streaming</div>
         </div>
 
@@ -436,10 +458,13 @@
               id="commentInput"
               class="comment-input"
               placeholder="Share your thoughts about this movie..."
-              maxlength="1000"></textarea>
+              maxlength="1000"
+            ></textarea>
             <div class="comment-actions">
               <div id="charCount" class="comment-char-count">0/1000</div>
-              <button id="submitComment" class="comment-submit">Post Comment</button>
+              <button id="submitComment" class="comment-submit">
+                Post Comment
+              </button>
             </div>
           </div>
           <div id="commentError" class="comment-error hidden"></div>
@@ -452,20 +477,20 @@
 
     <script>
       console.log("movie-watch script loaded");
-      window.addEventListener('error', (event) => {
-        console.error('Global JS error:', event.error || event.message, event);
-        const commentError = document.getElementById('commentError');
+      window.addEventListener("error", (event) => {
+        console.error("Global JS error:", event.error || event.message, event);
+        const commentError = document.getElementById("commentError");
         if (commentError) {
           commentError.textContent = `Error: ${event.error || event.message}`;
-          commentError.classList.remove('hidden');
+          commentError.classList.remove("hidden");
         }
       });
-      window.addEventListener('unhandledrejection', (event) => {
-        console.error('Unhandled rejection:', event.reason);
-        const commentError = document.getElementById('commentError');
+      window.addEventListener("unhandledrejection", (event) => {
+        console.error("Unhandled rejection:", event.reason);
+        const commentError = document.getElementById("commentError");
         if (commentError) {
           commentError.textContent = `Error: ${event.reason}`;
-          commentError.classList.remove('hidden');
+          commentError.classList.remove("hidden");
         }
       });
 
@@ -492,7 +517,9 @@
 
         try {
           // Load movie details
-          const res = await fetch(`/api/public/movies/detail?type=${encodeURIComponent(type)}&id=${encodeURIComponent(id)}`);
+          const res = await fetch(
+            `/api/public/movies/detail?type=${encodeURIComponent(type)}&id=${encodeURIComponent(id)}`,
+          );
           if (!res.ok) {
             throw new Error("Failed to load movie details");
           }
@@ -502,7 +529,9 @@
           let seasonsData = [];
           if (type === "tv") {
             try {
-              const seasonsRes = await fetch(`/api/movies/tv/${encodeURIComponent(id)}/seasons`);
+              const seasonsRes = await fetch(
+                `/api/movies/tv/${encodeURIComponent(id)}/seasons`,
+              );
               if (seasonsRes.ok) {
                 seasonsData = await seasonsRes.json();
               }
@@ -514,11 +543,18 @@
           renderWatchPage(movieData, type, seasonsData, season, episode);
         } catch (e) {
           console.error(e);
-          document.getElementById("loading").textContent = "Failed to load movie.";
+          document.getElementById("loading").textContent =
+            "Failed to load movie.";
         }
       }
 
-      function renderWatchPage(movieData, type, seasonsData, selectedSeason, selectedEpisode) {
+      function renderWatchPage(
+        movieData,
+        type,
+        seasonsData,
+        selectedSeason,
+        selectedEpisode,
+      ) {
         document.title = `MovieZone | Watch ${movieData.title || "Movie"}`;
 
         // Hide loading, show content
@@ -551,13 +587,19 @@
         }
 
         if (overviewEl) {
-          overviewEl.textContent = movieData.overview || "No overview available.";
+          overviewEl.textContent =
+            movieData.overview || "No overview available.";
         }
 
         // Handle TV series vs Movie (errors here should not prevent comments from loading)
         try {
           if (type === "tv") {
-            setupTVSeries(movieData, seasonsData, selectedSeason, selectedEpisode);
+            setupTVSeries(
+              movieData,
+              seasonsData,
+              selectedSeason,
+              selectedEpisode,
+            );
           } else {
             setupMovie(movieData);
           }
@@ -566,25 +608,30 @@
         }
 
         // Check premium status and show/hide ad banner (if function exists)
-        if (typeof checkUserPremiumStatus === 'function') {
-          checkUserPremiumStatus().then(isPremium => {
-            const adBanner = document.getElementById('adBanner');
-            if (isPremium) {
-              adBanner.classList.add('hidden');
-            } else {
-              adBanner.classList.remove('hidden');
-            }
-          }).catch(e => {
-            console.warn('Premium status check failed', e);
-          });
+        if (typeof checkUserPremiumStatus === "function") {
+          checkUserPremiumStatus()
+            .then((isPremium) => {
+              const adBanner = document.getElementById("adBanner");
+              if (isPremium) {
+                adBanner.classList.add("hidden");
+              } else {
+                adBanner.classList.remove("hidden");
+              }
+            })
+            .catch((e) => {
+              console.warn("Premium status check failed", e);
+            });
         }
 
         // Start the elapsed-time tracker now that we have a video loaded.
         // Use runtime (minutes → seconds) when available; TV episodes default to 45 min.
         const runtimeSec = movieData.runtime
           ? movieData.runtime * 60
-          : (type === 'tv' ? 45 * 60 : 0);
-        if (window._startHistoryTracker) window._startHistoryTracker(runtimeSec);
+          : type === "tv"
+            ? 45 * 60
+            : 0;
+        if (window._startHistoryTracker)
+          window._startHistoryTracker(runtimeSec);
 
         // Initialize comments functionality
         initializeComments();
@@ -606,254 +653,420 @@
           commentError = document.getElementById("commentError");
           commentsList = document.getElementById("commentsList");
 
-        function setError(message) {
-          if (!commentError) return;
-          commentError.textContent = message || "";
-          commentError.classList.toggle("hidden", !message);
-        }
-
-        function updateSubmitState() {
-          // Keep the button enabled so the user can always attempt to post.
-          // The click handler will validate the comment text and show an error if needed.
-          if (submitBtn) {
-            submitBtn.disabled = false;
-          }
-        }
-
-        function renderCommentRow(review) {
-          const row = document.createElement("div");
-          row.className = "comment-row";
-
-          const content = document.createElement("div");
-          content.style.flex = "1";
-
-          const meta = document.createElement("div");
-          meta.className = "comment-meta";
-
-          const author = document.createElement("div");
-          author.className = "comment-author";
-          author.textContent = review.username || "Anonymous";
-
-          const time = document.createElement("div");
-          time.className = "comment-time";
-          if (review.createdDate) {
-            const date = new Date(review.createdDate);
-            time.textContent = date.toLocaleString();
+          function setError(message) {
+            if (!commentError) return;
+            commentError.textContent = message || "";
+            commentError.classList.toggle("hidden", !message);
           }
 
-          meta.appendChild(author);
-          meta.appendChild(time);
-
-          const text = document.createElement("div");
-          text.className = "comment-text";
-          text.textContent = review.comment || "";
-
-          content.appendChild(meta);
-          content.appendChild(text);
-
-          const actions = document.createElement("div");
-          actions.style.display = "flex";
-          actions.style.alignItems = "center";
-
-          const reportBtn = document.createElement("button");
-          reportBtn.className = "comment-report";
-          reportBtn.type = "button";
-          reportBtn.textContent = "🚩 Report";
-          reportBtn.addEventListener("click", async () => {
-            if (!localStorage.getItem("token")) {
-              alert("Please log in to report comments.");
-              return;
-            }
-            reportBtn.disabled = true;
-            try {
-              await fetch(`/api/user/reviews/${encodeURIComponent(review.reviewId)}/report`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "Authorization": `Bearer ${localStorage.getItem("token")}`
-                }
-              });
-              reportBtn.textContent = "Reported";
-            } catch (e) {
-              reportBtn.disabled = false;
-              console.warn("Report failed", e);
-              alert("Could not send report. Please try again later.");
-            }
-          });
-
-          actions.appendChild(reportBtn);
-
-          row.appendChild(content);
-          row.appendChild(actions);
-          return row;
-        }
-
-        function setCommentListPlaceholder(message) {
-          if (!commentsList) return;
-          commentsList.innerHTML = `<div class="comment-text">${message}</div>`;
-        }
-
-        async function loadComments() {
-          console.log("Loading comments...");
-          if (!commentsList) return;
-          setCommentListPlaceholder("Loading comments...");
-
-          const params = new URLSearchParams();
-          if (_currentType === "tv" && _currentEpisodeId) {
-            params.set("episodeId", _currentEpisodeId);
-          } else if (_currentMovieId) {
-            params.set("movieId", _currentMovieId);
-          }
-
-          try {
-            const res = await fetch(`/api/public/reviews?${params.toString()}`);
-            if (!res.ok) throw new Error("Failed to load comments");
-            const data = await res.json();
-
-            const reviews = Array.isArray(data.reviews) ? data.reviews : [];
-            if (reviews.length === 0) {
-              setCommentListPlaceholder("No comments yet. Be the first to post one!");
-              return;
-            }
-
-            commentsList.innerHTML = "";
-            reviews.forEach(review => {
-              commentsList.appendChild(renderCommentRow(review));
-            });
-          } catch (err) {
-            console.error(err);
-            setCommentListPlaceholder("Failed to load comments.");
-          }
-        }
-
-        // Expose comment loader so other UI bits (episode switch) can refresh comments
-        window._loadComments = loadComments;
-
-        function prependComment(review) {
-          if (!commentsList) return;
-          const placeholder = commentsList.querySelector(".comment-text");
-          if (placeholder && placeholder.textContent) {
-            const txt = placeholder.textContent.toLowerCase();
-            if (txt.includes("no comments") || txt.includes("loading comments") || txt.includes("failed to load")) {
-              commentsList.innerHTML = "";
-            }
-          }
-          commentsList.prepend(renderCommentRow(review));
-        }
-
-        async function postComment() {
-          setError(null);
-          const token = localStorage.getItem("token");
-          if (!token) {
-            setError("You must be logged in to post a comment.");
-            return;
-          }
-
-              const MAX_COMMENT_LENGTH = 1000;
-          const comment = commentInput ? commentInput.value.trim() : "";
-          if (!comment) {
-            setError("Comment cannot be empty.");
-            return;
-          }
-          if (comment.length > MAX_COMMENT_LENGTH) {
-            setError(`Comment cannot exceed ${MAX_COMMENT_LENGTH} characters.`);
-            return;
-          }
-
-          submitBtn.disabled = true;
-
-          try {
-            const body = { comment };
-            if (_currentType === "tv") {
-              if (!_currentEpisodeId) {
-                setError("Unable to post comment: missing episode identifier.");
-                submitBtn.disabled = false;
-                return;
-              }
-              body.episodeId = _currentEpisodeId;
-            } else {
-              if (!_currentMovieId) {
-                setError("Unable to post comment: missing movie identifier.");
-                submitBtn.disabled = false;
-                return;
-              }
-              body.movieId = _currentMovieId;
-            }
-
-            const res = await fetch("/api/user/reviews", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-              },
-              body: JSON.stringify(body)
-            });
-
-            if (!res.ok) {
-              const txt = await res.text();
-              const message = `Server returned ${res.status}: ${txt || res.statusText}`;
-              console.warn(message);
-              setError(message);
+          function updateSubmitState() {
+            // Keep the button enabled so the user can always attempt to post.
+            // The click handler will validate the comment text and show an error if needed.
+            if (submitBtn) {
               submitBtn.disabled = false;
+            }
+          }
+
+          function renderCommentRow(review) {
+            const row = document.createElement("div");
+            row.className = "comment-row";
+
+            const content = document.createElement("div");
+            content.style.flex = "1";
+
+            const meta = document.createElement("div");
+            meta.className = "comment-meta";
+
+            const author = document.createElement("div");
+            author.className = "comment-author";
+            author.textContent = review.username || "Anonymous";
+
+            const time = document.createElement("div");
+            time.className = "comment-time";
+            if (review.createdDate) {
+              const date = new Date(review.createdDate);
+              time.textContent = date.toLocaleString();
+            }
+
+            meta.appendChild(author);
+            meta.appendChild(time);
+
+            const text = document.createElement("div");
+            text.className = "comment-text";
+            text.textContent = review.comment || "";
+
+            content.appendChild(meta);
+            content.appendChild(text);
+
+            const actions = document.createElement("div");
+            actions.style.display = "flex";
+            actions.style.alignItems = "center";
+
+            const reportBtn = document.createElement("button");
+            reportBtn.className = "comment-report";
+            reportBtn.type = "button";
+            reportBtn.textContent = "🚩 Report";
+            reportBtn.addEventListener("click", async () => {
+              if (!localStorage.getItem("token")) {
+                alert("Please log in to report comments.");
+                return;
+              }
+
+              // show modal form to collect reason
+              const modal = getOrCreateReportModal();
+              modal.show(
+                review.reviewId,
+                async (reason, setError, setSubmitting) => {
+                  if (!reason || reason.trim().length === 0) {
+                    setError("Please provide a reason for the report.");
+                    return { success: false };
+                  }
+
+                  reportBtn.disabled = true;
+                  setSubmitting(true);
+                  try {
+                    const token = localStorage.getItem("token");
+                    console.debug("Sending report, token present?", !!token);
+
+                    const res = await fetch(
+                      `/api/user/reviews/${encodeURIComponent(review.reviewId)}/report`,
+                      {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                          Authorization: `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({ reason }),
+                      },
+                    );
+
+                    if (!res.ok) {
+                      let msg =
+                        "Could not send report. Please try again later.";
+                      try {
+                        const json = await res.json();
+                        if (json && json.message) msg = json.message;
+                      } catch (err) {
+                        const text = await res.text();
+                        if (text) msg = text;
+                      }
+                      setError(msg);
+                      setSubmitting(false);
+                      reportBtn.disabled = false;
+                      return { success: false };
+                    }
+
+                    reportBtn.textContent = "Reported";
+                    setSubmitting(false);
+                    return { success: true };
+                  } catch (e) {
+                    console.warn("Report failed", e);
+                    setError("Could not send report. Please try again later.");
+                    setSubmitting(false);
+                    reportBtn.disabled = false;
+                    return { success: false };
+                  }
+                },
+              );
+            });
+
+            actions.appendChild(reportBtn);
+
+            row.appendChild(content);
+            row.appendChild(actions);
+            return row;
+          }
+
+          function setCommentListPlaceholder(message) {
+            if (!commentsList) return;
+            commentsList.innerHTML = `<div class="comment-text">${message}</div>`;
+          }
+
+          async function loadComments() {
+            console.log("Loading comments...");
+            if (!commentsList) return;
+            setCommentListPlaceholder("Loading comments...");
+
+            const params = new URLSearchParams();
+            if (_currentType === "tv" && _currentEpisodeId) {
+              params.set("episodeId", _currentEpisodeId);
+            } else if (_currentMovieId) {
+              params.set("movieId", _currentMovieId);
+            }
+
+            try {
+              const res = await fetch(
+                `/api/public/reviews?${params.toString()}`,
+              );
+              if (!res.ok) throw new Error("Failed to load comments");
+              const data = await res.json();
+
+              const reviews = Array.isArray(data.reviews) ? data.reviews : [];
+              if (reviews.length === 0) {
+                setCommentListPlaceholder(
+                  "No comments yet. Be the first to post one!",
+                );
+                return;
+              }
+
+              commentsList.innerHTML = "";
+              reviews.forEach((review) => {
+                commentsList.appendChild(renderCommentRow(review));
+              });
+            } catch (err) {
+              console.error(err);
+              setCommentListPlaceholder("Failed to load comments.");
+            }
+          }
+
+          // Report modal helper: creates a singleton modal to collect reason
+          function getOrCreateReportModal() {
+            let existing = document.getElementById("report-modal-root");
+            if (existing) {
+              return existing._api;
+            }
+
+            const root = document.createElement("div");
+            root.id = "report-modal-root";
+            root.style.position = "fixed";
+            root.style.left = 0;
+            root.style.top = 0;
+            root.style.right = 0;
+            root.style.bottom = 0;
+            root.style.display = "flex";
+            root.style.alignItems = "center";
+            root.style.justifyContent = "center";
+            root.style.background = "rgba(0,0,0,0.6)";
+            root.style.zIndex = 9999;
+            root.style.visibility = "hidden";
+
+            const box = document.createElement("div");
+            box.className = "card";
+            box.style.width = "420px";
+            box.style.maxWidth = "92%";
+
+            const title = document.createElement("div");
+            title.textContent = "Report comment";
+            title.className = "card-title";
+            title.style.marginBottom = "8px";
+
+            const textarea = document.createElement("textarea");
+            textarea.style.width = "100%";
+            textarea.style.height = "120px";
+            textarea.style.marginBottom = "12px";
+            textarea.className = "comment-input";
+
+            const error = document.createElement("div");
+            error.style.color = "crimson";
+            error.style.marginBottom = "8px";
+            error.className = "muted";
+
+            const btnRow = document.createElement("div");
+            btnRow.style.display = "flex";
+            btnRow.style.justifyContent = "flex-end";
+            btnRow.style.gap = "8px";
+
+            const cancelBtn = document.createElement("button");
+            cancelBtn.textContent = "Cancel";
+            cancelBtn.className = "btn ghost";
+            cancelBtn.onclick = () => {
+              root.style.visibility = "hidden";
+            };
+
+            const submitBtn = document.createElement("button");
+            submitBtn.textContent = "Submit";
+            submitBtn.className = "btn";
+            submitBtn.onclick = async () => {
+              error.textContent = "";
+              const cb = root._api._onSubmit;
+              if (typeof cb === "function") {
+                const setError = (msg) => {
+                  error.textContent = msg || "";
+                };
+                const setSubmitting = (v) => {
+                  submitBtn.disabled = !!v;
+                };
+                try {
+                  const result = await cb(
+                    textarea.value,
+                    setError,
+                    setSubmitting,
+                  );
+                  if (result && result.success)
+                    root.style.visibility = "hidden";
+                } catch (e) {
+                  console.error("Report modal onSubmit error", e);
+                  setError("Could not send report. Please try again later.");
+                }
+              }
+            };
+
+            btnRow.appendChild(cancelBtn);
+            btnRow.appendChild(submitBtn);
+
+            box.appendChild(title);
+            box.appendChild(textarea);
+            box.appendChild(error);
+            box.appendChild(btnRow);
+            root.appendChild(box);
+            document.body.appendChild(root);
+
+            const api = {
+              show: (reviewId, onSubmit) => {
+                textarea.value = "";
+                error.textContent = "";
+                root._api._onSubmit = onSubmit;
+                root.style.visibility = "visible";
+                textarea.focus();
+              },
+            };
+            root._api = api;
+            return api;
+          }
+
+          // Expose comment loader so other UI bits (episode switch) can refresh comments
+          window._loadComments = loadComments;
+
+          function prependComment(review) {
+            if (!commentsList) return;
+            const placeholder = commentsList.querySelector(".comment-text");
+            if (placeholder && placeholder.textContent) {
+              const txt = placeholder.textContent.toLowerCase();
+              if (
+                txt.includes("no comments") ||
+                txt.includes("loading comments") ||
+                txt.includes("failed to load")
+              ) {
+                commentsList.innerHTML = "";
+              }
+            }
+            commentsList.prepend(renderCommentRow(review));
+          }
+
+          async function postComment() {
+            setError(null);
+            const token = localStorage.getItem("token");
+            if (!token) {
+              setError("You must be logged in to post a comment.");
               return;
             }
 
-            const created = await res.json();
-            if (created) {
-              prependComment(created);
-            }
-            commentInput.value = "";
-            if (charCount) charCount.textContent = "0/500";
-            updateSubmitState();
-          } catch (e) {
-            console.error(e);
-            setError(`Unable to post comment. ${e.message || ''}`);
-            submitBtn.disabled = false;
-          }
-        }
-
-        if (commentInput) {
-          console.log("Comment input element found");
-          commentInput.addEventListener("input", () => {
-            const len = commentInput.value.length;
-            if (charCount) charCount.textContent = `${len}/1000`;
-            updateSubmitState();
-          });
-        } else {
-          console.warn("Comment input element not found");
-        }
-
-        if (submitBtn) {
-          console.log("Submit button element found");
-          submitBtn.addEventListener("click", () => {
-            console.log("Post Comment clicked");
+            const MAX_COMMENT_LENGTH = 1000;
             const comment = commentInput ? commentInput.value.trim() : "";
             if (!comment) {
               setError("Comment cannot be empty.");
-              if (commentInput) {
-                commentInput.focus();
-              }
               return;
             }
-            postComment();
-          });
-        } else {
-          console.warn("Submit button element not found");
-        }
+            if (comment.length > MAX_COMMENT_LENGTH) {
+              setError(
+                `Comment cannot exceed ${MAX_COMMENT_LENGTH} characters.`,
+              );
+              return;
+            }
 
-        updateSubmitState();
-        loadComments();
-      } catch (e) {
-        console.error("Failed to initialize comments section", e);
-        if (commentError) {
-          commentError.textContent = "Could not initialize comments. See console for details.";
-          commentError.classList.remove("hidden");
-        }
-        if (commentsList) {
-          commentsList.innerHTML = `<div class="comment-text">Failed to load comments.</div>`;
+            submitBtn.disabled = true;
+
+            try {
+              const body = { comment };
+              if (_currentType === "tv") {
+                if (!_currentEpisodeId) {
+                  setError(
+                    "Unable to post comment: missing episode identifier.",
+                  );
+                  submitBtn.disabled = false;
+                  return;
+                }
+                body.episodeId = _currentEpisodeId;
+              } else {
+                if (!_currentMovieId) {
+                  setError("Unable to post comment: missing movie identifier.");
+                  submitBtn.disabled = false;
+                  return;
+                }
+                body.movieId = _currentMovieId;
+              }
+
+              const res = await fetch("/api/user/reviews", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(body),
+              });
+
+              if (!res.ok) {
+                let message = "Unable to post comment.";
+
+                try {
+                  const err = await res.json();
+                  message = err.message || message;
+                } catch {
+                  message = "You can't comment at this time.";
+                }
+
+                setError(message);
+                submitBtn.disabled = false;
+                return;
+              }
+
+              const created = await res.json();
+              if (created) {
+                prependComment(created);
+              }
+              commentInput.value = "";
+              if (charCount) charCount.textContent = "0/500";
+              updateSubmitState();
+            } catch (e) {
+              console.error(e);
+              setError(`Unable to post comment. ${e.message || ""}`);
+              submitBtn.disabled = false;
+            }
+          }
+
+          if (commentInput) {
+            console.log("Comment input element found");
+            commentInput.addEventListener("input", () => {
+              const len = commentInput.value.length;
+              if (charCount) charCount.textContent = `${len}/1000`;
+              updateSubmitState();
+            });
+          } else {
+            console.warn("Comment input element not found");
+          }
+
+          if (submitBtn) {
+            console.log("Submit button element found");
+            submitBtn.addEventListener("click", () => {
+              console.log("Post Comment clicked");
+              const comment = commentInput ? commentInput.value.trim() : "";
+              if (!comment) {
+                setError("Comment cannot be empty.");
+                if (commentInput) {
+                  commentInput.focus();
+                }
+                return;
+              }
+              postComment();
+            });
+          } else {
+            console.warn("Submit button element not found");
+          }
+
+          updateSubmitState();
+          loadComments();
+        } catch (e) {
+          console.error("Failed to initialize comments section", e);
+          if (commentError) {
+            commentError.textContent =
+              "Could not initialize comments. See console for details.";
+            commentError.classList.remove("hidden");
+          }
+          if (commentsList) {
+            commentsList.innerHTML = `<div class="comment-text">Failed to load comments.</div>`;
+          }
         }
       }
-    }
 
       function setupMovie(movieData) {
         const videoUrl = movieData.src || "";
@@ -861,7 +1074,12 @@
         loadVideo(videoUrl, window._resumeSec || 0);
       }
 
-      function setupTVSeries(movieData, seasonsData, selectedSeason, selectedEpisode) {
+      function setupTVSeries(
+        movieData,
+        seasonsData,
+        selectedSeason,
+        selectedEpisode,
+      ) {
         const selector = document.getElementById("episodeSelector");
         const buttonsContainer = document.getElementById("episodeButtons");
 
@@ -872,82 +1090,97 @@
         buttonsContainer.innerHTML = "";
 
         // Sort seasons
-        const sortedSeasons = [...seasonsData].sort((a, b) => (a.seasonNumber || 0) - (b.seasonNumber || 0));
+        const sortedSeasons = [...seasonsData].sort(
+          (a, b) => (a.seasonNumber || 0) - (b.seasonNumber || 0),
+        );
 
         // Group episodes by season for better organization
         const episodesBySeason = {};
-        sortedSeasons.forEach(season => {
-          const publishedEpisodes = (season.episodes || []).filter(ep => ep.published);
+        sortedSeasons.forEach((season) => {
+          const publishedEpisodes = (season.episodes || []).filter(
+            (ep) => ep.published,
+          );
           if (publishedEpisodes.length > 0) {
-            episodesBySeason[season.seasonNumber] = publishedEpisodes.sort((a, b) => (a.episodeNumber || 0) - (b.episodeNumber || 0));
+            episodesBySeason[season.seasonNumber] = publishedEpisodes.sort(
+              (a, b) => (a.episodeNumber || 0) - (b.episodeNumber || 0),
+            );
           }
         });
 
         // Create buttons for each season's episodes
-        Object.keys(episodesBySeason).sort((a, b) => Number(a) - Number(b)).forEach(seasonNum => {
-          const episodes = episodesBySeason[seasonNum];
+        Object.keys(episodesBySeason)
+          .sort((a, b) => Number(a) - Number(b))
+          .forEach((seasonNum) => {
+            const episodes = episodesBySeason[seasonNum];
 
-          // Add season header if there are multiple seasons
-          if (Object.keys(episodesBySeason).length > 1) {
-            const seasonHeader = document.createElement("div");
-            seasonHeader.className = "season-header";
-            seasonHeader.textContent = `Season ${seasonNum}`;
-            seasonHeader.style.fontSize = "14px";
-            seasonHeader.style.fontWeight = "600";
-            seasonHeader.style.color = "var(--text-subtle)";
-            seasonHeader.style.marginBottom = "8px";
-            seasonHeader.style.marginTop = "12px";
-            buttonsContainer.appendChild(seasonHeader);
-          }
-
-          // Create episode buttons
-          episodes.forEach(ep => {
-            const button = document.createElement("button");
-            button.className = "episode-button";
-            button.textContent = `Ep ${ep.episodeNumber}`;
-            button.dataset.season = seasonNum;
-            button.dataset.episode = ep.episodeNumber;
-            // Keep the DB identifier around for comments/history
-            button.dataset.episodeId = ep.id || ep.episodeId || ep.episodeNumber;
-
-            // Check if this is the selected episode
-            const isSelected = selectedSeason == seasonNum && selectedEpisode == ep.episodeNumber;
-            if (isSelected) {
-              button.classList.add("active");
-              _currentEpisodeId = button.dataset.episodeId ? parseInt(button.dataset.episodeId, 10) : null;
+            // Add season header if there are multiple seasons
+            if (Object.keys(episodesBySeason).length > 1) {
+              const seasonHeader = document.createElement("div");
+              seasonHeader.className = "season-header";
+              seasonHeader.textContent = `Season ${seasonNum}`;
+              seasonHeader.style.fontSize = "14px";
+              seasonHeader.style.fontWeight = "600";
+              seasonHeader.style.color = "var(--text-subtle)";
+              seasonHeader.style.marginBottom = "8px";
+              seasonHeader.style.marginTop = "12px";
+              buttonsContainer.appendChild(seasonHeader);
             }
 
-            button.addEventListener("click", () => {
-              // Remove active class from all buttons
-              document.querySelectorAll(".episode-button").forEach(btn => {
-                btn.classList.remove("active");
+            // Create episode buttons
+            episodes.forEach((ep) => {
+              const button = document.createElement("button");
+              button.className = "episode-button";
+              button.textContent = `Ep ${ep.episodeNumber}`;
+              button.dataset.season = seasonNum;
+              button.dataset.episode = ep.episodeNumber;
+              // Keep the DB identifier around for comments/history
+              button.dataset.episodeId =
+                ep.id || ep.episodeId || ep.episodeNumber;
+
+              // Check if this is the selected episode
+              const isSelected =
+                selectedSeason == seasonNum &&
+                selectedEpisode == ep.episodeNumber;
+              if (isSelected) {
+                button.classList.add("active");
+                _currentEpisodeId = button.dataset.episodeId
+                  ? parseInt(button.dataset.episodeId, 10)
+                  : null;
+              }
+
+              button.addEventListener("click", () => {
+                // Remove active class from all buttons
+                document.querySelectorAll(".episode-button").forEach((btn) => {
+                  btn.classList.remove("active");
+                });
+
+                // Add active class to clicked button
+                button.classList.add("active");
+
+                // Update current episode id for comments & history tracking
+                _currentEpisodeId = button.dataset.episodeId
+                  ? parseInt(button.dataset.episodeId, 10)
+                  : null;
+
+                // Load the episode video — only resume on the initial auto-click,
+                // not when the user manually picks a different episode
+                const resumeOnLoad = window._resumeSec || 0;
+                window._resumeSec = 0; // clear after first use
+                if (ep && ep.src) {
+                  loadVideo(ep.src, resumeOnLoad);
+                } else {
+                  loadVideo("", 0);
+                }
+
+                // Refresh episode-specific comments when switching
+                if (typeof window._loadComments === "function") {
+                  window._loadComments();
+                }
               });
 
-              // Add active class to clicked button
-              button.classList.add("active");
-
-              // Update current episode id for comments & history tracking
-              _currentEpisodeId = button.dataset.episodeId ? parseInt(button.dataset.episodeId, 10) : null;
-
-              // Load the episode video — only resume on the initial auto-click,
-              // not when the user manually picks a different episode
-              const resumeOnLoad = window._resumeSec || 0;
-              window._resumeSec = 0; // clear after first use
-              if (ep && ep.src) {
-                loadVideo(ep.src, resumeOnLoad);
-              } else {
-                loadVideo("", 0);
-              }
-
-              // Refresh episode-specific comments when switching
-              if (typeof window._loadComments === 'function') {
-                window._loadComments();
-              }
+              buttonsContainer.appendChild(button);
             });
-
-            buttonsContainer.appendChild(button);
           });
-        });
 
         // Auto-select first episode if no specific episode selected
         if (!selectedSeason || !selectedEpisode) {
@@ -956,7 +1189,9 @@
 
           if (firstEpisode) {
             // Find and click the first episode button
-            const firstButton = buttonsContainer.querySelector(`[data-season="${firstSeasonNum}"][data-episode="${firstEpisode.episodeNumber}"]`);
+            const firstButton = buttonsContainer.querySelector(
+              `[data-season="${firstSeasonNum}"][data-episode="${firstEpisode.episodeNumber}"]`,
+            );
             if (firstButton) {
               firstButton.click();
             } else if (firstEpisode.src) {
@@ -966,8 +1201,12 @@
           }
         } else {
           // Load the specified episode
-          const season = sortedSeasons.find(s => s.seasonNumber == selectedSeason);
-          const ep = season?.episodes?.find(e => e.episodeNumber == selectedEpisode && e.published);
+          const season = sortedSeasons.find(
+            (s) => s.seasonNumber == selectedSeason,
+          );
+          const ep = season?.episodes?.find(
+            (e) => e.episodeNumber == selectedEpisode && e.published,
+          );
           if (ep && ep.src) {
             loadVideo(ep.src, window._resumeSec || 0);
             window._resumeSec = 0;
@@ -983,141 +1222,154 @@
       // addEventListener() called on it. Without the API the tracker never
       // fires and nothing is ever saved to the database.
 
-      let _ytPlayer     = null;   // YT.Player instance
-      let _ytReady      = false;  // true once onReady fires
-      let _pendingLoad  = null;   // { videoId, startSec } queued before API ready
-      let _ytStartSec   = 0;      // start position for the current video
+      let _ytPlayer = null; // YT.Player instance
+      let _ytReady = false; // true once onReady fires
+      let _pendingLoad = null; // { videoId, startSec } queued before API ready
+      let _ytStartSec = 0; // start position for the current video
 
       // Called by the YT API script once it has loaded
-      window.onYouTubeIframeAPIReady = function() {
-          _ytReady = true;
-          if (_pendingLoad) {
-              _createPlayer(_pendingLoad.videoId, _pendingLoad.startSec);
-              _pendingLoad = null;
-          }
+      window.onYouTubeIframeAPIReady = function () {
+        _ytReady = true;
+        if (_pendingLoad) {
+          _createPlayer(_pendingLoad.videoId, _pendingLoad.startSec);
+          _pendingLoad = null;
+        }
       };
 
       function _createPlayer(videoId, startSec) {
-          _ytStartSec = Math.floor(startSec || 0);  // saved for onReady seekTo()
+        _ytStartSec = Math.floor(startSec || 0); // saved for onReady seekTo()
 
-          // Destroy previous player if one exists (e.g. episode switch)
-          if (_ytPlayer) {
-              try { _ytPlayer.destroy(); } catch(e) {}
-              _ytPlayer = null;
-              const container = document.querySelector('.video-container');
-              const div = document.createElement('div');
-              div.id = 'videoPlayer';
-              div.className = 'video-player';
-              container.appendChild(div);
-          }
-          _ytPlayer = new YT.Player('videoPlayer', {
-              width:  '100%',
-              height: '100%',
-              videoId: videoId,
-              playerVars: {
-                  rel:            0,
-                  modestbranding: 1
-              },
-              events: {
-                  onReady:       _onPlayerReady,
-                  onStateChange: _onStateChange
-              }
-          });
+        // Destroy previous player if one exists (e.g. episode switch)
+        if (_ytPlayer) {
+          try {
+            _ytPlayer.destroy();
+          } catch (e) {}
+          _ytPlayer = null;
+          const container = document.querySelector(".video-container");
+          const div = document.createElement("div");
+          div.id = "videoPlayer";
+          div.className = "video-player";
+          container.appendChild(div);
+        }
+        _ytPlayer = new YT.Player("videoPlayer", {
+          width: "100%",
+          height: "100%",
+          videoId: videoId,
+          playerVars: {
+            rel: 0,
+            modestbranding: 1,
+          },
+          events: {
+            onReady: _onPlayerReady,
+            onStateChange: _onStateChange,
+          },
+        });
       }
 
       function _onPlayerReady(event) {
-          // Get exact duration straight from the YouTube player API
-          const ytDuration = event.target.getDuration();
-          if (ytDuration && ytDuration > 0) {
-              _durationSec = Math.floor(ytDuration);
-          }
+        // Get exact duration straight from the YouTube player API
+        const ytDuration = event.target.getDuration();
+        if (ytDuration && ytDuration > 0) {
+          _durationSec = Math.floor(ytDuration);
+        }
 
-          // Seek to saved position — seekTo() is reliable without autoplay,
-          // unlike playerVars.start which YouTube ignores when paused on load
-          if (_ytStartSec > 0) {
-              event.target.seekTo(_ytStartSec, true);
-          }
+        // Seek to saved position — seekTo() is reliable without autoplay,
+        // unlike playerVars.start which YouTube ignores when paused on load
+        if (_ytStartSec > 0) {
+          event.target.seekTo(_ytStartSec, true);
+        }
       }
 
       function _onStateChange(event) {
-          const state = event.data;
-          // YT.PlayerState: PLAYING=1, PAUSED=2, ENDED=0, BUFFERING=3
-          if (state === YT.PlayerState.PLAYING) {
-              if (_firstPlay) {
-                  _firstPlay = false;
-                  _doSave();   // immediate save creates the DB record right away
-              }
-          } else if (state === YT.PlayerState.PAUSED || state === YT.PlayerState.ENDED) {
-              _doSave();       // save the exact position whenever user pauses or video ends
+        const state = event.data;
+        // YT.PlayerState: PLAYING=1, PAUSED=2, ENDED=0, BUFFERING=3
+        if (state === YT.PlayerState.PLAYING) {
+          if (_firstPlay) {
+            _firstPlay = false;
+            _doSave(); // immediate save creates the DB record right away
           }
+        } else if (
+          state === YT.PlayerState.PAUSED ||
+          state === YT.PlayerState.ENDED
+        ) {
+          _doSave(); // save the exact position whenever user pauses or video ends
+        }
       }
 
       function loadVideo(videoUrl, startSec) {
-          const start = Math.floor(startSec || 0);
+        const start = Math.floor(startSec || 0);
 
-          if (!videoUrl || videoUrl.trim() === '') {
-              // No URL — show blank player area
-              if (_ytPlayer) { try { _ytPlayer.stopVideo(); } catch(e) {} }
-              return;
+        if (!videoUrl || videoUrl.trim() === "") {
+          // No URL — show blank player area
+          if (_ytPlayer) {
+            try {
+              _ytPlayer.stopVideo();
+            } catch (e) {}
           }
+          return;
+        }
 
-          // Start wall-clock counter the moment a real video URL is loaded
+        // Start wall-clock counter the moment a real video URL is loaded
 
-          if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
-              const videoId = extractYouTubeId(videoUrl);
-              if (!videoId) return;
-              if (_ytReady) {
-                  _createPlayer(videoId, start);
-              } else {
-                  // API script not loaded yet — queue and load the script now
-                  _pendingLoad = { videoId, startSec: start };
-                  if (!document.getElementById('yt-api-script')) {
-                      const tag = document.createElement('script');
-                      tag.id  = 'yt-api-script';
-                      tag.src = 'https://www.youtube.com/iframe_api';
-                      document.head.appendChild(tag);
-                  }
-              }
-          } else if (videoUrl.includes('vimeo.com')) {
-              // Vimeo: fall back to plain iframe (Vimeo Player SDK is separate)
-              const videoId = extractVimeoId(videoUrl);
-              if (videoId) {
-                  const container = document.querySelector('.video-container');
-                  container.innerHTML =
-                      `<iframe class="video-player" allowfullscreen
+        if (videoUrl.includes("youtube.com") || videoUrl.includes("youtu.be")) {
+          const videoId = extractYouTubeId(videoUrl);
+          if (!videoId) return;
+          if (_ytReady) {
+            _createPlayer(videoId, start);
+          } else {
+            // API script not loaded yet — queue and load the script now
+            _pendingLoad = { videoId, startSec: start };
+            if (!document.getElementById("yt-api-script")) {
+              const tag = document.createElement("script");
+              tag.id = "yt-api-script";
+              tag.src = "https://www.youtube.com/iframe_api";
+              document.head.appendChild(tag);
+            }
+          }
+        } else if (videoUrl.includes("vimeo.com")) {
+          // Vimeo: fall back to plain iframe (Vimeo Player SDK is separate)
+          const videoId = extractVimeoId(videoUrl);
+          if (videoId) {
+            const container = document.querySelector(".video-container");
+            container.innerHTML = `<iframe class="video-player" allowfullscreen
                           src="https://player.vimeo.com/video/${videoId}?api=1#t=${start}">
                        </iframe>`;
-                  // For Vimeo: fall back to time-based tracking (no state events)
-                  _isPlaying = true;
-                  if (_firstPlay) { _firstPlay = false; _doSave(); }
-              }
-          } else {
-              // Direct URL — plain iframe, fall back to time-based tracking
-              const container = document.querySelector('.video-container');
-              container.innerHTML =
-                  `<iframe class="video-player" allowfullscreen
-                      src="${start > 0 ? videoUrl + '#t=' + start : videoUrl}">
-                   </iframe>`;
-              _isPlaying = true;
-              if (_firstPlay) { _firstPlay = false; _doSave(); }
+            // For Vimeo: fall back to time-based tracking (no state events)
+            _isPlaying = true;
+            if (_firstPlay) {
+              _firstPlay = false;
+              _doSave();
+            }
           }
+        } else {
+          // Direct URL — plain iframe, fall back to time-based tracking
+          const container = document.querySelector(".video-container");
+          container.innerHTML = `<iframe class="video-player" allowfullscreen
+                      src="${start > 0 ? videoUrl + "#t=" + start : videoUrl}">
+                   </iframe>`;
+          _isPlaying = true;
+          if (_firstPlay) {
+            _firstPlay = false;
+            _doSave();
+          }
+        }
       }
 
       function extractYouTubeId(url) {
-          const patterns = [
-              /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/,
-              /youtube\.com\/embed\/([^&\n?#]+)/
-          ];
-          for (const pattern of patterns) {
-              const match = url.match(pattern);
-              if (match) return match[1];
-          }
-          return null;
+        const patterns = [
+          /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/,
+          /youtube\.com\/embed\/([^&\n?#]+)/,
+        ];
+        for (const pattern of patterns) {
+          const match = url.match(pattern);
+          if (match) return match[1];
+        }
+        return null;
       }
 
       function extractVimeoId(url) {
-          const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
-          return match ? match[1] : null;
+        const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+        return match ? match[1] : null;
       }
 
       // ── Watch History Tracker ──────────────────────────────────────────
@@ -1131,109 +1383,114 @@
       // Adding _savedProgress would double-count it on every session.
 
       const _histParams = new URLSearchParams(window.location.search);
-      const _histId     = _histParams.get("id");
-      const _histType   = _histParams.get("type") || "movie";
-      const _histToken  = localStorage.getItem("token");
-      const _tParam     = _histParams.get("t"); // seek position only
+      const _histId = _histParams.get("id");
+      const _histType = _histParams.get("type") || "movie";
+      const _histToken = localStorage.getItem("token");
+      const _tParam = _histParams.get("t"); // seek position only
 
-      let _durationSec  = 0;     // set from getDuration() in _onPlayerReady
-      let _firstPlay    = true;  // triggers immediate DB insert on first play
+      let _durationSec = 0; // set from getDuration() in _onPlayerReady
+      let _firstPlay = true; // triggers immediate DB insert on first play
 
       window._resumeSec = 0;
 
-      window._startHistoryTracker = function(durationSeconds) {
-          _durationSec = durationSeconds || 0;
+      window._startHistoryTracker = function (durationSeconds) {
+        _durationSec = durationSeconds || 0;
       };
 
       // Returns the exact playback position from YouTube — already absolute
       function _getCurrentTime() {
-          try {
-              if (_ytPlayer && typeof _ytPlayer.getCurrentTime === "function") {
-                  return Math.floor(_ytPlayer.getCurrentTime()) || 0;
-              }
-          } catch(e) {}
-          return 0;
+        try {
+          if (_ytPlayer && typeof _ytPlayer.getCurrentTime === "function") {
+            return Math.floor(_ytPlayer.getCurrentTime()) || 0;
+          }
+        } catch (e) {}
+        return 0;
       }
 
       function _buildPayload() {
-          const currentTime = _getCurrentTime();  // absolute — no offset needed
-          const duration    = Math.floor(_durationSec);
-          const progress    = (duration > 0) ? Math.min(currentTime, duration) : currentTime;
-          return {
-              progressSec: progress,
-              durationSec: duration,
-              ...(_histType === "movie"
-                  ? { movieId:   parseInt(_histId) }
-                  : { episodeId: parseInt(_histId) })
-          };
+        const currentTime = _getCurrentTime(); // absolute — no offset needed
+        const duration = Math.floor(_durationSec);
+        const progress =
+          duration > 0 ? Math.min(currentTime, duration) : currentTime;
+        return {
+          progressSec: progress,
+          durationSec: duration,
+          ...(_histType === "movie"
+            ? { movieId: parseInt(_histId) }
+            : { episodeId: parseInt(_histId) }),
+        };
       }
 
       function _doSave() {
-          if (!_histId || !_histToken) return;
-          fetch("http://localhost:8080/api/user/history/save", {
-              method : "POST",
-              headers: {
-                  "Content-Type" : "application/json",
-                  "Authorization": "Bearer " + _histToken
-              },
-              body: JSON.stringify(_buildPayload())
-          }).catch(() => {});
+        if (!_histId || !_histToken) return;
+        fetch("http://localhost:8080/api/user/history/save", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + _histToken,
+          },
+          body: JSON.stringify(_buildPayload()),
+        }).catch(() => {});
       }
 
       // Periodic save every 15 seconds (only when player exists)
       setInterval(() => {
-          if (_ytPlayer && !_firstPlay) _doSave();
+        if (_ytPlayer && !_firstPlay) _doSave();
       }, 15_000);
 
       // Save on tab close using sync XHR (sendBeacon can't send Authorization header)
       window.addEventListener("beforeunload", () => {
-          if (!_histId || !_histToken || _firstPlay) return;
-          const xhr = new XMLHttpRequest();
-          xhr.open("POST", "http://localhost:8080/api/user/history/save", false);
-          xhr.setRequestHeader("Content-Type", "application/json");
-          xhr.setRequestHeader("Authorization", "Bearer " + _histToken);
-          try { xhr.send(JSON.stringify(_buildPayload())); } catch(e) {}
+        if (!_histId || !_histToken || _firstPlay) return;
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://localhost:8080/api/user/history/save", false);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.setRequestHeader("Authorization", "Bearer " + _histToken);
+        try {
+          xhr.send(JSON.stringify(_buildPayload()));
+        } catch (e) {}
       });
 
       async function _initAndStart() {
-          // ?t= sets the video seek position only — do NOT use it for _savedProgress.
-          // Always fetch from DB so cumulative progress is never lost.
-          if (_tParam !== null && _tParam !== "") {
-              window._resumeSec = parseFloat(_tParam) || 0;
-          }
+        // ?t= sets the video seek position only — do NOT use it for _savedProgress.
+        // Always fetch from DB so cumulative progress is never lost.
+        if (_tParam !== null && _tParam !== "") {
+          window._resumeSec = parseFloat(_tParam) || 0;
+        }
 
-          // Always fetch saved progress from DB regardless of ?t=
-          if (_histId && _histToken) {
-              try {
-                  const res = await fetch("http://localhost:8080/api/user/history", {
-                      headers: { "Authorization": "Bearer " + _histToken }
-                  });
-                  if (res.ok) {
-                      const list = await res.json();
-                      const rec  = list.find(h =>
-                          (_histType === "movie" && String(h.movieId)   === String(_histId)) ||
-                          (_histType === "tv"    && String(h.episodeId) === String(_histId))
-                      );
-                      if (rec) {
-                          // Use saved position to seek the player — getCurrentTime()
-                          // will then return this absolute position directly, so no
-                          // _savedProgress offset is needed in _buildPayload()
-                          const savedPos = rec.progressSec || 0;
-                          _durationSec   = rec.durationSec || 0;
-                          if (!window._resumeSec) {
-                              window._resumeSec = savedPos;
-                          }
-                      }
-                  }
-              } catch (e) {
-                  console.warn("Could not load saved progress:", e);
+        // Always fetch saved progress from DB regardless of ?t=
+        if (_histId && _histToken) {
+          try {
+            const res = await fetch("http://localhost:8080/api/user/history", {
+              headers: { Authorization: "Bearer " + _histToken },
+            });
+            if (res.ok) {
+              const list = await res.json();
+              const rec = list.find(
+                (h) =>
+                  (_histType === "movie" &&
+                    String(h.movieId) === String(_histId)) ||
+                  (_histType === "tv" &&
+                    String(h.episodeId) === String(_histId)),
+              );
+              if (rec) {
+                // Use saved position to seek the player — getCurrentTime()
+                // will then return this absolute position directly, so no
+                // _savedProgress offset is needed in _buildPayload()
+                const savedPos = rec.progressSec || 0;
+                _durationSec = rec.durationSec || 0;
+                if (!window._resumeSec) {
+                  window._resumeSec = savedPos;
+                }
               }
+            }
+          } catch (e) {
+            console.warn("Could not load saved progress:", e);
           }
-          loadWatchPage();
+        }
+        loadWatchPage();
       }
 
       _initAndStart();
-
     </script>
   </body>
 </html>

@@ -1,0 +1,149 @@
+<div class="card">
+  <h2>Reports (Pending)</h2>
+  <div class="muted">Review and moderate reported comments. Approve to remove the comment and disable commenting for the reported user; Reject to notify the reporter.</div>
+
+  <div id="reportsMessage" style="margin-top:12px"></div>
+
+  <div style="overflow:auto; margin-top:12px">
+    <table style="width:100%; border-collapse: collapse;">
+      <thead>
+        <tr style="opacity:0.9; background: rgba(255,255,255,0.02)">
+          <th style="padding:10px; text-align:left;">ID</th>
+          <th style="padding:10px; text-align:left;">Review ID</th>
+          <th style="padding:10px; text-align:left;">Reported User</th>
+          <th style="padding:10px; text-align:left;">Reporter</th>
+          <th style="padding:10px; text-align:left;">Reason</th>
+          <th style="padding:10px; text-align:left;">Created At</th>
+          <th style="padding:10px; text-align:left;">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="reportsTableBody">
+        <tr><td colspan="7" style="padding:12px">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Admin reason modal -->
+  <div id="adminReportModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; z-index:60;">
+    <div class="card" style="width:520px; margin:auto;">
+      <h3 id="modalTitle">Admin action</h3>
+      <div class="muted" style="margin-bottom:8px">Provide a short reason to include in email notifications.</div>
+      <textarea id="modalReason" style="width:100%; height:120px; padding:10px; border-radius:8px; background:transparent; color:var(--text-main); border:1px solid rgba(148,163,184,0.12);"></textarea>
+      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px">
+        <button id="modalCancel" class="btn ghost">Cancel</button>
+        <button id="modalSubmit" class="btn">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script data-fragment-script>
+    (async function(){
+      const { fetchJson, api, refreshCounts } = window.adminApi;
+      const msgEl = document.getElementById('reportsMessage');
+
+      function showMessage(text, isError){
+        msgEl.textContent = text;
+        msgEl.style.color = isError ? 'crimson' : 'lightgreen';
+        setTimeout(()=> msgEl.textContent = '', 5000);
+      }
+
+      async function loadReports(){
+        try{
+          const reports = await fetchJson(api.reports);
+          render(reports || []);
+        }catch(e){
+          console.error(e);
+          showMessage('Failed to load reports', true);
+          document.getElementById('reportsTableBody').innerHTML = '<tr><td colspan="7" style="padding:12px">Failed to load</td></tr>';
+        }
+      }
+
+      function escapeHtml(s){
+        return s ? s.replace(/[&<>\"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c])) : '';
+      }
+
+      function render(list){
+        const tbody = document.getElementById('reportsTableBody');
+        if (!list.length){
+          tbody.innerHTML = '<tr><td colspan="7" style="padding:12px">No pending reports</td></tr>';
+          return;
+        }
+        tbody.innerHTML = '';
+        list.forEach(r => {
+          const tr = document.createElement('tr');
+          tr.style.borderTop = '1px solid rgba(255,255,255,0.04)';
+          tr.innerHTML = `
+            <td style="padding:10px">${r.id}</td>
+            <td style="padding:10px">${r.reviewId || ''}</td>
+            <td style="padding:10px">${r.reportedUsername || ''}</td>
+            <td style="padding:10px">${r.reporterUsername || ''}</td>
+            <td style="padding:10px; max-width:420px">${escapeHtml(r.reason || '')}</td>
+            <td style="padding:10px">${r.createdAt ? new Date(r.createdAt).toLocaleString() : ''}</td>
+            <td style="padding:10px">
+              <button class="btn" onclick="window.adminApi.handleReport(${r.id}, 'approve')">Approve</button>
+              <button class="btn ghost" onclick="window.adminApi.handleReport(${r.id}, 'reject')">Reject</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // Expose a handler for approve/reject that shows a modal prompt consistent with site
+      // Modal-based handler
+      (function(){
+        const modal = document.getElementById('adminReportModal');
+        const reasonInput = document.getElementById('modalReason');
+        const titleEl = document.getElementById('modalTitle');
+        const btnCancel = document.getElementById('modalCancel');
+        const btnSubmit = document.getElementById('modalSubmit');
+        let current = { id: null, action: null };
+
+        function openModal(id, action){
+          current.id = id; current.action = action;
+          titleEl.textContent = action === 'approve' ? 'Approve report #' + id : 'Reject report #' + id;
+          reasonInput.value = '';
+          modal.style.display = 'flex';
+          reasonInput.focus();
+        }
+
+        function closeModal(){
+          modal.style.display = 'none';
+          current.id = null; current.action = null;
+        }
+
+        btnCancel.addEventListener('click', (e)=>{ e.preventDefault(); closeModal(); });
+
+        btnSubmit.addEventListener('click', async (e)=>{
+          e.preventDefault();
+          if (!current.id || !current.action) return closeModal();
+          const reason = reasonInput.value || '';
+          btnSubmit.disabled = true; btnCancel.disabled = true;
+          try{
+            await fetchJson(`${api.reports}/${current.id}/${current.action}`, {
+              method: 'POST',
+              headers: {'Content-Type':'application/json'},
+              body: JSON.stringify({reason})
+            });
+            showMessage(`${current.action === 'approve' ? 'Approved' : 'Rejected'} #${current.id}`);
+            if (typeof refreshCounts === 'function') refreshCounts();
+            await loadReports();
+            closeModal();
+          }catch(err){
+            console.error(err);
+            showMessage('Action failed: ' + (err && err.message ? err.message : ''), true);
+          }finally{
+            btnSubmit.disabled = false; btnCancel.disabled = false;
+          }
+        });
+
+        // expose helper to open modal
+        window.adminApi.handleReport = function(id, action){
+          openModal(id, action);
+        };
+      })();
+
+      // initial load
+      await loadReports();
+    })();
+  </script>
+</div>
