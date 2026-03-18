@@ -251,6 +251,51 @@
             background-color: rgba(15, 23, 42, 1);
         }
 
+        /* Password field with inline toggle */
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-wrapper input {
+            padding-right: 48px; /* room for the icon */
+        }
+
+        /* Use a more specific selector so the page's global `button` styles don't apply */
+        .register-container .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent !important;
+            border: none !important;
+            color: #9ca3af !important;
+            width: 28px !important;
+            height: 28px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 6px !important;
+            cursor: pointer !important;
+            padding: 0 !important;
+            margin: 0 !important; /* override global button margin */
+            box-shadow: none !important;
+            z-index: 5 !important; /* sit above input */
+            line-height: 0 !important;
+            box-sizing: content-box !important;
+        }
+
+        .register-container .toggle-password:hover {
+            background: rgba(255,255,255,0.02) !important;
+            color: #f97316 !important;
+        }
+
+        .register-container .toggle-password svg {
+            width: 18px;
+            height: 18px;
+        }
+
         button {
             width: 100%;
             padding: 11px;
@@ -384,8 +429,16 @@
                 </div>
                 <div class="field">
                     <div class="field-label" data-i18n="auth.password">Password</div>
-                    <input type="password" id="password" data-i18n-placeholder="auth.password_placeholder"
-                           placeholder="At least 6 characters" required>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" data-i18n-placeholder="auth.password_placeholder"
+                               placeholder="At least 6 characters" required>
+                        <button type="button" id="togglePassword" class="toggle-password" aria-label="Show password" aria-pressed="false">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="M12 5C7 5 2.73 8.11 1 12c1.73 3.89 6 7 11 7s9.27-3.11 11-7c-1.73-3.89-6-7-11-7z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></circle>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <button type="submit" data-i18n="auth.send_otp">Send OTP</button>
             </form>
@@ -503,6 +556,32 @@
         }
 
     });
+
+    // Password visibility toggle (register)
+    (function () {
+        const pwd = document.getElementById('password');
+        const toggle = document.getElementById('togglePassword');
+        if (!pwd || !toggle) return;
+
+        function updateToggleState() {
+            const isShown = pwd.type === 'text';
+            toggle.setAttribute('aria-pressed', String(isShown));
+            toggle.setAttribute('aria-label', isShown ? 'Hide password' : 'Show password');
+        }
+
+        toggle.addEventListener('click', function (e) {
+            const selectionStart = pwd.selectionStart;
+            const selectionEnd = pwd.selectionEnd;
+            pwd.type = pwd.type === 'password' ? 'text' : 'password';
+            updateToggleState();
+            pwd.focus();
+            try {
+                pwd.setSelectionRange(selectionStart, selectionEnd);
+            } catch (err) {}
+        });
+
+        updateToggleState();
+    })();
 
 </script>
 <script src="/js/i18n.js"></script>

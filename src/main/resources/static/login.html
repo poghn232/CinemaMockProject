@@ -256,6 +256,43 @@
             color: #6b7280;
         }
 
+        /* Password field with inline toggle */
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-wrapper input {
+            padding-right: 40px; /* room for the icon */
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 8px;
+            background: transparent;
+            border: none;
+            color: #9ca3af;
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .toggle-password:hover {
+            background: rgba(255,255,255,0.02);
+            color: #f97316;
+        }
+
+        .toggle-password svg {
+            width: 18px;
+            height: 18px;
+        }
+
         .login-container input:focus {
             border-color: #f97316;
             box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.65), 0 0 0 10px rgba(249, 115, 22, 0.1);
@@ -480,8 +517,16 @@
                     <div class="field">
                         <div class="field-label"
                             data-i18n="auth.password">Password</div>
-                        <input type="password" id="password"
-                            placeholder="••••••••" required>
+                        <div class="password-wrapper">
+                            <input type="password" id="password"
+                                placeholder="••••••••" required>
+                            <button type="button" id="togglePassword" class="toggle-password" aria-label="Show password" aria-pressed="false">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path d="M12 5C7 5 2.73 8.11 1 12c1.73 3.89 6 7 11 7s9.27-3.11 11-7c-1.73-3.89-6-7-11-7z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></circle>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
 
                     <button type="submit" id="loginBtn" class="btn-primary"
@@ -670,6 +715,36 @@
             }
         }, 300);
     });
+
+        // Password visibility toggle
+        (function () {
+            const pwd = document.getElementById('password');
+            const toggle = document.getElementById('togglePassword');
+            if (!pwd || !toggle) return;
+
+            function updateToggleState() {
+                const isShown = pwd.type === 'text';
+                toggle.setAttribute('aria-pressed', String(isShown));
+                toggle.setAttribute('aria-label', isShown ? 'Hide password' : 'Show password');
+            }
+
+            toggle.addEventListener('click', function (e) {
+                const selectionStart = pwd.selectionStart;
+                const selectionEnd = pwd.selectionEnd;
+                pwd.type = pwd.type === 'password' ? 'text' : 'password';
+                updateToggleState();
+                // keep focus and restore cursor position
+                pwd.focus();
+                try {
+                    pwd.setSelectionRange(selectionStart, selectionEnd);
+                } catch (err) {
+                    // ignore if not supported
+                }
+            });
+
+            // initialize state
+            updateToggleState();
+        })();
 </script>
 
     </body>
