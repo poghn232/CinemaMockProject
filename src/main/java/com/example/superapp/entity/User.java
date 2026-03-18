@@ -46,4 +46,8 @@ public class User {
     @Builder.Default
     private Boolean commentDisabled = false; // if true, user cannot post comments
 
+    @Override
+    public String toString() {
+        return "User " + username;
+    }
 }

@@ -261,13 +261,13 @@
 </div>
 
 <script data-fragment-script>
-(function () {
+  (function () {
   /* ─── state ─── */
   let allLogs    = [];
   let filtered   = [];
   let currentPage = 1;
-  let sortCol    = null;
-  let sortDir    = 'asc';
+  let sortCol    = 'logId';
+  let sortDir    = 'desc';
   const PAGE_SIZE = () => parseInt(document.getElementById('logsPageSize').value, 10);
 
   /* ─── DOM refs ─── */
@@ -285,7 +285,7 @@
 
   /* ─── column config: detect automatically + pretty labels ─── */
   const LABEL_MAP = {
-    id:          'ID',
+    logId:          'ID',
     username:    'Username',
     action:      'Action',
     level:       'Level',
@@ -352,7 +352,7 @@
     if (!logs.length) return [];
     const keys = Object.keys(logs[0]);
     // put id first, time last
-    const priority = ['id','username','action','level','message','method','endpoint','ipAddress','ip','region','countryCode','details','status'];
+    const priority = ['logId','id','username','action','level','message','method','endpoint','ipAddress','ip','region','countryCode','details','status'];
     const timeLast  = [...TIME_FIELDS];
     const sorted = [
       ...priority.filter(k => keys.includes(k)),
@@ -383,7 +383,7 @@
         if (sortCol === col) {
           sortDir = sortDir === 'asc' ? 'desc' : 'asc';
         } else {
-          sortCol = col; sortDir = 'asc';
+          sortCol = col; sortDir = 'desc';
         }
         currentPage = 1;
         applyFilterSort();

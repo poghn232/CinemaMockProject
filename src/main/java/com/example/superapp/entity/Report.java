@@ -48,4 +48,9 @@ public class Report {
     public enum Status {
         PENDING, APPROVED, REJECTED
     }
+
+    @Override
+    public String toString() {
+        return "Report " + id;
+    }
 }

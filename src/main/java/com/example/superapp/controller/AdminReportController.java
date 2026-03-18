@@ -1,12 +1,15 @@
+//TODO: report logs
 package com.example.superapp.controller;
 
 import com.example.superapp.dto.ReportAdminDto;
+import com.example.superapp.entity.AdminLogs;
 import com.example.superapp.entity.Report;
 import com.example.superapp.entity.Review;
 import com.example.superapp.entity.User;
 import com.example.superapp.repository.ReportRepository;
 import com.example.superapp.repository.ReviewRepository;
 import com.example.superapp.repository.UserRepository;
+import com.example.superapp.service.AdminLogsService;
 import com.example.superapp.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +29,7 @@ public class AdminReportController {
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
     private final EmailService emailService;
+    private final AdminLogsService adminLogsService;
 
     @GetMapping
     public List<ReportAdminDto> listPending() {
@@ -51,6 +55,7 @@ public class AdminReportController {
         if (review != null) {
             review.setHidden(true);
             reviewRepository.save(review);
+            adminLogsService.saveLog(new AdminLogs(review + " is reported successfully"));
         }
 
         // disable reported user from commenting (reuse enabled flag: set to false)
@@ -59,9 +64,11 @@ public class AdminReportController {
             // disable commenting only (do not disable login)
             reported.setCommentDisabled(true);
             userRepository.save(reported);
+            adminLogsService.saveLog(new AdminLogs(reported + " is reported successfully"));
         }
 
         reportRepository.save(r);
+        adminLogsService.saveLog(new AdminLogs(r + " is added to database"));
 
         // send email to reported user
         if (reported != null) {
@@ -91,6 +98,7 @@ public class AdminReportController {
         r.setAdminReason(req.reason);
         r.setAdminActionAt(LocalDateTime.now());
         reportRepository.save(r);
+        adminLogsService.saveLog(new AdminLogs(r + " is added to database"));
 
         // send email to reporter with admin reason
         User reporter = r.getReporter();

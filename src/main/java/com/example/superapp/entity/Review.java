@@ -44,4 +44,9 @@ public class Review {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id", nullable = true)
     private Movie movie;
+
+    @Override
+    public String toString() {
+        return "Review " + reviewId;
+    }
 }
