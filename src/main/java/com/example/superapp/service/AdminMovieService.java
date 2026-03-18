@@ -8,6 +8,7 @@ import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.HttpStatus;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
@@ -34,6 +35,7 @@ public class AdminMovieService {
     private final TvRegionBlockRepository tvRegionBlockRepository;
     private final AdminLogsRepository adminLogsRepository;
     private final AdminLogsService adminLogsService;
+
 
     @Transactional(readOnly = true)
     public List<AdminMovieDto> listPublished(String query) {
@@ -132,15 +134,13 @@ public class AdminMovieService {
                                 mc.setPerson(p);
                             }
                             MovieCredit saved = movieCreditRepository.save(mc);
-                            adminLogsRepository.save(new AdminLogs(saved + " is added to database"));
-
                             existing.getCredits().add(mc);
                         }
                     }
                 } catch (Exception ignored) {}
 
                 Movie saved = movieRepository.save(existing);
-                adminLogsRepository.save(new AdminLogs(existing + " is added to database"));
+                adminLogsRepository.save(new AdminLogs(saved + " is added to database"));
                 return new AdminMovieDto(saved.getId(), saved.getTitle(), "movie",
                         Boolean.TRUE.equals(saved.getPublished()),
                         Boolean.TRUE.equals(saved.getActive()),
@@ -173,8 +173,6 @@ public class AdminMovieService {
                     mc.getId().setMovieId(saved.getId());
                     mc.setMovie(saved);
                     movieCreditRepository.save(mc);
-                    adminLogsRepository.save(new AdminLogs(saved + " is added to database"));
-
                     // attach back to saved movie entity
                     saved.getCredits().add(mc);
                 }
@@ -458,7 +456,6 @@ public class AdminMovieService {
             if (existing.isPresent()) {
                 movieRegionBlockRepository.deleteByMovie_IdAndRegionCode(id, region);
                 adminLogsRepository.save(new AdminLogs(m + " is now allowed in " + region));
-
             } else {
                 com.example.superapp.entity.MovieRegionBlock b = new com.example.superapp.entity.MovieRegionBlock();
                 b.setRegionCode(region);
