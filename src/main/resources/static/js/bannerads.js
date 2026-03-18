@@ -1,3 +1,4 @@
+(function () {
 document.head.insertAdjacentHTML("beforeend", `
   <style>
     .banner-ad-wrapper { position: fixed; z-index: 9999; }
@@ -94,3 +95,4 @@ fetch("/api/banner", {
             });
         });
     });
+})();
