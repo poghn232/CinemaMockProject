@@ -457,6 +457,8 @@ public class AdminMovieService {
             java.util.Optional<com.example.superapp.entity.MovieRegionBlock> existing = movieRegionBlockRepository.findByMovie_IdAndRegionCode(id, region);
             if (existing.isPresent()) {
                 movieRegionBlockRepository.deleteByMovie_IdAndRegionCode(id, region);
+                adminLogsRepository.save(new AdminLogs(m + " is now allowed in " + region));
+
             } else {
                 com.example.superapp.entity.MovieRegionBlock b = new com.example.superapp.entity.MovieRegionBlock();
                 b.setRegionCode(region);
@@ -469,6 +471,7 @@ public class AdminMovieService {
             java.util.Optional<com.example.superapp.entity.TvRegionBlock> existing = tvRegionBlockRepository.findByTvSeries_IdAndRegionCode(id, region);
             if (existing.isPresent()) {
                 tvRegionBlockRepository.deleteById(existing.get().getId());
+                adminLogsRepository.save(new AdminLogs(tv + " is now allowed in " + region));
             } else {
                 com.example.superapp.entity.TvRegionBlock b = new com.example.superapp.entity.TvRegionBlock();
                 b.setRegionCode(region);

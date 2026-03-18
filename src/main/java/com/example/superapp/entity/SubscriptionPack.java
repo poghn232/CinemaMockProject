@@ -27,4 +27,9 @@ public class SubscriptionPack {
 
     @OneToMany(mappedBy = "pack")
     private List<Subscription> subscriptions;
+
+    @Override
+    public String toString() {
+        return "Subscription pack " + packName;
+    }
 }

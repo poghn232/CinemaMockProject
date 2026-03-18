@@ -1,8 +1,10 @@
 package com.example.superapp.controller;
 
 import com.example.superapp.dto.SubscriptionPackDto;
+import com.example.superapp.entity.AdminLogs;
 import com.example.superapp.entity.SubscriptionPack;
 import com.example.superapp.repository.SubscriptionPackRepository;
+import com.example.superapp.service.AdminLogsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +24,8 @@ public class SubscriptionPackController {
 
     private final SubscriptionPackRepository packRepo;
 
+    private final AdminLogsService adminLogsService;
+
     @GetMapping
     public List<SubscriptionPackDto> all() {
         return packRepo.findAll()
@@ -37,6 +41,7 @@ public class SubscriptionPackController {
         p.setPackPrice(dto.packPrice());
         p.setDurationDays(dto.durationDays());
         SubscriptionPack saved = packRepo.save(p);
+        adminLogsService.saveLog(new AdminLogs(saved + " is added to database"));
         return new SubscriptionPackDto(saved.getPackId(), saved.getPackName(), saved.getPackPrice(), saved.getDurationDays());
     }
 
@@ -47,11 +52,15 @@ public class SubscriptionPackController {
         p.setPackPrice(dto.packPrice());
         p.setDurationDays(dto.durationDays());
         SubscriptionPack saved = packRepo.save(p);
+        adminLogsService.saveLog(new AdminLogs(saved + " is updated to database"));
         return new SubscriptionPackDto(saved.getPackId(), saved.getPackName(), saved.getPackPrice(), saved.getDurationDays());
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
+        SubscriptionPack saved = packRepo.findById(id).orElse(null);
         packRepo.deleteById(id);
+        adminLogsService.saveLog(new AdminLogs(saved + " is deleted from database"));
+
     }
 }
