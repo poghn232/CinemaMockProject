@@ -317,7 +317,14 @@
     if (TIME_FIELDS.has(key)) {
       try {
         const d = new Date(val);
-        if (!isNaN(d)) return d.toLocaleString('vi-VN', { dateStyle:'short', timeStyle:'medium' });
+        if (!isNaN(d.getTime())) {
+          const hours   = String(d.getHours()).padStart(2, '0');
+          const minutes = String(d.getMinutes()).padStart(2, '0');
+          const day     = String(d.getDate()).padStart(2, '0');
+          const month   = String(d.getMonth() + 1).padStart(2, '0');
+          const year    = d.getFullYear();
+          return `${hours}:${minutes} - ${day}/${month}/${year}`;
+        }
       } catch(_) {}
     }
 
