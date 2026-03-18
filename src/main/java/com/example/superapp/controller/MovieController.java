@@ -48,6 +48,11 @@ public class MovieController {
         return tmdbService.getMovieDetails(tmdbId);
     }
 
+    @GetMapping("/search")
+    public MoviePageResponse search(@RequestParam("q") String q, @RequestParam(name = "type", defaultValue = "all") String type, @RequestParam(name = "page", defaultValue = "1") int page) {
+        return tmdbService.search(q, type, page);
+    }
+
         @GetMapping("/tv/{tvId}/season/{season}/episode/{episode}")
         public Map<String, Object> episodeDetails(@PathVariable("tvId") long tvId,
                                                    @PathVariable("season") int season,

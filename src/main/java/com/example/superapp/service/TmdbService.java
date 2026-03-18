@@ -14,6 +14,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class TmdbService {
@@ -128,6 +130,80 @@ public class TmdbService {
             if (dto.getTitle() != null) {
                 items.add(dto);
             }
+        }
+
+        return new MoviePageResponse(items, currentPage, totalPages);
+    }
+
+    /**
+     * Search TMDB for query across movie/tv or specific type.
+     */
+    @SuppressWarnings("unchecked")
+    public MoviePageResponse search(String query, String type, int page) {
+        if (query == null) query = "";
+        String q = query.trim();
+        if (q.isBlank()) return new MoviePageResponse(List.of(), 1, 1);
+
+        String t = (type == null ? "all" : type.trim().toLowerCase());
+        String endpoint;
+        if (t.equals("movie")) endpoint = "/search/movie";
+        else if (t.equals("tv")) endpoint = "/search/tv";
+        else endpoint = "/search/multi";
+
+        int safePage = page <= 0 ? 1 : page;
+        String url = baseUrl + endpoint + "?language=en-US&page=" + safePage + "&query=" + URLEncoder.encode(q, StandardCharsets.UTF_8) + "&api_key=" + apiKey;
+
+        Map<String, Object> response = safeGetMap(url);
+        if (response == null) return new MoviePageResponse(List.of(), safePage, 1);
+
+        Object pageObj = response.get("page");
+        Object totalPagesObj = response.get("total_pages");
+
+        int currentPage = (pageObj instanceof Number n) ? n.intValue() : safePage;
+        int totalPages = (totalPagesObj instanceof Number n) ? Math.max(1, n.intValue()) : 1;
+
+        Object resultsObj = response.get("results");
+        if (!(resultsObj instanceof List<?> rawList)) {
+            return new MoviePageResponse(List.of(), currentPage, totalPages);
+        }
+
+        List<MovieItemDto> items = new ArrayList<>();
+        for (Object element : rawList) {
+            if (!(element instanceof Map)) continue;
+            Map<String, Object> row = (Map<String, Object>) element;
+            MovieItemDto dto = new MovieItemDto();
+
+            Object idObj = row.get("id");
+            if (idObj instanceof Number n) dto.setId(n.longValue());
+
+            String mediaTypeValue = stringVal(row.get("media_type"));
+            if (mediaTypeValue == null || mediaTypeValue.isBlank()) {
+                // fallback: infer from endpoint
+                mediaTypeValue = t.equals("all") ? (row.containsKey("title") ? "movie" : "tv") : t;
+            }
+            dto.setType(mediaTypeValue);
+
+            String title = stringVal(row.get("title"));
+            if (title == null || title.isBlank()) title = stringVal(row.get("name"));
+            dto.setTitle(title);
+
+            Object voteObj = row.get("vote_average");
+            if (voteObj instanceof Number n) dto.setRating(n.doubleValue());
+
+            String dateStr = stringVal(row.get("release_date"));
+            if (dateStr == null || dateStr.isBlank()) dateStr = stringVal(row.get("first_air_date"));
+            if (dateStr != null && dateStr.length() >= 4) {
+                try {
+                    dto.setYear(LocalDate.parse(dateStr.substring(0, 10)).getYear());
+                } catch (Exception ignored) {
+                    try { dto.setYear(Integer.parseInt(dateStr.substring(0, 4))); } catch (Exception ignored2) {}
+                }
+            }
+
+            String posterPath = stringVal(row.get("poster_path"));
+            if (posterPath != null && !posterPath.isBlank()) dto.setImageUrl(imageBaseUrl + posterPath);
+
+            if (dto.getTitle() != null) items.add(dto);
         }
 
         return new MoviePageResponse(items, currentPage, totalPages);

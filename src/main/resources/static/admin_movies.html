@@ -96,7 +96,7 @@
     const pageSize = 5; 
 
     // Render films with search and pagination
-    function renderFilms() {
+  async function renderFilms() {
       const container = document.getElementById("filmsList");
       const pageInfo = document.getElementById("filmsPageInfo");
 
@@ -228,16 +228,16 @@
       container.innerHTML = "Loading...";
       try {
         filmsCache = (await fetchJson(api.movies)) || [];
-        renderFilms();
+        await renderFilms();
       } catch (e) {
         container.innerHTML = "Failed to load films.";
         console.error(e);
       }
     }
 
-    document.getElementById("filmSearch").addEventListener("input", () => {
+    document.getElementById("filmSearch").addEventListener("input", async () => {
       currentPage = 1;
-      renderFilms();
+      try { await renderFilms(); } catch (e) { console.error('renderFilms error', e); }
     });
     document
       .getElementById("refreshFilms")
@@ -803,20 +803,26 @@
 
     document.getElementById("tmdbReload").addEventListener("click", async () => {
       tmdbPage = 1;
-      await loadTmdb();
+      const qRaw = (document.getElementById("tmdbSearch").value || "").trim();
+      if (qRaw) await performTmdbSearch(1);
+      else await loadTmdb();
     });
 
     document.getElementById("tmdbPrev").addEventListener("click", async () => {
       if (tmdbPage > 1) {
         tmdbPage--;
-        await loadTmdb();
+        const qRaw = (document.getElementById("tmdbSearch").value || "").trim();
+        if (qRaw) await performTmdbSearch(tmdbPage);
+        else await loadTmdb();
       }
     });
 
     document.getElementById("tmdbNext").addEventListener("click", async () => {
       if (tmdbPage < tmdbTotalPages) {
         tmdbPage++;
-        await loadTmdb();
+        const qRaw = (document.getElementById("tmdbSearch").value || "").trim();
+        if (qRaw) await performTmdbSearch(tmdbPage);
+        else await loadTmdb();
       }
     });
 
@@ -825,22 +831,130 @@
       await loadTmdb();
     });
 
-    document.getElementById("tmdbSearch").addEventListener("input", () => {
-      renderTmdb();
+    // Helper: perform paginated TMDB search and render results
+    async function performTmdbSearch(page) {
+      const qRaw = (document.getElementById("tmdbSearch").value || "").trim();
+      const container = document.getElementById('tmdbTableContainer');
+      const pageInfo = document.getElementById('tmdbPageInfo');
+      if (!qRaw) {
+        renderTmdb();
+        return;
+      }
+      container.innerHTML = 'Searching TMDB...';
+      try {
+        const resp = await fetchJson(`/api/movies/search?q=${encodeURIComponent(qRaw)}&type=${encodeURIComponent(document.getElementById('tmdbBrowseType').value || 'all')}&page=${encodeURIComponent(page || 1)}`);
+        const list = resp.items || [];
+        tmdbPage = resp.page || page || 1;
+        tmdbTotalPages = resp.totalPages || 1;
+        if (!list.length) {
+          container.innerHTML = 'No results.';
+          pageInfo.textContent = '';
+          return;
+        }
+
+        const table = document.createElement('table');
+        table.style.width = '100%';
+        table.style.borderCollapse = 'collapse';
+        table.innerHTML = `<thead><tr style="text-align:left"><th style="width:64px"></th><th style="width:50%">Title</th><th style="width:12%">Type</th><th style="width:8%">Year</th><th style="width:8%">Rating</th><th style="width:12%"></th></tr></thead>`;
+        const tbody = document.createElement('tbody');
+
+        list.forEach((it) => {
+          const tr = document.createElement('tr');
+          tr.style.borderBottom = '1px solid rgba(255,255,255,0.03)';
+
+          const imgTd = document.createElement('td');
+          imgTd.style.width = '64px';
+          const img = document.createElement('img');
+          img.src = it.imageUrl || '/static/images/banner.png';
+          img.style.width = '48px';
+          img.style.height = '48px';
+          img.style.objectFit = 'cover';
+          img.style.borderRadius = '4px';
+          imgTd.appendChild(img);
+
+          const titleTd = document.createElement('td');
+          titleTd.textContent = it.title || '';
+
+          const typeTd = document.createElement('td');
+          typeTd.textContent = it.type === 'tv' ? 'TV Series' : 'Movie';
+
+          const yearTd = document.createElement('td');
+          yearTd.textContent = it.year || '';
+
+          const ratingTd = document.createElement('td');
+          ratingTd.textContent = it.rating != null ? it.rating.toFixed(1) : '';
+
+          const actionTd = document.createElement('td');
+          if (isExistingItem(it)) {
+            const added = document.createElement('button');
+            added.className = 'btn ghost';
+            added.textContent = 'Added';
+            added.disabled = true;
+            actionTd.appendChild(added);
+          } else {
+            const addBtn = document.createElement('button');
+            addBtn.className = 'btn';
+            addBtn.textContent = 'Add';
+            addBtn.addEventListener('click', async () => {
+              const msg = document.getElementById('tmdbMessage');
+              msg.textContent = 'Loading details...';
+              try {
+                const details = await fetchJson(`/api/movies/details?id=${encodeURIComponent(it.id)}&type=${encodeURIComponent(it.type)}`);
+                msg.textContent = '';
+                showTmdbDetailModal(details, it);
+              } catch (e) {
+                msg.textContent = 'Failed to load details: ' + e;
+              }
+            });
+            actionTd.appendChild(addBtn);
+          }
+
+          tr.appendChild(imgTd);
+          tr.appendChild(titleTd);
+          tr.appendChild(typeTd);
+          tr.appendChild(yearTd);
+          tr.appendChild(ratingTd);
+          tr.appendChild(actionTd);
+          tbody.appendChild(tr);
+        });
+
+        table.appendChild(tbody);
+        container.innerHTML = '';
+        container.appendChild(table);
+        pageInfo.textContent = `Page ${tmdbPage} / ${Math.max(1, tmdbTotalPages)}`;
+      } catch (err) {
+        container.innerHTML = 'Search failed: ' + err;
+        pageInfo.textContent = '';
+      }
+    }
+
+    let tmdbSearchTimer = null;
+    document.getElementById("tmdbSearch").addEventListener("input", (e) => {
+      clearTimeout(tmdbSearchTimer);
+      tmdbSearchTimer = setTimeout(async () => {
+        const qRaw = (document.getElementById("tmdbSearch").value || "").trim();
+        if (!qRaw) {
+          // no query -> render cached browse results
+          renderTmdb();
+          return;
+        }
+        // perform paginated search starting at page 1
+        await performTmdbSearch(1);
+      }, 300);
     });
 
-    document.getElementById("filmsPrev").addEventListener("click", () => {
+    document.getElementById("filmsPrev").addEventListener("click", async () => {
       if (currentPage > 1) {
         currentPage--;
-        renderFilms();
+        try { await renderFilms(); } catch (e) { console.error('renderFilms error', e); }
       }
     });
 
-    document.getElementById("filmsNext").addEventListener("click", () => {
+    document.getElementById("filmsNext").addEventListener("click", async () => {
       const totalPages = Math.ceil(filmsCache.length / pageSize);
       if (currentPage < totalPages) {
         currentPage++;
-        renderFilms();
+        try { await renderFilms(); } catch (e) { console.error('renderFilms error', e); }
       }
     });
 
