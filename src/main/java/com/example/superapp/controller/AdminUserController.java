@@ -1,7 +1,9 @@
 package com.example.superapp.controller;
 
 import com.example.superapp.dto.UserAdminDto;
+import com.example.superapp.entity.AdminLogs;
 import com.example.superapp.entity.User;
+import com.example.superapp.repository.AdminLogsRepository;
 import com.example.superapp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -21,6 +23,7 @@ public class AdminUserController {
 
     private final UserRepository userRepository;
     private final com.example.superapp.repository.ReviewRepository reviewRepository;
+    private final AdminLogsRepository adminLogsRepository;
 
     @GetMapping
     public List<UserAdminDto> all() {
@@ -34,7 +37,6 @@ public class AdminUserController {
 
     @PutMapping("/{id}/enabled")
     public UserAdminDto setEnabled(@PathVariable Long id, @RequestBody Boolean enabled) {
-    log.info("AdminUserController.setEnabled called for id={} enabled={}", id, enabled);
         User u = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
     // disallow changing admin accounts
     if (u.getRole() != null && u.getRole().toUpperCase().contains("ADMIN")) {
@@ -43,6 +45,7 @@ public class AdminUserController {
     // Toggle commenting instead of login
     u.setCommentDisabled(enabled);
         User saved = userRepository.save(u);
+        adminLogsRepository.save(new AdminLogs("User" + saved.getUsername() + "is enabled"));
         // If we re-enable commenting for this user, unhide their previously hidden reviews
         if (Boolean.FALSE.equals(saved.getCommentDisabled())) {
             try {

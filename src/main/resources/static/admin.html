@@ -568,6 +568,9 @@
                             data-i18n="admin.films">
                             Films
                         </button>
+                        <button class="side-item" data-fragment="admin_logs_fragment.html">
+                            Logs
+                        </button>
                            <button class="side-item"
                             data-fragment="admin_report.html"
                             data-i18n="admin.reports">
@@ -600,7 +603,6 @@
         users: "/api/admin/users",
         packs: "/api/packs",
         movies: "/api/admin/movies",
-        reports: "/api/admin/reports"
     };
 
     // Generic fetch function with JWT token support
@@ -609,22 +611,9 @@
         const headers = Object.assign({}, opts.headers || {});
         if (token) headers["Authorization"] = "Bearer " + token;// Attach token
         const res = await fetch(url, Object.assign({}, opts, {headers}));
+        if (!res.ok) throw new Error(res.status + " " + (await res.text()));
         const txt = await res.text();
-        // try parse JSON body
-        let json = null;
-        if (txt) {
-            try {
-                json = JSON.parse(txt);
-            } catch (e) {
-                json = null;
-            }
-        }
-        if (!res.ok) {
-            // prefer a 'message' field from the server JSON if present
-            const errMsg = (json && json.message) ? json.message : (txt || res.statusText || String(res.status));
-            throw new Error(res.status + " " + errMsg);
-        }
-        return json;
+        return txt ? JSON.parse(txt) : null;
     }
 
     // Convert string to Title Case (for display formatting)

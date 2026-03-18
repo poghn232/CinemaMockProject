@@ -27,4 +27,9 @@ public class Season {
 
     @OneToMany(mappedBy = "season", cascade = CascadeType.ALL)
     private Set<Episode> episodes = new HashSet<>();
+
+    @Override
+    public String toString() {
+        return "Season " + name;
+    }
 }
