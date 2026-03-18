@@ -10,6 +10,10 @@ import com.example.superapp.repository.UserRepository;
 import com.example.superapp.repository.SubscriptionRepository;
 import com.example.superapp.repository.MovieRepository;
 import lombok.RequiredArgsConstructor;
+import com.example.superapp.repository.PaymentRepository;
+import com.example.superapp.entity.Payment;
+import com.example.superapp.entity.PaymentStatus;
+import java.math.BigDecimal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +28,7 @@ public class AdminAnalyticsController {
 
     private final UserRepository userRepository;
     private final SubscriptionRepository subscriptionRepository;
+    private final PaymentRepository paymentRepository;
     private final MovieRepository movieRepository;
     private final LoginHistoryRepository loginHistoryRepository;
 
@@ -189,5 +194,22 @@ public class AdminAnalyticsController {
             default ->
                 null;
         };
+    }
+
+    @GetMapping("/revenue")
+    public Map<String, Object> revenue(@RequestParam(defaultValue = "all") String period) {
+        // Sum amounts for payments with SUCCESS status. Period parameter is accepted for future extension.
+        List<Payment> payments = paymentRepository.findAll();
+        BigDecimal total = payments.stream()
+                .filter(p -> p.getStatus() != null && p.getStatus() == PaymentStatus.SUCCESS)
+                .map(Payment::getAmount)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("totalRevenue", total); // BigDecimal serializes nicely with Jackson
+    result.put("currency", "VND");
+        result.put("period", period);
+        return result;
     }
 }

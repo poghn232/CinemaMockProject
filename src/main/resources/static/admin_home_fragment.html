@@ -1,38 +1,33 @@
 <div class="card">
     <h2 data-i18n="nav.home">Admin Home</h2>
     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 12px">
-        <div style="
-        background: rgba(255, 255, 255, 0.02);
-        padding: 12px;
-        border-radius: 8px;
-      ">
+        <div style="background: rgba(255, 255, 255, 0.02); padding: 12px; border-radius: 8px;">
             <div class="muted" data-i18n="admin.users">Users (non-admin)</div>
-            <div id="homeUsers" style="font-weight: 700; font-size: 20px; margin-top: 8px">
-                --
-            </div>
+            <div id="homeUsers" style="font-weight: 700; font-size: 20px; margin-top: 8px">--</div>
         </div>
-        <div style="
-        background: rgba(255, 255, 255, 0.02);
-        padding: 12px;
-        border-radius: 8px;
-      ">
+        <div style="background: rgba(255, 255, 255, 0.02); padding: 12px; border-radius: 8px;">
             <div class="muted" data-i18n="admin.packs">Subscription packs</div>
-            <div id="homePacks" style="font-weight: 700; font-size: 20px; margin-top: 8px">
-                --
-            </div>
-
-
+            <div id="homePacks" style="font-weight: 700; font-size: 20px; margin-top: 8px">--</div>
         </div>
-        <div style="
-      background: rgba(255, 255, 255, 0.02);
-      padding: 12px;
-      border-radius: 8px;
-    ">
+        <div style="background: rgba(255, 255, 255, 0.02); padding: 12px; border-radius: 8px;">
             <div class="muted" data-i18n="admin.films">Published Films</div>
-            <div id="homeMovies" style="font-weight: 700; font-size: 20px; margin-top: 8px">
-                --
-            </div>
+            <div id="homeMovies" style="font-weight: 700; font-size: 20px; margin-top: 8px">--</div>
+        </div>
+    </div>
 
+    <!-- additional stats row -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 12px">
+        <div style="background: rgba(255, 255, 255, 0.02); padding: 12px; border-radius: 8px;">
+            <div class="muted">Reports (pending)</div>
+            <div id="homeReports" style="font-weight: 700; font-size: 20px; margin-top: 8px">--</div>
+        </div>
+        <div style="background: rgba(255, 255, 255, 0.02); padding: 12px; border-radius: 8px;">
+            <div class="muted">Banners</div>
+            <div id="homeBanners" style="font-weight: 700; font-size: 20px; margin-top: 8px">--</div>
+        </div>
+        <div style="background: rgba(255, 255, 255, 0.02); padding: 12px; border-radius: 8px;">
+            <div class="muted">Total Revenue</div>
+            <div id="homeAnalytics" style="font-weight: 700; font-size: 20px; margin-top: 8px">--</div>
         </div>
     </div>
 
@@ -48,6 +43,9 @@
     <button class="btn" onclick="window.adminApi.loadFragment('admin_movies.html')" data-i18n="admin.manage_films">
         Manage Films
     </button>
+
+    <button class="btn ghost" onclick="window.adminApi.loadFragment('admin_report.html')">Manage Reports</button>
+    <button class="btn" onclick="window.adminApi.loadFragment('admin_banners_fragment.html')">Manage Banners</button>
 <!-- Fragment script executed after this HTML is loaded -->
     <script data-fragment-script>
         (async function () {
@@ -56,13 +54,31 @@
                 const users = (await fetchJson(api.users)) || [];
                 const packs = (await fetchJson(api.packs)) || [];
                 const movies = (await fetchJson(api.movies)) || [];
-                // Count only non-admin users
-                document.getElementById("homeUsers").textContent = users.filter(
-                    (u) => u.role !== "ADMIN",
-                ).length;
-                document.getElementById("homePacks").textContent = packs.length;
 
+                // additional endpoints
+                let reports = [];
+                try { reports = (await fetchJson(api.reports)) || []; } catch (e) { reports = []; }
+                let banners = [];
+                try { const b = await fetchJson('/api/banner'); banners = b || []; } catch (e) { banners = []; }
+
+                // Count only non-admin users
+                document.getElementById("homeUsers").textContent = users.filter((u) => u.role !== "ADMIN").length;
+                document.getElementById("homePacks").textContent = packs.length;
                 document.getElementById("homeMovies").textContent = movies.length;
+
+                document.getElementById("homeReports").textContent = reports.length;
+                document.getElementById("homeBanners").textContent = banners.length;
+
+                // fetch total revenue from admin analytics
+                try {
+                    const rev = await fetchJson('/api/admin/analytics/revenue');
+                    const amount = (rev && rev.totalRevenue) ? Number(rev.totalRevenue) : 0;
+                    // format as VND, no fractional digits and use dot as thousand separator (e.g. 1.234.567 ₫)
+                    const vnd = Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(amount);
+                    document.getElementById("homeAnalytics").textContent = vnd;
+                } catch (err) {
+                    document.getElementById("homeAnalytics").textContent = '--';
+                }
             } catch (e) {
                 console.error(e);
             }

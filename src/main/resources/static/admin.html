@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="vi">
-    <script>
+<script>
     const token = localStorage.getItem("token");
 
     if (!token) {
@@ -14,11 +14,11 @@
         }
     }
 </script>
-    <head>
-        <meta charset="UTF-8" />
-        <title>MovieZone | Admin</title>
-        <style>
 
+<head>
+    <meta charset="UTF-8" />
+    <title>MovieZone | Admin</title>
+    <style>
         :root {
             --bg-primary: #020617;
             --accent: #f97316;
@@ -34,23 +34,21 @@
         }
 
         body {
-            font-family: "Poppins",
-            system-ui,
-            -apple-system,
-            BlinkMacSystemFont,
-            "Segoe UI",
-            sans-serif;
-            background: radial-gradient(
-                    circle at 0 0,
+            font-family:
+                "Poppins",
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+            background:
+                radial-gradient(circle at 0 0,
                     rgba(255, 255, 255, 0.06),
-                    transparent 55%
-            ),
-            radial-gradient(
-                    circle at 100% 100%,
+                    transparent 55%),
+                radial-gradient(circle at 100% 100%,
                     rgba(37, 99, 235, 0.3),
-                    transparent 60%
-            ),
-            linear-gradient(135deg, #020617, #030712 50%, #020617);
+                    transparent 60%),
+                linear-gradient(135deg, #020617, #030712 50%, #020617);
             color: var(--text-main);
             min-height: 100vh;
         }
@@ -67,14 +65,14 @@
             justify-content: space-between;
             padding: 10px 20px;
             border-radius: 18px;
-            background: radial-gradient(
-                    circle at 0 0,
+            background:
+                radial-gradient(circle at 0 0,
                     rgba(148, 163, 184, 0.35),
-                    transparent 58%
-            ),
-            rgba(15, 23, 42, 0.96);
-            box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.45),
-            0 18px 40px rgba(15, 23, 42, 0.95);
+                    transparent 58%),
+                rgba(15, 23, 42, 0.96);
+            box-shadow:
+                0 0 0 1px rgba(148, 163, 184, 0.45),
+                0 18px 40px rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(18px);
             position: sticky;
             top: 12px;
@@ -91,12 +89,10 @@
             width: 30px;
             height: 30px;
             border-radius: 999px;
-            background: radial-gradient(
-                    circle at 30% 20%,
+            background: radial-gradient(circle at 30% 20%,
                     #f97316,
                     #e11d48 55%,
-                    #4f46e5
-            );
+                    #4f46e5);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -153,8 +149,9 @@
             background: linear-gradient(135deg, #f97316, #ec4899);
             color: white;
             border-color: transparent;
-            box-shadow: 0 12px 22px rgba(248, 113, 113, 0.6),
-            0 0 0 1px rgba(248, 113, 113, 0.7);
+            box-shadow:
+                0 12px 22px rgba(248, 113, 113, 0.6),
+                0 0 0 1px rgba(248, 113, 113, 0.7);
         }
 
         .nav-right {
@@ -360,7 +357,6 @@
             cursor: pointer;
         }
 
-
         select option {
             background: #0f172a;
             color: #e5e7eb;
@@ -390,7 +386,6 @@
             }
         }
 
-
         .lang-dropdown {
             position: relative;
         }
@@ -406,7 +401,6 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.15s ease;
-
         }
 
         .lang-current img {
@@ -451,7 +445,6 @@
             height: 20px;
             object-fit: cover;
             border-radius: 50%;
-
         }
 
         .lang-item:hover {
@@ -462,307 +455,299 @@
             display: block;
         }
     </style>
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-    </head>
-    <body>
-        <div class="page-shell">
-            <div class="navbar">
-                <div class="nav-left">
-                    <div class="nav-logo">MZ</div>
-                    <div class="nav-title">
-                        <div class="nav-title-main"
-                            data-i18n="admin.title">MovieZone Admin</div>
-                        <div class="nav-title-sub"
-                            data-i18n="admin.subtitle">Manage users &
-                            packs</div>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+</head>
+
+<body>
+    <div class="page-shell">
+        <div class="navbar">
+            <div class="nav-left">
+                <div class="nav-logo">MZ</div>
+                <div class="nav-title">
+                    <div class="nav-title-main" data-i18n="admin.title">
+                        MovieZone Admin
                     </div>
-                </div>
-                <div class="nav-center">
-                    <a class="nav-link active" href="/admin.html"
-                        data-i18n="nav.home">Home</a>
-                </div>
-                <div class="lang-dropdown">
-                    <button class="lang-current" id="langCurrent">
-                        <img id="langFlag" src="https://flagcdn.com/w40/gb.png">
-                    </button>
-
-                    <div class="lang-menu" id="langMenu">
-                        <div class="lang-item" onclick="changeLanguage('vi')">
-                            <img src="https://flagcdn.com/w40/vn.png">
-                            <span>Tiếng Việt</span>
-                        </div>
-
-                        <div class="lang-item" onclick="changeLanguage('en')">
-                            <img src="https://flagcdn.com/w40/gb.png">
-                            <span>English</span>
-                        </div>
-                        <div class="lang-item" onclick="changeLanguage('my')">
-                            <img src="https://flagcdn.com/w40/mm.png">
-                            <span>မြန်မာဘာသာ</span>
-                        </div>
-
-                        <div class="lang-item" onclick="changeLanguage('ja')">
-                            <img src="https://flagcdn.com/w40/jp.png">
-                            <span>日本語</span>
-                        </div>
-
-                        <div class="lang-item" onclick="changeLanguage('de')">
-                            <img src="https://flagcdn.com/w40/de.png">
-                            <span>Deutsch</span>
-                        </div>
+                    <div class="nav-title-sub" data-i18n="admin.subtitle">
+                        Manage users & packs
                     </div>
-                </div>
-                <div class="nav-right">
-                    <div class="nav-username">
-                        <span data-i18n="admin.welcome">Welcome</span>
-                        <span id="usernameDisplay"></span>
-                    </div>
-                    <button id="logoutBtn" class="nav-button nav-button-primary"
-                        data-i18n="nav.logout">
-                        Sign out
-                    </button>
                 </div>
             </div>
+            <div class="nav-center">
+                <a class="nav-link active" href="/admin.html" data-i18n="nav.home">Home</a>
+            </div>
+            <div class="lang-dropdown">
+                <button class="lang-current" id="langCurrent">
+                    <img id="langFlag" src="https://flagcdn.com/w40/gb.png" />
+                </button>
 
-            <div class="layout">
-                <aside class="sidebar" id="sidebar">
-                    <div class="side-section">
-                        <div class="stat">
-                            <div class="stat-label"
-                                data-i18n="admin.users">Users (non-admin)</div>
-                            <div class="stat-value" id="countUsers">--</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label"
-                                data-i18n="admin.packs">Subscription packs</div>
-                            <div class="stat-value" id="countPacks">--</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label"
-                                data-i18n="admin.films">Published films</div>
-                            <div class="stat-value" id="countFilms">--</div>
-                        </div>
+                <div class="lang-menu" id="langMenu">
+                    <div class="lang-item" onclick="changeLanguage('vi')">
+                        <img src="https://flagcdn.com/w40/vn.png" />
+                        <span>Tiếng Việt</span>
                     </div>
-                    <nav class="side-menu">
-                        <button class="side-item"
-                            data-fragment="admin_home_fragment.html"
-                            data-i18n="nav.home">
-                            Home
-                        </button>
-                        <button class="side-item"
-                            data-fragment="admin_dashboard_fragment.html">
-                            Analytics
-                        </button>
-                        <button class="side-item"
-                            data-fragment="admin_users.html"
-                            data-i18n="admin.users">
-                            Users
-                        </button>
-                        <button class="side-item"
-                            data-fragment="admin_packs.html"
-                            data-i18n="admin.packs">
-                            Packs
-                        </button>
-                        <button class="side-item"
-                            data-fragment="admin_movies.html"
-                            data-i18n="admin.films">
-                            Films
-                        </button>
-                        <button class="side-item" data-fragment="admin_logs_fragment.html">
-                            Logs
-                        </button>
-                           <button class="side-item"
-                            data-fragment="admin_report.html"
-                            data-i18n="admin.reports">
-                            Reports
-                        </button>
-                        <button class="side-item"
-                            data-fragment="admin_logs_fragment.html">
-                            Logs
-                        </button>
-                        <button class="side-item"
-                            data-fragment="admin_banners_fragment.html">
-                            Banners
-                        </button>
-                    </nav>
-                </aside>
 
-                <main class="content" id="content">
-                    <!-- dynamic content loaded here -->
-                    <div class="card">
-                        <h2 data-i18n="common.loading">Loading...</h2>
+                    <div class="lang-item" onclick="changeLanguage('en')">
+                        <img src="https://flagcdn.com/w40/gb.png" />
+                        <span>English</span>
                     </div>
-                </main>
+                    <div class="lang-item" onclick="changeLanguage('my')">
+                        <img src="https://flagcdn.com/w40/mm.png" />
+                        <span>မြန်မာဘာသာ</span>
+                    </div>
+
+                    <div class="lang-item" onclick="changeLanguage('ja')">
+                        <img src="https://flagcdn.com/w40/jp.png" />
+                        <span>日本語</span>
+                    </div>
+
+                    <div class="lang-item" onclick="changeLanguage('de')">
+                        <img src="https://flagcdn.com/w40/de.png" />
+                        <span>Deutsch</span>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-right">
+                <div class="nav-username">
+                    <span data-i18n="admin.welcome">Welcome</span>
+                    <span id="usernameDisplay"></span>
+                </div>
+                <button id="logoutBtn" class="nav-button nav-button-primary" data-i18n="nav.logout">
+                    Sign out
+                </button>
             </div>
         </div>
 
-        <script src="/js/i18n.js"></script>
-        <script>
-    // Shared admin JS: loads fragments and provides APIs for user/pack/film screens
-    const api = {
-        users: "/api/admin/users",
-        packs: "/api/packs",
-        movies: "/api/admin/movies",
-    };
+        <div class="layout">
+            <aside class="sidebar" id="sidebar">
+                <div class="side-section">
+                    <div class="stat">
+                        <div class="stat-label" data-i18n="admin.users">
+                            Users (non-admin)
+                        </div>
+                        <div class="stat-value" id="countUsers">--</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label" data-i18n="admin.packs">
+                            Subscription packs
+                        </div>
+                        <div class="stat-value" id="countPacks">--</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label" data-i18n="admin.films">
+                            Published films
+                        </div>
+                        <div class="stat-value" id="countFilms">--</div>
+                    </div>
+                </div>
+                <nav class="side-menu">
+                    <button class="side-item" data-fragment="admin_home_fragment.html" data-i18n="nav.home">
+                        Home
+                    </button>
+                    <button class="side-item" data-fragment="admin_dashboard_fragment.html">
+                        Analytics
+                    </button>
+                    <button class="side-item" data-fragment="admin_users.html" data-i18n="admin.users">
+                        Users
+                    </button>
+                    <button class="side-item" data-fragment="admin_packs.html" data-i18n="admin.packs">
+                        Packs
+                    </button>
+                    <button class="side-item" data-fragment="admin_movies.html" data-i18n="admin.films">
+                        Films
+                    </button>
 
-    // Generic fetch function with JWT token support
-    async function fetchJson(url, opts = {}) {
-        const token = localStorage.getItem("token");// Get saved login token
-        const headers = Object.assign({}, opts.headers || {});
-        if (token) headers["Authorization"] = "Bearer " + token;// Attach token
-        const res = await fetch(url, Object.assign({}, opts, {headers}));
-        if (!res.ok) throw new Error(res.status + " " + (await res.text()));
-        const txt = await res.text();
-        return txt ? JSON.parse(txt) : null;
-    }
+                    <button class="side-item" data-fragment="admin_report.html" data-i18n="admin.reports">
+                        Reports
+                    </button>
+                    <button class="side-item" data-fragment="admin_logs_fragment.html">
+                        Logs
+                    </button>
+                    <button class="side-item" data-fragment="admin_banners_fragment.html">
+                        Banners
+                    </button>
+                </nav>
+            </aside>
 
-    // Convert string to Title Case (for display formatting)
-    function titleCase(s) {
-        if (!s) return s;
-        return s
-            .split(" ")
-            .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-            .join(" ");
-    }
+            <main class="content" id="content">
+                <!-- dynamic content loaded here -->
+                <div class="card">
+                    <h2 data-i18n="common.loading">Loading...</h2>
+                </div>
+            </main>
+        </div>
+    </div>
 
-    // Format price to 2 decimal places
-    function formatPrice(v) {
-        if (v == null) return "";
-        const n = parseFloat(v);
-        if (isNaN(n)) return v;
-        return n.toFixed(2);
-    }
+    <script src="/js/i18n.js"></script>
+    <script>
+        // Shared admin JS: loads fragments and provides APIs for user/pack/film screens
+        const api = {
+            users: "/api/admin/users",
+            packs: "/api/packs",
+            movies: "/api/admin/movies",
+            // added missing endpoints used by fragments
+            reports: "/api/admin/reports",
+            banner: "/api/banner",
+        };
 
-    // load fragment into #content
-    async function loadFragment(url) {
-        const content = document.getElementById("content");
-        content.innerHTML = '<div class="card"><h2 data-i18n="common.loading">Loading...</h2></div>';
-        try {
-            // Attach token header (same logic as fetchJson)
-            const token = localStorage.getItem("token");
-            const headers = {};
-            if (token) headers["Authorization"] = "Bearer " + token;
-            const res = await fetch(url, {cache: "no-store", headers});
-            if (!res.ok) throw new Error(res.status + " " + res.statusText);
-            const html = await res.text();
-            content.innerHTML = html;
-            // chạy i18n cho fragment vừa load
-            if (window.applyTranslations) {
-                applyTranslations();
-            }
-            // if the fragment includes a <script type="module" data-fragment-script> tag, evaluate it
-            const dummy = document.createElement("div");
-            dummy.innerHTML = html;
-            const scripts = dummy.querySelectorAll(
-                "script[data-fragment-script]",
-            );
-            scripts.forEach((s) => {
-                try {
-                    new Function(s.textContent)();// Run script
-                } catch (e) {
-                    console.error("fragment script error", e);
-                }
-            });
-        } catch (e) {
+        // Generic fetch function with JWT token support
+        async function fetchJson(url, opts = {}) {
+            const token = localStorage.getItem("token"); // Get saved login token
+            const headers = Object.assign({}, opts.headers || {});
+            if (token) headers["Authorization"] = "Bearer " + token; // Attach token
+            const res = await fetch(url, Object.assign({}, opts, { headers }));
+            if (!res.ok) throw new Error(res.status + " " + (await res.text()));
+            const txt = await res.text();
+            return txt ? JSON.parse(txt) : null;
+        }
+
+        // Convert string to Title Case (for display formatting)
+        function titleCase(s) {
+            if (!s) return s;
+            return s
+                .split(" ")
+                .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                .join(" ");
+        }
+
+        // Format price to 2 decimal places
+        function formatPrice(v) {
+            if (v == null) return "";
+            const n = parseFloat(v);
+            if (isNaN(n)) return v;
+            return n.toFixed(2);
+        }
+
+        // load fragment into #content
+        async function loadFragment(url) {
+            const content = document.getElementById("content");
             content.innerHTML =
-                '<div class="card"><h2>Failed to load</h2><div class="muted">' +
-                String(e) +
-                "</div></div>";
-            console.error(e);
+                '<div class="card"><h2 data-i18n="common.loading">Loading...</h2></div>';
+            try {
+                // Attach token header (same logic as fetchJson)
+                const token = localStorage.getItem("token");
+                const headers = {};
+                if (token) headers["Authorization"] = "Bearer " + token;
+                const res = await fetch(url, { cache: "no-store", headers });
+                if (!res.ok) throw new Error(res.status + " " + res.statusText);
+                const html = await res.text();
+                content.innerHTML = html;
+                // chạy i18n cho fragment vừa load
+                if (window.applyTranslations) {
+                    applyTranslations();
+                }
+                // if the fragment includes a <script type="module" data-fragment-script> tag, evaluate it
+                const dummy = document.createElement("div");
+                dummy.innerHTML = html;
+                const scripts = dummy.querySelectorAll(
+                    "script[data-fragment-script]",
+                );
+                scripts.forEach((s) => {
+                    try {
+                        new Function(s.textContent)(); // Run script
+                    } catch (e) {
+                        console.error("fragment script error", e);
+                    }
+                });
+            } catch (e) {
+                content.innerHTML =
+                    '<div class="card"><h2>Failed to load</h2><div class="muted">' +
+                    String(e) +
+                    "</div></div>";
+                console.error(e);
+            }
         }
-    }
 
-    // update counts
-    async function refreshCounts() {
-        try {
-            const users = (await fetchJson(api.users)) || [];
-            const packs = (await fetchJson(api.packs)) || [];
-            const films = (await fetchJson(api.movies)) || [];
-            //non_admin only
-            const nonAdmin = (users || []).filter(
-                (u) => u.role !== "ADMIN",
-            ).length;
-            document.getElementById("countUsers").textContent = nonAdmin;
-            document.getElementById("countPacks").textContent = (
-                packs || []
-            ).length;
-            document.getElementById("countFilms").textContent = (
-                films || []
-            ).length;
-        } catch (e) {
-            console.error("refreshCounts", e);
+        // update counts
+        async function refreshCounts() {
+            try {
+                const users = (await fetchJson(api.users)) || [];
+                const packs = (await fetchJson(api.packs)) || [];
+                const films = (await fetchJson(api.movies)) || [];
+                //non_admin only
+                const nonAdmin = (users || []).filter(
+                    (u) => u.role !== "ADMIN",
+                ).length;
+                document.getElementById("countUsers").textContent = nonAdmin;
+                document.getElementById("countPacks").textContent = (
+                    packs || []
+                ).length;
+                document.getElementById("countFilms").textContent = (
+                    films || []
+                ).length;
+            } catch (e) {
+                console.error("refreshCounts", e);
+            }
         }
-    }
 
-    // Run when page is fully loaded
-    document.addEventListener("DOMContentLoaded", () => {
+        // Run when page is fully loaded
+        document.addEventListener("DOMContentLoaded", () => {
+            applyTranslations();
 
-        applyTranslations();
+            const logoutBtn = document.getElementById("logoutBtn");
 
-        const logoutBtn = document.getElementById("logoutBtn");
+            logoutBtn &&
+                logoutBtn.addEventListener("click", () => {
+                    // remove token
+                    localStorage.removeItem("token");
 
-        logoutBtn &&
-        logoutBtn.addEventListener("click", () => {
-            // remove token
-            localStorage.removeItem("token");
+                    // optional: clear everything
+                    // localStorage.clear();
 
-            // optional: clear everything
-            // localStorage.clear();
+                    // redirect to login page
+                    window.location.href = "/login.html";
+                });
 
-            // redirect to login page
-            window.location.href = "/login.html";
+            // Sidebar navigation click events
+            const items = document.querySelectorAll(".side-item");
+            items.forEach((b) =>
+                b.addEventListener("click", (ev) => {
+                    // Remove active from all
+                    document
+                        .querySelectorAll(".side-item")
+                        .forEach((i) => i.classList.remove("active")); // Highlight selected
+                    b.classList.add("active");
+                    const frag = b.getAttribute("data-fragment");
+                    if (frag) loadFragment(frag);
+                }),
+            );
+            // Sidebar collapse toggle
+            const menuToggle = document.getElementById("menuToggle");
+            const sidebar = document.getElementById("sidebar");
+            menuToggle &&
+                menuToggle.addEventListener("click", () => {
+                    sidebar.classList.toggle("collapsed");
+                });
+
+            // load home by default
+            const homeBtn = document.querySelector(
+                '.side-item[data-fragment="admin_home_fragment.html"]',
+            );
+            if (homeBtn) homeBtn.click();
+
+            refreshCounts();
         });
+        // Display logged-in username
+        const username = localStorage.getItem("username");
 
-        // Sidebar navigation click events
-        const items = document.querySelectorAll(".side-item");
-        items.forEach((b) =>
-            b.addEventListener("click", (ev) => {
-                // Remove active from all
-                document
-                    .querySelectorAll(".side-item")
-                    .forEach((i) => i.classList.remove("active"));// Highlight selected
-                b.classList.add("active");
-                const frag = b.getAttribute("data-fragment");
-                if (frag) loadFragment(frag);
-            }),
-        );
-        // Sidebar collapse toggle
-        const menuToggle = document.getElementById("menuToggle");
-        const sidebar = document.getElementById("sidebar");
-        menuToggle &&
-        menuToggle.addEventListener("click", () => {
-            sidebar.classList.toggle("collapsed");
-        });
+        if (username) {
+            document.getElementById("usernameDisplay").textContent = username;
+        }
 
-        // load home by default
-        const homeBtn = document.querySelector(
-            '.side-item[data-fragment="admin_home_fragment.html"]',
-        );
-        if (homeBtn) homeBtn.click();
+        // Make helper functions accessible globally (used by fragments)
+        window.adminApi = {
+            fetchJson,
+            api,
+            titleCase,
+            formatPrice,
+            refreshCounts,
+            loadFragment,
+        };
 
-        refreshCounts();
-    });
-    // Display logged-in username
-    const username = localStorage.getItem("username");
+        const footerYear = document.getElementById("footerYear");
+        if (footerYear) {
+            footerYear.textContent = new Date().getFullYear().toString();
+        }
+    </script>
+</body>
 
-    if (username) {
-        document.getElementById("usernameDisplay").textContent = username;
-    }
-
-    // Make helper functions accessible globally (used by fragments)
-    window.adminApi = {
-        fetchJson,
-        api,
-        titleCase,
-        formatPrice,
-        refreshCounts,
-        loadFragment,
-    };
-
-    const footerYear = document.getElementById("footerYear");
-    if (footerYear) {
-        footerYear.textContent = new Date().getFullYear().toString();
-    }
-</script>
-    </body>
 </html>
