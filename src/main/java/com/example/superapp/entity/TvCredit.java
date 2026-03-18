@@ -35,4 +35,9 @@ public class TvCredit {
     private String department;
 
     private Integer creditOrder;
+
+    @Override
+    public String toString() {
+        return "Tv Credit with TvSeries_id_" + tvSeries.getId();
+    }
 }

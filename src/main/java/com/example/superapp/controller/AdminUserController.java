@@ -45,7 +45,8 @@ public class AdminUserController {
     // Toggle commenting instead of login
     u.setCommentDisabled(enabled);
         User saved = userRepository.save(u);
-        adminLogsRepository.save(new AdminLogs("User" + saved.getUsername() + "is enabled"));
+        String status = enabled ? "enabled" : "disabled";
+        adminLogsRepository.save(new AdminLogs("User" + saved.getUsername() + " is now " + status));
         // If we re-enable commenting for this user, unhide their previously hidden reviews
         if (Boolean.FALSE.equals(saved.getCommentDisabled())) {
             try {

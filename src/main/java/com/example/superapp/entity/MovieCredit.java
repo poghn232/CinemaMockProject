@@ -34,4 +34,9 @@ public class MovieCredit {
     private String department;    // Acting, Directing...
 
     private Integer creditOrder;
+
+    @Override
+    public String toString() {
+        return "Movie Credit with Movie_id_" + movie.getId();
+    }
 }

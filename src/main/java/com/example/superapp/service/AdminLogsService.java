@@ -16,7 +16,7 @@ public class AdminLogsService {
         return adminLogsRepository.findAll();
     }
 
-    public AdminLogs saveLog(AdminLogs log) {
-        return adminLogsRepository.save(log);
+    public void saveLog(AdminLogs log) {
+        adminLogsRepository.save(log);
     }
 }

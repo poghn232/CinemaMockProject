@@ -1,12 +1,10 @@
 package com.example.superapp.service;
 
 import com.example.superapp.dto.AdminMovieDto;
-import com.example.superapp.entity.AdminLogs;
-import com.example.superapp.entity.Episode;
-import com.example.superapp.entity.Movie;
-import com.example.superapp.entity.TvSeries;
+import com.example.superapp.entity.*;
 import com.example.superapp.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.HttpStatus;
@@ -34,6 +32,8 @@ public class AdminMovieService {
     private final TmdbService tmdbService;
     private final MovieRegionBlockRepository movieRegionBlockRepository;
     private final TvRegionBlockRepository tvRegionBlockRepository;
+    private final AdminLogsRepository adminLogsRepository;
+    private final AdminLogsService adminLogsService;
 
     @Transactional(readOnly = true)
     public List<AdminMovieDto> listPublished(String query) {
@@ -131,13 +131,16 @@ public class AdminMovieService {
                                 com.example.superapp.entity.Person p = personRepository.findById(mc.getPerson().getId()).orElse(mc.getPerson());
                                 mc.setPerson(p);
                             }
-                            movieCreditRepository.save(mc);
+                            MovieCredit saved = movieCreditRepository.save(mc);
+                            adminLogsRepository.save(new AdminLogs(saved + " is added to database"));
+
                             existing.getCredits().add(mc);
                         }
                     }
                 } catch (Exception ignored) {}
 
                 Movie saved = movieRepository.save(existing);
+                adminLogsRepository.save(new AdminLogs(existing + " is added to database"));
                 return new AdminMovieDto(saved.getId(), saved.getTitle(), "movie",
                         Boolean.TRUE.equals(saved.getPublished()),
                         Boolean.TRUE.equals(saved.getActive()),
@@ -161,6 +164,7 @@ public class AdminMovieService {
             } catch (Exception ignored) {}
 
             Movie saved = movieRepository.save(movie);
+            adminLogsRepository.save(new AdminLogs(saved + " is added to database"));
 
             // persist credits after movie has an id and set proper movie reference + composite id
             try {
@@ -169,6 +173,8 @@ public class AdminMovieService {
                     mc.getId().setMovieId(saved.getId());
                     mc.setMovie(saved);
                     movieCreditRepository.save(mc);
+                    adminLogsRepository.save(new AdminLogs(saved + " is added to database"));
+
                     // attach back to saved movie entity
                     saved.getCredits().add(mc);
                 }
@@ -224,13 +230,17 @@ public class AdminMovieService {
                                 com.example.superapp.entity.Person p = personRepository.findById(tc.getPerson().getId()).orElse(tc.getPerson());
                                 tc.setPerson(p);
                             }
-                            tvCreditRepository.save(tc);
+                            TvCredit saved = tvCreditRepository.save(tc);
+                            adminLogsRepository.save(new AdminLogs(saved + " is added to database"));
+
                             existing.getCredits().add(tc);
                         }
                     }
                 } catch (Exception ignored) {}
 
                 TvSeries saved = tvSeriesRepository.save(existing);
+                adminLogsRepository.save(new AdminLogs(saved + " is added to database"));
+
                 return new AdminMovieDto(saved.getId(), saved.getName(), "tv",
                         Boolean.TRUE.equals(saved.getPublished()),
                         Boolean.TRUE.equals(saved.getActive()),
@@ -254,6 +264,7 @@ public class AdminMovieService {
             } catch (Exception ignored) {}
 
             TvSeries saved = tvSeriesRepository.save(tv);
+            adminLogsRepository.save(new AdminLogs(saved + " is added to database"));
 
             // persist credits after tv has an id and set proper tv reference + composite id
             try {
@@ -265,6 +276,7 @@ public class AdminMovieService {
                     saved.getCredits().add(tc);
                 }
                 tvSeriesRepository.save(saved);
+                adminLogsRepository.save(new AdminLogs(saved + " is added to database"));
             } catch (Exception ignored) {}
 
             return new AdminMovieDto(saved.getId(), saved.getName(), "tv",
@@ -283,6 +295,7 @@ public class AdminMovieService {
             tv.setActive(true);
             tv.setPublished(true);
             existing = tvSeriesRepository.save(tv);
+            adminLogsRepository.save(new AdminLogs(tv + " is added to database"));
         }
 
         // fetch episode details via TMDB API: /tv/{tv_id}/season/{season_number}/episode/{episode_number}
@@ -308,6 +321,7 @@ public class AdminMovieService {
             season.setSeasonNumber(seasonNumber);
             season.setTvSeries(existing);
             seasonRepository.save(season);
+            adminLogsRepository.save(new AdminLogs(season + " - " + season.getTvSeries() + " is added to database"));
         }
 
         // create / upsert episode
@@ -336,6 +350,7 @@ public class AdminMovieService {
         episode.setSeason(season);
         episode.setPublished(true); // Set published by default when importing
         episodeRepository.save(episode);
+        adminLogsRepository.save(new AdminLogs(episode + " - " + episode.getSeason() + " - " + episode.getSeason().getTvSeries() + " is added to database"));
 
         return new AdminMovieDto(existing.getId(), existing.getName(), "tv", Boolean.TRUE.equals(existing.getPublished()), Boolean.TRUE.equals(existing.getActive()), existing.getSrc());
     }
@@ -358,11 +373,13 @@ public class AdminMovieService {
             movieRepository.findById(tmdbId).ifPresent(m -> {
                 m.setPublished(false);
                 movieRepository.save(m);
+                adminLogsRepository.save(new AdminLogs(m + " is now hidden"));
             });
         } else if (t.equals("tv")) {
             tvSeriesRepository.findById(tmdbId).ifPresent(tv -> {
                 tv.setPublished(false);
                 tvSeriesRepository.save(tv);
+                adminLogsRepository.save(new AdminLogs(tv + " is now hidden"));
             });
         } else {
             throw new IllegalArgumentException("type must be 'movie' or 'tv'");
@@ -376,6 +393,8 @@ public class AdminMovieService {
         com.example.superapp.entity.Episode episode = episodeRepository.findById(epId).orElse(null);
         if (episode != null) {
             episode.setPublished(Boolean.TRUE.equals(episode.getPublished()) ? false : true);
+            String status = episode.getPublished() ? "public" : "private";
+            adminLogsRepository.save(new AdminLogs(episode.toString() + " is now " + status));
             episodeRepository.save(episode);
         }
     }
@@ -387,6 +406,7 @@ public class AdminMovieService {
         if (episode != null) {
             episode.setSrc(src);
             episodeRepository.save(episode);
+            adminLogsRepository.save(new AdminLogs(episode.toString() + " updated trailer"));
         }
     }
 
@@ -395,6 +415,7 @@ public class AdminMovieService {
         if (movie != null) {
             movie.setSrc(src);
             movieRepository.save(movie);
+            adminLogsRepository.save(new AdminLogs(movie.toString() + " updated trailer"));
         }
     }
 
@@ -441,6 +462,7 @@ public class AdminMovieService {
                 b.setRegionCode(region);
                 b.setMovie(m);
                 movieRegionBlockRepository.save(b);
+                adminLogsRepository.save(new AdminLogs(m + " is now blocked in " + region));
             }
         } else if (t.equals("tv")) {
             com.example.superapp.entity.TvSeries tv = tvSeriesRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("TV not found"));
@@ -452,6 +474,8 @@ public class AdminMovieService {
                 b.setRegionCode(region);
                 b.setTvSeries(tv);
                 tvRegionBlockRepository.save(b);
+                adminLogsRepository.save(new AdminLogs(tv + " is now blocked in " + region));
+
             }
         } else {
             throw new IllegalArgumentException("type must be 'movie' or 'tv'");
