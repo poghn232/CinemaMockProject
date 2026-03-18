@@ -1,4 +1,3 @@
-//TODO: report logs
 package com.example.superapp.controller;
 
 import com.example.superapp.dto.ReportAdminDto;
@@ -68,7 +67,7 @@ public class AdminReportController {
         }
 
         reportRepository.save(r);
-        adminLogsService.saveLog(new AdminLogs(r + " is added to database"));
+        adminLogsService.saveLog(new AdminLogs(r + " is approved"));
 
         // send email to reported user
         if (reported != null) {
@@ -98,7 +97,7 @@ public class AdminReportController {
         r.setAdminReason(req.reason);
         r.setAdminActionAt(LocalDateTime.now());
         reportRepository.save(r);
-        adminLogsService.saveLog(new AdminLogs(r + " is added to database"));
+        adminLogsService.saveLog(new AdminLogs(r + " is rejected"));
 
         // send email to reporter with admin reason
         User reporter = r.getReporter();
