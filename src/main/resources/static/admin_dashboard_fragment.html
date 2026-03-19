@@ -97,7 +97,8 @@
   <div class="analytics-header">
     <div>
       <div class="analytics-title">Analytics Dashboard</div>
-      <div class="analytics-subtitle"><span class="live-dot"></span>Live data</div>
+      <div class="analytics-subtitle"><span class="live-dot"></span>Live data ·
+        auto-refreshes every 60s</div>
     </div>
   </div>
   <div class="charts-grid">
@@ -202,17 +203,17 @@
 
   var ubChart = null, gnChart = null, lgChart = null;
 
-  function buildDonut(bodyId, canvasId, data, labels, colors, centerNum, centerSub) {
+  function buildDonut(bodyId, canvasId, data, labels, colors, centerNum, centerSub, fullCircle) {
     var body = document.getElementById(bodyId);
     if (!body) return null;
     body.innerHTML =
       '<div class="chart-body">' +
         '<div class="chart-canvas-wrap">' +
           '<canvas id="' + canvasId + '" width="180" height="180"></canvas>' +
-          '<div class="chart-center-label">' +
+          (!fullCircle ? '<div class="chart-center-label">' +
             '<div class="chart-center-num">' + centerNum + '</div>' +
             '<div class="chart-center-sub">' + centerSub + '</div>' +
-          '</div>' +
+          '</div>' : '') +
         '</div>' +
         '<ul class="legend-list" id="' + canvasId + '-legend"></ul>' +
       '</div>';
@@ -227,7 +228,7 @@
           borderColor: 'rgba(2,6,23,0.9)', borderWidth: 2, hoverOffset: 6 }]
       },
       options: {
-        cutout: '72%',
+        cutout: fullCircle ? '0%' : '72%',
         plugins: {
           legend: { display: false },
           tooltip: { callbacks: { label: function(c) {
@@ -350,7 +351,7 @@
       var labels = d.labels||[], values = d.values||[];
       gnChart = buildDonut('gn-body', 'gn-canvas', values, labels,
         labels.map(function(_,i){ return PALETTE[i % PALETTE.length]; }),
-        labels.length, 'genres');
+        0, '', true);
     }).catch(function(e) {
       var el = document.getElementById('gn-body');
       if (el) el.innerHTML = '<div class="loading-pulse" style="color:#ef4444">Error: ' + e.message + '</div>';
