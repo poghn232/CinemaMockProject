@@ -212,7 +212,7 @@
         </svg>
         Admin Logs
       </h2>
-      <p class="muted" style="margin-top:3px;font-size:12px;">Lịch sử hoạt động hệ thống</p>
+      <p class="muted" style="margin-top:3px;font-size:12px;">History system logs</p>
     </div>
   </div>
 
@@ -221,18 +221,18 @@
     <div class="logs-search-wrap">
       <input id="logsSearch" class="logs-search" type="text" placeholder="Tìm theo username, action, IP…" autocomplete="off"/>
     </div>
-    <span class="logs-count-badge" id="logsCountBadge">-- bản ghi</span>
+    <span class="logs-count-badge" id="logsCountBadge">-- log</span>
     <button class="logs-refresh-btn" id="logsRefreshBtn">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
         <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
       </svg>
-      Làm mới
+      Refresh
     </button>
-    <select class="page-size-select" id="logsPageSize" title="Số hàng mỗi trang">
-      <option value="10">10 / trang</option>
-      <option value="20" selected>20 / trang</option>
-      <option value="50">50 / trang</option>
-      <option value="100">100 / trang</option>
+    <select class="page-size-select" id="logsPageSize" title="Rows per page">
+      <option value="10">10 / page</option>
+      <option value="20" selected>20 / page</option>
+      <option value="50">50 / page</option>
+      <option value="100">100 / page</option>
     </select>
   </div>
 
@@ -242,7 +242,7 @@
       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
         <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
       </svg>
-      Đang tải dữ liệu…
+      Loading logs...
     </div>
     <table class="logs-table" id="logsTable" style="display:none;">
       <thead>
@@ -408,7 +408,7 @@
       });
     }
 
-    countBadge.textContent = `${filtered.length} / ${allLogs.length} bản ghi`;
+    countBadge.textContent = `${filtered.length} / ${allLogs.length} logs`;
     renderBody(buildColumns(allLogs));
     renderPagination();
   }
@@ -423,7 +423,7 @@
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
-        Không tìm thấy kết quả
+        Cannot find any result
       </td></tr>`;
       return;
     }
@@ -446,7 +446,7 @@
 
     const from = (currentPage - 1) * ps + 1;
     const to   = Math.min(currentPage * ps, total);
-    pageInfo.textContent = `Hiển thị ${from}–${to} trong ${total} bản ghi`;
+    pageInfo.textContent = `Displaying ${from}–${to} of ${total} logs`;
 
     /* build page buttons (max 7 visible) */
     const btns = [];
@@ -491,7 +491,7 @@
       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
         <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
       </svg>
-      Đang tải dữ liệu…`;
+      Loading logs`;
     state.style.display = 'block';
     table.style.display = 'none';
     pagination.style.display = 'none';
@@ -516,15 +516,15 @@
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
             <polyline points="14 2 14 8 20 8"/>
           </svg>
-          Chưa có log nào.`;
-        countBadge.textContent = '0 bản ghi';
+          No logs yet.`;
+        countBadge.textContent = '0 logs';
         return;
       }
 
       state.style.display = 'none';
       table.style.display  = 'table';
 
-      countBadge.textContent = `${allLogs.length} bản ghi`;
+      countBadge.textContent = `${allLogs.length} logs`;
       render();
       applyFilterSort();
 
@@ -533,7 +533,7 @@
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="1.4">
           <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
         </svg>
-        <span style="color:#f87171">Không thể tải dữ liệu</span><br>
+        <span style="color:#f87171">Cannot load logs</span><br>
         <span style="font-size:12px;color:#6b7280">${err.message}</span>`;
     } finally {
       refreshBtn.classList.remove('spinning');
