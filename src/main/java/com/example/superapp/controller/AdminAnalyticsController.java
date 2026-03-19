@@ -9,11 +9,8 @@ import com.example.superapp.repository.LoginHistoryRepository;
 import com.example.superapp.repository.UserRepository;
 import com.example.superapp.repository.SubscriptionRepository;
 import com.example.superapp.repository.MovieRepository;
+import com.example.superapp.repository.WatchHistoryRepository;
 import lombok.RequiredArgsConstructor;
-import com.example.superapp.repository.PaymentRepository;
-import com.example.superapp.entity.Payment;
-import com.example.superapp.entity.PaymentStatus;
-import java.math.BigDecimal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,9 +25,9 @@ public class AdminAnalyticsController {
 
     private final UserRepository userRepository;
     private final SubscriptionRepository subscriptionRepository;
-    private final PaymentRepository paymentRepository;
     private final MovieRepository movieRepository;
     private final LoginHistoryRepository loginHistoryRepository;
+    private final WatchHistoryRepository watchHistoryRepository;
 
     @GetMapping("/users")
     @Transactional(readOnly = true)
@@ -67,22 +64,42 @@ public class AdminAnalyticsController {
         return result;
     }
 
+    /**
+     * Returns the most watched genres based on actual user watch history. Each
+     * watch history entry (movie or TV episode) contributes 1 count to every
+     * genre that content belongs to. Movies: WatchHistory → Movie → genres TV:
+     * WatchHistory → Episode → Season → TvSeries → genres
+     */
     @GetMapping("/genres")
     @Transactional(readOnly = true)
     public Map<String, Object> genreStats(@RequestParam(defaultValue = "all") String period) {
-        List<Movie> movies = movieRepository.findAll()
+        LocalDateTime cutoff = getCutoff(period);
+
+        List<com.example.superapp.entity.WatchHistory> history = watchHistoryRepository.findAll()
                 .stream()
-                .filter(m -> Boolean.TRUE.equals(m.getActive()))
+                .filter(wh -> cutoff == null || (wh.getWatchedAt() != null && wh.getWatchedAt().isAfter(cutoff)))
                 .toList();
 
         Map<String, Long> genreCounts = new LinkedHashMap<>();
-        for (Movie movie : movies) {
-            long weight = movie.getVoteCount() != null ? movie.getVoteCount() : 1L;
-            for (Genre g : movie.getGenres()) {   // genres is LAZY — needs open session
-                genreCounts.merge(g.getName(), weight, Long::sum);
+
+        for (var wh : history) {
+            // Movie watch
+            if (wh.getMovie() != null) {
+                for (Genre g : wh.getMovie().getGenres()) {
+                    genreCounts.merge(g.getName(), 1L, Long::sum);
+                }
+            }
+            // TV episode watch → season → tvSeries → genres
+            if (wh.getEpisode() != null
+                    && wh.getEpisode().getSeason() != null
+                    && wh.getEpisode().getSeason().getTvSeries() != null) {
+                for (Genre g : wh.getEpisode().getSeason().getTvSeries().getGenres()) {
+                    genreCounts.merge(g.getName(), 1L, Long::sum);
+                }
             }
         }
 
+        // Sort descending, top 10 + Others
         List<Map.Entry<String, Long>> sorted = genreCounts.entrySet().stream()
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
                 .toList();
@@ -107,6 +124,7 @@ public class AdminAnalyticsController {
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("labels", labels);
         result.put("values", values);
+        result.put("totalWatches", history.size());
         result.put("period", period);
         return result;
     }
@@ -194,22 +212,5 @@ public class AdminAnalyticsController {
             default ->
                 null;
         };
-    }
-
-    @GetMapping("/revenue")
-    public Map<String, Object> revenue(@RequestParam(defaultValue = "all") String period) {
-        // Sum amounts for payments with SUCCESS status. Period parameter is accepted for future extension.
-        List<Payment> payments = paymentRepository.findAll();
-        BigDecimal total = payments.stream()
-                .filter(p -> p.getStatus() != null && p.getStatus() == PaymentStatus.SUCCESS)
-                .map(Payment::getAmount)
-                .filter(Objects::nonNull)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        Map<String, Object> result = new LinkedHashMap<>();
-        result.put("totalRevenue", total); // BigDecimal serializes nicely with Jackson
-    result.put("currency", "VND");
-        result.put("period", period);
-        return result;
     }
 }
