@@ -11,5 +11,7 @@ public record WishlistItemDto(
         String title,
         String posterUrl,
         Double rating,
-        Integer year
+        Integer year,
+        // whether the content is region-blocked for the requesting user
+        Boolean blocked
 ) {}

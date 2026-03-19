@@ -1494,12 +1494,18 @@
             items.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'history-card';
-                card.style.cursor = 'pointer';
+                card.style.position = 'relative';
+                card.style.cursor = item.blocked ? 'default' : 'pointer';
+                if (item.blocked) {
+                    card.style.opacity = '0.7';
+                }
                 card.style.position = 'relative';
 
                 const posterUrl = item.posterUrl || 'https://via.placeholder.com/160x240?text=No+Image';
                 const ratingText = item.rating ? item.rating.toFixed(1) : 'N/A';
                 const typeLabel = item.contentType === 'tv' ? 'TV Series' : 'Movie';
+
+                const blockedBadge = item.blocked ? `<div style="color:#f87171;font-size:12px;margin-top:6px;">Not available in your region</div>` : '';
 
                 card.innerHTML = `
                 <div class="history-thumb" style="
@@ -1525,12 +1531,14 @@
                     <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">
                         ★ ${ratingText} · ${item.year || ''}
                     </div>
+                    ${blockedBadge}
                 </div>
             `;
 
                 // Click card → đi tới trang detail
                 card.addEventListener('click', (e) => {
                     if (e.target.closest('.wishlist-remove-btn')) return;
+                    if (item.blocked) return; // blocked → no navigation
                     window.location.href = `movie-detail.html?id=${item.contentId}&type=${item.contentType}`;
                 });
 

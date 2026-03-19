@@ -21,8 +21,8 @@ public class WishlistController {
     private final WishlistService wishlistService;
 
     @GetMapping
-    public ResponseEntity<List<WishlistItemDto>> getWishlist(Authentication auth) {
-        return ResponseEntity.ok(wishlistService.getWishlist(auth.getName()));
+    public ResponseEntity<List<WishlistItemDto>> getWishlist(Authentication auth, jakarta.servlet.http.HttpServletRequest request) {
+        return ResponseEntity.ok(wishlistService.getWishlist(auth.getName(), request));
     }
 
     @PostMapping("/toggle")

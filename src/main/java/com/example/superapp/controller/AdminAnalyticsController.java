@@ -10,6 +10,7 @@ import com.example.superapp.repository.UserRepository;
 import com.example.superapp.repository.SubscriptionRepository;
 import com.example.superapp.repository.MovieRepository;
 import com.example.superapp.repository.WatchHistoryRepository;
+import com.example.superapp.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,7 @@ public class AdminAnalyticsController {
     private final MovieRepository movieRepository;
     private final LoginHistoryRepository loginHistoryRepository;
     private final WatchHistoryRepository watchHistoryRepository;
+    private final PaymentRepository paymentRepository;
 
     @GetMapping("/users")
     @Transactional(readOnly = true)
@@ -75,26 +77,34 @@ public class AdminAnalyticsController {
     public Map<String, Object> genreStats(@RequestParam(defaultValue = "all") String period) {
         LocalDateTime cutoff = getCutoff(period);
 
-        List<com.example.superapp.entity.WatchHistory> history = watchHistoryRepository.findAll()
-                .stream()
-                .filter(wh -> cutoff == null || (wh.getWatchedAt() != null && wh.getWatchedAt().isAfter(cutoff)))
-                .toList();
+    List<com.example.superapp.entity.WatchHistory> history = watchHistoryRepository.findAll()
+        .stream()
+        // only include entries with a valid watchedAt (if cutoff applied) and at least one target (movie or episode)
+        .filter(wh -> (cutoff == null || (wh.getWatchedAt() != null && wh.getWatchedAt().isAfter(cutoff)))
+            && (wh.getMovie() != null || wh.getEpisode() != null))
+        .toList();
 
         Map<String, Long> genreCounts = new LinkedHashMap<>();
 
         for (var wh : history) {
             // Movie watch
             if (wh.getMovie() != null) {
-                for (Genre g : wh.getMovie().getGenres()) {
-                    genreCounts.merge(g.getName(), 1L, Long::sum);
+                var genres = wh.getMovie().getGenres();
+                if (genres != null) {
+                    for (Genre g : genres) {
+                        if (g != null && g.getName() != null) genreCounts.merge(g.getName(), 1L, Long::sum);
+                    }
                 }
             }
             // TV episode watch → season → tvSeries → genres
             if (wh.getEpisode() != null
                     && wh.getEpisode().getSeason() != null
                     && wh.getEpisode().getSeason().getTvSeries() != null) {
-                for (Genre g : wh.getEpisode().getSeason().getTvSeries().getGenres()) {
-                    genreCounts.merge(g.getName(), 1L, Long::sum);
+                var tvGenres = wh.getEpisode().getSeason().getTvSeries().getGenres();
+                if (tvGenres != null) {
+                    for (Genre g : tvGenres) {
+                        if (g != null && g.getName() != null) genreCounts.merge(g.getName(), 1L, Long::sum);
+                    }
                 }
             }
         }
@@ -127,6 +137,21 @@ public class AdminAnalyticsController {
         result.put("totalWatches", history.size());
         result.put("period", period);
         return result;
+    }
+
+    @GetMapping("/revenue")
+    @Transactional(readOnly = true)
+    public Map<String, Object> revenueStats() {
+        // Sum only completed payments
+        var payments = paymentRepository.findAll();
+    java.math.BigDecimal total = payments.stream()
+        .filter(p -> p.getStatus() != null && p.getStatus() == com.example.superapp.entity.PaymentStatus.SUCCESS)
+        .map(p -> p.getAmount() == null ? java.math.BigDecimal.ZERO : p.getAmount())
+        .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+
+        Map<String, Object> res = new LinkedHashMap<>();
+        res.put("totalRevenue", total);
+        return res;
     }
 
     @GetMapping("/logins")
