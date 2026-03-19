@@ -86,6 +86,62 @@ public class PublicMovieService {
     }
 
     @Transactional(readOnly = true)
+    public MoviePageResponse search(String query, String type, int page, HttpServletRequest request) {
+        String q = query == null ? "" : query.trim().toLowerCase();
+        String t = type == null ? "all" : type.trim().toLowerCase();
+        if (!t.equals("movie") && !t.equals("tv")) {
+            t = "all";
+        }
+
+        String userRegion = extractRegionFromRequest(request);
+
+        int pageSize = 20;
+        int safePage = Math.max(1, page);
+
+        List<MovieItemDto> allItems = new ArrayList<>();
+
+        if (t.equals("movie") || t.equals("all")) {
+            for (Movie m : movieRepository.findByActiveTrueAndPublishedTrue()) {
+                if (!isMovieBlockedForRegion(m, userRegion)) {
+                    MovieItemDto dto = mapMovie(m);
+                    if (q.isEmpty() || (dto.getTitle() != null && dto.getTitle().toLowerCase().contains(q))) {
+                        allItems.add(dto);
+                    }
+                }
+            }
+        }
+
+        if (t.equals("tv") || t.equals("all")) {
+            for (TvSeries tv : tvSeriesRepository.findByActiveTrueAndPublishedTrue()) {
+                if (!isTvBlockedForRegion(tv, userRegion)) {
+                    MovieItemDto dto = mapTv(tv);
+                    if (q.isEmpty() || (dto.getTitle() != null && dto.getTitle().toLowerCase().contains(q))) {
+                        allItems.add(dto);
+                    }
+                }
+            }
+        }
+
+        allItems.sort(Comparator.comparing(MovieItemDto::getTitle, String.CASE_INSENSITIVE_ORDER));
+
+        int total = allItems.size();
+        int totalPages = Math.max(1, (int) Math.ceil(total / (double) pageSize));
+
+        int fromIndex = (safePage - 1) * pageSize;
+        int toIndex = Math.min(fromIndex + pageSize, total);
+
+        if (fromIndex >= total) {
+            fromIndex = 0;
+            toIndex = Math.min(pageSize, total);
+            safePage = 1;
+        }
+
+        List<MovieItemDto> pageItems = allItems.subList(fromIndex, toIndex);
+
+        return new MoviePageResponse(pageItems, safePage, totalPages);
+    }
+
+    @Transactional(readOnly = true)
     public MovieDetailDto getDetail(String type, long id, HttpServletRequest request) {
         String t = type == null ? "movie" : type.trim().toLowerCase();
         if (!t.equals("movie") && !t.equals("tv")) {

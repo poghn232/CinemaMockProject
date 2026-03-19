@@ -26,6 +26,16 @@ public class PublicMovieController {
         return publicMovieService.listForHomepage(type, page, request);
     }
 
+    @GetMapping("/search")
+    public MoviePageResponse search(
+            @RequestParam(name = "q") String q,
+            @RequestParam(name = "type", defaultValue = "all") String type,
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            HttpServletRequest request
+    ) {
+        return publicMovieService.search(q, type, page, request);
+    }
+
     @GetMapping("/detail")
     public MovieDetailDto detail(
             @RequestParam(name = "type") String type,

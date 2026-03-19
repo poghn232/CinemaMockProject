@@ -1051,13 +1051,14 @@
                 headers["Authorization"] = "Bearer " + token;
             }
 
-            const res = await fetch(
-                `/api/public/movies?type=${encodeURIComponent(normalizedType)}&page=${targetPage}`,
-                {
-                    method: "GET",
-                    headers: headers
-                }
-            );
+            // If there's an active search, call the public search endpoint which queries
+            // the whole system (movies + tv). Otherwise use the standard list endpoint.
+            const useSearch = currentSearch && currentSearch.trim();
+            const url = useSearch
+                ? `/api/public/movies/search?q=${encodeURIComponent(currentSearch.trim())}&type=${encodeURIComponent(normalizedType)}&page=${targetPage}`
+                : `/api/public/movies?type=${encodeURIComponent(normalizedType)}&page=${targetPage}`;
+
+            const res = await fetch(url, { method: "GET", headers: headers });
 
             if (!res.ok) {
                 throw new Error("Không tải được dữ liệu (" + res.status + ")");
@@ -1388,21 +1389,29 @@
         const button = document.getElementById("searchButton");
         if (!input || !button) return;
 
+        // Debounced search: update currentSearch and request server results
+        let searchTimer = null;
+        const triggerSearch = (goToFirstPage = true) => {
+            currentSearch = input.value || "";
+            if (goToFirstPage) currentPage = 1;
+            loadMovies(currentFilter, currentPage);
+        };
+
         input.addEventListener("input", () => {
-            currentSearch = input.value;
-            renderMovies();
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => triggerSearch(true), 300);
         });
 
         button.addEventListener("click", () => {
-            currentSearch = input.value;
-            renderMovies();
+            clearTimeout(searchTimer);
+            triggerSearch(true);
         });
 
         input.addEventListener("keydown", (e) => {
             if (e.key === "Enter") {
                 e.preventDefault();
-                currentSearch = input.value;
-                renderMovies();
+                clearTimeout(searchTimer);
+                triggerSearch(true);
             }
         });
     }

@@ -563,9 +563,19 @@
                 body: JSON.stringify({ tmdbId: item.id, type: item.type }),
               });
               msg.textContent = 'Added successfully.';
+              // Refresh local film list
               await loadFilms();
+              // Update existence set
               updateExistingSet();
-              renderTmdb();
+              // If a search query is active, re-run the TMDB search to keep the displayed
+              // search results intact; otherwise reload the browse/trending results.
+              const qRaw = (document.getElementById('tmdbSearch').value || '').trim();
+              if (qRaw) {
+                // Re-run the same page of search results to preserve context
+                await performTmdbSearch(tmdbPage);
+              } else {
+                await loadTmdb();
+              }
               refreshCounts();
               close();
             } catch (e) {
@@ -843,9 +853,12 @@
       container.innerHTML = 'Searching TMDB...';
       try {
         const resp = await fetchJson(`/api/movies/search?q=${encodeURIComponent(qRaw)}&type=${encodeURIComponent(document.getElementById('tmdbBrowseType').value || 'all')}&page=${encodeURIComponent(page || 1)}`);
-        const list = resp.items || [];
-        tmdbPage = resp.page || page || 1;
-        tmdbTotalPages = resp.totalPages || 1;
+  const list = resp.items || [];
+  tmdbPage = resp.page || page || 1;
+  tmdbTotalPages = resp.totalPages || 1;
+  // Persist search results to tmdbCache so renderTmdb() can reuse them
+  // (keeps the displayed list intact after actions like Add that call renderTmdb())
+  tmdbCache = list.slice();
         if (!list.length) {
           container.innerHTML = 'No results.';
           pageInfo.textContent = '';
