@@ -1414,6 +1414,9 @@
                 ? `movie-watch.html?id=${item.movieId}&type=movie&t=${progress}`
                 : `movie-watch.html?id=${item.episodeId}&type=tv&t=${progress}`;
 
+            const disabledAttr = item.blocked ? 'aria-disabled="true" tabindex="-1" style="opacity:0.5;pointer-events:none;"' : '';
+            const blockedBadge = item.blocked ? `<div style="color:#f87171;font-size:12px;margin-top:6px;">Not available in your region</div>` : '';
+
             return `
             <div class="history-card">
                 <img src="${poster}" class="history-poster" alt="${escHtml(mainTitle)}" 
@@ -1426,9 +1429,12 @@
                             <div>${formatTime(progress)} / ${formatTime(duration)} (${percent}%)</div>
                         </div>
                     </div>
-                    <a href="${link}" class="history-play-btn">
+                    <div>
+                      <a href="${link}" class="history-play-btn" ${disabledAttr}>
                         <i class="fas fa-play" style="margin-right:6px;font-size:10px;"></i> Continue
-                    </a>
+                      </a>
+                      ${blockedBadge}
+                    </div>
                 </div>
             </div>`;
         }).join('');

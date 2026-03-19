@@ -390,6 +390,32 @@ public class AdminMovieService {
     }
 
     @Transactional
+    public void publish(long tmdbId, String type) {
+        String t = (type == null ? "movie" : type.trim().toLowerCase());
+        if (t.equals("movie")) {
+            movieRepository.findById(tmdbId).ifPresent(m -> {
+                m.setPublished(true);
+                movieRepository.save(m);
+                adminLogsRepository.save(new AdminLogs(m + " is now published"));
+                notificationService.notifyWishlistUsers(
+                        m.getId(), "movie", m.getTitle(), m.getPosterPath(), "PUBLISHED"
+                );
+            });
+        } else if (t.equals("tv")) {
+            tvSeriesRepository.findById(tmdbId).ifPresent(tv -> {
+                tv.setPublished(true);
+                tvSeriesRepository.save(tv);
+                adminLogsRepository.save(new AdminLogs(tv + " is now published"));
+                notificationService.notifyWishlistUsers(
+                        tv.getId(), "tv", tv.getName(), tv.getPosterPath(), "PUBLISHED"
+                );
+            });
+        } else {
+            throw new IllegalArgumentException("type must be 'movie' or 'tv'");
+        }
+    }
+
+    @Transactional
     public void toggleEpisodePublished(long tvId, int seasonNumber, int episodeNumber) {
         Long seasonId = tvId * 1000 + seasonNumber;
         Long epId = tvId * 100000L + seasonNumber * 1000L + episodeNumber;

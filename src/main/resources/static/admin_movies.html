@@ -167,19 +167,21 @@
 
         const hideBtn = document.createElement("button");
         hideBtn.className = "btn ghost";
-        hideBtn.textContent = f.published ? "Hide" : "Hidden";
-        hideBtn.disabled = !f.published;
+        hideBtn.textContent = f.published ? "Hide" : "Show";
 
         hideBtn.addEventListener("click", async () => {
-          if (!confirm("Ẩn phim này khỏi trang chính?")) return;
           try {
-            await fetchJson(api.movies + "/" + f.type + "/" + f.id + "/hide", {
-              method: "PUT",
-            });
+            if (f.published) {
+              if (!confirm("Ẩn phim này khỏi trang chính?")) return;
+              await fetchJson(api.movies + "/" + f.type + "/" + f.id + "/hide", { method: "PUT" });
+            } else {
+              // Publish it again
+              await fetchJson(api.movies + "/" + f.type + "/" + f.id + "/publish", { method: "PUT" });
+            }
             await loadFilms();
             refreshCounts();
           } catch (e) {
-            alert("Hide failed: " + e);
+            alert((f.published ? "Hide" : "Publish") + " failed: " + e);
           }
         });
 

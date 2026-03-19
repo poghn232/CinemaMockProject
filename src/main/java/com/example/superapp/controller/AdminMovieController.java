@@ -48,6 +48,11 @@ public class AdminMovieController {
         adminMovieService.hide(id, type);
     }
 
+    @PutMapping("/{type}/{id}/publish")
+    public void publish(@PathVariable("type") String type, @PathVariable("id") long id) {
+        adminMovieService.publish(id, type);
+    }
+
     @PostMapping("/tv/{tvId}/seasons/{seasonNumber}/episodes/{episodeNumber}/import")
     public AdminMovieDto importEpisode(@PathVariable("tvId") long tvId,
                                        @PathVariable("seasonNumber") int seasonNumber,

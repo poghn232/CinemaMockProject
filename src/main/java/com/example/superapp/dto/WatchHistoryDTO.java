@@ -10,6 +10,8 @@ public class WatchHistoryDTO {
     private Integer durationSec;
     private Integer progressSec;
     private String posterPath;
+    // Whether the content was region-blocked for the requesting user
+    private Boolean blocked = false;
 
     // Dành cho Phim Lẻ
     private Long movieId;

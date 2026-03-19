@@ -10,6 +10,8 @@ import com.example.superapp.repository.EpisodeRepository; // Cần thêm
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
+import com.example.superapp.utils.JwtUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -37,6 +39,8 @@ public class WatchHistoryController {
     private MovieRepository movieRepository;     // Đảm bảo tên class này chính xác
     @Autowired
     private EpisodeRepository episodeRepository; // Đảm bảo tên class này chính xác
+    @Autowired
+    private JwtUtils jwtUtils;
 
     // Constructor thủ công để đảm bảo tiêm đủ các Repository
     public WatchHistoryController(WatchHistoryRepository watchHistoryRepository,
@@ -50,11 +54,13 @@ public class WatchHistoryController {
     }
 
     @GetMapping
-    public ResponseEntity<List<WatchHistoryDTO>> getHistory(Authentication auth) {
+    public ResponseEntity<List<WatchHistoryDTO>> getHistory(Authentication auth, jakarta.servlet.http.HttpServletRequest request) {
         User user = userRepository.findByUsername(auth.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<WatchHistory> list = watchHistoryRepository.findByUser_UserIdOrderByWatchedAtDesc(user.getUserId());
+    List<WatchHistory> list = watchHistoryRepository.findByUser_UserIdOrderByWatchedAtDesc(user.getUserId());
+
+    String userRegion = extractRegionFromRequest(request);
 
         List<WatchHistoryDTO> dtos = list.stream().map(h -> {
             WatchHistoryDTO dto = new WatchHistoryDTO();
@@ -70,6 +76,19 @@ public class WatchHistoryController {
                 if (p != null && !p.isBlank()) {
                     dto.setPosterPath(p.startsWith("http") ? p : imageBaseUrl + p);
                 }
+
+                if (userRegion != null && !userRegion.isBlank()) {
+                    String rr = userRegion.trim().toUpperCase();
+                    var blocks = h.getMovie().getRegionBlocks();
+                    if (blocks != null && !blocks.isEmpty()) {
+                        boolean blocked = blocks.stream()
+                                .map(b -> b.getRegionCode())
+                                .filter(code -> code != null && !code.isBlank())
+                                .anyMatch(code -> code.trim().equalsIgnoreCase(rr));
+                        dto.setBlocked(blocked);
+                    }
+                }
+
             } else if (h.getEpisode() != null) {
                 dto.setEpisodeId(h.getEpisode().getId());
                 dto.setEpisodeName(h.getEpisode().getName());
@@ -78,6 +97,18 @@ public class WatchHistoryController {
                     String tp = h.getEpisode().getSeason().getTvSeries().getPosterPath();
                     if (tp != null && !tp.isBlank()) {
                         dto.setPosterPath(tp.startsWith("http") ? tp : imageBaseUrl + tp);
+                    }
+
+                    if (userRegion != null && !userRegion.isBlank()) {
+                        String rr = userRegion.trim().toUpperCase();
+                        var blocks = h.getEpisode().getSeason().getTvSeries().getRegionBlocks();
+                        if (blocks != null && !blocks.isEmpty()) {
+                            boolean blocked = blocks.stream()
+                                    .map(b -> b.getRegionCode())
+                                    .filter(code -> code != null && !code.isBlank())
+                                    .anyMatch(code -> code.trim().equalsIgnoreCase(rr));
+                            dto.setBlocked(blocked);
+                        }
                     }
                 }
             }
@@ -117,5 +148,19 @@ public class WatchHistoryController {
 
         watchHistoryRepository.save(history);
         return ResponseEntity.ok(Map.of("message", "History saved"));
+    }
+
+    private String extractRegionFromRequest(jakarta.servlet.http.HttpServletRequest request) {
+        if (request == null) return null;
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) return null;
+        try {
+            String token = authHeader.substring(7);
+            String region = jwtUtils.extractRegion(token);
+            if (region == null || region.isBlank()) return null;
+            return region.trim().toUpperCase();
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
