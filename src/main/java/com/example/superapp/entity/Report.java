@@ -24,7 +24,7 @@ public class Report {
 
     @ManyToOne
     @JoinColumn(name = "reporter_id")
-    private User reporter;
+    private Profile reporter;
 
     @Column(columnDefinition = "TEXT")
     private String reason; // reason provided by reporter

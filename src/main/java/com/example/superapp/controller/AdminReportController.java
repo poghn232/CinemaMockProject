@@ -1,10 +1,8 @@
 package com.example.superapp.controller;
 
 import com.example.superapp.dto.ReportAdminDto;
-import com.example.superapp.entity.AdminLogs;
-import com.example.superapp.entity.Report;
-import com.example.superapp.entity.Review;
-import com.example.superapp.entity.User;
+import com.example.superapp.entity.*;
+import com.example.superapp.repository.ProfileRepository;
 import com.example.superapp.repository.ReportRepository;
 import com.example.superapp.repository.ReviewRepository;
 import com.example.superapp.repository.UserRepository;
@@ -26,6 +24,7 @@ public class AdminReportController {
 
     private final ReportRepository reportRepository;
     private final ReviewRepository reviewRepository;
+    private final ProfileRepository profileRepository;
     private final UserRepository userRepository;
     private final EmailService emailService;
     private final AdminLogsService adminLogsService;
@@ -57,23 +56,23 @@ public class AdminReportController {
             adminLogsService.saveLog(new AdminLogs(review + " is reported successfully"));
         }
 
-        // disable reported user from commenting (reuse enabled flag: set to false)
-        User reported = r.getReview() != null && r.getReview().getUser() != null ? r.getReview().getUser() : null;
-        if (reported != null) {
+        // disable reported profile from commenting (reuse enabled flag: set to false)
+        Profile reportedProfile = r.getReview() != null && r.getReview().getProfile() != null ? r.getReview().getProfile() : null;
+        if (reportedProfile != null) {
             // disable commenting only (do not disable login)
-            reported.setCommentDisabled(true);
-            userRepository.save(reported);
-            adminLogsService.saveLog(new AdminLogs(reported + " is reported successfully"));
+            reportedProfile.setCommentDisabled(true);
+            profileRepository.save(reportedProfile);
+            adminLogsService.saveLog(new AdminLogs(reportedProfile + " is reported successfully"));
         }
 
         reportRepository.save(r);
         adminLogsService.saveLog(new AdminLogs(r + " is approved"));
 
         // send email to reported user
-        if (reported != null) {
-            String to = reported.getEmail();
+        if (reportedProfile != null) {
+            String to = reportedProfile.getUser().getEmail();
             String subject = "Your comment has been removed";
-            String html = "<div>Dear " + reported.getUsername() + ",<br><br>" +
+            String html = "<div>Dear " + reportedProfile.getPName() + ",<br><br>" +
                     "Your comment has been removed by admin for the following reason:<br><i>" + req.reason + "</i><br><br>" +
                     "You are temporarily restricted from commenting.<br><br>Regards,<br>MovieZone Admin</div>";
             try {
@@ -100,11 +99,11 @@ public class AdminReportController {
         adminLogsService.saveLog(new AdminLogs(r + " is rejected"));
 
         // send email to reporter with admin reason
-        User reporter = r.getReporter();
+        Profile reporter = r.getReporter();
         if (reporter != null) {
-            String to = reporter.getEmail();
+            String to = reporter.getUser().getEmail();
             String subject = "Your report has been rejected";
-            String html = "<div>Dear " + reporter.getUsername() + ",<br><br>" +
+            String html = "<div>Dear " + reporter.getPName() + ",<br><br>" +
                     "Your report about a comment was reviewed and rejected by admin for the following reason:<br><i>" + req.reason + "</i><br><br>Regards,<br>MovieZone Admin</div>";
             try {
                 emailService.sendCustomHtml(to, subject, html);
@@ -120,8 +119,8 @@ public class AdminReportController {
         ReportAdminDto d = new ReportAdminDto();
         d.id = r.getId();
         d.reviewId = r.getReview() != null ? r.getReview().getReviewId() : null;
-        d.reportedUsername = r.getReview() != null && r.getReview().getUser() != null ? r.getReview().getUser().getUsername() : null;
-        d.reporterUsername = r.getReporter() != null ? r.getReporter().getUsername() : null;
+        d.reportedProfile = r.getReview() != null && r.getReview().getProfile() != null ? r.getReview().getProfile().getPName() : null;
+        d.reporterProfile = r.getReporter() != null ? r.getReporter().getPName() : null;
         d.reason = r.getReason();
         d.createdAt = r.getCreatedAt();
         d.status = r.getStatus() != null ? r.getStatus().name() : null;
