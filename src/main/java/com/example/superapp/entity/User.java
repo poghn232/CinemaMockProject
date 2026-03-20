@@ -3,6 +3,7 @@ package com.example.superapp.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -38,6 +39,9 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<Review> reviews = new java.util.ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<Profile> profiles = new ArrayList<>();
 
     @Column(nullable = false)
     private Boolean enabled = true;
