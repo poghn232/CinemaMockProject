@@ -45,7 +45,13 @@ public class AdminMovieController {
 
     @PostMapping("/import")
     public AdminMovieDto importMovie(@RequestBody ImportRequest request) {
-        return adminMovieService.importFromTmdb(request.getTmdbId(), request.getType());
+        AdminMovieDto dto = adminMovieService.importFromTmdb(request.getTmdbId(), request.getType());
+
+        if ("movie".equalsIgnoreCase(request.getType())) {
+            videoAssetService.syncExistingPlaybackFromR2("movie", request.getTmdbId());
+        }
+
+        return dto;
     }
 
     @PutMapping("/{type}/{id}/hide")
@@ -62,7 +68,21 @@ public class AdminMovieController {
     public AdminMovieDto importEpisode(@PathVariable("tvId") long tvId,
                                        @PathVariable("seasonNumber") int seasonNumber,
                                        @PathVariable("episodeNumber") int episodeNumber) {
-        return adminMovieService.importEpisodeFromTmdb(tvId, seasonNumber, episodeNumber);
+        AdminMovieDto dto = adminMovieService.importEpisodeFromTmdb(tvId, seasonNumber, episodeNumber);
+
+        Season season = seasonRepository.findByTvSeriesId(tvId).stream()
+                .filter(s -> s.getSeasonNumber() != null && s.getSeasonNumber() == seasonNumber)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Season not found"));
+
+        Episode episode = episodeRepository.findBySeasonId(season.getId()).stream()
+                .filter(e -> e.getEpisodeNumber() != null && e.getEpisodeNumber() == episodeNumber)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Episode not found"));
+
+        videoAssetService.syncExistingPlaybackFromR2("tv_episode", episode.getId());
+
+        return dto;
     }
 
     @GetMapping("/tv/{tvId}/seasons/{seasonNumber}/episodes/existing")

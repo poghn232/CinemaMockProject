@@ -206,6 +206,29 @@ public class VideoAssetService {
 
         throw new IllegalArgumentException("Unsupported ownerType: " + asset.getOwnerType());
     }
+    public void syncExistingPlaybackFromR2(String ownerType, Long ownerId) {
+        r2StorageService.findLatestMasterPlaylistKey(ownerType, ownerId).ifPresent(masterKey -> {
+            String playbackUrl = r2StorageService.buildPublicUrl(masterKey);
+
+            if ("movie".equalsIgnoreCase(ownerType)) {
+                Movie movie = movieRepository.findById(ownerId)
+                        .orElseThrow(() -> new IllegalArgumentException("Movie not found: " + ownerId));
+                movie.setSrcFilm(playbackUrl);
+                movieRepository.save(movie);
+                return;
+            }
+
+            if ("tv_episode".equalsIgnoreCase(ownerType)) {
+                Episode episode = episodeRepository.findById(ownerId)
+                        .orElseThrow(() -> new IllegalArgumentException("Episode not found: " + ownerId));
+                episode.setSrcFilm(playbackUrl);
+                episodeRepository.save(episode);
+                return;
+            }
+
+            throw new IllegalArgumentException("Unsupported ownerType: " + ownerType);
+        });
+    }
 
 
 }
