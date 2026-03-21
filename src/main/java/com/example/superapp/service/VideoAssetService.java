@@ -126,6 +126,7 @@ public class VideoAssetService {
             asset.setHas1080p(vs.stream().anyMatch(v -> v.height() == 1080));
 
             videoAssetRepository.save(asset);
+            attachPlaybackUrlToOwner(asset, asset.getPlaybackUrl());
 
         } catch (Exception e) {
             asset.setStatus("FAILED");
@@ -185,6 +186,25 @@ public class VideoAssetService {
                 .has1080p(asset.getHas1080p())
                 .durationSeconds(asset.getDurationSeconds())
                 .build();
+    }
+    private void attachPlaybackUrlToOwner(VideoAsset asset, String playbackUrl) {
+        if ("movie".equalsIgnoreCase(asset.getOwnerType())) {
+            Movie movie = movieRepository.findById(asset.getOwnerId())
+                    .orElseThrow(() -> new IllegalArgumentException("Movie not found: " + asset.getOwnerId()));
+            movie.setSrcFilm(playbackUrl);
+            movieRepository.save(movie);
+            return;
+        }
+
+        if ("tv_episode".equalsIgnoreCase(asset.getOwnerType())) {
+            Episode episode = episodeRepository.findById(asset.getOwnerId())
+                    .orElseThrow(() -> new IllegalArgumentException("Episode not found: " + asset.getOwnerId()));
+            episode.setSrcFilm(playbackUrl);
+            episodeRepository.save(episode);
+            return;
+        }
+
+        throw new IllegalArgumentException("Unsupported ownerType: " + asset.getOwnerType());
     }
 
 

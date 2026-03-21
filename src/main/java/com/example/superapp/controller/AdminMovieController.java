@@ -154,8 +154,20 @@ public class AdminMovieController {
                                                              @PathVariable("seasonNumber") int seasonNumber,
                                                              @PathVariable("episodeNumber") int episodeNumber,
                                                              @RequestParam("file") MultipartFile file) {
-        Long episodeId = tvId * 100000L + seasonNumber * 1000L + episodeNumber;
-        VideoAssetDto dto = videoAssetService.uploadSource("tv_episode", episodeId, file);
+        TvSeries tv = tvSeriesRepository.findById(tvId)
+                .orElseThrow(() -> new IllegalArgumentException("TV series not found"));
+
+        Season season = seasonRepository.findByTvSeriesId(tv.getId()).stream()
+                .filter(s -> s.getSeasonNumber() != null && s.getSeasonNumber() == seasonNumber)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Season not found"));
+
+        Episode episode = episodeRepository.findBySeasonId(season.getId()).stream()
+                .filter(e -> e.getEpisodeNumber() != null && e.getEpisodeNumber() == episodeNumber)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Episode not found"));
+
+        VideoAssetDto dto = videoAssetService.uploadSource("tv_episode", episode.getId(), file);
         return ResponseEntity.ok(dto);
     }
 
@@ -163,8 +175,20 @@ public class AdminMovieController {
     public ResponseEntity<VideoAssetDto> getLatestEpisodeSource(@PathVariable("tvId") long tvId,
                                                                 @PathVariable("seasonNumber") int seasonNumber,
                                                                 @PathVariable("episodeNumber") int episodeNumber) {
-        Long episodeId = tvId * 100000L + seasonNumber * 1000L + episodeNumber;
-        return ResponseEntity.ok(videoAssetService.getLatestAsset("tv_episode", episodeId));
+        TvSeries tv = tvSeriesRepository.findById(tvId)
+                .orElseThrow(() -> new IllegalArgumentException("TV series not found"));
+
+        Season season = seasonRepository.findByTvSeriesId(tv.getId()).stream()
+                .filter(s -> s.getSeasonNumber() != null && s.getSeasonNumber() == seasonNumber)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Season not found"));
+
+        Episode episode = episodeRepository.findBySeasonId(season.getId()).stream()
+                .filter(e -> e.getEpisodeNumber() != null && e.getEpisodeNumber() == episodeNumber)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Episode not found"));
+
+        return ResponseEntity.ok(videoAssetService.getLatestAsset("tv_episode", episode.getId()));
     }
 
     @Data
