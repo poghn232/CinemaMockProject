@@ -1,6 +1,7 @@
 package com.example.superapp.controller;
 
 import com.example.superapp.dto.AdminMovieDto;
+import com.example.superapp.dto.VideoAssetDto;
 import com.example.superapp.service.AdminMovieService;
 import com.example.superapp.entity.TvSeries;
 import com.example.superapp.entity.Season;
@@ -8,9 +9,12 @@ import com.example.superapp.entity.Episode;
 import com.example.superapp.repository.TvSeriesRepository;
 import com.example.superapp.repository.SeasonRepository;
 import com.example.superapp.repository.EpisodeRepository;
+import com.example.superapp.service.VideoAssetService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +30,7 @@ public class AdminMovieController {
     private final TvSeriesRepository tvSeriesRepository;
     private final SeasonRepository seasonRepository;
     private final EpisodeRepository episodeRepository;
+    private final VideoAssetService videoAssetService;
 
     @GetMapping
     public List<AdminMovieDto> list(@RequestParam(name = "q", required = false) String query) {
@@ -119,6 +124,47 @@ public class AdminMovieController {
                                   @PathVariable("episodeNumber") int episodeNumber,
                                   @RequestBody TrailerRequest request) {
         adminMovieService.setEpisodeTrailer(tvId, seasonNumber, episodeNumber, request.getSrc());
+    }
+
+    @PostMapping("/{type}/{id}/source")
+    public ResponseEntity<VideoAssetDto> uploadSource(@PathVariable("type") String type,
+                                                      @PathVariable("id") long id,
+                                                      @RequestParam("file") MultipartFile file) {
+        String ownerType = resolveOwnerType(type);
+        VideoAssetDto dto = videoAssetService.uploadSource(ownerType, id, file);
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/{type}/{id}/source/latest")
+    public ResponseEntity<VideoAssetDto> getLatestSource(@PathVariable("type") String type,
+                                                         @PathVariable("id") long id) {
+        String ownerType = resolveOwnerType(type);
+        return ResponseEntity.ok(videoAssetService.getLatestAsset(ownerType, id));
+    }
+
+    private String resolveOwnerType(String type) {
+        String t = type == null ? "" : type.trim().toLowerCase();
+        if ("movie".equals(t)) return "movie";
+        if ("tv".equals(t)) return "tv";
+        throw new IllegalArgumentException("type must be 'movie' or 'tv'");
+    }
+
+    @PostMapping("/tv/{tvId}/seasons/{seasonNumber}/episodes/{episodeNumber}/source")
+    public ResponseEntity<VideoAssetDto> uploadEpisodeSource(@PathVariable("tvId") long tvId,
+                                                             @PathVariable("seasonNumber") int seasonNumber,
+                                                             @PathVariable("episodeNumber") int episodeNumber,
+                                                             @RequestParam("file") MultipartFile file) {
+        Long episodeId = tvId * 100000L + seasonNumber * 1000L + episodeNumber;
+        VideoAssetDto dto = videoAssetService.uploadSource("tv_episode", episodeId, file);
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/tv/{tvId}/seasons/{seasonNumber}/episodes/{episodeNumber}/source/latest")
+    public ResponseEntity<VideoAssetDto> getLatestEpisodeSource(@PathVariable("tvId") long tvId,
+                                                                @PathVariable("seasonNumber") int seasonNumber,
+                                                                @PathVariable("episodeNumber") int episodeNumber) {
+        Long episodeId = tvId * 100000L + seasonNumber * 1000L + episodeNumber;
+        return ResponseEntity.ok(videoAssetService.getLatestAsset("tv_episode", episodeId));
     }
 
     @Data
