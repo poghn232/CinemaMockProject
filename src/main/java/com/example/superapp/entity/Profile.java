@@ -1,5 +1,6 @@
 package com.example.superapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,16 +19,18 @@ public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "profile_id")
-    private int pId;
+    private long profileId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     @Column(name = "profile_name")
-    private String pName;
+    private String profileName;
 
     @OneToMany(mappedBy = "profile")
+    @Builder.Default
     private List<Review> reviews = new ArrayList<>();
 
     @Column(name = "comment_disabled", nullable = false)
@@ -36,6 +39,10 @@ public class Profile {
 
     @Override
     public String toString() {
-        return "Profile: " + pName;
+        return "Profile: " + profileName;
+    }
+
+    public Profile(String profileName) {
+        this.profileName = profileName;
     }
 }

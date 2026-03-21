@@ -37,18 +37,13 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Subscription> subscriptions = new java.util.ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
-    private List<Review> reviews = new java.util.ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Profile> profiles = new ArrayList<>();
 
     @Column(nullable = false)
-    private Boolean enabled = true;
-
-    @Column(name = "comment_disabled", nullable = false)
     @Builder.Default
-    private Boolean commentDisabled = false; // if true, user cannot post comments
+    private Boolean enabled = true;
 
     @Override
     public String toString() {

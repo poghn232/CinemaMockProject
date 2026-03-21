@@ -559,8 +559,17 @@
         return new Intl.NumberFormat("vi-VN").format(n) + " ₫";
     }
 
-    function initUserUi() {
-        const username = localStorage.getItem("username") || "Guest";
+    async function initUserUi() {
+
+        const profileData = await fetch("api/profiles/" + localStorage.getItem("profileId"), {
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        })
+
+        const profile = await profileData.json();
+
+        const username = profile.profileName || "Guest";
         const usernameEl = document.getElementById("navUsername");
         const premiumBadge = document.getElementById("premiumBadge");
         const isPremium = localStorage.getItem("isPremium") === "true";

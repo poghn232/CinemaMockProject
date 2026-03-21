@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Who is watching</h1>
+<a href=""></a>
+<div class="profile" id="profile-section">
+</div>
+</body>
+<script>
+    async function loadProfiles() {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+        const profileSection = document.getElementById("profile-section");
+        const response = await fetch("api/profiles", {
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        });
+        const data = await response.json();
+        for (const profile of data) {
+            const p =  document.createElement("div");
+            const a = document.createElement("a");
+            a.href= 'homepage.html';
+            a.textContent = 'Profile ' + profile.profileId;
+            p.appendChild(a);
+            a.addEventListener("click", () => {
+                localStorage.setItem("profileId", profile.profileId);
+            })
+            profileSection.appendChild(a);
+        }
+    }
+
+    loadProfiles();
+</script>
+</html>

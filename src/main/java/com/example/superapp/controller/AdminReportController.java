@@ -72,7 +72,7 @@ public class AdminReportController {
         if (reportedProfile != null) {
             String to = reportedProfile.getUser().getEmail();
             String subject = "Your comment has been removed";
-            String html = "<div>Dear " + reportedProfile.getPName() + ",<br><br>" +
+            String html = "<div>Dear " + reportedProfile.getProfileName() + ",<br><br>" +
                     "Your comment has been removed by admin for the following reason:<br><i>" + req.reason + "</i><br><br>" +
                     "You are temporarily restricted from commenting.<br><br>Regards,<br>MovieZone Admin</div>";
             try {
@@ -103,7 +103,7 @@ public class AdminReportController {
         if (reporter != null) {
             String to = reporter.getUser().getEmail();
             String subject = "Your report has been rejected";
-            String html = "<div>Dear " + reporter.getPName() + ",<br><br>" +
+            String html = "<div>Dear " + reporter.getProfileName() + ",<br><br>" +
                     "Your report about a comment was reviewed and rejected by admin for the following reason:<br><i>" + req.reason + "</i><br><br>Regards,<br>MovieZone Admin</div>";
             try {
                 emailService.sendCustomHtml(to, subject, html);
@@ -119,8 +119,8 @@ public class AdminReportController {
         ReportAdminDto d = new ReportAdminDto();
         d.id = r.getId();
         d.reviewId = r.getReview() != null ? r.getReview().getReviewId() : null;
-        d.reportedProfile = r.getReview() != null && r.getReview().getProfile() != null ? r.getReview().getProfile().getPName() : null;
-        d.reporterProfile = r.getReporter() != null ? r.getReporter().getPName() : null;
+        d.reportedProfile = r.getReview() != null && r.getReview().getProfile() != null ? r.getReview().getProfile().getProfileName() : null;
+        d.reporterProfile = r.getReporter() != null ? r.getReporter().getProfileName() : null;
         d.reason = r.getReason();
         d.createdAt = r.getCreatedAt();
         d.status = r.getStatus() != null ? r.getStatus().name() : null;

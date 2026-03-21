@@ -600,8 +600,7 @@
             document.getElementById("contactForm").reset();
 
         } catch (error) {
-            msgDiv.innerHTML =
-                `<div class="err">${error.message || "Sending failed!"}</div>`;
+            msgDiv.innerHTML =`<div class="err">${error.message || "Sending failed!"}</div>`;
         } finally {
             btn.disabled = false;
         }
@@ -633,10 +632,18 @@
 
             const hasActive = subs.some(s => s && s.status === "ACTIVE");
 
+            const profileRes = await fetch("api/profiles/" + localStorage.getItem("profileId"), {
+                headers: {
+                    Authorization: "Bearer " + token
+                }
+            })
+
+            const profile = await profileRes.json();
+
             return {
                 isLoggedIn: true,
                 isPremium: hasActive,
-                username: data.username || localStorage.getItem("username") || "User"
+                username: profile.profileName || localStorage.getItem("username") || "User"
             };
 
         } catch (e) {
@@ -681,6 +688,10 @@
 
             localStorage.removeItem("token");
             localStorage.removeItem("username");
+            localStorage.removeItem("role");
+            localStorage.removeItem("region");
+            localStorage.removeItem("profileId");
+            window.location.href = "login.html";
 
             window.location.href = "login.html";
         });

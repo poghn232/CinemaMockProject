@@ -2,6 +2,7 @@ package com.example.superapp.controller;
 
 import com.example.superapp.dto.CreateReviewRequest;
 import com.example.superapp.dto.ReviewDto;
+import com.example.superapp.entity.Profile;
 import com.example.superapp.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +43,9 @@ public class ReviewController {
         if (reviewEntityOpt.isEmpty()) return ResponseEntity.badRequest().body(Map.of("message","Review not found"));
 
         var reviewEntity = reviewEntityOpt.get();
-        var reporter = userRepository.findByUsername(auth.getName()).orElse(null);
+        //TODO: Refactor this one
+        var reporter = new Profile();
+//                              .findByUsername(auth.getName()).orElse(null);
 
     String reasonText = (req != null && req.reason != null) ? req.reason : "";
 

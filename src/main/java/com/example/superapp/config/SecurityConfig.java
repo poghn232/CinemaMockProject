@@ -41,35 +41,36 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // ✅ JWT stateless
-                .authorizeHttpRequests(auth -> auth
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // ✅ JWT stateless
+            .authorizeHttpRequests(auth -> auth
                 // admin page requires ADMIN
 
                 .requestMatchers(
-                        "/login.html", "/register.html", "/forgot-password.html", "/oauth2callback.html",
-                        "/homepage.html", "/home.html",
-                        "/movie-detail.html", "/movie-trailer.html", "/movie-watch.html",
-                        "/packs.html", "/contact.html", "/detect-region.html",
-                         "/index.html", "/admin.html", "/profile.html",
-                        "/css/**", "/js/**", "/images/**", "/favicon.ico",
-                        "/api/auth/**",
-                        "/api/movies/**", "/api/contact",
-                        "/api/public/**", "/i18n/**",
-                        "/api/user/history/**",
-                        // ✅ VNPay callbacks
-                        "/api/vnpay/**",
-                        "/api/payment/**", // nếu dùng path này
-                        "/api/payments/**",
-                        "/api/banner",
-                        "/api/image/**"
+                    "/login.html", "/register.html", "/forgot-password.html", "/oauth2callback.html",
+                    "/homepage.html", "/home.html",
+                    "/movie-detail.html", "/movie-trailer.html", "/movie-watch.html",
+                    "/packs.html", "/contact.html", "/detect-region.html",
+                    "/index.html", "/admin.html", "/profile.html",
+                    "/choose_profile.html",
+                    "/css/**", "/js/**", "/images/**",
+                    "/api/auth/**",
+                    "/api/movies/**", "/api/contact",
+                    "/api/public/**", "/i18n/**",
+                    "/api/user/history/**",
+                    // ✅ VNPay callbacks
+                    "/api/vnpay/**",
+                    "/api/payment/**", // nếu dùng path này
+                    "/api/payments/**",
+                    "/api/banner",
+                    "/api/image/**"
                 ).permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
-                )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .formLogin(form -> form.disable())
-                .httpBasic(basic -> basic.disable());
+            )
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+            .formLogin(form -> form.disable())
+            .httpBasic(basic -> basic.disable());
 
         return http.build();
     }

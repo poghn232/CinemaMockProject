@@ -1064,8 +1064,16 @@
                     if (!response.ok) throw new Error("Server connection error");
                     return response.json();
                 })
-                .then(userData => {
-                    renderUserInfo(userData.username, userData.email, userData.role);
+                .then(async userData => {
+                    const profileData = await fetch("api/profiles/" + localStorage.getItem("profileId"), {
+                        headers: {
+                            Authorization: "Bearer " + localStorage.getItem("token")
+                        }
+                    });
+
+                    const profile = await profileData.json();
+
+                    renderUserInfo(profile.profileName, userData.email, userData.role);
 
                     if (userData.subscriptions && userData.subscriptions.length > 0) {
                         renderSubscriptions(userData.subscriptions);

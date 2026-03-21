@@ -1,7 +1,9 @@
 package com.example.superapp.controller;
 
 import com.example.superapp.dto.*;
+import com.example.superapp.entity.Profile;
 import com.example.superapp.entity.User;
+import com.example.superapp.repository.ProfileRepository;
 import com.example.superapp.repository.UserRepository;
 import com.example.superapp.service.*;
 import com.example.superapp.utils.GoogleTokenVerifier;
@@ -12,9 +14,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 @RestController
@@ -30,6 +34,7 @@ public class AuthController {
     private final GeoIpService geoIpService;
     private final LoginHistoryService loginHistoryService;
     private final GoogleTokenVerifier googleTokenVerifier;
+    private final ProfileRepository profileRepository;
 
     public AuthController(
             AuthenticationManager authenticationManager,
@@ -40,8 +45,8 @@ public class AuthController {
             OtpService otpService,
             GeoIpService geoIpService,
             LoginHistoryService loginHistoryService,
-            GoogleTokenVerifier googleTokenVerifier
-    ) {
+            GoogleTokenVerifier googleTokenVerifier,
+            ProfileRepository profileRepository) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.userRepository = userRepository;
@@ -51,6 +56,7 @@ public class AuthController {
         this.geoIpService = geoIpService;
         this.loginHistoryService = loginHistoryService;
         this.googleTokenVerifier = googleTokenVerifier;
+        this.profileRepository = profileRepository;
     }
 
     // ─── Normal login ────────────────────────────────────────────────────────
@@ -125,6 +131,14 @@ public class AuthController {
                     .role("CUSTOMER")
                     .enabled(true)
                     .build();
+
+            Profile defaultProfile = Profile.builder().profileName("default").build();
+
+            defaultProfile.setUser(newUser);
+
+            newUser.getProfiles().add(defaultProfile);
+
+            System.out.println("google default profile: " + newUser.getProfiles());
             return userRepository.save(newUser);
         });
 

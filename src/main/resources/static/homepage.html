@@ -1109,8 +1109,16 @@
                 : [];
             const hasActive = subs.some((s) => s && s.status === "ACTIVE");
 
+            const profileRes = await fetch("api/profiles/" + localStorage.getItem("profileId"), {
+                headers: {
+                    Authorization: "Bearer " + token
+                }
+            });
+
+            const profile = await profileRes.json();
+
             const usernameFromApi =
-                data.username || localStorage.getItem("username") || "User";
+                profile.profileName || localStorage.getItem("username") || "User";
 
             return {
                 isLoggedIn: true,
@@ -1476,6 +1484,7 @@
                 localStorage.removeItem("username");
                 localStorage.removeItem("role");
                 localStorage.removeItem("region");
+                localStorage.removeItem("profileId");
                 // giữ isPremium để dev test; nếu muốn xoá thì bỏ comment dòng dưới
                 // localStorage.removeItem("isPremium");
                 window.location.href = "login.html";

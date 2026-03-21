@@ -1,14 +1,9 @@
+//TODO: FAMILY ACCOUNT: refactor this one
 package com.example.superapp.service;
 
 import com.example.superapp.dto.ReviewDto;
-import com.example.superapp.entity.Episode;
-import com.example.superapp.entity.Movie;
-import com.example.superapp.entity.Review;
-import com.example.superapp.entity.User;
-import com.example.superapp.repository.EpisodeRepository;
-import com.example.superapp.repository.MovieRepository;
-import com.example.superapp.repository.ReviewRepository;
-import com.example.superapp.repository.UserRepository;
+import com.example.superapp.entity.*;
+import com.example.superapp.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +26,7 @@ public class ReviewService {
     private final UserRepository userRepository;
     private final MovieRepository movieRepository;
     private final EpisodeRepository episodeRepository;
+    private final ProfileRepository profileRepository;
 
     @Transactional(readOnly = true)
     public List<ReviewDto> listReviews(Long movieId, Long episodeId) {
@@ -39,8 +35,9 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
+    //TODO: refactor this method
     @Transactional
-    public ReviewDto createComment(String username, Long movieId, Long episodeId, String comment) {
+    public ReviewDto createComment(String profileName, Long movieId, Long episodeId, String comment) {
         if ((movieId == null && episodeId == null) || (movieId != null && episodeId != null)) {
             throw new IllegalArgumentException("Either movieId or episodeId must be provided");
         }
@@ -53,11 +50,11 @@ public class ReviewService {
             throw new IllegalArgumentException("Comment is too long (max 1000 characters)");
         }
 
-        User user = userRepository.findByUsername(username)
+        Profile profile = profileRepository.findByProfileName(profileName)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         // Block commenting for users flagged as commentDisabled
-        if (Boolean.TRUE.equals(user.getCommentDisabled())) {
+        if (Boolean.TRUE.equals(profile.getCommentDisabled())) {
             // friendlier, more natural message returned to clients
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't post comments right now.");
         }
@@ -74,7 +71,7 @@ public class ReviewService {
         review.setEpisode(episode);
     }
 
-    review.setUser(user);
+    review.setProfile(new Profile());
         // keep rating field present to satisfy schema; default to 0 for comments
         review.setRating(0);
     review.setComment(comment == null ? null : comment.trim());
@@ -107,7 +104,7 @@ public class ReviewService {
     private ReviewDto toDto(Review review) {
         ReviewDto dto = new ReviewDto();
         dto.setReviewId(review.getReviewId());
-        dto.setUsername(review.getUser() != null ? review.getUser().getUsername() : "Unknown");
+        dto.setUsername(review.getProfile().getUser() != null ? review.getProfile().getUser().getUsername() : "Unknown");
         dto.setComment(review.getComment());
         dto.setCreatedDate(review.getCreatedDate() != null ? review.getCreatedDate() : LocalDateTime.now());
         return dto;
