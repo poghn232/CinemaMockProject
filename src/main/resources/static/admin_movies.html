@@ -69,6 +69,7 @@
                 style="flex: 1; min-width: 200px; padding: 8px; border-radius: 8px"
         />
         <button id="refreshFilms" class="btn ghost" data-i18n="admin.reload">Reload</button>
+        <button id="backfillSrcFilmBtn" class="btn ghost">Fill src_film from R2</button>
     </div>
 
     <div id="filmsList" class="packs" style="margin-top: 12px" data-i18n="common.loading">Loading...</div>
@@ -203,6 +204,44 @@
             input.click();
         }
 
+        async function syncSingleSrcFilm(type, id, title) {
+            try {
+                const result = await fetchJson(
+                    `/api/admin/movies/${encodeURIComponent(type)}/${encodeURIComponent(id)}/sync-src-film`,
+                    { method: "POST" }
+                );
+
+                alert(result.message || `src_film synced for ${title}`);
+                await loadFilms();
+                refreshCounts();
+            } catch (err) {
+                alert("Fill src_film failed: " + err);
+            }
+        }
+
+        async function backfillSrcFilmAll() {
+            const msg = document.getElementById("tmdbMessage");
+
+            if (!confirm("Fill src_film for old movies/episodes from R2?")) return;
+
+            msg.textContent = "Backfilling src_film from R2...";
+
+            try {
+                const result = await fetchJson("/api/admin/movies/backfill/src-film", {
+                    method: "POST",
+                });
+
+                msg.textContent =
+                    `Backfill completed. Movies updated: ${result.moviesUpdated || 0}, Episodes updated: ${result.episodesUpdated || 0}`;
+
+                await loadFilms();
+                refreshCounts();
+            } catch (e) {
+                msg.textContent = "Backfill failed: " + e;
+                alert("Backfill src_film failed: " + e);
+            }
+        }
+
         async function showVideoStatusModal(type, id, title) {
             const asset = await fetchVideoAssetStatus(type, id);
 
@@ -284,6 +323,7 @@
                 const typeLabel = f.type === "tv" ? "TV Series" : "Movie";
                 const status = f.published ? "Published" : "Hidden";
                 const trailerStatus = f.src ? "Trailer: set" : "Trailer: not set";
+                const srcFilmStatus = f.srcFilm ? "src_film: set" : "src_film: empty";
 
                 let assetStatus = {
                     status: "NOT_UPLOADED",
@@ -312,6 +352,7 @@
           <div style="font-weight:600">${f.title}</div>
           <div class="muted">${typeLabel} · ${status} · ${trailerStatus}</div>
           <div class="muted">${sourceStatus}</div>
+          <div class="muted">${srcFilmStatus}</div>
         `;
 
                 const actions = document.createElement("div");
@@ -399,6 +440,13 @@
                     await uploadFilmSource(f.type, f.id);
                 });
 
+                const syncSrcFilmBtn = document.createElement("button");
+                syncSrcFilmBtn.className = "btn ghost";
+                syncSrcFilmBtn.textContent = "Fill src_film";
+                syncSrcFilmBtn.addEventListener("click", async () => {
+                    await syncSingleSrcFilm(f.type, f.id, f.title);
+                });
+
                 const videoStatusBtn = document.createElement("button");
                 videoStatusBtn.className = "btn ghost";
                 videoStatusBtn.textContent = "Video status";
@@ -415,6 +463,7 @@
                 actions.appendChild(detailsBtn);
                 actions.appendChild(regionBtn);
                 actions.appendChild(uploadSourceBtn);
+                actions.appendChild(syncSrcFilmBtn);
                 actions.appendChild(videoStatusBtn);
 
                 row.appendChild(info);
@@ -447,6 +496,7 @@
         });
 
         document.getElementById("refreshFilms").addEventListener("click", loadFilms);
+        document.getElementById("backfillSrcFilmBtn").addEventListener("click", backfillSrcFilmAll);
 
         function renderTmdb() {
             const container = document.getElementById("tmdbTableContainer");

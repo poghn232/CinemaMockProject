@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -228,6 +229,71 @@ public class VideoAssetService {
 
             throw new IllegalArgumentException("Unsupported ownerType: " + ownerType);
         });
+    }
+
+    public int backfillMovieSrcFilmFromR2() {
+        List<Movie> movies = movieRepository.findAll();
+        int updated = 0;
+
+        for (Movie movie : movies) {
+            String current = movie.getSrcFilm();
+            if (current != null && !current.isBlank()) {
+                continue;
+            }
+
+            boolean synced = syncExistingPlaybackFromR2AndReturn("movie", movie.getId());
+            if (synced) {
+                updated++;
+            }
+        }
+
+        return updated;
+    }
+
+    public int backfillEpisodeSrcFilmFromR2() {
+        List<Episode> episodes = episodeRepository.findAll();
+        int updated = 0;
+
+        for (Episode episode : episodes) {
+            String current = episode.getSrcFilm();
+            if (current != null && !current.isBlank()) {
+                continue;
+            }
+
+            boolean synced = syncExistingPlaybackFromR2AndReturn("tv_episode", episode.getId());
+            if (synced) {
+                updated++;
+            }
+        }
+
+        return updated;
+    }
+
+    public boolean syncExistingPlaybackFromR2AndReturn(String ownerType, Long ownerId) {
+        Optional<String> masterKeyOpt = r2StorageService.findLatestMasterPlaylistKey(ownerType, ownerId);
+        if (masterKeyOpt.isEmpty()) {
+            return false;
+        }
+
+        String playbackUrl = r2StorageService.buildPublicUrl(masterKeyOpt.get());
+
+        if ("movie".equalsIgnoreCase(ownerType)) {
+            Movie movie = movieRepository.findById(ownerId)
+                    .orElseThrow(() -> new IllegalArgumentException("Movie not found: " + ownerId));
+            movie.setSrcFilm(playbackUrl);
+            movieRepository.save(movie);
+            return true;
+        }
+
+        if ("tv_episode".equalsIgnoreCase(ownerType)) {
+            Episode episode = episodeRepository.findById(ownerId)
+                    .orElseThrow(() -> new IllegalArgumentException("Episode not found: " + ownerId));
+            episode.setSrcFilm(playbackUrl);
+            episodeRepository.save(episode);
+            return true;
+        }
+
+        throw new IllegalArgumentException("Unsupported ownerType: " + ownerType);
     }
 
 

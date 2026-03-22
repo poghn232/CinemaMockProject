@@ -211,6 +211,19 @@ public class AdminMovieController {
         return ResponseEntity.ok(videoAssetService.getLatestAsset("tv_episode", episode.getId()));
     }
 
+    @PostMapping("/backfill/src-film")
+    public ResponseEntity<Map<String, Object>> backfillSrcFilm() {
+        int moviesUpdated = videoAssetService.backfillMovieSrcFilmFromR2();
+        int episodesUpdated = videoAssetService.backfillEpisodeSrcFilmFromR2();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("moviesUpdated", moviesUpdated);
+        result.put("episodesUpdated", episodesUpdated);
+        result.put("message", "Backfill completed");
+
+        return ResponseEntity.ok(result);
+    }
+
     @Data
     public static class ImportRequest {
         private long tmdbId;
