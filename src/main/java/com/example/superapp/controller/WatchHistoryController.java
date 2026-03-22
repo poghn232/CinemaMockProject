@@ -1,12 +1,12 @@
 package com.example.superapp.controller;
 
 import com.example.superapp.dto.WatchHistoryDTO;
+import com.example.superapp.entity.Profile;
+import com.example.superapp.entity.TvSeries;
 import com.example.superapp.entity.User;
 import com.example.superapp.entity.WatchHistory;
-import com.example.superapp.repository.WatchHistoryRepository;
-import com.example.superapp.repository.UserRepository;
-import com.example.superapp.repository.MovieRepository; // Cần thêm
-import com.example.superapp.repository.EpisodeRepository; // Cần thêm
+import com.example.superapp.repository.*;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -24,37 +24,26 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/user/history")
 @CrossOrigin(origins = "*")
+@RequiredArgsConstructor
 public class WatchHistoryController {
 
     @Value("${tmdb.image-base-url}")
     private String imageBaseUrl;
+    private final ProfileRepository profileRepository;
+    private final WatchHistoryRepository watchHistoryRepository;
+    private final UserRepository userRepository;
+    private final MovieRepository movieRepository;     // Đảm bảo tên class này chính xác
+    private final EpisodeRepository episodeRepository; // Đảm bảo tên class này chính xác
 
-    @Autowired
-    private WatchHistoryRepository watchHistoryRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private MovieRepository movieRepository;     // Đảm bảo tên class này chính xác
-    @Autowired
-    private EpisodeRepository episodeRepository; // Đảm bảo tên class này chính xác
-
-    // Constructor thủ công để đảm bảo tiêm đủ các Repository
-    public WatchHistoryController(WatchHistoryRepository watchHistoryRepository,
-            UserRepository userRepository,
-            MovieRepository movieRepository,
-            EpisodeRepository episodeRepository) {
-        this.watchHistoryRepository = watchHistoryRepository;
-        this.userRepository = userRepository;
-        this.movieRepository = movieRepository;
-        this.episodeRepository = episodeRepository;
-    }
 
     @GetMapping
-    public ResponseEntity<List<WatchHistoryDTO>> getHistory(Authentication auth) {
-        User user = userRepository.findByUsername(auth.getName())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public ResponseEntity<List<WatchHistoryDTO>> getHistory(Authentication auth, HttpServletRequest request) {
+        long profileId = Long.parseLong(request.getHeader("X-Profile-Id"));
+        User currentUser = userRepository.findByUsername(auth.getName())
+                                       .orElseThrow(() -> new RuntimeException("User not found"));
+        Profile profile = profileRepository.findByProfileIdAndUser(profileId, currentUser).orElseThrow(() -> new IllegalArgumentException("Cannot find profile with id: " + profileId));
 
-        List<WatchHistory> list = watchHistoryRepository.findByUser_UserIdOrderByWatchedAtDesc(user.getUserId());
+        List<WatchHistory> list = profile.getWatchHistories();
 
         List<WatchHistoryDTO> dtos = list.stream().map(h -> {
             WatchHistoryDTO dto = new WatchHistoryDTO();
@@ -73,9 +62,10 @@ public class WatchHistoryController {
             } else if (h.getEpisode() != null) {
                 dto.setEpisodeId(h.getEpisode().getId());
                 dto.setEpisodeName(h.getEpisode().getName());
-                if (h.getEpisode().getSeason() != null && h.getEpisode().getSeason().getTvSeries() != null) {
-                    dto.setTvSeriesName(h.getEpisode().getSeason().getTvSeries().getName());
-                    String tp = h.getEpisode().getSeason().getTvSeries().getPosterPath();
+                TvSeries tvSeries = h.getEpisode().getSeason().getTvSeries();
+                if (h.getEpisode().getSeason() != null && tvSeries != null) {
+                    dto.setTvSeriesName(tvSeries.getName());
+                    String tp = tvSeries.getPosterPath();
                     if (tp != null && !tp.isBlank()) {
                         dto.setPosterPath(tp.startsWith("http") ? tp : imageBaseUrl + tp);
                     }
@@ -88,22 +78,31 @@ public class WatchHistoryController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<?> saveHistory(Authentication auth, @RequestBody WatchHistoryDTO dto) {
+    public ResponseEntity<?> saveHistory(Authentication auth,
+                                         @RequestBody WatchHistoryDTO dto,
+                                         HttpServletRequest request) {
         User user = userRepository.findByUsername(auth.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        long id = Long.parseLong(request.getHeader("X-Profile-Id"));
+
+        Profile profile = profileRepository.findByProfileIdAndUser(id,user)
+                                           .orElseThrow(
+                                               () -> new IllegalArgumentException("Cannot find profile with id: " + id)
+                                           );
+
         Optional<WatchHistory> existing;
         if (dto.getMovieId() != null) {
-            existing = watchHistoryRepository.findByUser_UserIdAndMovie_Id(user.getUserId(), dto.getMovieId());
+            existing = watchHistoryRepository.findByProfile_ProfileIdAndMovie_Id(profile.getProfileId(), dto.getMovieId());
         } else {
-            existing = watchHistoryRepository.findByUser_UserIdAndEpisode_Id(user.getUserId(), dto.getEpisodeId());
+            existing = watchHistoryRepository.findByProfile_ProfileIdAndEpisode_Id(profile.getProfileId(), dto.getEpisodeId());
         }
 
         WatchHistory history = existing.orElse(new WatchHistory());
 
         // QUAN TRỌNG: Gán liên kết thực thể nếu là bản ghi mới
         if (history.getId() == null) {
-            history.setUser(user);
+            history.setProfile(profile);
             if (dto.getMovieId() != null) {
                 history.setMovie(movieRepository.findById(dto.getMovieId()).orElse(null));
             } else if (dto.getEpisodeId() != null) {

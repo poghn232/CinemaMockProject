@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -37,16 +38,16 @@ public class AuthController {
     private final ProfileRepository profileRepository;
 
     public AuthController(
-            AuthenticationManager authenticationManager,
-            CustomUserDetailsService userDetailsService,
-            UserRepository userRepository,
-            JwtUtils jwtUtil,
-            AuthService authService,
-            OtpService otpService,
-            GeoIpService geoIpService,
-            LoginHistoryService loginHistoryService,
-            GoogleTokenVerifier googleTokenVerifier,
-            ProfileRepository profileRepository) {
+        AuthenticationManager authenticationManager,
+        CustomUserDetailsService userDetailsService,
+        UserRepository userRepository,
+        JwtUtils jwtUtil,
+        AuthService authService,
+        OtpService otpService,
+        GeoIpService geoIpService,
+        LoginHistoryService loginHistoryService,
+        GoogleTokenVerifier googleTokenVerifier,
+        ProfileRepository profileRepository) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.userRepository = userRepository;
@@ -62,23 +63,23 @@ public class AuthController {
     // ─── Normal login ────────────────────────────────────────────────────────
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
-            @RequestBody LoginRequest request,
-            HttpServletRequest httpRequest
+        @RequestBody LoginRequest request,
+        HttpServletRequest httpRequest
     ) {
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
-                )
+            new UsernamePasswordAuthenticationToken(
+                request.getUsername(),
+                request.getPassword()
+            )
         );
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
 
         String role = userDetails.getAuthorities()
-                .stream()
-                .findFirst()
-                .map(Object::toString)
-                .orElse("ROLE_CUSTOMER");
+                                 .stream()
+                                 .findFirst()
+                                 .map(Object::toString)
+                                 .orElse("ROLE_CUSTOMER");
 
         String clientIp = IpUtil.getClientIp(httpRequest);
         String region = geoIpService.resolveRegion(clientIp);
@@ -89,8 +90,8 @@ public class AuthController {
         resp.setRegion(region);
 
         boolean requirePublicIp = geoIpService.isLocalIp(clientIp)
-                || "LOCAL-LOCAL".equalsIgnoreCase(region)
-                || "LOCAL".equalsIgnoreCase(region);
+            || "LOCAL-LOCAL".equalsIgnoreCase(region)
+            || "LOCAL".equalsIgnoreCase(region);
         resp.setRequirePublicIp(requirePublicIp);
 
         if (!requirePublicIp && role.toUpperCase().contains("CUSTOMER")) {
@@ -103,8 +104,8 @@ public class AuthController {
     // ─── Google OAuth2 login ─────────────────────────────────────────────────
     @PostMapping("/google")
     public ResponseEntity<?> googleLogin(
-            @RequestBody Map<String, String> body,
-            HttpServletRequest httpRequest
+        @RequestBody Map<String, String> body,
+        HttpServletRequest httpRequest
     ) {
         String idToken = body.get("idToken");
         if (idToken == null || idToken.isBlank()) {
@@ -123,21 +124,20 @@ public class AuthController {
 
         // Find existing user by googleId or email, or create a new one
         User user = userRepository.findByEmail(email).orElseGet(() -> {
-            User newUser = User.builder()
-                    .email(email)
-                    .username(email)
-                    .googleId(googleId)
-                    .password(null)
-                    .role("CUSTOMER")
-                    .enabled(true)
-                    .build();
-
             Profile defaultProfile = Profile.builder().profileName("default").build();
+            List<Profile> profiles = new ArrayList<>();
+            profiles.add(defaultProfile);
+            User newUser = User.builder()
+                               .email(email)
+                               .username(email)
+                               .googleId(googleId)
+                               .password(null)
+                               .profiles(profiles)
+                               .role("CUSTOMER")
+                               .enabled(true)
+                               .build();
 
             defaultProfile.setUser(newUser);
-
-            newUser.getProfiles().add(defaultProfile);
-
             System.out.println("google default profile: " + newUser.getProfiles());
             return userRepository.save(newUser);
         });
@@ -155,18 +155,18 @@ public class AuthController {
         String jwt = jwtUtil.generateToken(userDetails, region, clientIp);
 
         String role = userDetails.getAuthorities()
-                .stream()
-                .findFirst()
-                .map(Object::toString)
-                .orElse("ROLE_CUSTOMER");
+                                 .stream()
+                                 .findFirst()
+                                 .map(Object::toString)
+                                 .orElse("ROLE_CUSTOMER");
 
         LoginResponse resp = new LoginResponse(jwt);
         resp.setRole(role);
         resp.setRegion(region);
 
         boolean requirePublicIp = geoIpService.isLocalIp(clientIp)
-                || "LOCAL-LOCAL".equalsIgnoreCase(region)
-                || "LOCAL".equalsIgnoreCase(region);
+            || "LOCAL-LOCAL".equalsIgnoreCase(region)
+            || "LOCAL".equalsIgnoreCase(region);
         resp.setRequirePublicIp(requirePublicIp);
 
         if (!requirePublicIp) {
@@ -215,8 +215,8 @@ public class AuthController {
     // ─── Resolve region from public IP ───────────────────────────────────────
     @PostMapping("/resolve-region")
     public ResponseEntity<?> resolveRegionFromPublicIp(
-            @RequestBody ResolveRegionRequest request,
-            HttpServletRequest httpRequest
+        @RequestBody ResolveRegionRequest request,
+        HttpServletRequest httpRequest
     ) {
         String authHeader = httpRequest.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -237,10 +237,10 @@ public class AuthController {
         String newToken = jwtUtil.generateToken(userDetails, region, publicIp);
 
         String role = userDetails.getAuthorities()
-                .stream()
-                .findFirst()
-                .map(Object::toString)
-                .orElse("ROLE_CUSTOMER");
+                                 .stream()
+                                 .findFirst()
+                                 .map(Object::toString)
+                                 .orElse("ROLE_CUSTOMER");
 
         LoginResponse resp = new LoginResponse(newToken);
         resp.setRole(role);

@@ -23,7 +23,6 @@ public class Profile {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    @JsonIgnore
     private User user;
 
     @Column(name = "profile_name")
@@ -36,6 +35,10 @@ public class Profile {
     @Column(name = "comment_disabled", nullable = false)
     @Builder.Default
     private Boolean commentDisabled = false;
+
+    @OneToMany(mappedBy = "profile")
+    @Builder.Default
+    private List<WatchHistory> watchHistories = new ArrayList<>();
 
     @Override
     public String toString() {

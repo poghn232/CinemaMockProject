@@ -1,5 +1,6 @@
 package com.example.superapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;              // QUAN TRỌNG: Phải có dòng này
 import lombok.NoArgsConstructor;   // QUAN TRỌNG: Phải có dòng này
@@ -19,8 +20,8 @@ public class WatchHistory {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "profile_id", nullable = false)
+    private Profile profile;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id")

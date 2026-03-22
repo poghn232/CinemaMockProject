@@ -1050,43 +1050,34 @@
         }
 
         // --- LẤY DỮ LIỆU TỪ MYSQL (KHÔNG CÒN MOCK DATA) ---
-        function loadUserData() {
-            fetch(`${API_URL}/profile`, {
+        async function loadUserData() {
+            const profileData = await fetch(`${API_URL}/profile`, {
                 method: 'GET',
                 headers: getAuthHeaders()
-            })
-                .then(response => {
-                    if (response.status === 401 || response.status === 403) {
-                        localStorage.removeItem('token');
-                        window.location.replace('login.html');
-                        throw new Error("Login Expired");
-                    }
-                    if (!response.ok) throw new Error("Server connection error");
-                    return response.json();
-                })
-                .then(async userData => {
-                    const profileData = await fetch("api/profiles/" + localStorage.getItem("profileId"), {
-                        headers: {
-                            Authorization: "Bearer " + localStorage.getItem("token")
-                        }
-                    });
+            });
 
-                    const profile = await profileData.json();
+            const response = await profileData.json();
+            if (response.status === 401 || response.status === 403) {
+                localStorage.removeItem('token');
+                window.location.replace('login.html');
+                throw new Error("Login Expired");
+            }
 
-                    renderUserInfo(profile.profileName, userData.email, userData.role);
+            const p = await fetch("api/profiles/" + localStorage.getItem("profileId"), {
+                headers: {
+                    Authorization: "Bearer " + localStorage.getItem("token")
+                }
+            });
 
-                    if (userData.subscriptions && userData.subscriptions.length > 0) {
-                        renderSubscriptions(userData.subscriptions);
-                    } else {
-                        renderSubscriptions([]);
-                    }
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                    if (error.message !== "Login Expired") {
-                        showToast("Server Connection Fail. Please try again later!", true);
-                    }
-                });
+            const profile = await p.json();
+
+            renderUserInfo(profile.profileName, response.email, response.role);
+
+            if (response.subscriptions && response.subscriptions.length > 0) {
+                renderSubscriptions(response.subscriptions);
+            } else {
+                renderSubscriptions([]);
+            }
         }
 
         function renderUserInfo(username, email, role) {
@@ -1367,10 +1358,11 @@
 
         try {
             // Cập nhật đúng Endpoint từ WatchHistoryController
-            const res = await fetch('http://localhost:8080/api/user/history', {
+            const res = await fetch('/api/user/history', {
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    "X-Profile-Id": localStorage.getItem("profileId")
                 }
             });
 

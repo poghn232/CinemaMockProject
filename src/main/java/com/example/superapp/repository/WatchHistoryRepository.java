@@ -9,11 +9,11 @@ import java.util.Optional;
 @Repository
 public interface WatchHistoryRepository extends JpaRepository<WatchHistory, Long> {
 
-    List<WatchHistory> findByUser_UserIdOrderByWatchedAtDesc(Long userId);
+    List<WatchHistory> findAllByProfile_ProfileIdOrderByWatchedAtDesc(Long profileId);
 
     // Sửa 'MovieId' thành 'Id' (hoặc đúng tên trường ID trong class Movie)
-    Optional<WatchHistory> findByUser_UserIdAndMovie_Id(Long userId, Long movieId);
+    Optional<WatchHistory> findByProfile_ProfileIdAndMovie_Id(Long profileId, Long movieId);
 
     // Sửa 'EpisodeId' thành 'Id' (hoặc đúng tên trường ID trong class Episode)
-    Optional<WatchHistory> findByUser_UserIdAndEpisode_Id(Long userId, Long episodeId);
+    Optional<WatchHistory> findByProfile_ProfileIdAndEpisode_Id(Long profileId, Long episodeId);
 }
