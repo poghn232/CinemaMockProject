@@ -619,6 +619,10 @@
                         <span class="meta-value" id="metaCountry">-</span>
                     </li>
                     <li>
+                        <span class="meta-label">Studio</span>
+                        <span class="meta-value" id="metaStudio">-</span>
+                    </li>
+                    <li>
                         <span class="meta-label" data-i18n="movie_detail.release_date">Release Date</span>
                         <span class="meta-value" id="metaReleaseDate">-</span>
                     </li>
@@ -911,7 +915,8 @@
             type === "tv" ? "TV Series" : "Movie";
         document.getElementById("metaYear").textContent = d.year || "-";
         document.getElementById("metaDirector").textContent = d.director || "-";
-        document.getElementById("metaCountry").textContent = d.country || "-";
+    document.getElementById("metaCountry").textContent = d.country || "-";
+    document.getElementById("metaStudio").textContent = d.studio || "-";
         document.getElementById("metaReleaseDate").textContent = d.releaseDate || "-";
         document.getElementById("metaRuntime").textContent = d.runtime
             ? `${d.runtime} min`

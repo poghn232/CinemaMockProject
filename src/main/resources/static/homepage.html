@@ -981,6 +981,29 @@
         flex-shrink: 0;
       }
 
+      /* ACTOR ROW */
+      .actor-card {
+        background: rgba(15,23,42,0.96);
+        border-radius: 12px;
+        padding: 8px;
+        width: 140px;
+        flex-shrink: 0;
+        text-align: center;
+        cursor: pointer;
+        border: 1px solid rgba(31,41,55,0.9);
+      }
+
+      .actor-thumb {
+        width: 100%;
+        aspect-ratio: 3/4;
+        background-size: cover;
+        background-position: center;
+        border-radius: 8px;
+      }
+
+      .actor-name { margin-top: 8px; font-weight:600; font-size:13px; }
+
+
       #heroSection.hidden {
         display: none;
       }
@@ -1403,7 +1426,7 @@
         featuredList = [...movies]
           .filter((m) => m.imageUrl)
           .sort((a, b) => b.rating - a.rating)
-          .slice(0, 5); // top 5 movies
+          .slice(0, 10); // top 5 movies
 
         featuredIndex = 0;
         showFeatured(featuredIndex);
@@ -1669,12 +1692,19 @@
         }
 
         // ✅ NORMAL MODE (ROWS)
-
         // pass full lists to renderRow; rows will only display first ROW_DISPLAY_LIMIT items
         renderRow(
           "🔥 Trending",
           movies.filter((m) => m.rating >= 8),
         );
+
+        // build and render actor row (non-blocking but try to collect quickly)
+        (async () => {
+          try {
+            const topActors = await collectTopActors(20);
+            renderActorRow('👥 Top Actors', topActors);
+          } catch (e) { console.debug('actor row build failed', e); }
+        })();
         renderRow(
           "🎬 Movies",
           movies.filter((m) => m.type === "movie"),
@@ -1844,6 +1874,85 @@
         row.appendChild(headerWrap);
         row.appendChild(scroll);
         container.appendChild(row);
+      }
+
+      // ACTORS: build a top-actors row (collect from movies' cast)
+      async function collectTopActors(limit = 20) {
+        // build a map id -> actor {id, name, profilePath, count}
+        const map = new Map();
+
+        // iterate movies array and fetch details sequentially (to avoid flooding)
+        for (let i = 0; i < movies.length; i++) {
+          const it = movies[i];
+          if (!it || !it.id) continue;
+          try {
+            const res = await fetch(`/api/public/movies/detail?type=${encodeURIComponent(it.type)}&id=${encodeURIComponent(it.id)}`);
+            if (!res.ok) continue;
+            const d = await res.json();
+            const cast = d.cast || [];
+            for (let j = 0; j < cast.length; j++) {
+              const c = cast[j];
+              if (!c || !c.id) continue;
+              const key = String(c.id);
+              const existing = map.get(key) || { id: c.id, name: c.name || c.original_name || 'Unknown', profilePath: c.profilePath || c.profile_path || null, count: 0 };
+              existing.count = (existing.count || 0) + 1;
+              existing.profilePath = existing.profilePath || c.profilePath || c.profile_path || null;
+              map.set(key, existing);
+            }
+          } catch (e) {
+            // ignore
+          }
+          // early exit when we have gathered enough actors (approx)
+          if (map.size >= limit * 3) break; // gather a bit more to allow sorting
+        }
+
+        const arr = Array.from(map.values()).sort((a,b) => b.count - a.count).slice(0, limit);
+        return arr;
+      }
+
+      function renderActorRow(title, list) {
+        if (!list || !list.length) return;
+        const container = document.getElementById('moviesContainer');
+        const row = document.createElement('div');
+        row.className = 'movie-row';
+
+        const titleEl = document.createElement('div');
+        titleEl.className = 'movie-row-title';
+        titleEl.textContent = title;
+
+        const watchAll = document.createElement('button');
+        watchAll.className = 'watch-all-btn';
+        watchAll.textContent = 'See all';
+        watchAll.addEventListener('click', () => { window.location.href = 'actors.html'; });
+
+        const headerWrap = document.createElement('div');
+        headerWrap.style.display = 'flex';
+        headerWrap.style.alignItems = 'center';
+        headerWrap.style.justifyContent = 'space-between';
+        headerWrap.appendChild(titleEl);
+        headerWrap.appendChild(watchAll);
+
+        const scroll = document.createElement('div');
+        scroll.className = 'movie-row-scroll';
+
+        list.forEach(actor => {
+          const card = document.createElement('div');
+          card.className = 'actor-card';
+          card.innerHTML = `<div class="actor-thumb" style="background-image:url('${actor.profilePath || 'https://via.placeholder.com/300x400?text=No+Image'}')"></div><div class="actor-name">${actor.name}</div>`;
+          card.addEventListener('click', () => { window.location.href = `actors.html?id=${encodeURIComponent(actor.id)}`; });
+          scroll.appendChild(card);
+        });
+
+        row.appendChild(headerWrap);
+        row.appendChild(scroll);
+        // insert actors row after the first row (Trending)
+        // find first movie-row and insert after it
+        const firstRow = container.querySelector('.movie-row');
+        if (firstRow && firstRow.parentElement) {
+          container.insertBefore(row, firstRow.nextSibling);
+        } else {
+          container.appendChild(row);
+        }
       }
 
       // Show a full grid for a selected list (Watch All)
