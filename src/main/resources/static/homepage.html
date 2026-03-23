@@ -981,29 +981,6 @@
         flex-shrink: 0;
       }
 
-      /* ACTOR ROW */
-      .actor-card {
-        background: rgba(15,23,42,0.96);
-        border-radius: 12px;
-        padding: 8px;
-        width: 140px;
-        flex-shrink: 0;
-        text-align: center;
-        cursor: pointer;
-        border: 1px solid rgba(31,41,55,0.9);
-      }
-
-      .actor-thumb {
-        width: 100%;
-        aspect-ratio: 3/4;
-        background-size: cover;
-        background-position: center;
-        border-radius: 8px;
-      }
-
-      .actor-name { margin-top: 8px; font-weight:600; font-size:13px; }
-
-
       #heroSection.hidden {
         display: none;
       }
@@ -1066,63 +1043,22 @@
       }
 
       .btn-play {
-        padding: 12px 20px;
+        padding: 10px 18px;
         border-radius: 999px;
         border: none;
-        background: linear-gradient(90deg, #f97316 0%, #ec4899 100%);
-        color: #fff;
-        font-weight: 700;
+        background: white;
+        color: black;
+        font-weight: 600;
         cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 10px 30px rgba(249, 115, 22, 0.18), 0 2px 6px rgba(0, 0, 0, 0.4);
-        transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
-      }
-
-      .btn-play:hover {
-        transform: translateY(-3px);
-        filter: brightness(1.03);
-        box-shadow: 0 18px 40px rgba(249, 115, 22, 0.22);
-      }
-
-      .btn-play:active {
-        transform: translateY(-1px);
-      }
-
-      .btn-play:focus-visible {
-        outline: 3px solid rgba(249, 115, 22, 0.18);
-        outline-offset: 3px;
       }
 
       .btn-info {
-        padding: 12px 20px;
+        padding: 10px 18px;
         border-radius: 999px;
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        background: rgba(255, 255, 255, 0.03);
-        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        background: rgba(0, 0, 0, 0.4);
+        color: white;
         cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        font-weight: 600;
-        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
-        transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
-      }
-
-      .btn-info:hover {
-        background: rgba(255, 255, 255, 0.06);
-        transform: translateY(-2px);
-        border-color: rgba(255, 255, 255, 0.28);
-      }
-
-      .btn-info:active {
-        transform: translateY(0);
-      }
-
-      .btn-info:focus-visible {
-        outline: 3px solid rgba(148, 163, 184, 0.18);
-        outline-offset: 3px;
       }
 
       /* Watch All / Grid view buttons */
@@ -1426,7 +1362,7 @@
         featuredList = [...movies]
           .filter((m) => m.imageUrl)
           .sort((a, b) => b.rating - a.rating)
-          .slice(0, 10); // top 5 movies
+          .slice(0, 5); // top 5 movies
 
         featuredIndex = 0;
         showFeatured(featuredIndex);
@@ -1692,19 +1628,12 @@
         }
 
         // ✅ NORMAL MODE (ROWS)
+
         // pass full lists to renderRow; rows will only display first ROW_DISPLAY_LIMIT items
         renderRow(
           "🔥 Trending",
           movies.filter((m) => m.rating >= 8),
         );
-
-        // build and render actor row (non-blocking but try to collect quickly)
-        (async () => {
-          try {
-            const topActors = await collectTopActors(20);
-            renderActorRow('👥 Top Actors', topActors);
-          } catch (e) { console.debug('actor row build failed', e); }
-        })();
         renderRow(
           "🎬 Movies",
           movies.filter((m) => m.type === "movie"),
@@ -1874,85 +1803,6 @@
         row.appendChild(headerWrap);
         row.appendChild(scroll);
         container.appendChild(row);
-      }
-
-      // ACTORS: build a top-actors row (collect from movies' cast)
-      async function collectTopActors(limit = 20) {
-        // build a map id -> actor {id, name, profilePath, count}
-        const map = new Map();
-
-        // iterate movies array and fetch details sequentially (to avoid flooding)
-        for (let i = 0; i < movies.length; i++) {
-          const it = movies[i];
-          if (!it || !it.id) continue;
-          try {
-            const res = await fetch(`/api/public/movies/detail?type=${encodeURIComponent(it.type)}&id=${encodeURIComponent(it.id)}`);
-            if (!res.ok) continue;
-            const d = await res.json();
-            const cast = d.cast || [];
-            for (let j = 0; j < cast.length; j++) {
-              const c = cast[j];
-              if (!c || !c.id) continue;
-              const key = String(c.id);
-              const existing = map.get(key) || { id: c.id, name: c.name || c.original_name || 'Unknown', profilePath: c.profilePath || c.profile_path || null, count: 0 };
-              existing.count = (existing.count || 0) + 1;
-              existing.profilePath = existing.profilePath || c.profilePath || c.profile_path || null;
-              map.set(key, existing);
-            }
-          } catch (e) {
-            // ignore
-          }
-          // early exit when we have gathered enough actors (approx)
-          if (map.size >= limit * 3) break; // gather a bit more to allow sorting
-        }
-
-        const arr = Array.from(map.values()).sort((a,b) => b.count - a.count).slice(0, limit);
-        return arr;
-      }
-
-      function renderActorRow(title, list) {
-        if (!list || !list.length) return;
-        const container = document.getElementById('moviesContainer');
-        const row = document.createElement('div');
-        row.className = 'movie-row';
-
-        const titleEl = document.createElement('div');
-        titleEl.className = 'movie-row-title';
-        titleEl.textContent = title;
-
-        const watchAll = document.createElement('button');
-        watchAll.className = 'watch-all-btn';
-        watchAll.textContent = 'See all';
-        watchAll.addEventListener('click', () => { window.location.href = 'actors.html'; });
-
-        const headerWrap = document.createElement('div');
-        headerWrap.style.display = 'flex';
-        headerWrap.style.alignItems = 'center';
-        headerWrap.style.justifyContent = 'space-between';
-        headerWrap.appendChild(titleEl);
-        headerWrap.appendChild(watchAll);
-
-        const scroll = document.createElement('div');
-        scroll.className = 'movie-row-scroll';
-
-        list.forEach(actor => {
-          const card = document.createElement('div');
-          card.className = 'actor-card';
-          card.innerHTML = `<div class="actor-thumb" style="background-image:url('${actor.profilePath || 'https://via.placeholder.com/300x400?text=No+Image'}')"></div><div class="actor-name">${actor.name}</div>`;
-          card.addEventListener('click', () => { window.location.href = `actors.html?id=${encodeURIComponent(actor.id)}`; });
-          scroll.appendChild(card);
-        });
-
-        row.appendChild(headerWrap);
-        row.appendChild(scroll);
-        // insert actors row after the first row (Trending)
-        // find first movie-row and insert after it
-        const firstRow = container.querySelector('.movie-row');
-        if (firstRow && firstRow.parentElement) {
-          container.insertBefore(row, firstRow.nextSibling);
-        } else {
-          container.appendChild(row);
-        }
       }
 
       // Show a full grid for a selected list (Watch All)
@@ -2566,46 +2416,6 @@
         const el = document.getElementById('moviesContainer');
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         unlockFeaturedOnScroll();
-      });
-
-      // wire featured Play and More Info buttons
-      document.addEventListener('click', (e) => {
-        const playBtn = e.target.closest('#featuredPlay');
-        const infoBtn = e.target.closest('#featuredInfo');
-
-        if (playBtn) {
-          e.stopPropagation();
-          const movie = featuredList && featuredList[featuredIndex];
-          if (!movie || !movie.id) {
-            alert('No movie selected to play.');
-            return;
-          }
-          const type = movie.type || 'movie';
-          // navigate to watch page
-          window.location.href = `movie-watch.html?id=${encodeURIComponent(movie.id)}&type=${encodeURIComponent(type)}`;
-          return;
-        }
-
-        if (infoBtn) {
-          e.stopPropagation();
-          const movie = featuredList && featuredList[featuredIndex];
-          if (!movie || !movie.id) {
-            alert('No movie selected.');
-            return;
-          }
-          const type = movie.type || 'movie';
-          // require login to view details (keep same UX as card click)
-          const token = localStorage.getItem('token');
-          if (!token) {
-            const goLogin = confirm(
-              'Bạn cần đăng nhập để xem chi tiết phim. Chuyển tới trang đăng nhập?',
-            );
-            if (goLogin) window.location.href = 'login.html';
-            return;
-          }
-          window.location.href = `movie-detail.html?id=${encodeURIComponent(movie.id)}&type=${encodeURIComponent(type)}`;
-          return;
-        }
       });
     </script>
     <div

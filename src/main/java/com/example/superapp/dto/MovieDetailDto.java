@@ -13,9 +13,9 @@ public class MovieDetailDto {
     private String posterUrl;
     private String backdropUrl;
     private String src; // trailer url
-    private String director;
-    private String country;
-    private String studio;
+    // In MovieDetailDto.java — add this field alongside `src`:
+    private String srcFilm;
+
     private java.util.List<CastMemberDto> cast;
 
     public Long getId() {
@@ -106,30 +106,6 @@ public class MovieDetailDto {
         this.src = src;
     }
 
-    public String getDirector() {
-        return director;
-    }
-
-    public void setDirector(String director) {
-        this.director = director;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public String getStudio() {
-        return studio;
-    }
-
-    public void setStudio(String studio) {
-        this.studio = studio;
-    }
-
     public java.util.List<CastMemberDto> getCast() {
         return cast;
     }
@@ -137,5 +113,12 @@ public class MovieDetailDto {
     public void setCast(java.util.List<CastMemberDto> cast) {
         this.cast = cast;
     }
-}
 
+    public String getSrcFilm() {
+        return srcFilm;
+    }
+
+    public void setSrcFilm(String srcFilm) {
+        this.srcFilm = srcFilm;
+    }
+}

@@ -112,10 +112,15 @@
         overflow: hidden;
         aspect-ratio: 16 / 9;
       }
+      /* All player types: div, iframe, video — fill the container */
+      .video-container > *,
       .video-player {
-        width: 100%;
-        height: 100%;
+        position: absolute;
+        top: 0; left: 0;
+        width: 100% !important;
+        height: 100% !important;
         border: none;
+        display: block;
       }
 
       /* EPISODE SELECTOR */
@@ -418,8 +423,7 @@
         <!-- VIDEO PLAYER -->
         <div class="video-section">
           <div class="video-container">
-            <div id="videoPlayer" class="video-player"></div>
-          </div>
+            <div id="videoPlayer" class="video-player"></div> </div>
         </div>
 
         <!-- EPISODE SELECTOR (hidden for movies) -->
@@ -458,8 +462,7 @@
               id="commentInput"
               class="comment-input"
               placeholder="Share your thoughts about this movie..."
-              maxlength="1000"
-            ></textarea>
+              maxlength="1000"></textarea>
             <div class="comment-actions">
               <div id="charCount" class="comment-char-count">0/1000</div>
               <button id="submitComment" class="comment-submit">
@@ -1070,7 +1073,7 @@
       }
 
       function setupMovie(movieData) {
-        const videoUrl = movieData.src || "";
+        const videoUrl = movieData.srcFilm || movieData.src || "";
         // _resumeSec is set by the tracker block below before loadWatchPage() runs
         loadVideo(videoUrl, window._resumeSec || 0);
       }
@@ -1167,8 +1170,8 @@
                 // not when the user manually picks a different episode
                 const resumeOnLoad = window._resumeSec || 0;
                 window._resumeSec = 0; // clear after first use
-                if (ep && ep.src) {
-                  loadVideo(ep.src, resumeOnLoad);
+                if (ep && (ep.srcFilm || ep.src)) {
+                  loadVideo(ep.srcFilm || ep.src, resumeOnLoad);
                 } else {
                   loadVideo("", 0);
                 }
@@ -1195,8 +1198,8 @@
             );
             if (firstButton) {
               firstButton.click();
-            } else if (firstEpisode.src) {
-              loadVideo(firstEpisode.src, window._resumeSec || 0);
+            } else if (firstEpisode.srcFilm || firstEpisode.src) {
+              loadVideo(firstEpisode.srcFilm || firstEpisode.src, window._resumeSec || 0);
               window._resumeSec = 0;
             }
           }
@@ -1208,8 +1211,8 @@
           const ep = season?.episodes?.find(
             (e) => e.episodeNumber == selectedEpisode && e.published,
           );
-          if (ep && ep.src) {
-            loadVideo(ep.src, window._resumeSec || 0);
+          if (ep && (ep.srcFilm || ep.src)) {
+            loadVideo(ep.srcFilm || ep.src, window._resumeSec || 0);
             window._resumeSec = 0;
           }
         }
@@ -1247,6 +1250,7 @@
           } catch (e) {}
           _ytPlayer = null;
           const container = document.querySelector(".video-container");
+          container.innerHTML = "";
           const div = document.createElement("div");
           div.id = "videoPlayer";
           div.className = "video-player";
@@ -1297,20 +1301,17 @@
         }
       }
 
+      let _nativeVideo = null; // <video> element for direct MP4/HLS
+
       function loadVideo(videoUrl, startSec) {
         const start = Math.floor(startSec || 0);
 
         if (!videoUrl || videoUrl.trim() === "") {
-          // No URL — show blank player area
-          if (_ytPlayer) {
-            try {
-              _ytPlayer.stopVideo();
-            } catch (e) {}
-          }
+          if (_ytPlayer) { try { _ytPlayer.stopVideo(); } catch (e) {} }
           return;
         }
 
-        // Start wall-clock counter the moment a real video URL is loaded
+        _nativeVideo = null;
 
         if (videoUrl.includes("youtube.com") || videoUrl.includes("youtu.be")) {
           const videoId = extractYouTubeId(videoUrl);
@@ -1318,7 +1319,6 @@
           if (_ytReady) {
             _createPlayer(videoId, start);
           } else {
-            // API script not loaded yet — queue and load the script now
             _pendingLoad = { videoId, startSec: start };
             if (!document.getElementById("yt-api-script")) {
               const tag = document.createElement("script");
@@ -1328,31 +1328,38 @@
             }
           }
         } else if (videoUrl.includes("vimeo.com")) {
-          // Vimeo: fall back to plain iframe (Vimeo Player SDK is separate)
           const videoId = extractVimeoId(videoUrl);
           if (videoId) {
             const container = document.querySelector(".video-container");
-            container.innerHTML = `<iframe class="video-player" allowfullscreen
+            container.innerHTML = `<iframe id="videoPlayer" class="video-player" allowfullscreen
                           src="https://player.vimeo.com/video/${videoId}?api=1#t=${start}">
                        </iframe>`;
-            // For Vimeo: fall back to time-based tracking (no state events)
-            _isPlaying = true;
-            if (_firstPlay) {
-              _firstPlay = false;
-              _doSave();
-            }
+            if (_firstPlay) { _firstPlay = false; _doSave(); }
           }
-        } else {
-          // Direct URL — plain iframe, fall back to time-based tracking
+        } else if (/\.(mp4|webm|ogg|mov)([\?#]|$)/i.test(videoUrl) || videoUrl.includes(".m3u8")) {
+          // Native <video> element — full JS seek support
           const container = document.querySelector(".video-container");
-          container.innerHTML = `<iframe class="video-player" allowfullscreen
-                      src="${start > 0 ? videoUrl + "#t=" + start : videoUrl}">
+          const vid = document.createElement("video");
+          vid.id = "videoPlayer";
+          vid.className = "video-player";
+          vid.controls = true;
+          vid.style.background = "#000";
+          vid.addEventListener("loadedmetadata", () => {
+            if (vid.duration > 0) _durationSec = Math.floor(vid.duration);
+            if (start > 0) vid.currentTime = start;
+          }, { once: true });
+          vid.src = videoUrl;
+          container.innerHTML = "";
+          container.appendChild(vid);
+          _nativeVideo = vid;
+          if (_firstPlay) { _firstPlay = false; _doSave(); }
+        } else {
+          // Generic embedded iframe
+          const container = document.querySelector(".video-container");
+          container.innerHTML = `<iframe id="videoPlayer" class="video-player" allowfullscreen
+                      src="${start > 0 ? videoUrl + '#t=' + start : videoUrl}">
                    </iframe>`;
-          _isPlaying = true;
-          if (_firstPlay) {
-            _firstPlay = false;
-            _doSave();
-          }
+          if (_firstPlay) { _firstPlay = false; _doSave(); }
         }
       }
 
@@ -1374,23 +1381,15 @@
       }
 
       // ── Watch History Tracker ──────────────────────────────────────────
-      // getCurrentTime() returns the absolute playback position in the video
-      // (e.g. 1200 if the user is at the 20-minute mark), so it is saved
-      // directly as progressSec — no offset needed.
-      //
-      // _savedProgress must NOT be added to getCurrentTime() because
-      // seekTo(_savedProgress) already moves the player to that position,
-      // so getCurrentTime() already reflects the full cumulative position.
-      // Adding _savedProgress would double-count it on every session.
 
       const _histParams = new URLSearchParams(window.location.search);
-      const _histId = _histParams.get("id");
-      const _histType = _histParams.get("type") || "movie";
-      const _histToken = localStorage.getItem("token");
-      const _tParam = _histParams.get("t"); // seek position only
+      const _histId     = _histParams.get("id");
+      const _histType   = _histParams.get("type") || "movie";
+      const _histToken  = localStorage.getItem("token");
+      const _tParam     = _histParams.get("t");
 
-      let _durationSec = 0; // set from getDuration() in _onPlayerReady
-      let _firstPlay = true; // triggers immediate DB insert on first play
+      let _durationSec = 0;
+      let _firstPlay   = true;
 
       window._resumeSec = 0;
 
@@ -1398,90 +1397,108 @@
         _durationSec = durationSeconds || 0;
       };
 
-      // Returns the exact playback position from YouTube — already absolute
+      // ── Current time — works for YouTube, native <video>, and iframes ──
       function _getCurrentTime() {
         try {
           if (_ytPlayer && typeof _ytPlayer.getCurrentTime === "function") {
             return Math.floor(_ytPlayer.getCurrentTime()) || 0;
           }
+          if (_nativeVideo) {
+            return Math.floor(_nativeVideo.currentTime) || 0;
+          }
         } catch (e) {}
         return 0;
       }
 
+      // ── Duration — prefers live player value over stored estimate ──────
+      function _getLiveDuration() {
+        try {
+          if (_ytPlayer && typeof _ytPlayer.getDuration === "function") {
+            const d = _ytPlayer.getDuration();
+            if (d > 0) return Math.floor(d);
+          }
+          if (_nativeVideo && _nativeVideo.duration > 0) {
+            return Math.floor(_nativeVideo.duration);
+          }
+        } catch (e) {}
+        return _durationSec || 0;
+      }
+
+      // ── Resolve which content is currently playing ─────────────────────
+      // When a TV episode is switched, _currentMovieId / _currentEpisodeId
+      // are updated by setupTVSeries — use those instead of the URL ?id=.
       function _buildPayload() {
-        const currentTime = _getCurrentTime(); // absolute — no offset needed
-        const duration = Math.floor(_durationSec);
-        const progress =
-          duration > 0 ? Math.min(currentTime, duration) : currentTime;
-        return {
-          progressSec: progress,
-          durationSec: duration,
-          ...(_histType === "movie"
-            ? { movieId: parseInt(_histId) }
-            : { episodeId: parseInt(_histId) }),
-        };
+        const currentTime = _getCurrentTime();
+        const duration    = _getLiveDuration();
+        if (duration > 0) _durationSec = duration; // keep in sync
+        const progress    = duration > 0 ? Math.min(currentTime, duration) : currentTime;
+
+        // Determine which entity to attach the record to
+        if (_histType === "tv") {
+          const epId = _currentEpisodeId || parseInt(_histId);
+          return { progressSec: progress, durationSec: duration, episodeId: epId };
+        } else {
+          const mvId = _currentMovieId || parseInt(_histId);
+          return { progressSec: progress, durationSec: duration, movieId: mvId };
+        }
       }
 
       function _doSave() {
-        if (!_histId || !_histToken) return;
-        fetch("http://localhost:8080/api/user/history/save", {
+        if (!_histToken) return;
+        const payload = _buildPayload();
+        // Need at least one content id
+        if (!payload.movieId && !payload.episodeId) return;
+        fetch("/api/user/history/save", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: "Bearer " + _histToken,
           },
-          body: JSON.stringify(_buildPayload()),
+          body: JSON.stringify(payload),
         }).catch(() => {});
       }
 
-      // Periodic save every 15 seconds (only when player exists)
+      // Periodic save every 15 s — fires for all player types once playing has started
       setInterval(() => {
-        if (_ytPlayer && !_firstPlay) _doSave();
+        if (!_firstPlay) _doSave();
       }, 15_000);
 
-      // Save on tab close using sync XHR (sendBeacon can't send Authorization header)
+      // Save on tab/browser close (synchronous XHR — sendBeacon can't set Auth header)
       window.addEventListener("beforeunload", () => {
-        if (!_histId || !_histToken || _firstPlay) return;
+        if (_firstPlay || !_histToken) return;
+        const payload = _buildPayload();
+        if (!payload.movieId && !payload.episodeId) return;
         const xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://localhost:8080/api/user/history/save", false);
+        xhr.open("POST", "/api/user/history/save", false);
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.setRequestHeader("Authorization", "Bearer " + _histToken);
-        try {
-          xhr.send(JSON.stringify(_buildPayload()));
-        } catch (e) {}
+        try { xhr.send(JSON.stringify(payload)); } catch (e) {}
       });
 
       async function _initAndStart() {
-        // ?t= sets the video seek position only — do NOT use it for _savedProgress.
-        // Always fetch from DB so cumulative progress is never lost.
         if (_tParam !== null && _tParam !== "") {
           window._resumeSec = parseFloat(_tParam) || 0;
         }
 
-        // Always fetch saved progress from DB regardless of ?t=
+        // Load saved progress from DB to resume from where the user left off
         if (_histId && _histToken) {
           try {
-            const res = await fetch("http://localhost:8080/api/user/history", {
+            const res = await fetch("/api/user/history", {
               headers: { Authorization: "Bearer " + _histToken },
             });
             if (res.ok) {
               const list = await res.json();
+              // For TV, _histId is the series ID. Match history by the ?episode= param (episode DB id).
+              const _episodeParam = _histParams.get("episode");
               const rec = list.find(
                 (h) =>
-                  (_histType === "movie" &&
-                    String(h.movieId) === String(_histId)) ||
-                  (_histType === "tv" &&
-                    String(h.episodeId) === String(_histId)),
+                  (_histType === "movie" && String(h.movieId) === String(_histId)) ||
+                  (_histType === "tv" && _episodeParam && String(h.episodeId) === String(_episodeParam)),
               );
               if (rec) {
-                // Use saved position to seek the player — getCurrentTime()
-                // will then return this absolute position directly, so no
-                // _savedProgress offset is needed in _buildPayload()
                 const savedPos = rec.progressSec || 0;
-                _durationSec = rec.durationSec || 0;
-                if (!window._resumeSec) {
-                  window._resumeSec = savedPos;
-                }
+                if (rec.durationSec > 0) _durationSec = rec.durationSec;
+                if (!window._resumeSec) window._resumeSec = savedPos;
               }
             }
           } catch (e) {
@@ -1493,6 +1510,5 @@
 
       _initAndStart();
     </script>
-    <script src="js/ai-chat-support.js"></script>
   </body>
 </html>

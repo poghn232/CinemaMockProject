@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -54,13 +55,14 @@ public class WatchHistoryController {
     }
 
     @GetMapping
+    @Transactional
     public ResponseEntity<List<WatchHistoryDTO>> getHistory(Authentication auth, jakarta.servlet.http.HttpServletRequest request) {
         User user = userRepository.findByUsername(auth.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-    List<WatchHistory> list = watchHistoryRepository.findByUser_UserIdOrderByWatchedAtDesc(user.getUserId());
+        List<WatchHistory> list = watchHistoryRepository.findByUser_UserIdOrderByWatchedAtDesc(user.getUserId());
 
-    String userRegion = extractRegionFromRequest(request);
+        String userRegion = extractRegionFromRequest(request);
 
         List<WatchHistoryDTO> dtos = list.stream().map(h -> {
             WatchHistoryDTO dto = new WatchHistoryDTO();
@@ -91,8 +93,13 @@ public class WatchHistoryController {
 
             } else if (h.getEpisode() != null) {
                 dto.setEpisodeId(h.getEpisode().getId());
+                dto.setEpisodeNumber(h.getEpisode().getEpisodeNumber());
                 dto.setEpisodeName(h.getEpisode().getName());
+                if (h.getEpisode().getSeason() != null) {
+                    dto.setSeasonNumber(h.getEpisode().getSeason().getSeasonNumber());
+                }
                 if (h.getEpisode().getSeason() != null && h.getEpisode().getSeason().getTvSeries() != null) {
+                    dto.setTvSeriesId(h.getEpisode().getSeason().getTvSeries().getId());
                     dto.setTvSeriesName(h.getEpisode().getSeason().getTvSeries().getName());
                     String tp = h.getEpisode().getSeason().getTvSeries().getPosterPath();
                     if (tp != null && !tp.isBlank()) {
@@ -151,13 +158,19 @@ public class WatchHistoryController {
     }
 
     private String extractRegionFromRequest(jakarta.servlet.http.HttpServletRequest request) {
-        if (request == null) return null;
+        if (request == null) {
+            return null;
+        }
         String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) return null;
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return null;
+        }
         try {
             String token = authHeader.substring(7);
             String region = jwtUtils.extractRegion(token);
-            if (region == null || region.isBlank()) return null;
+            if (region == null || region.isBlank()) {
+                return null;
+            }
             return region.trim().toUpperCase();
         } catch (Exception e) {
             return null;

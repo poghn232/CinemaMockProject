@@ -53,40 +53,41 @@ public class MovieController {
         return tmdbService.search(q, type, page);
     }
 
-        @GetMapping("/tv/{tvId}/season/{season}/episode/{episode}")
-        public Map<String, Object> episodeDetails(@PathVariable("tvId") long tvId,
-                                                   @PathVariable("season") int season,
-                                                   @PathVariable("episode") int episode) {
-            return tmdbService.getTvEpisodeDetails(tvId, season, episode);
-        }
+    @GetMapping("/tv/{tvId}/season/{season}/episode/{episode}")
+    public Map<String, Object> episodeDetails(@PathVariable("tvId") long tvId,
+            @PathVariable("season") int season,
+            @PathVariable("episode") int episode) {
+        return tmdbService.getTvEpisodeDetails(tvId, season, episode);
+    }
 
-        @GetMapping("/tv/{tvId}/seasons")
-        public java.util.List<java.util.Map<String, Object>> getSeasons(@PathVariable("tvId") long tvId) {
-            System.out.println("[MovieController] getSeasons tvId=" + tvId);
-            TvSeries tv = tvSeriesRepository.findById(tvId).orElse(null);
-            if (tv == null) {
-                System.out.println("[MovieController] TV not found: " + tvId);
-                return java.util.Collections.emptyList();
-            }
-            java.util.List<com.example.superapp.entity.Season> seasons = seasonRepository.findByTvSeriesId(tvId);
-            System.out.println("[MovieController] Found " + seasons.size() + " seasons");
-            return seasons.stream().map(s -> {
-                java.util.Map<String, Object> m = new java.util.HashMap<>();
-                m.put("seasonNumber", s.getSeasonNumber());
-                java.util.List<java.util.Map<String, Object>> eps = episodeRepository.findBySeasonId(s.getId()).stream()
-                        .filter(e -> Boolean.TRUE.equals(e.getPublished())) // Only published episodes
-                        .map(e -> {
-                    java.util.Map<String, Object> em = new java.util.HashMap<>();
-                    em.put("id", e.getId());
-                    em.put("episodeNumber", e.getEpisodeNumber());
-                    em.put("name", e.getName());
-                    em.put("src", e.getSrc());
-                    em.put("published", e.getPublished());
-                    return em;
-                }).collect(java.util.stream.Collectors.toList());
-                m.put("episodes", eps);
-                System.out.println("[MovieController] Season " + s.getSeasonNumber() + " has " + eps.size() + " published episodes");
-                return m;
-            }).collect(java.util.stream.Collectors.toList());
+    @GetMapping("/tv/{tvId}/seasons")
+    public java.util.List<java.util.Map<String, Object>> getSeasons(@PathVariable("tvId") long tvId) {
+        System.out.println("[MovieController] getSeasons tvId=" + tvId);
+        TvSeries tv = tvSeriesRepository.findById(tvId).orElse(null);
+        if (tv == null) {
+            System.out.println("[MovieController] TV not found: " + tvId);
+            return java.util.Collections.emptyList();
         }
+        java.util.List<com.example.superapp.entity.Season> seasons = seasonRepository.findByTvSeriesId(tvId);
+        System.out.println("[MovieController] Found " + seasons.size() + " seasons");
+        return seasons.stream().map(s -> {
+            java.util.Map<String, Object> m = new java.util.HashMap<>();
+            m.put("seasonNumber", s.getSeasonNumber());
+            java.util.List<java.util.Map<String, Object>> eps = episodeRepository.findBySeasonId(s.getId()).stream()
+                    .filter(e -> Boolean.TRUE.equals(e.getPublished())) // Only published episodes
+                    .map(e -> {
+                        java.util.Map<String, Object> em = new java.util.HashMap<>();
+                        em.put("id", e.getId());
+                        em.put("episodeNumber", e.getEpisodeNumber());
+                        em.put("name", e.getName());
+                        em.put("src", e.getSrc());
+                        em.put("srcFilm", e.getSrcFilm());
+                        em.put("published", e.getPublished());
+                        return em;
+                    }).collect(java.util.stream.Collectors.toList());
+            m.put("episodes", eps);
+            System.out.println("[MovieController] Season " + s.getSeasonNumber() + " has " + eps.size() + " published episodes");
+            return m;
+        }).collect(java.util.stream.Collectors.toList());
+    }
 }

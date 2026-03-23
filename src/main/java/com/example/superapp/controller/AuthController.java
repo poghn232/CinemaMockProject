@@ -5,6 +5,8 @@ import com.example.superapp.entity.User;
 import com.example.superapp.repository.UserRepository;
 import com.example.superapp.service.*;
 import com.example.superapp.utils.GoogleTokenVerifier;
+import com.example.superapp.utils.FacebookTokenVerifier;
+import com.example.superapp.utils.FacebookTokenVerifier.FacebookUserInfo;
 import com.example.superapp.utils.IpUtil;
 import com.example.superapp.utils.JwtUtils;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
@@ -30,6 +32,7 @@ public class AuthController {
     private final GeoIpService geoIpService;
     private final LoginHistoryService loginHistoryService;
     private final GoogleTokenVerifier googleTokenVerifier;
+    private final FacebookTokenVerifier facebookTokenVerifier;
 
     public AuthController(
             AuthenticationManager authenticationManager,
@@ -40,7 +43,8 @@ public class AuthController {
             OtpService otpService,
             GeoIpService geoIpService,
             LoginHistoryService loginHistoryService,
-            GoogleTokenVerifier googleTokenVerifier
+            GoogleTokenVerifier googleTokenVerifier,
+            FacebookTokenVerifier facebookTokenVerifier
     ) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
@@ -51,6 +55,7 @@ public class AuthController {
         this.geoIpService = geoIpService;
         this.loginHistoryService = loginHistoryService;
         this.googleTokenVerifier = googleTokenVerifier;
+        this.facebookTokenVerifier = facebookTokenVerifier;
     }
 
     // ─── Normal login ────────────────────────────────────────────────────────
@@ -150,6 +155,79 @@ public class AuthController {
         resp.setRole(role);
         resp.setRegion(region);
 
+        boolean requirePublicIp = geoIpService.isLocalIp(clientIp)
+                || "LOCAL-LOCAL".equalsIgnoreCase(region)
+                || "LOCAL".equalsIgnoreCase(region);
+        resp.setRequirePublicIp(requirePublicIp);
+
+        if (!requirePublicIp) {
+            loginHistoryService.saveLoginHistory(user.getUsername(), clientIp, region);
+        }
+
+        return ResponseEntity.ok(resp);
+    }
+
+    // ─── Facebook OAuth2 login ──────────────────────────────────────────────────
+    @PostMapping("/facebook")
+    public ResponseEntity<?> facebookLogin(
+            @RequestBody Map<String, String> body,
+            HttpServletRequest httpRequest) {
+
+        String accessToken = body.get("accessToken");
+        if (accessToken == null || accessToken.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "accessToken is required"));
+        }
+
+        FacebookUserInfo fbUser;
+        try {
+            fbUser = facebookTokenVerifier.verify(accessToken);
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body(Map.of("message", "Invalid Facebook token"));
+        }
+
+        String email = fbUser.getEmail();
+        String fbId = fbUser.getId();
+
+        // Lookup order: facebookId → email (if present) → create new
+        User user = userRepository.findByFacebookId(fbId).orElse(null);
+
+        if (user == null && email != null && !email.isBlank()) {
+            user = userRepository.findByEmail(email).orElse(null);
+        }
+
+        if (user == null) {
+            String username = (email != null && !email.isBlank()) ? email : "fb_" + fbId;
+            if (userRepository.existsByUsername(username)) {
+                username = "fb_" + fbId;
+            }
+            user = User.builder()
+                    .email(email != null && !email.isBlank() ? email : "fb_" + fbId + "@facebook.com")
+                    .username(username)
+                    .facebookId(fbId)
+                    .password(null)
+                    .role("CUSTOMER")
+                    .enabled(true)
+                    .build();
+            user = userRepository.save(user);
+        }
+
+        // Sync facebookId if missing
+        if (user.getFacebookId() == null) {
+            user.setFacebookId(fbId);
+            userRepository.save(user);
+        }
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
+        String clientIp = IpUtil.getClientIp(httpRequest);
+        String region = geoIpService.resolveRegion(clientIp);
+        String jwt = jwtUtil.generateToken(userDetails, region, clientIp);
+
+        String role = userDetails.getAuthorities().stream()
+                .findFirst().map(Object::toString).orElse("ROLE_CUSTOMER");
+
+        LoginResponse resp = new LoginResponse(jwt);
+        resp.setRole(role);
+        resp.setRegion(region);
         boolean requirePublicIp = geoIpService.isLocalIp(clientIp)
                 || "LOCAL-LOCAL".equalsIgnoreCase(region)
                 || "LOCAL".equalsIgnoreCase(region);

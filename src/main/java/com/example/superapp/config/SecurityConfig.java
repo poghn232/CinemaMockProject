@@ -47,7 +47,7 @@ public class SecurityConfig {
                         // admin page requires ADMIN
 
                         .requestMatchers(
-                                "/login.html", "/register.html", "/forgot-password.html", "/oauth2callback.html",
+                                "/login.html", "/register.html", "/forgot-password.html", "/oauth2callback.html",  "/Fbcallback.html",
                                 "/homepage.html", "/home.html",
                                 "/actors.html",
                                 "/movie-detail.html", "/movie-trailer.html", "/movie-watch.html",

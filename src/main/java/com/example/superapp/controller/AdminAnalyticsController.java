@@ -34,32 +34,41 @@ public class AdminAnalyticsController {
     @GetMapping("/users")
     @Transactional(readOnly = true)
     public Map<String, Object> userStats(@RequestParam(defaultValue = "all") String period) {
-        List<User> allUsers = userRepository.findAll()
-                .stream()
-                .filter(u -> u.getRole() == null || !u.getRole().toUpperCase().contains("ADMIN"))
-                .toList();
+        List<User> allUsers = userRepository.findAll();
+
+        // Exclude admin accounts — only count regular users
+        List<User> regularUsers = allUsers.stream()
+                .filter(u -> u.getRole() == null || !u.getRole().trim().toUpperCase().contains("ADMIN"))
+                .collect(Collectors.toList());
 
         List<Subscription> allSubs = subscriptionRepository.findAll();
         LocalDateTime cutoff = getCutoff(period);
 
+        // Subscribed count: only among regular users
+        Set<Long> regularUserIds = regularUsers.stream()
+                .map(User::getUserId)
+                .collect(Collectors.toSet());
+
         Set<Long> subscribedUserIds = allSubs.stream()
                 .filter(s -> s.getStatus() != null && s.getStatus() == SubscriptionStatus.ACTIVE)
                 .map(s -> s.getUser().getUserId())
+                .filter(regularUserIds::contains)
                 .collect(Collectors.toSet());
 
         long newUsers;
         if (cutoff == null) {
-            newUsers = allUsers.size();
+            newUsers = regularUsers.size();
         } else {
             newUsers = allSubs.stream()
                     .filter(s -> s.getStartDate() != null && s.getStartDate().isAfter(cutoff))
                     .map(s -> s.getUser().getUserId())
+                    .filter(regularUserIds::contains)
                     .distinct()
                     .count();
         }
 
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("totalUsers", allUsers.size());
+        result.put("totalUsers", regularUsers.size());
         result.put("subscribedUsers", subscribedUserIds.size());
         result.put("newUsers", newUsers);
         result.put("period", period);
@@ -77,12 +86,12 @@ public class AdminAnalyticsController {
     public Map<String, Object> genreStats(@RequestParam(defaultValue = "all") String period) {
         LocalDateTime cutoff = getCutoff(period);
 
-    List<com.example.superapp.entity.WatchHistory> history = watchHistoryRepository.findAll()
-        .stream()
-        // only include entries with a valid watchedAt (if cutoff applied) and at least one target (movie or episode)
-        .filter(wh -> (cutoff == null || (wh.getWatchedAt() != null && wh.getWatchedAt().isAfter(cutoff)))
-            && (wh.getMovie() != null || wh.getEpisode() != null))
-        .toList();
+        List<com.example.superapp.entity.WatchHistory> history = watchHistoryRepository.findAll()
+                .stream()
+                // only include entries with a valid watchedAt (if cutoff applied) and at least one target (movie or episode)
+                .filter(wh -> (cutoff == null || (wh.getWatchedAt() != null && wh.getWatchedAt().isAfter(cutoff)))
+                && (wh.getMovie() != null || wh.getEpisode() != null))
+                .toList();
 
         Map<String, Long> genreCounts = new LinkedHashMap<>();
 
@@ -92,7 +101,9 @@ public class AdminAnalyticsController {
                 var genres = wh.getMovie().getGenres();
                 if (genres != null) {
                     for (Genre g : genres) {
-                        if (g != null && g.getName() != null) genreCounts.merge(g.getName(), 1L, Long::sum);
+                        if (g != null && g.getName() != null) {
+                            genreCounts.merge(g.getName(), 1L, Long::sum);
+                        }
                     }
                 }
             }
@@ -103,7 +114,9 @@ public class AdminAnalyticsController {
                 var tvGenres = wh.getEpisode().getSeason().getTvSeries().getGenres();
                 if (tvGenres != null) {
                     for (Genre g : tvGenres) {
-                        if (g != null && g.getName() != null) genreCounts.merge(g.getName(), 1L, Long::sum);
+                        if (g != null && g.getName() != null) {
+                            genreCounts.merge(g.getName(), 1L, Long::sum);
+                        }
                     }
                 }
             }
@@ -144,10 +157,10 @@ public class AdminAnalyticsController {
     public Map<String, Object> revenueStats() {
         // Sum only completed payments
         var payments = paymentRepository.findAll();
-    java.math.BigDecimal total = payments.stream()
-        .filter(p -> p.getStatus() != null && p.getStatus() == com.example.superapp.entity.PaymentStatus.SUCCESS)
-        .map(p -> p.getAmount() == null ? java.math.BigDecimal.ZERO : p.getAmount())
-        .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+        java.math.BigDecimal total = payments.stream()
+                .filter(p -> p.getStatus() != null && p.getStatus() == com.example.superapp.entity.PaymentStatus.SUCCESS)
+                .map(p -> p.getAmount() == null ? java.math.BigDecimal.ZERO : p.getAmount())
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
 
         Map<String, Object> res = new LinkedHashMap<>();
         res.put("totalRevenue", total);

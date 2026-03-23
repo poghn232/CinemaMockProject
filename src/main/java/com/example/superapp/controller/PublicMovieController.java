@@ -44,10 +44,5 @@ public class PublicMovieController {
     ) {
         return publicMovieService.getDetail(type, id, request);
     }
-
-    @GetMapping("/genres")
-    public java.util.List<com.example.superapp.dto.GenreWithItems> genres(HttpServletRequest request) {
-        return publicMovieService.listGenresWithItems(request);
-    }
 }
 

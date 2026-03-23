@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class WatchHistoryDTO {
+
     private Long id;
     private LocalDateTime watchedAt;
     private Integer durationSec;
@@ -19,6 +20,9 @@ public class WatchHistoryDTO {
 
     // Dành cho Phim Bộ
     private Long episodeId;
+    private Integer episodeNumber;
+    private Integer seasonNumber;
+    private Long tvSeriesId;
     private String tvSeriesName;
     private String episodeName;
 }

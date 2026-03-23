@@ -151,24 +151,17 @@
             font-size: 11px;
             color: #d1d5db;
         }
-        /* Night City Stories - Action 2025 */
+
         .poster-1 {
-            background-image: url("https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=500");
+            background-image: url("https://image.tmdb.org/t/p/w500/9TEJXta9Jjd26jKV4wLGYzFPYfC.jpg");
         }
 
-        /* Echoes of Stars - Science Fiction */
         .poster-2 {
-            background-image: url("https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=500");
+            background-image: url("https://image.tmdb.org/t/p/w500/bcERImYVxN8pPMP4RPgCvm91vB.jpg");
         }
 
-        /* Hidden Notes - Psychological · Music */
         .poster-3 {
-            background-image: url("https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=500");
-        }
-
-        .poster-1, .poster-2, .poster-3 {
-            background-size: cover;
-            background-position: center;
+            background-image: url("https://image.tmdb.org/t/p/w500/ixZdcct8F7zfMDfUYFhXTR2iCpL.jpg");
         }
 
         .login-container {
@@ -254,43 +247,6 @@
 
         .login-container input::placeholder {
             color: #6b7280;
-        }
-
-        /* Password field with inline toggle */
-        .password-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .password-wrapper input {
-            padding-right: 40px; /* room for the icon */
-        }
-
-        .toggle-password {
-            position: absolute;
-            right: 8px;
-            background: transparent;
-            border: none;
-            color: #9ca3af;
-            width: 28px;
-            height: 28px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 6px;
-            cursor: pointer;
-            padding: 0;
-        }
-
-        .toggle-password:hover {
-            background: rgba(255,255,255,0.02);
-            color: #f97316;
-        }
-
-        .toggle-password svg {
-            width: 18px;
-            height: 18px;
         }
 
         .login-container input:focus {
@@ -402,6 +358,41 @@
 
         .btn-google svg {
             flex-shrink: 0;
+        }
+
+        /* ── Facebook button ── */
+        .btn-facebook {
+            width: 100%;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #1877f2;
+            border: none;
+            border-radius: 999px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.12s ease;
+            font-family: inherit;
+            margin-top: 10px;
+        }
+
+        .btn-facebook:hover {
+            background: #1464d8;
+            transform: translateY(-1px);
+        }
+
+        .btn-facebook:active {
+            transform: translateY(0);
+        }
+
+        .btn-facebook:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .helper-row {
@@ -517,16 +508,8 @@
                     <div class="field">
                         <div class="field-label"
                             data-i18n="auth.password">Password</div>
-                        <div class="password-wrapper">
-                            <input type="password" id="password"
-                                placeholder="••••••••" required>
-                            <button type="button" id="togglePassword" class="toggle-password" aria-label="Show password" aria-pressed="false">
-                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                    <path d="M12 5C7 5 2.73 8.11 1 12c1.73 3.89 6 7 11 7s9.27-3.11 11-7c-1.73-3.89-6-7-11-7z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path>
-                                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></circle>
-                                </svg>
-                            </button>
-                        </div>
+                        <input type="password" id="password"
+                            placeholder="••••••••" required>
                     </div>
 
                     <button type="submit" id="loginBtn" class="btn-primary"
@@ -562,6 +545,15 @@
                     Continue with Google
                 </button>
 
+                <button class="btn-facebook" id="facebookBtn" type="button">
+                    <svg width="18" height="18" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#fff"
+                            d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.791-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z" />
+                    </svg>
+                    Continue with Facebook
+                </button>
+
                 <p id="error" class="error"></p>
             </section>
         </div>
@@ -569,6 +561,8 @@
         <!-- Google client ID config — replace with your real client ID -->
         <meta name="google-client-id"
             content="849376005522-l2oe13172l2o9dklrqstm6i5mmcahukg.apps.googleusercontent.com">
+        <!-- Facebook App ID — replace with your real App ID -->
+        <meta name="facebook-app-id" content="1206251101263889">
 
         <script src="/js/i18n.js"></script>
         <script>
@@ -716,35 +710,78 @@
         }, 300);
     });
 
-        // Password visibility toggle
-        (function () {
-            const pwd = document.getElementById('password');
-            const toggle = document.getElementById('togglePassword');
-            if (!pwd || !toggle) return;
+    // ── Facebook login ────────────────────────────────────────────────────────
+    const FB_APP_ID = document.querySelector("meta[name='facebook-app-id']").content;
+    const FB_REDIRECT_URI = window.location.origin + "/Fbcallback.html";
 
-            function updateToggleState() {
-                const isShown = pwd.type === 'text';
-                toggle.setAttribute('aria-pressed', String(isShown));
-                toggle.setAttribute('aria-label', isShown ? 'Hide password' : 'Show password');
-            }
+    function buildFacebookAuthUrl() {
+        const params = new URLSearchParams({
+            client_id: FB_APP_ID,
+            redirect_uri: FB_REDIRECT_URI,
+            scope: "email,public_profile",
+            response_type: "token",
+            auth_type: "rerequest",
+        });
+        return "https://www.facebook.com/v19.0/dialog/oauth?" + params.toString();
+    }
 
-            toggle.addEventListener('click', function (e) {
-                const selectionStart = pwd.selectionStart;
-                const selectionEnd = pwd.selectionEnd;
-                pwd.type = pwd.type === 'password' ? 'text' : 'password';
-                updateToggleState();
-                // keep focus and restore cursor position
-                pwd.focus();
-                try {
-                    pwd.setSelectionRange(selectionStart, selectionEnd);
-                } catch (err) {
-                    // ignore if not supported
-                }
+    async function sendFacebookToken(accessToken) {
+        setLoading(true);
+        try {
+            const res = await fetch("/api/auth/facebook", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ accessToken })
             });
 
-            // initialize state
-            updateToggleState();
-        })();
+            if (!res.ok) {
+                const body = await res.json().catch(() => ({}));
+                showError(body.message || "Facebook login failed. Please try again.");
+                return;
+            }
+
+            const data = await res.json();
+            handleLoginResponse(data, null);
+        } catch (err) {
+            showError("Facebook login error. Please try again.");
+        }
+    }
+
+    // Listen for token or error posted from Fbcallback.html
+    window.addEventListener("message", function (event) {
+        if (event.origin !== window.location.origin) return;
+        if (!event.data) return;
+        if (event.data.type === "FACEBOOK_TOKEN") {
+            sendFacebookToken(event.data.accessToken);
+        } else if (event.data.type === "FACEBOOK_ERROR") {
+            setLoading(false);
+            showError("Facebook login was cancelled or denied.");
+        }
+    });
+
+    document.getElementById("facebookBtn").addEventListener("click", function () {
+        if (isLoading) return;
+        clearError();
+
+        const url = buildFacebookAuthUrl();
+        const popup = window.open(url, "facebookLogin", "width=500,height=620,left=200,top=100");
+
+        if (!popup) {
+            showError("Popup was blocked. Please allow popups for this site and try again.");
+            return;
+        }
+
+        setLoading(true);
+
+        const timer = setInterval(function () {
+            if (popup.closed) {
+                clearInterval(timer);
+                setTimeout(function () {
+                    if (isLoading) setLoading(false);
+                }, 500);
+            }
+        }, 300);
+    });
 </script>
 
     </body>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head><meta charset="UTF-8"><title>Signing in...</title></head>
+    <body>
+        <script>
+    // Facebook redirects here with #access_token=... in the URL fragment
+    // (response_type=token) or ?error=... on denial
+    const hash   = new URLSearchParams(window.location.hash.substring(1));
+    const query  = new URLSearchParams(window.location.search);
+
+    const accessToken = hash.get("access_token");
+    const error       = query.get("error") || hash.get("error");
+
+    if (window.opener && !window.opener.closed) {
+        if (accessToken) {
+            window.opener.postMessage(
+                { type: "FACEBOOK_TOKEN", accessToken: accessToken },
+                window.location.origin
+            );
+        } else if (error) {
+            window.opener.postMessage(
+                { type: "FACEBOOK_ERROR", error: error },
+                window.location.origin
+            );
+        }
+    }
+
+    window.close();
+</script>
+    </body>
+</html>

@@ -28,26 +28,25 @@ public class User {
     private String password;
 
     @Column(nullable = true, unique = true)
-    private String googleId;  // set only for Google-login users
+    private String googleId;      // set only for Google-login users
+
+    @Column(nullable = true, unique = true)
+    private String facebookId;    // set only for Facebook-login users
 
     @Column(nullable = false)
     private String role;
 
     @OneToMany(mappedBy = "user")
-    private List<Subscription> subscriptions = new java.util.ArrayList<>();
+    private List<Subscription> subscriptions;
 
     @OneToMany(mappedBy = "user")
-    private List<Review> reviews = new java.util.ArrayList<>();
+    private List<Review> reviews;
 
     @Column(nullable = false)
     private Boolean enabled = true;
 
     @Column(name = "comment_disabled", nullable = false)
     @Builder.Default
-    private Boolean commentDisabled = false; // if true, user cannot post comments
+    private Boolean commentDisabled = false;
 
-    @Override
-    public String toString() {
-        return "User " + username;
-    }
 }
