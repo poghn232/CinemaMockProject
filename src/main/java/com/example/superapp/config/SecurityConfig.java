@@ -49,6 +49,7 @@ public class SecurityConfig {
                 .requestMatchers(
                         "/login.html", "/register.html", "/forgot-password.html", "/oauth2callback.html",
                         "/homepage.html", "/home.html",
+                        "/actors.html",
                         "/movie-detail.html", "/movie-trailer.html", "/movie-watch.html",
                         "/packs.html", "/contact.html", "/detect-region.html",
                          "/index.html", "/admin.html", "/profile.html",

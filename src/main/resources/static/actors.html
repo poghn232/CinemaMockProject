@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Actors · MovieZone</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root {
+      --bg-primary: #020617;
+      --text-main: #e5e7eb;
+      --text-subtle: #9ca3af;
+      --accent: #f97316;
+    }
+    body { font-family: Poppins, system-ui, -apple-system, 'Segoe UI', sans-serif; background: linear-gradient(135deg,#020617,#030712); color:var(--text-main); margin:0; }
+    .page { max-width:1100px; margin: 28px auto; padding: 18px; }
+    .header { display:flex; align-items:center; justify-content:space-between; }
+    .title { font-size:22px; font-weight:700; }
+    .actors-grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(150px,1fr)); gap:14px; margin-top:18px; }
+    .actor-card { background: rgba(15,23,42,0.9); padding:12px; border-radius:12px; text-align:center; cursor:pointer; border:1px solid rgba(148,163,184,0.08); }
+    .actor-thumb { width:100%; aspect-ratio: 3/4; background-size:cover; background-position:center; border-radius:8px; }
+    .actor-name { margin-top:8px; font-weight:600; }
+    .actor-sub { color:var(--text-subtle); font-size:13px; }
+  .actor-search { margin-top:12px; display:flex; gap:8px; align-items:center; }
+  #actorSearch { flex:1; padding:8px 10px; border-radius:8px; border:1px solid rgba(148,163,184,0.08); background:rgba(255,255,255,0.03); color:var(--text-main); }
+  #actorSearch:focus { outline:2px solid rgba(249,115,22,0.12); }
+    .back-link { padding:8px 12px; border-radius:8px; background:rgba(15,23,42,0.9); border:1px solid rgba(148,163,184,0.08); color:var(--text-main); text-decoration:none; }
+    .person-detail { margin-top:18px; display:flex; gap:18px; }
+    .person-meta { width:260px; }
+    .person-bio { flex:1; background: rgba(2,6,23,0.5); padding:12px; border-radius:10px; }
+    .movies-list { margin-top:12px; display:grid; grid-template-columns: repeat(auto-fill,minmax(130px,1fr)); gap:12px; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="title">Actors</div>
+        <div class="actor-search"><input id="actorSearch" placeholder="Search actors by name..." /></div>
+      </div>
+  <a href="homepage.html" class="back-link">Home</a>
+    </div>
+
+  <div id="actorsList" class="actors-grid">Loading actors...</div>
+
+    <div id="personDetailWrap" style="display:none;">
+      <a href="#" id="closePerson" class="back-link" style="margin-top:12px;display:inline-block;">Back to list</a>
+      <div id="personDetail" class="person-detail">
+        <!-- left meta -->
+        <div class="person-meta">
+          <div id="personThumb" style="width:100%;aspect-ratio:3/4;background-size:cover;border-radius:8px;background-position:center;"></div>
+          <div id="personName" style="margin-top:10px;font-weight:700;"></div>
+          <div id="personBorn" class="actor-sub"></div>
+        </div>
+        <div class="person-bio">
+          <div id="personBio"></div>
+          <h3 style="margin-top:12px;">Known for on MovieZone</h3>
+          <div id="personMovies" class="movies-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Build actors list by fetching all movies/tv and aggregating cast from details
+    async function loadActors() {
+      const el = document.getElementById('actorsList');
+      el.textContent = 'Loading actors... (this may take a moment)';
+
+      try {
+        // fetch all movies/tv items first
+        let allItems = [];
+        let p = 1;
+        let totalPages = 1;
+        do {
+          const res = await fetch('/api/public/movies?type=all&page=' + p);
+          const data = await res.json();
+          allItems = allItems.concat(data.items || []);
+          totalPages = data.totalPages || 1;
+          p++;
+        } while (p <= totalPages);
+
+        // aggregate actors map: id -> { id, name, profilePath, credits: [movie] }
+        const actors = new Map();
+
+        // process sequentially to avoid overloading
+        for (let i = 0; i < allItems.length; i++) {
+          const it = allItems[i];
+          try {
+            const detailRes = await fetch(`/api/public/movies/detail?type=${encodeURIComponent(it.type)}&id=${encodeURIComponent(it.id)}`);
+            if (!detailRes.ok) continue;
+            const detail = await detailRes.json();
+            const cast = detail.cast || [];
+            cast.forEach(c => {
+              if (!c || !c.id) return;
+              const existing = actors.get(String(c.id)) || { id: c.id, name: c.name || c.original_name || 'Unknown', profilePath: c.profilePath || c.profile_path || null, credits: [] };
+              existing.name = existing.name || c.name;
+              existing.profilePath = existing.profilePath || c.profilePath || c.profile_path || null;
+              existing.credits.push({ id: detail.id, title: detail.title || detail.name, type: detail.type, imageUrl: detail.posterUrl || detail.backdropUrl || null, character: c.character });
+              actors.set(String(c.id), existing);
+            });
+          } catch (e) {
+            // ignore individual detail errors
+            console.debug('detail fetch failed for', it.id, e);
+          }
+        }
+
+  // convert to array and sort by credits count desc
+  const arr = Array.from(actors.values()).sort((a,b) => b.credits.length - a.credits.length);
+
+  // store actors array and map for use by search and detail view
+  window.__actorsArray = arr;
+  window.__actorsMap = {};
+  arr.forEach(a => window.__actorsMap[String(a.id)] = a);
+
+  renderActorsList(arr);
+
+      } catch (e) {
+        el.textContent = 'Failed to build actors list';
+        console.error(e);
+      }
+    }
+
+    function renderActorsList(list) {
+      const el = document.getElementById('actorsList');
+      el.innerHTML = '';
+      if (!list || list.length === 0) {
+        el.textContent = 'No actors found';
+        return;
+      }
+      list.forEach(a => {
+        const card = document.createElement('div');
+        card.className = 'actor-card';
+        const img = document.createElement('div');
+        img.className = 'actor-thumb';
+        img.style.backgroundImage = `url('${a.profilePath || '/static/img/placeholder-actor.png'}')`;
+        const name = document.createElement('div');
+        name.className = 'actor-name';
+        name.textContent = a.name + ` (${a.credits.length})`;
+        const sub = document.createElement('div');
+        sub.className = 'actor-sub';
+        sub.textContent = (a.credits && a.credits.length > 0) ? a.credits.slice(0,3).map(c=>c.title).join(', ') : '';
+        card.appendChild(img);
+        card.appendChild(name);
+        card.appendChild(sub);
+        card.addEventListener('click', () => showPersonFromMap(a.id, a));
+        el.appendChild(card);
+      });
+    }
+
+    // debounce helper
+    function debounce(fn, wait){ let t; return (...args)=>{ clearTimeout(t); t = setTimeout(()=>fn(...args), wait); }; }
+
+    // attach search filter after DOM ready
+    document.addEventListener('DOMContentLoaded', ()=>{
+      const input = document.getElementById('actorSearch');
+      if (!input) return;
+      input.addEventListener('input', debounce((e)=>{
+        const q = (e.target.value || '').trim().toLowerCase();
+        const arr = window.__actorsArray || [];
+        if (!q) return renderActorsList(arr);
+        const filtered = arr.filter(a => (a.name || '').toLowerCase().includes(q) || (a.credits || []).some(c => (c.title||'').toLowerCase().includes(q)));
+        renderActorsList(filtered);
+      }, 220));
+    });
+
+    async function showPersonFromMap(id, data) {
+      const wrap = document.getElementById('personDetailWrap');
+      const list = document.getElementById('actorsList');
+      const p = data || window.__actorsMap[String(id)];
+      if (!p) return alert('Actor not found');
+
+      document.getElementById('personThumb').style.backgroundImage = `url('${p.profilePath || '/static/img/placeholder-actor.png'}')`;
+      document.getElementById('personName').textContent = p.name;
+      document.getElementById('personBorn').textContent = '';
+      document.getElementById('personBio').textContent = '';
+      // attempt to fetch person biography from server if endpoint exists
+      let bioSet = false;
+      try {
+        const res = await fetch('/api/public/people/' + encodeURIComponent(p.id));
+        if (res.ok) {
+          const pd = await res.json();
+          if (pd) {
+            document.getElementById('personBio').textContent = pd.biography || '';
+            bioSet = !!pd.biography;
+            if (pd.birthday) document.getElementById('personBorn').textContent = 'Born: ' + pd.birthday;
+          }
+        } else if (res.status === 403 || res.status === 401) {
+          console.debug('person detail access denied', res.status);
+        }
+      } catch (e) {
+        console.debug('person detail fetch failed', e);
+      }
+
+      // if server bio not available, generate a small fallback summary
+      if (!bioSet) {
+        const known = (p.credits || []).slice(0,5).map(c => c.title).filter(Boolean);
+        const desc = known.length ? `Appears in ${p.credits.length} titles on MovieZone. Known for: ${known.join(', ')}.` : `Appears in ${p.credits.length} titles on MovieZone.`;
+        document.getElementById('personBio').textContent = desc;
+      }
+      const moviesEl = document.getElementById('personMovies');
+      moviesEl.innerHTML = '';
+      (p.credits || []).forEach(m => {
+        const card = document.createElement('div');
+        card.style.cursor = 'pointer';
+        card.style.background = 'rgba(15,23,42,0.9)';
+        card.style.borderRadius = '8px';
+        card.style.padding = '6px';
+        card.innerHTML = `<div style="background-image:url('${m.imageUrl || ''}');height:160px;background-size:cover;background-position:center;border-radius:6px;"></div><div style="margin-top:6px;font-weight:600">${m.title}</div><div style='color:var(--text-subtle);font-size:12px'>${m.character || ''}</div>`;
+        card.addEventListener('click', () => { window.location.href = '/movie-detail.html?id=' + encodeURIComponent(m.id) + '&type=' + encodeURIComponent(m.type); });
+        moviesEl.appendChild(card);
+      });
+
+      list.style.display = 'none';
+      wrap.style.display = '';
+    }
+
+    document.getElementById('closePerson').addEventListener('click', (e) => { e.preventDefault(); document.getElementById('personDetailWrap').style.display='none'; document.getElementById('actorsList').style.display='grid'; });
+
+    (async ()=>{
+      await loadActors();
+      // open actor detail if ?id= is present in URL
+      const params = new URLSearchParams(window.location.search);
+      const aid = params.get('id');
+      if (aid) {
+        // try to open from loaded map, or wait briefly
+        const actor = window.__actorsMap && window.__actorsMap[String(aid)];
+        if (actor) {
+          showPersonFromMap(aid, actor);
+        } else {
+          // small retry after 200ms in case mapping finished slightly later
+          setTimeout(()=>{
+            const actor2 = window.__actorsMap && window.__actorsMap[String(aid)];
+            if (actor2) showPersonFromMap(aid, actor2);
+          }, 200);
+        }
+      }
+    })();
+  </script>
+</body>
+</html>

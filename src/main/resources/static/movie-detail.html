@@ -939,6 +939,18 @@
               </div>
             `;
 
+                // navigate to actors page detail on click
+                li.style.cursor = 'pointer';
+                li.addEventListener('click', () => {
+                    const pid = c.id || c.personId || c.castId || c.profileId || c.person_id || '';
+                    if (pid) {
+                        window.location.href = '/actors.html?id=' + encodeURIComponent(pid);
+                    } else {
+                        // fallback: open actors page without id
+                        window.location.href = '/actors.html';
+                    }
+                });
+
                 castList.appendChild(li);
             });
         } else {

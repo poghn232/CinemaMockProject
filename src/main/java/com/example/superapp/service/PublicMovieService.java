@@ -407,4 +407,52 @@ public class PublicMovieService {
 
         return dto;
     }
+
+    @Transactional(readOnly = true)
+    public java.util.List<com.example.superapp.dto.GenreWithItems> listGenresWithItems(HttpServletRequest request) {
+        String userRegion = extractRegionFromRequest(request);
+
+        // fetch all published movies and tv
+        List<com.example.superapp.dto.GenreWithItems> result = new ArrayList<>();
+        java.util.Map<Long, com.example.superapp.dto.GenreWithItems> map = new java.util.HashMap<>();
+
+        // helper to ensure genre entry
+        java.util.function.BiConsumer<Long, String> ensureGenre = (id, name) -> {
+            if (id == null || name == null) return;
+            if (!map.containsKey(id)) map.put(id, new com.example.superapp.dto.GenreWithItems(id, name));
+        };
+
+        // collect movies
+        for (Movie m : movieRepository.findByActiveTrueAndPublishedTrue()) {
+            if (isMovieBlockedForRegion(m, userRegion)) continue;
+            // map item
+            MovieItemDto item = mapMovie(m);
+            // attach to genres
+            if (m.getGenres() != null) {
+                for (com.example.superapp.entity.Genre g : m.getGenres()) {
+                    if (g == null) continue;
+                    ensureGenre.accept(g.getId(), g.getName());
+                    map.get(g.getId()).addItem(item);
+                }
+            }
+        }
+
+        // collect tv
+        for (TvSeries tv : tvSeriesRepository.findByActiveTrueAndPublishedTrue()) {
+            if (isTvBlockedForRegion(tv, userRegion)) continue;
+            MovieItemDto item = mapTv(tv);
+            if (tv.getGenres() != null) {
+                for (com.example.superapp.entity.Genre g : tv.getGenres()) {
+                    if (g == null) continue;
+                    ensureGenre.accept(g.getId(), g.getName());
+                    map.get(g.getId()).addItem(item);
+                }
+            }
+        }
+
+        // convert map to list and sort by size desc
+        result.addAll(map.values());
+        result.sort((a,b) -> Integer.compare(b.getItems().size(), a.getItems().size()));
+        return result;
+    }
 }

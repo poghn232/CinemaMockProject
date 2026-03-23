@@ -1,1136 +1,1554 @@
 <!doctype html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8"/>
+  <head>
+    <meta charset="UTF-8" />
     <title>MovieZone | Trang chủ</title>
 
     <style>
-        :root {
-            --bg-primary: #020617;
-            --bg-elevated: #020617;
-            --accent: #f97316;
-            --accent-soft: rgba(249, 115, 22, 0.18);
-            --accent-strong: rgba(249, 115, 22, 0.45);
-            --text-main: #e5e7eb;
-            --text-subtle: #9ca3af;
-            --border-soft: rgba(148, 163, 184, 0.45);
-        }
+      :root {
+        --bg-primary: #020617;
+        --bg-elevated: #020617;
+        --accent: #f97316;
+        --accent-soft: rgba(249, 115, 22, 0.18);
+        --accent-strong: rgba(249, 115, 22, 0.45);
+        --text-main: #e5e7eb;
+        --text-subtle: #9ca3af;
+        --border-soft: rgba(148, 163, 184, 0.45);
+      }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-        body {
-            font-family: "Poppins",
-            system-ui,
-            -apple-system,
-            BlinkMacSystemFont,
-            "Segoe UI",
-            sans-serif;
-            background: radial-gradient(
-                    circle at 0 0,
-                    rgba(255, 255, 255, 0.06),
-                    transparent 55%
-            ),
-            radial-gradient(
-                    circle at 100% 100%,
-                    rgba(37, 99, 235, 0.3),
-                    transparent 60%
-            ),
-            linear-gradient(135deg, #020617, #030712 50%, #020617);
-            color: var(--text-main);
-            min-height: 100vh;
-        }
+      body {
+        font-family:
+          "Poppins",
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        background:
+          radial-gradient(
+            circle at 0 0,
+            rgba(255, 255, 255, 0.06),
+            transparent 55%
+          ),
+          radial-gradient(
+            circle at 100% 100%,
+            rgba(37, 99, 235, 0.3),
+            transparent 60%
+          ),
+          linear-gradient(135deg, #020617, #030712 50%, #020617);
+        color: var(--text-main);
+        min-height: 100vh;
+      }
 
-        .page-shell {
-            max-width: 1320px;
-            margin: 0 auto;
-            padding: 20px 28px 48px;
-        }
+      .page-shell {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 20px 28px 48px;
+      }
 
-        /* NAVBAR */
+      /* NAVBAR */
+      .navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 20px;
+        border-radius: 18px;
+        background:
+          radial-gradient(
+            circle at 0 0,
+            rgba(148, 163, 184, 0.35),
+            transparent 58%
+          ),
+          rgba(15, 23, 42, 0.96);
+        box-shadow:
+          0 0 0 1px rgba(148, 163, 184, 0.45),
+          0 18px 40px rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(18px);
+        position: sticky;
+        top: 12px;
+        z-index: 20;
+      }
+
+      .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .nav-logo {
+        width: 30px;
+        height: 30px;
+        border-radius: 999px;
+        background: radial-gradient(
+          circle at 30% 20%,
+          #f97316,
+          #e11d48 55%,
+          #4f46e5
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 25px rgba(248, 113, 113, 0.55);
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .nav-title {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+      }
+
+      .nav-title-main {
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-size: 12px;
+      }
+
+      .nav-title-sub {
+        font-size: 11px;
+        color: var(--text-subtle);
+      }
+
+      .nav-center {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-left: auto;
+        margin-right: 10px;
+      }
+
+      .nav-link {
+        font-size: 13px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        color: var(--text-subtle);
+        text-decoration: none;
+        border: 1px solid transparent;
+        transition: all 0.16s ease;
+        cursor: pointer;
+      }
+
+      .nav-link:hover {
+        color: var(--text-main);
+        border-color: rgba(148, 163, 184, 0.6);
+        background: rgba(15, 23, 42, 0.9);
+      }
+
+      .nav-link.active {
+        background: linear-gradient(135deg, #f97316, #ec4899);
+        color: white;
+        border-color: transparent;
+        box-shadow:
+          0 12px 22px rgba(248, 113, 113, 0.6),
+          0 0 0 1px rgba(248, 113, 113, 0.7);
+      }
+
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+      }
+
+      .nav-username {
+        color: var(--text-subtle);
+      }
+
+      .nav-link-premium {
+        background: linear-gradient(135deg, #f97316, #ec4899);
+        color: white;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        box-shadow:
+          0 10px 22px rgba(248, 113, 113, 0.6),
+          0 0 0 1px rgba(248, 113, 113, 0.7);
+      }
+
+      .nav-link-premium:hover {
+        filter: brightness(1.05);
+        border-color: transparent;
+      }
+
+      .nav-link-logout {
+        border-color: rgba(248, 113, 22, 0.6);
+        color: #e91000;
+      }
+
+      .nav-link-logout:hover {
+        background: rgba(15, 23, 42, 1);
+        border-color: rgba(248, 113, 22, 0.9);
+      }
+
+      .badge-premium {
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        background: rgba(234, 179, 8, 0.12);
+        border: 1px solid rgba(250, 204, 21, 0.7);
+        color: #facc15;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .badge-premium-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: #facc15;
+        box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.32);
+      }
+
+      .nav-button {
+        padding: 7px 13px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.7);
+        background: rgba(15, 23, 42, 0.9);
+        color: var(--text-main);
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.16s ease;
+      }
+
+      .nav-button:hover {
+        background: rgba(15, 23, 42, 1);
+        border-color: rgba(249, 115, 22, 0.9);
+        color: #fed7aa;
+      }
+
+      .nav-button-primary {
+        border: none;
+        background: linear-gradient(135deg, #f97316, #ec4899);
+        color: white;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        box-shadow:
+          0 12px 25px rgba(248, 113, 113, 0.6),
+          0 0 0 1px rgba(248, 113, 113, 0.7);
+      }
+
+      .nav-button-primary:hover {
+        filter: brightness(1.05);
+      }
+
+      /* HERO: SEARCH + SOCIAL + ADS */
+      .hero {
+        margin-top: 30px;
+      }
+
+      .search-shell {
+        background:
+          radial-gradient(
+            circle at 0 0,
+            rgba(148, 163, 184, 0.25),
+            transparent 55%
+          ),
+          radial-gradient(
+            circle at 100% 100%,
+            rgba(59, 130, 246, 0.4),
+            transparent 60%
+          ),
+          rgba(15, 23, 42, 0.96);
+        border-radius: 22px;
+        padding: 22px 24px 22px;
+        box-shadow:
+          0 0 0 1px rgba(148, 163, 184, 0.45),
+          0 24px 55px rgba(15, 23, 42, 0.98);
+      }
+
+      #searchRow.hidden {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-10px);
+        transition: all 0.25s ease;
+        height: 0;
+        overflow: hidden;
+        padding: 0;
+        border: none;
+      }
+
+      .search-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .search-icon {
+        width: 26px;
+        height: 26px;
+        border-radius: 999px;
+        background: radial-gradient(circle at 30% 20%, #f97316, #ec4899);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        box-shadow: 0 0 12px rgba(248, 113, 113, 0.6);
+      }
+
+      .search-input-wrap {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+
+        background: #020617; /* 🔥 black/dark */
+        border-radius: 999px;
+        padding: 8px 14px;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+      }
+
+      .search-input {
+        border: none;
+        background: transparent;
+        color: var(--text-main);
+        font-size: 14px;
+        outline: none;
+      }
+
+      .search-input-wrap:focus-within {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
+      }
+
+      .search-placeholder-sub {
+        font-size: 11px;
+        color: var(--text-subtle);
+        margin-top: 2px;
+      }
+
+      .search-button {
+        padding: 10px 18px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.5);
+        background: transparent !important; /* 🔥 make it transparent */
+        color: var(--text-main);
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        cursor: pointer;
+        white-space: nowrap;
+        box-shadow: none; /* remove glow */
+        transition: all 0.14s ease;
+      }
+
+      .search-button:hover {
+        background: rgba(255, 255, 255, 0.05); /* subtle hover */
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .social-row-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 16px;
+      }
+
+      .social-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .social-label {
+        font-size: 11px;
+        color: var(--text-subtle);
+      }
+
+      .social-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        border: 1px solid rgba(148, 163, 184, 0.6);
+        background: rgba(15, 23, 42, 0.92);
+        color: var(--text-main);
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.14s ease;
+      }
+
+      .social-pill span.icon {
+        width: 16px;
+        height: 16px;
+        border-radius: 999px;
+        background: rgba(37, 99, 235, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+      }
+
+      .social-pill.twitter span.icon {
+        background: black;
+      }
+
+      .social-pill.reddit span.icon {
+        background: #f97316;
+      }
+
+      .social-pill:hover {
+        border-color: var(--accent-strong);
+        transform: translateY(-1px);
+      }
+
+      /* AD BANNER (non premium only) */
+      .ad-wrapper {
+        margin-top: 26px;
+      }
+
+      .ad-banner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 18px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #f97316, #facc15);
+        color: #111827;
+        box-shadow:
+          0 18px 38px rgba(248, 113, 22, 0.7),
+          0 0 0 1px rgba(248, 171, 22, 0.9);
+      }
+
+      .ad-text {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .ad-title {
+        font-weight: 700;
+        font-size: 14px;
+      }
+
+      .ad-subtitle {
+        font-size: 12px;
+      }
+
+      .ad-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.13em;
+        opacity: 0.9;
+      }
+
+      .ad-cta {
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: none;
+        background: #111827;
+        color: #f9fafb;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        white-space: nowrap;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .ad-cta:hover {
+        filter: brightness(1.08);
+      }
+
+      /* MOVIE GRID */
+      .section-header {
+        margin-top: 34px;
+        margin-bottom: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section-title {
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .section-subtitle {
+        font-size: 12px;
+        color: var(--text-subtle);
+      }
+
+      .filter-pills {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+      }
+
+      .filter-pill {
+        padding: 5px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.6);
+        background: rgba(15, 23, 42, 0.9);
+        color: var(--text-subtle);
+        cursor: pointer;
+        transition: all 0.14s ease;
+      }
+
+      .filter-pill.active {
+        background: var(--accent-soft);
+        color: var(--accent);
+        border-color: var(--accent-strong);
+      }
+
+      .movies-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 18px 18px;
+      }
+
+      /* Smooth content fades */
+      .fadeable {
+        transition: opacity 0.28s ease, transform 0.28s ease;
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .fadeable.fade-out {
+        opacity: 0;
+        transform: translateY(6px);
+        pointer-events: none;
+      }
+      .fadeable.fade-in {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* PAGINATION */
+      .pagination {
+        margin-top: 22px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+      }
+
+      .page-button {
+        min-width: 32px;
+        height: 32px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.6);
+        background: rgba(15, 23, 42, 0.96);
+        color: var(--text-subtle);
+        cursor: pointer;
+        padding: 0 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.16s ease;
+      }
+
+      .page-button:hover:not(.disabled):not(.active) {
+        border-color: var(--accent-strong);
+        color: var(--text-main);
+      }
+
+      .page-button.active {
+        background: linear-gradient(135deg, #f97316, #ec4899);
+        color: white;
+        border-color: transparent;
+        box-shadow:
+          0 10px 22px rgba(248, 113, 113, 0.6),
+          0 0 0 1px rgba(248, 113, 113, 0.7);
+      }
+
+      .page-button.disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+
+      .movie-card {
+        background: rgba(15, 23, 42, 0.96);
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(31, 41, 55, 0.9);
+        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.9);
+        cursor: pointer;
+        transition:
+          transform 0.16s ease,
+          box-shadow 0.16s ease,
+          border-color 0.16s ease;
+        position: relative;
+
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+
+      .movie-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(96, 165, 250, 0.8);
+        box-shadow:
+          0 20px 40px rgba(15, 23, 42, 0.95),
+          0 0 0 1px rgba(59, 130, 246, 0.55);
+      }
+
+      .movie-thumb {
+        position: relative;
+        aspect-ratio: 2 / 3;
+        background-size: cover;
+        background-position: center;
+      }
+
+      .movie-badge {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        font-size: 10px;
+        background: rgba(15, 23, 42, 0.88);
+        color: #facc15;
+        border: 1px solid rgba(250, 204, 21, 0.8);
+      }
+
+      .movie-type {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        font-size: 10px;
+        background: rgba(15, 23, 42, 0.86);
+        color: #bfdbfe;
+        border: 1px solid rgba(96, 165, 250, 0.9);
+      }
+
+      .movie-body {
+        padding: 8px 9px 9px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+      }
+
+      .movie-title {
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 4px;
+
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .movie-meta-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 11px;
+        color: var(--text-subtle);
+        margin-top: auto;
+      }
+
+      .movie-rating {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .movie-rating span.star {
+        color: #facc15;
+      }
+
+      .movie-year {
+        opacity: 0.8;
+      }
+
+      /* FOOTER */
+      .site-footer {
+        margin-top: 48px;
+        padding: 28px 0 24px;
+        border-top: 1px solid rgba(148, 163, 184, 0.25);
+      }
+
+      .footer-inner {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 24px;
+      }
+
+      .footer-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .footer-logo {
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background: radial-gradient(
+          circle at 30% 20%,
+          #f97316,
+          #e11d48 55%,
+          #4f46e5
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .footer-title {
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        font-size: 13px;
+      }
+
+      .footer-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .footer-links a {
+        color: var(--text-subtle);
+        text-decoration: none;
+        font-size: 13px;
+        transition: color 0.15s ease;
+      }
+
+      .footer-links a:hover {
+        color: var(--accent);
+      }
+
+      .footer-bottom {
+        margin-top: 22px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(148, 163, 184, 0.15);
+        font-size: 12px;
+        color: var(--text-subtle);
+        text-align: center;
+      }
+
+      /* RESPONSIVE */
+      @media (max-width: 900px) {
         .navbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 20px;
-            border-radius: 18px;
-            background: radial-gradient(
-                    circle at 0 0,
-                    rgba(148, 163, 184, 0.35),
-                    transparent 58%
-            ),
-            rgba(15, 23, 42, 0.96);
-            box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.45),
-            0 18px 40px rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(18px);
-            position: sticky;
-            top: 12px;
-            z-index: 20;
-        }
-
-        .nav-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .nav-logo {
-            width: 30px;
-            height: 30px;
-            border-radius: 999px;
-            background: radial-gradient(
-                    circle at 30% 20%,
-                    #f97316,
-                    #e11d48 55%,
-                    #4f46e5
-            );
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 25px rgba(248, 113, 113, 0.55);
-            font-size: 14px;
-            font-weight: 700;
-        }
-
-        .nav-title {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.1;
-        }
-
-        .nav-title-main {
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            font-size: 12px;
-        }
-
-        .nav-title-sub {
-            font-size: 11px;
-            color: var(--text-subtle);
+          border-radius: 18px;
+          flex-wrap: wrap;
+          gap: 10px;
         }
 
         .nav-center {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-left: auto;
-            margin-right: 10px;
+          order: 3;
+          width: 100%;
+          justify-content: center;
+          flex-wrap: wrap;
         }
 
-        .nav-link {
-            font-size: 13px;
-            padding: 6px 12px;
-            border-radius: 999px;
-            color: var(--text-subtle);
-            text-decoration: none;
-            border: 1px solid transparent;
-            transition: all 0.16s ease;
-            cursor: pointer;
+        .page-shell {
+          padding-inline: 14px;
         }
+      }
 
-        .nav-link:hover {
-            color: var(--text-main);
-            border-color: rgba(148, 163, 184, 0.6);
-            background: rgba(15, 23, 42, 0.9);
-        }
-
-        .nav-link.active {
-            background: linear-gradient(135deg, #f97316, #ec4899);
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 12px 22px rgba(248, 113, 113, 0.6),
-            0 0 0 1px rgba(248, 113, 113, 0.7);
-        }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-        }
-
-        .nav-username {
-            color: var(--text-subtle);
-        }
-
-        .nav-link-premium {
-            background: linear-gradient(135deg, #f97316, #ec4899);
-            color: white;
-            font-weight: 600;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            box-shadow: 0 10px 22px rgba(248, 113, 113, 0.6),
-            0 0 0 1px rgba(248, 113, 113, 0.7);
-        }
-
-        .nav-link-premium:hover {
-            filter: brightness(1.05);
-            border-color: transparent;
-        }
-
-        .nav-link-logout {
-            border-color: rgba(248, 113, 22, 0.6);
-            color: #e91000;
-        }
-
-        .nav-link-logout:hover {
-            background: rgba(15, 23, 42, 1);
-            border-color: rgba(248, 113, 22, 0.9);
-        }
-
-        .badge-premium {
-            padding: 4px 10px;
-            border-radius: 999px;
-            font-size: 11px;
-            background: rgba(234, 179, 8, 0.12);
-            border: 1px solid rgba(250, 204, 21, 0.7);
-            color: #facc15;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .badge-premium-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 999px;
-            background: #facc15;
-            box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.32);
-        }
-
-        .nav-button {
-            padding: 7px 13px;
-            border-radius: 999px;
-            border: 1px solid rgba(148, 163, 184, 0.7);
-            background: rgba(15, 23, 42, 0.9);
-            color: var(--text-main);
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.16s ease;
-        }
-
-        .nav-button:hover {
-            background: rgba(15, 23, 42, 1);
-            border-color: rgba(249, 115, 22, 0.9);
-            color: #fed7aa;
-        }
-
-        .nav-button-primary {
-            border: none;
-            background: linear-gradient(135deg, #f97316, #ec4899);
-            color: white;
-            font-weight: 600;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            box-shadow: 0 12px 25px rgba(248, 113, 113, 0.6),
-            0 0 0 1px rgba(248, 113, 113, 0.7);
-        }
-
-        .nav-button-primary:hover {
-            filter: brightness(1.05);
-        }
-
-        /* HERO: SEARCH + SOCIAL + ADS */
-        .hero {
-            margin-top: 30px;
-        }
-
+      @media (max-width: 640px) {
         .search-shell {
-            background: radial-gradient(
-                    circle at 0 0,
-                    rgba(148, 163, 184, 0.25),
-                    transparent 55%
-            ),
-            radial-gradient(
-                    circle at 100% 100%,
-                    rgba(59, 130, 246, 0.4),
-                    transparent 60%
-            ),
-            rgba(15, 23, 42, 0.96);
-            border-radius: 22px;
-            padding: 22px 24px 22px;
-            box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.45),
-            0 24px 55px rgba(15, 23, 42, 0.98);
-        }
-
-        .search-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-radius: 999px;
-            padding: 8px 10px 8px 14px;
-            background: rgba(15, 23, 42, 0.95);
-            border: 1px solid rgba(148, 163, 184, 0.6);
-        }
-
-        .search-icon {
-            width: 26px;
-            height: 26px;
-            border-radius: 999px;
-            background: radial-gradient(circle at 30% 20%, #f97316, #ec4899);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            box-shadow: 0 0 12px rgba(248, 113, 113, 0.6);
-        }
-
-        .search-input-wrap {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .search-input {
-            border: none;
-            background: transparent;
-            color: var(--text-main);
-            font-size: 14px;
-            outline: none;
-        }
-
-        .search-placeholder-sub {
-            font-size: 11px;
-            color: var(--text-subtle);
-            margin-top: 2px;
+          padding: 16px 14px 14px;
         }
 
         .search-button {
-            padding: 10px 18px;
-            border-radius: 999px;
-            border: none;
-            background: linear-gradient(135deg, #f97316, #ec4899);
-            color: white;
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
-            cursor: pointer;
-            white-space: nowrap;
-            box-shadow: 0 10px 22px rgba(248, 113, 113, 0.55),
-            0 0 0 1px rgba(248, 113, 113, 0.7);
-            transition: all 0.14s ease;
+          padding-inline: 12px;
         }
 
-        .search-button:hover {
-            transform: translateY(-1px);
-            filter: brightness(1.05);
-        }
-
-        .social-row-wrapper {
-            display: flex;
-            justify-content: center;
-            margin-top: 16px;
-        }
-
-        .social-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .social-label {
-            font-size: 11px;
-            color: var(--text-subtle);
-        }
-
-        .social-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 10px;
-            border-radius: 999px;
-            font-size: 11px;
-            border: 1px solid rgba(148, 163, 184, 0.6);
-            background: rgba(15, 23, 42, 0.92);
-            color: var(--text-main);
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.14s ease;
-        }
-
-        .social-pill span.icon {
-            width: 16px;
-            height: 16px;
-            border-radius: 999px;
-            background: rgba(37, 99, 235, 0.9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-        }
-
-        .social-pill.twitter span.icon {
-            background: black;
-        }
-
-        .social-pill.reddit span.icon {
-            background: #f97316;
-        }
-
-        .social-pill:hover {
-            border-color: var(--accent-strong);
-            transform: translateY(-1px);
-        }
-
-        /* AD BANNER (non premium only) */
-        .ad-wrapper {
-            margin-top: 26px;
-        }
-
-        .ad-banner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            padding: 14px 18px;
-            border-radius: 18px;
-            background: linear-gradient(135deg, #f97316, #facc15);
-            color: #111827;
-            box-shadow: 0 18px 38px rgba(248, 113, 22, 0.7),
-            0 0 0 1px rgba(248, 171, 22, 0.9);
-        }
-
-        .ad-text {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .ad-title {
-            font-weight: 700;
-            font-size: 14px;
-        }
-
-        .ad-subtitle {
-            font-size: 12px;
-        }
-
-        .ad-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.13em;
-            opacity: 0.9;
-        }
-
-        .ad-cta {
-            padding: 8px 14px;
-            border-radius: 999px;
-            border: none;
-            background: #111827;
-            color: #f9fafb;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            white-space: nowrap;
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
-        }
-
-        .ad-cta:hover {
-            filter: brightness(1.08);
-        }
-
-        /* MOVIE GRID */
-        .section-header {
-            margin-top: 34px;
-            margin-bottom: 18px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-title {
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .section-subtitle {
-            font-size: 12px;
-            color: var(--text-subtle);
-        }
-
-        .filter-pills {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 11px;
-        }
-
-        .filter-pill {
-            padding: 5px 10px;
-            border-radius: 999px;
-            border: 1px solid rgba(148, 163, 184, 0.6);
-            background: rgba(15, 23, 42, 0.9);
-            color: var(--text-subtle);
-            cursor: pointer;
-            transition: all 0.14s ease;
-        }
-
-        .filter-pill.active {
-            background: var(--accent-soft);
-            color: var(--accent);
-            border-color: var(--accent-strong);
+        .meta-row {
+          flex-direction: column;
+          align-items: flex-start;
         }
 
         .movies-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 18px 18px;
+          grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
         }
+      }
 
-        /* PAGINATION */
-        .pagination {
-            margin-top: 22px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 6px;
-            font-size: 13px;
-        }
+      .lang-dropdown {
+        position: relative;
+      }
 
-        .page-button {
-            min-width: 32px;
-            height: 32px;
-            border-radius: 999px;
-            border: 1px solid rgba(148, 163, 184, 0.6);
-            background: rgba(15, 23, 42, 0.96);
-            color: var(--text-subtle);
-            cursor: pointer;
-            padding: 0 10px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.16s ease;
-        }
+      .lang-current {
+        width: 36px;
+        height: 36px;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        background: rgba(15, 23, 42, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
 
-        .page-button:hover:not(.disabled):not(.active) {
-            border-color: var(--accent-strong);
-            color: var(--text-main);
-        }
+      .lang-current img {
+        width: 20px;
+        height: 20px;
+        object-fit: cover;
+        border-radius: 50%;
+      }
 
-        .page-button.active {
-            background: linear-gradient(135deg, #f97316, #ec4899);
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 10px 22px rgba(248, 113, 113, 0.6),
-            0 0 0 1px rgba(248, 113, 113, 0.7);
-        }
+      .lang-current:hover {
+        border-color: var(--accent);
+        transform: scale(1.05);
+      }
 
-        .page-button.disabled {
-            opacity: 0.4;
-            cursor: default;
-        }
+      /* dropdown */
 
-        .movie-card {
-            background: rgba(15, 23, 42, 0.96);
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid rgba(31, 41, 55, 0.9);
-            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.9);
-            cursor: pointer;
-            transition: transform 0.16s ease,
-            box-shadow 0.16s ease,
-            border-color 0.16s ease;
-            position: relative;
-        }
+      .lang-menu {
+        position: absolute;
+        top: 42px;
+        right: 0;
+        background: rgba(15, 23, 42, 0.98);
+        border: 1px solid rgba(148, 163, 184, 0.45);
+        border-radius: 12px;
+        width: 150px;
+        padding: 6px;
+        display: none;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+      }
 
-        .movie-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(96, 165, 250, 0.8);
-            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.95),
-            0 0 0 1px rgba(59, 130, 246, 0.55);
-        }
+      .lang-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 13px;
+      }
 
-        .movie-thumb {
-            position: relative;
-            aspect-ratio: 2 / 3;
-            background-size: cover;
-            background-position: center;
-        }
+      .lang-item img {
+        width: 20px;
+        height: 20px;
+        object-fit: cover;
+        border-radius: 50%;
+      }
 
-        .movie-badge {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            padding: 3px 8px;
-            border-radius: 999px;
-            font-size: 10px;
-            background: rgba(15, 23, 42, 0.88);
-            color: #facc15;
-            border: 1px solid rgba(250, 204, 21, 0.8);
-        }
+      .lang-item:hover {
+        background: rgba(148, 163, 184, 0.12);
+      }
 
-        .movie-type {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            padding: 3px 8px;
-            border-radius: 999px;
-            font-size: 10px;
-            background: rgba(15, 23, 42, 0.86);
-            color: #bfdbfe;
-            border: 1px solid rgba(96, 165, 250, 0.9);
-        }
+      .lang-dropdown.open .lang-menu {
+        display: block;
+      }
+      /* Follow us label in footer */
+      .follow-us-line {
+        font-size: 14px;
+        color: var(--text-subtle);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        opacity: 0.95;
+        font-weight: 600;
+      }
+      /* SEARCH OVERLAY (Netflix-like) */
+      .search-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.72);
+        display: flex;
+        align-items: start;
+        justify-content: center;
+        padding-top: 60px;
+        z-index: 60;
+        overflow: auto;
+      }
 
-        .movie-body {
-            padding: 8px 9px 9px;
-        }
+      .search-overlay.hidden { display: none; }
 
-        .movie-title {
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
+      .search-overlay-panel {
+        width: min(1180px, 96%);
+        background: transparent; /* keep darkened backdrop visible */
+        border-radius: 12px;
+        padding: 18px;
+        color: var(--text-main);
+      }
 
-        .movie-meta-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 11px;
-            color: var(--text-subtle);
-        }
+      .search-overlay-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
 
-        .movie-rating {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
+      .search-overlay-input {
+        flex: 1;
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: 1px solid rgba(148,163,184,0.22);
+        background: rgba(2,6,23,0.65);
+        color: var(--text-main);
+        font-size: 18px;
+        box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+      }
 
-        .movie-rating span.star {
-            color: #facc15;
-        }
+      .search-overlay-close {
+        padding: 8px 12px;
+        border-radius: 10px;
+        background: rgba(15,23,42,0.9);
+        border: 1px solid rgba(148,163,184,0.12);
+        color: var(--text-main);
+        cursor: pointer;
+      }
 
-        .movie-year {
-            opacity: 0.8;
-        }
+      .search-overlay .movies-grid {
+        margin-top: 10px;
+        background: transparent;
+      }
 
-        /* FOOTER */
-        .site-footer {
-            margin-top: 48px;
-            padding: 28px 0 24px;
-            border-top: 1px solid rgba(148, 163, 184, 0.25);
-        }
+      .search-overlay .section-subtitle { color: var(--text-subtle); }
+      .welcome-region-card {
+        margin-top: 18px;
+        padding: 16px 18px;
+        border-radius: 18px;
+        background:
+          radial-gradient(
+            circle at 0 0,
+            rgba(148, 163, 184, 0.2),
+            transparent 55%
+          ),
+          radial-gradient(
+            circle at 100% 100%,
+            rgba(249, 115, 22, 0.2),
+            transparent 55%
+          ),
+          rgba(15, 23, 42, 0.96);
+        box-shadow:
+          0 0 0 1px rgba(148, 163, 184, 0.35),
+          0 18px 40px rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(16px);
+      }
 
-        .footer-inner {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 24px;
-        }
+      .welcome-region-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-main);
+      }
 
-        .footer-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+      .welcome-region-sub {
+        margin-top: 6px;
+        font-size: 13px;
+        color: var(--text-subtle);
+      }
 
-        .footer-logo {
-            width: 28px;
-            height: 28px;
-            border-radius: 999px;
-            background: radial-gradient(
-                    circle at 30% 20%,
-                    #f97316,
-                    #e11d48 55%,
-                    #4f46e5
-            );
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 700;
-        }
+      .movie-row {
+        margin-bottom: 28px;
+      }
 
-        .footer-title {
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            font-size: 13px;
-        }
+      .movie-row-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
 
-        .footer-links {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
+      .movie-row-scroll {
+        display: flex;
+        gap: 14px;
+        overflow-x: auto;
+        padding-bottom: 6px;
+        scroll-behavior: smooth;
+      }
 
-        .footer-links a {
-            color: var(--text-subtle);
-            text-decoration: none;
-            font-size: 13px;
-            transition: color 0.15s ease;
-        }
+      .movie-row-scroll::-webkit-scrollbar {
+        height: 6px;
+      }
 
-        .footer-links a:hover {
-            color: var(--accent);
-        }
+      .movie-row-scroll::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, 0.4);
+        border-radius: 999px;
+      }
 
-        .footer-bottom {
-            margin-top: 22px;
-            padding-top: 18px;
-            border-top: 1px solid rgba(148, 163, 184, 0.15);
-            font-size: 12px;
-            color: var(--text-subtle);
-            text-align: center;
-        }
+      .movie-row-scroll .movie-card {
+        min-width: 160px;
+        width: 160px; /* 🔥 force same width */
+        height: 300px; /* 🔥 force same height */
+        flex-shrink: 0;
+      }
 
-        /* RESPONSIVE */
-        @media (max-width: 900px) {
-            .navbar {
-                border-radius: 18px;
-                flex-wrap: wrap;
-                gap: 10px;
-            }
+      #heroSection.hidden {
+        display: none;
+      }
 
-            .nav-center {
-                order: 3;
-                width: 100%;
-                justify-content: center;
-                flex-wrap: wrap;
-            }
+      .featured {
+        margin-top: 24px;
+        /* Make featured occupy the full viewport until user scrolls */
+        height: calc(100vh - 120px);
+        border-radius: 22px;
+        overflow: hidden;
+        position: relative;
 
-            .page-shell {
-                padding-inline: 14px;
-            }
-        }
+        background-size: cover;
+        background-position: center;
 
-        @media (max-width: 640px) {
-            .search-shell {
-                padding: 16px 14px 14px;
-            }
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+        transition: background-image 0.5s ease-in-out;
+      }
 
-            .search-button {
-                padding-inline: 12px;
-            }
+      .featured.fade {
+        opacity: 0;
+        transition: opacity 0.4s ease;
+      }
 
-            .meta-row {
-                flex-direction: column;
-                align-items: flex-start;
-            }
+      .featured-overlay {
+        width: 100%;
+        height: 100%;
+        padding: 30px;
 
-            .movies-grid {
-                grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
-            }
-        }
+        display: flex;
+        align-items: flex-end;
 
-        .lang-dropdown {
-            position: relative;
-        }
+        background: linear-gradient(
+          to top,
+          rgba(2, 6, 23, 0.95) 10%,
+          rgba(2, 6, 23, 0.6) 40%,
+          transparent 80%
+        );
+      }
 
-        .lang-current {
-            width: 36px;
-            height: 36px;
-            border-radius: 999px;
-            border: 1px solid transparent;
-            background: rgba(15, 23, 42, 0.9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.15s ease;
+      .featured-content {
+        max-width: 500px;
+      }
 
-        }
+      .featured h1 {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
 
-        .lang-current img {
-            width: 20px;
-            height: 20px;
-            object-fit: cover;
-            border-radius: 50%;
-        }
+      .featured p {
+        font-size: 14px;
+        color: var(--text-subtle);
+        margin-bottom: 14px;
+      }
 
-        .lang-current:hover {
-            border-color: var(--accent);
-            transform: scale(1.05);
-        }
+      .featured-actions {
+        display: flex;
+        gap: 10px;
+      }
 
-        /* dropdown */
+      .btn-play {
+        padding: 10px 18px;
+        border-radius: 999px;
+        border: none;
+        background: white;
+        color: black;
+        font-weight: 600;
+        cursor: pointer;
+      }
 
-        .lang-menu {
-            position: absolute;
-            top: 42px;
-            right: 0;
-            background: rgba(15, 23, 42, 0.98);
-            border: 1px solid rgba(148, 163, 184, 0.45);
-            border-radius: 12px;
-            width: 150px;
-            padding: 6px;
-            display: none;
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
-        }
+      .btn-info {
+        padding: 10px 18px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        background: rgba(0, 0, 0, 0.4);
+        color: white;
+        cursor: pointer;
+      }
 
-        .lang-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-        }
+      /* Watch All / Grid view buttons */
+      .watch-all-btn {
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(148,163,184,0.25);
+        background: rgba(15,23,42,0.7);
+        color: var(--text-main);
+        font-size: 13px;
+        cursor: pointer;
+        margin-left: 10px;
+      }
 
-        .lang-item img {
-            width: 20px;
-            height: 20px;
-            object-fit: cover;
-            border-radius: 50%;
+      .grid-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
 
-        }
+      .grid-back {
+        padding: 8px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(148,163,184,0.2);
+        background: rgba(15,23,42,0.9);
+        color: var(--text-main);
+        cursor: pointer;
+      }
 
-        .lang-item:hover {
-            background: rgba(148, 163, 184, 0.12);
-        }
+      /* Genres menu */
+      .genres-menu {
+        background: rgba(15,23,42,0.98);
+        border: 1px solid rgba(148,163,184,0.12);
+        border-radius: 10px;
+        padding: 8px;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+      }
 
-        .lang-dropdown.open .lang-menu {
-            display: block;
-        }
-        .welcome-region-card {
-            margin-top: 18px;
-            padding: 16px 18px;
-            border-radius: 18px;
-            background:
-                    radial-gradient(circle at 0 0, rgba(148, 163, 184, 0.2), transparent 55%),
-                    radial-gradient(circle at 100% 100%, rgba(249, 115, 22, 0.2), transparent 55%),
-                    rgba(15, 23, 42, 0.96);
-            box-shadow:
-                    0 0 0 1px rgba(148, 163, 184, 0.35),
-                    0 18px 40px rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(16px);
-        }
+      .genres-menu .genre-item {
+        padding: 8px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        color: var(--text-main);
+        font-size: 14px;
+      }
 
-        .welcome-region-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .welcome-region-sub {
-            margin-top: 6px;
-            font-size: 13px;
-            color: var(--text-subtle);
-        }
+      .genres-menu .genre-item:hover {
+        background: rgba(148,163,184,0.06);
+      }
     </style>
-</head>
-<body>
-<div class="page-shell">
-    <!-- NAVBAR -->
-    <header class="navbar">
+  </head>
+  <body>
+    <div class="page-shell">
+      <!-- NAVBAR -->
+      <header class="navbar">
         <div class="nav-left">
-            <div class="nav-logo">MZ</div>
-            <div class="nav-title">
-                <span class="nav-title-main">MOVIEZONE</span>
-                <span class="nav-title-sub">Find movies, series &amp; more</span>
-            </div>
+          <div class="nav-logo">MZ</div>
+          <div class="nav-title">
+            <span class="nav-title-main">MOVIEZONE</span>
+            <span class="nav-title-sub">Find movies, series &amp; more</span>
+          </div>
         </div>
 
         <nav class="nav-center">
-            <button class="nav-link active" data-nav="home" data-i18n="nav.home">Home</button>
-            <button class="nav-link" data-nav="movies" data-i18n="nav.movie">Movie</button>
-            <button class="nav-link" data-nav="tv" data-i18n="nav.tv">TV Series</button>
+          <button class="nav-link active" data-nav="home" data-i18n="nav.home">
+            Home
+          </button>
+          <button class="nav-link" data-nav="movies" data-i18n="nav.movie">
+            Movie
+          </button>
+          <button class="nav-link" data-nav="tv" data-i18n="nav.tv">
+            TV Series
+          </button>
 
-            <!-- Các mục chỉ hiện khi đã đăng nhập -->
-            <button class="nav-link" data-nav="history" data-auth="auth" data-i18n="nav.history" disabled>
-                History
-            </button>
-            <a
-                    href="packs.html"
-                    class="nav-link nav-link-premium"
-                    id="premiumButton"
-                    data-auth="auth"
-                    data-i18n="nav.premium"
-            >Go Premium</a
-            >
-            <a
-                    href="profile.html"
-                    class="nav-link nav-link-profile"
-                    id="profileButton"
-                    data-i18n="nav.profile"
-            >Profile</a
-            >
-            <a
-                    href="contact.html"
-                    class="nav-link nav-link-contact"
-                    id="contactButton"
-                    data-i18n="nav.contact"
-            >
-                Contact
-            </a>
-            <div class="lang-dropdown">
-                <button class="lang-current" id="langCurrent">
-                    <img id="langFlag" src="https://flagcdn.com/w40/gb.png">
-                </button>
+          <button id="navSearchBtn" class="nav-link">🔍</button>
 
-                <div class="lang-menu" id="langMenu">
-                    <div class="lang-item" onclick="changeLanguage('vi')">
-                        <img src="https://flagcdn.com/w40/vn.png">
-                        <span>Tiếng Việt</span>
-                    </div>
-
-                    <div class="lang-item" onclick="changeLanguage('en')">
-                        <img src="https://flagcdn.com/w40/gb.png">
-                        <span>English</span>
-                    </div>
-                    <div class="lang-item" onclick="changeLanguage('my')">
-                        <img src="https://flagcdn.com/w40/mm.png">
-                        <span>မြန်မာ</span>
-                    </div>
-
-                    <div class="lang-item" onclick="changeLanguage('ja')">
-                        <img src="https://flagcdn.com/w40/jp.png">
-                        <span>日本語</span>
-                    </div>
-
-                    <div class="lang-item" onclick="changeLanguage('de')">
-                        <img src="https://flagcdn.com/w40/de.png">
-                        <span>Deutsch</span>
-                    </div>
-                </div>
+          <div class="genres-dropdown" style="position:relative;">
+            <button id="genresBtn" class="nav-link">Genres ▾</button>
+            <div class="genres-menu" id="genresMenu" style="display:none; position:absolute; top:44px; left:0; min-width:200px; z-index:40;">
+              <!-- items populated by JS -->
             </div>
-            <button
-                    class="nav-link nav-link-logout"
-                    id="logoutButton"
-                    type="button"
-                    data-auth="auth"
-                    data-i18n="nav.logout"
-            >
-                Logout
+          </div>
+
+          <!-- Các mục chỉ hiện khi đã đăng nhập -->
+          <a
+            href="actors.html"
+            class="nav-link"
+            data-i18n="nav.actors"
+          >
+            Actors
+          </a>
+          <a
+            href="packs.html"
+            class="nav-link nav-link-premium"
+            id="premiumButton"
+            data-auth="auth"
+            data-i18n="nav.premium"
+            >Go Premium</a
+          >
+          <a
+            href="profile.html"
+            class="nav-link nav-link-profile"
+            id="profileButton"
+            data-i18n="nav.profile"
+            >Profile</a
+          >
+          <a
+            href="contact.html"
+            class="nav-link nav-link-contact"
+            id="contactButton"
+            data-i18n="nav.contact"
+          >
+            Contact
+          </a>
+          <div class="lang-dropdown">
+            <button class="lang-current" id="langCurrent">
+              <img id="langFlag" src="https://flagcdn.com/w40/gb.png" />
             </button>
 
-            <!-- Nút Login chỉ hiện khi CHƯA đăng nhập -->
-            <a href="login.html" class="nav-link" id="loginNav" data-auth="guest" data-i18n="nav.login"
+            <div class="lang-menu" id="langMenu">
+              <div class="lang-item" onclick="changeLanguage('vi')">
+                <img src="https://flagcdn.com/w40/vn.png" />
+                <span>Tiếng Việt</span>
+              </div>
+
+              <div class="lang-item" onclick="changeLanguage('en')">
+                <img src="https://flagcdn.com/w40/gb.png" />
+                <span>English</span>
+              </div>
+              <div class="lang-item" onclick="changeLanguage('my')">
+                <img src="https://flagcdn.com/w40/mm.png" />
+                <span>မြန်မာ</span>
+              </div>
+
+              <div class="lang-item" onclick="changeLanguage('ja')">
+                <img src="https://flagcdn.com/w40/jp.png" />
+                <span>日本語</span>
+              </div>
+
+              <div class="lang-item" onclick="changeLanguage('de')">
+                <img src="https://flagcdn.com/w40/de.png" />
+                <span>Deutsch</span>
+              </div>
+            </div>
+          </div>
+          <button
+            class="nav-link nav-link-logout"
+            id="logoutButton"
+            type="button"
+            data-auth="auth"
+            data-i18n="nav.logout"
+          >
+            Logout
+          </button>
+
+          <!-- Nút Login chỉ hiện khi CHƯA đăng nhập -->
+          <a
+            href="login.html"
+            class="nav-link"
+            id="loginNav"
+            data-auth="guest"
+            data-i18n="nav.login"
             >Login</a
-            >
+          >
         </nav>
 
         <div class="nav-right">
-            <div id="notifBellMount"></div>
-            <span class="nav-username" id="navUsername"></span>
-            <span class="badge-premium" id="premiumBadge" style="display: none">
+          <div id="notifBellMount"></div>
+          <span class="nav-username" id="navUsername"></span>
+          <span class="badge-premium" id="premiumBadge" style="display: none">
             <span class="badge-premium-dot"></span>
             Premium
           </span>
         </div>
-    </header>
+      </header>
 
-    <!-- HERO -->
-    <section class="hero">
-        <div class="search-shell">
-            <div class="search-row">
-                <div class="search-icon">🔍</div>
-                <div class="search-input-wrap">
-                    <input
-                            id="searchInput"
-                            class="search-input"
-                            type="text"
-                            data-i18n-placeholder="search.placeholder"
-                            placeholder="Search movies, series, genres..."
-                    />
-                    <span class="search-placeholder-sub" data-i18n="search.fast">
-                Fast search for all content
-              </span>
-                </div>
-                <button class="search-button" id="searchButton" data-i18n="search.button">Search</button>
+      <!-- HERO -->
+      <section class="hero" id="heroSection">
+  <!-- search removed from hero; uses overlay search instead -->
+
+        <!-- ADS: shown for non-premium users (handled in initUserUi) -->
+      </section>
+
+      <section class="featured" id="featuredMovie">
+        <div class="featured-overlay">
+          <div class="featured-content">
+            <h1 id="featuredTitle">Loading...</h1>
+            <p id="featuredDesc">Please wait...</p>
+
+            <div class="featured-actions">
+              <button id="featuredPlay" class="btn-play">▶ Play</button>
+              <button id="featuredInfo" class="btn-info">More Info</button>
             </div>
-
-            <div class="social-row-wrapper">
-                <div class="social-row">
-                    <span class="social-label" data-i18n="social.follow">Follow MovieZone:</span>
-                    <a class="social-pill" href="javascript:void(0)">
-                        <span class="icon">f</span>
-                        <span>Facebook</span>
-                    </a>
-                    <a class="social-pill twitter" href="javascript:void(0)">
-                        <span class="icon">X</span>
-                        <span>Twitter</span>
-                    </a>
-                    <a class="social-pill reddit" href="javascript:void(0)">
-                        <span class="icon">R</span>
-                        <span>Reddit</span>
-                    </a>
-                </div>
-            </div>
+          </div>
         </div>
-
-        <div class="welcome-region-card" id="welcomeRegionCard">
-            <div class="welcome-region-title" id="welcomeMessage">Xin chào, Guest</div>
-            <div class="welcome-region-sub" id="regionMessage">Bạn đang ở: Unknown region</div>
+  <button id="featuredDown" title="Scroll to content" style="position:absolute;left:50%;transform:translateX(-50%);bottom:18px;padding:10px 14px;border-radius:999px;border:none;background:rgba(0,0,0,0.4);color:white;cursor:pointer;font-size:18px;">▼</button>
+      </section>
+      <div class="ad-wrapper" id="adWrapper">
+        <div class="ad-banner">
+          <div class="ad-text">
+            <span class="ad-label" data-i18n="ads.label"
+              >Ad · MovieZone Premium</span
+            >
+            <span class="ad-title" data-i18n="ads.title"
+              >Watch movies without ads, high speed.</span
+            >
+            <span class="ad-subtitle" data-i18n="ads.subtitle">
+              Upgrade to Premium to remove ads, prioritize servers, and unlock
+              more content.
+            </span>
+          </div>
+          <button
+            class="ad-cta"
+            type="button"
+            id="adUpgradeButton"
+            data-i18n="ads.upgrade"
+          >
+            Upgrade Now
+          </button>
         </div>
+      </div>
 
-        <!-- ADS: chỉ hiện với user chưa premium -->
-        <div class="ad-wrapper" id="adWrapper">
-            <div class="ad-banner">
-                <div class="ad-text">
-                    <span class="ad-label" data-i18n="ads.label">Ad · MovieZone Premium</span>
-                    <span class="ad-title" data-i18n="ads.title"
-                    >Watch movies without ads, high speed.</span
-                    >
-                    <span class="ad-subtitle" data-i18n="ads.subtitle">
-                Upgrade to Premium to remove ads, prioritize servers, and unlock
-                more content.
-              </span>
-                </div>
-                <button class="ad-cta" type="button" id="adUpgradeButton" data-i18n="ads.upgrade">
-                    Upgrade Now
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <!-- MOVIE GRID -->
-    <section>
+      <!-- MOVIE GRID -->
+      <section>
         <div class="section-header">
-            <div>
-                <h2 class="section-title" data-i18n="section.all_content">All Content</h2>
-                <p class="section-subtitle" id="resultCount"></p>
-            </div>
+          <div>
+            <h2 class="section-title" data-i18n="section.all_content">
+              All Content
+            </h2>
+            <p class="section-subtitle" id="resultCount"></p>
+          </div>
         </div>
 
-        <div class="movies-grid" id="moviesGrid">
-            <!-- Cards render bằng JS -->
+        <div class="movies-container" id="moviesContainer">
+          <!-- Cards render bằng JS -->
         </div>
 
         <!-- PAGINATION -->
-        <div class="pagination" id="pagination"></div>
-    </section>
+      </section>
 
-    <!-- FOOTER -->
-    <footer class="site-footer">
+      <!-- FOOTER -->
+      <footer class="site-footer">
         <div class="footer-inner">
-            <div class="footer-brand">
-            <span class="footer-title" data-i18n="footer.title"
-            >MovieZone · Watch movies everyday.</span
-            >
+          <div style="width:100%;text-align:center;margin-bottom:8px;">
+            <div class="follow-us-line">Follow us here</div>
+          </div>
+          <div class="social-row-wrapper" style="width:100%;margin-bottom:14px;">
+            <div class="social-row" style="justify-content:center;">
+              <a class="social-pill" href="javascript:void(0)">
+                <span class="icon">f</span>
+                <span>Facebook</span>
+              </a>
+              <a class="social-pill twitter" href="javascript:void(0)">
+                <span class="icon">X</span>
+                <span>Twitter</span>
+              </a>
+              <a class="social-pill reddit" href="javascript:void(0)">
+                <span class="icon">R</span>
+                <span>Reddit</span>
+              </a>
             </div>
+          </div>
+          <div class="footer-brand">
+            <span class="footer-title" data-i18n="footer.title"
+              >MovieZone · Watch movies everyday.</span
+            >
+          </div>
         </div>
         <div class="footer-bottom" data-i18n="footer.bottom">
-            © <span id="footerYear"></span> MovieZone. Online Movie Streaming Platform Project
+          © <span id="footerYear"></span> MovieZone. Online Movie Streaming
+          Platform Project
         </div>
-    </footer>
-</div>
-<script src="/js/i18n.js"></script>
-<script src="js/bannerads.js"></script>
-<script src="js/notification-bell.js"></script>
-<script>
-    // ========== STATE ==========
-    let currentFilter = "all"; // all | movie | tv
-    let currentSearch = "";
-    let movies = [];
-    let currentPage = 1;
-    let totalPages = 1;
+      </footer>
+    </div>
+    <script src="/js/i18n.js"></script>
+    <script src="js/bannerads.js"></script>
+    <script src="js/notification-bell.js"></script>
+    <!-- Search overlay for Netflix-like search experience -->
+    <div id="searchOverlay" class="search-overlay hidden" aria-hidden="true">
+      <div class="search-overlay-panel">
+        <div class="search-overlay-header">
+          <input id="overlaySearchInput" class="search-overlay-input" placeholder="Search movies, series, genres..." />
+          <button id="closeOverlayBtn" class="search-overlay-close">Close</button>
+        </div>
+        <div id="overlayResultCount" class="section-subtitle">Type to search</div>
+        <div id="overlayGrid" class="movies-grid"></div>
+        <div id="overlayPagination" class="pagination"></div>
+      </div>
+    </div>
+    <script>
+      let featuredIndex = 0;
+      let featuredList = [];
+      let featuredInterval = null;
 
-    const MAX_VISIBLE_PAGES = 5;
+      function renderFeaturedMovie() {
+        if (!movies.length) return;
 
-    async function loadMovies(type, page = 1) {
+        // 🔥 pick top movies (you can tweak this)
+        featuredList = [...movies]
+          .filter((m) => m.imageUrl)
+          .sort((a, b) => b.rating - a.rating)
+          .slice(0, 5); // top 5 movies
+
+        featuredIndex = 0;
+        showFeatured(featuredIndex);
+
+        // clear old interval if exists
+        if (featuredInterval) clearInterval(featuredInterval);
+
+        // 🔥 auto rotate every 5 seconds
+        featuredInterval = setInterval(() => {
+          featuredIndex = (featuredIndex + 1) % featuredList.length;
+          showFeatured(featuredIndex);
+        }, 5000);
+      }
+
+      function initNavbarSearchToggle() {
+        const btn = document.getElementById("navSearchBtn");
+        const hero = document.getElementById("heroSection");
+  if (!btn) return;
+  // Open overlay search when nav search is clicked
+  btn.addEventListener('click', () => showSearchOverlay());
+      }
+
+      // Make featured cover the viewport until user scrolls
+      function adjustFeaturedHeight() {
+        const feat = document.getElementById('featuredMovie');
+        if (!feat) return;
+        // account for navbar height ~80-100px; use 120 for spacing
+        feat.style.height = `calc(100vh - 120px)`;
+      }
+
+      let featuredLocked = true;
+      function unlockFeaturedOnScroll() {
+        if (!featuredLocked) return;
+        featuredLocked = false;
+        const feat = document.getElementById('featuredMovie');
+        if (feat) {
+          feat.style.position = 'relative';
+          feat.style.height = '';
+        }
+        window.removeEventListener('wheel', unlockFeaturedOnScroll, { passive: true });
+        window.removeEventListener('touchstart', unlockFeaturedOnScroll, { passive: true });
+      }
+
+      function showFeatured(index) {
+        const movie = featuredList[index];
+        if (!movie) return;
+
+        const section = document.getElementById("featuredMovie");
+
+        section.classList.add("fade");
+
+        setTimeout(() => {
+          section.style.backgroundImage = `url('${movie.imageUrl}')`;
+
+          document.getElementById("featuredTitle").textContent = movie.title;
+          document.getElementById("featuredDesc").textContent =
+            movie.description || "Top trending movie right now.";
+
+          section.classList.remove("fade");
+        }, 200);
+      }
+      // ========== STATE ==========
+      let currentFilter = "all"; // all | movie | tv
+      let currentSearch = "";
+      let movies = [];
+      let currentPage = 1;
+      let totalPages = 1;
+  let currentView = 'rows'; // 'rows' | 'grid' | 'search'
+  let genresFromServer = null; // populated by loadGenres()
+      const ROW_DISPLAY_LIMIT = 20; // how many items to show in a row visually
+
+      async function loadMovies(type, page = 1) {
         const normalizedType = type || "all";
-        const targetPage = page <= 0 ? 1 : page;
         const countEl = document.getElementById("resultCount");
-        const grid = document.getElementById("moviesGrid");
-        const paginationEl = document.getElementById("pagination");
+        const container = document.getElementById("moviesContainer");
 
-        if (countEl) {
-            countEl.textContent = "Đang tải danh sách phim...";
-        }
-        if (grid) {
-            grid.innerHTML = "";
-        }
-        if (paginationEl) {
-            paginationEl.innerHTML = "";
-        }
+        currentPage = page;
+
+        if (countEl) countEl.textContent = "Loading...";
+        if (container) container.innerHTML = "";
 
         try {
-            const token = localStorage.getItem("token");
+          const token = localStorage.getItem("token");
+          const headers = token ? { Authorization: "Bearer " + token } : {};
 
-            const headers = {};
-            if (token) {
-                headers["Authorization"] = "Bearer " + token;
-            }
+          const useSearch = currentSearch && currentSearch.trim();
 
-            // If there's an active search, call the public search endpoint which queries
-            // the whole system (movies + tv). Otherwise use the standard list endpoint.
-            const useSearch = currentSearch && currentSearch.trim();
-            const url = useSearch
-                ? `/api/public/movies/search?q=${encodeURIComponent(currentSearch.trim())}&type=${encodeURIComponent(normalizedType)}&page=${targetPage}`
-                : `/api/public/movies?type=${encodeURIComponent(normalizedType)}&page=${targetPage}`;
+          let url;
 
-            const res = await fetch(url, { method: "GET", headers: headers });
+          if (useSearch) {
+            // ✅ SEARCH → ONLY ONE PAGE
+            url = `/api/public/movies/search?q=${encodeURIComponent(currentSearch.trim())}&type=${normalizedType}&page=${page}`;
+          } else {
+            // ✅ NORMAL → LOAD ALL PAGES
+            let allMovies = [];
+            let p = 1;
+            let total = 1;
 
-            if (!res.ok) {
-                throw new Error("Không tải được dữ liệu (" + res.status + ")");
-            }
+            do {
+              const res = await fetch(
+                `/api/public/movies?type=${normalizedType}&page=${p}`,
+                { headers },
+              );
+              const data = await res.json();
 
-            const data = await res.json();
+              allMovies = allMovies.concat(data.items || []);
+              total = data.totalPages || 1;
+              p++;
+            } while (p <= total);
 
-            movies = Array.isArray(data.items) ? data.items : [];
-            currentPage = typeof data.page === "number" ? data.page : targetPage;
-            totalPages = typeof data.totalPages === "number" ? data.totalPages : 1;
-
+            movies = allMovies;
+            console.debug('[loadMovies] fetched allMovies count:', movies.length, 'sample:', movies.slice(0,3));
+            // try fetching server-side genres (combined movie+tv)
+            try { await loadGenres(); } catch(e) { console.debug('[loadMovies] loadGenres failed', e); }
             renderMovies();
-        } catch (e) {
-            console.error(e);
-            movies = [];
-            if (countEl) {
-                countEl.textContent = "Không tải được danh sách phim từ server.";
-            }
-        }
-    }
+            renderFeaturedMovie();
+            return;
+          }
 
-    async function fetchPremiumInfo() {
+          // SEARCH RESPONSE
+          const res = await fetch(url, { headers });
+          const data = await res.json();
+
+          movies = data.items || [];
+          console.debug('[loadMovies] search response items:', movies.length, 'sample:', movies.slice(0,3));
+          try { await loadGenres(); } catch(e) { console.debug('[loadMovies] loadGenres failed', e); }
+          totalPages = data.totalPages || 1;
+
+          renderMovies(true); // search mode
+          renderPagination();
+        } catch (e) {
+          console.error(e);
+          if (countEl) countEl.textContent = "Error loading data";
+        }
+      }
+      async function fetchPremiumInfo() {
         const token = localStorage.getItem("token");
         const hasToken = !!token;
 
         if (!hasToken) {
-            return {
-                isLoggedIn: false,
-                isPremium: false,
-                username: "Guest",
-                region: "Unknown",
-            };
+          return {
+            isLoggedIn: false,
+            isPremium: false,
+            username: "Guest",
+            region: "Unknown",
+          };
         }
 
         try {
-            const res = await fetch("/api/user/profile", {
-                headers: {
-                    Authorization: "Bearer " + token,
-                },
-            });
+          const res = await fetch("/api/user/profile", {
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          });
 
-            if (!res.ok) {
-                throw new Error("Profile error " + res.status);
-            }
+          if (!res.ok) {
+            throw new Error("Profile error " + res.status);
+          }
 
-            const data = await res.json();
-            const subs = Array.isArray(data.subscriptions)
-                ? data.subscriptions
-                : [];
-            const hasActive = subs.some((s) => s && s.status === "ACTIVE");
+          const data = await res.json();
+          const subs = Array.isArray(data.subscriptions)
+            ? data.subscriptions
+            : [];
+          const hasActive = subs.some((s) => s && s.status === "ACTIVE");
 
-            const usernameFromApi =
-                data.username || localStorage.getItem("username") || "User";
+          const usernameFromApi =
+            data.username || localStorage.getItem("username") || "User";
 
-            return {
-                isLoggedIn: true,
-                isPremium: hasActive,
-                username: usernameFromApi,
-                region: localStorage.getItem("region") || "Unknown",
-            };
+          return {
+            isLoggedIn: true,
+            isPremium: hasActive,
+            username: usernameFromApi,
+            region: localStorage.getItem("region") || "Unknown",
+          };
         } catch (e) {
-            const fallbackName = localStorage.getItem("username") || "User";
-            return {
-                isLoggedIn: true,
-                isPremium: false,
-                username: fallbackName,
-                region: localStorage.getItem("region") || "Unknown",
-            };
+          const fallbackName = localStorage.getItem("username") || "User";
+          return {
+            isLoggedIn: true,
+            isPremium: false,
+            username: fallbackName,
+            region: localStorage.getItem("region") || "Unknown",
+          };
         }
-    }
+      }
 
-    async function initUserUi() {
+      async function initUserUi() {
         const usernameEl = document.getElementById("navUsername");
         const premiumBadge = document.getElementById("premiumBadge");
         const premiumButton = document.getElementById("premiumButton");
@@ -1141,294 +1559,772 @@
         const info = await fetchPremiumInfo();
 
         if (usernameEl) {
-            usernameEl.textContent = "👋 " + translations.nav.hello + ", " + info.username;
-            renderWelcomeRegion(info.username, info.region);
+          usernameEl.textContent =
+            "👋 " + translations.nav.hello + ", " + info.username;
+          renderWelcomeRegion(info.username, info.region);
         }
 
         // Ẩn/hiện các mục navbar theo trạng thái đăng nhập
         authOnlyEls.forEach((el) => {
-            el.style.display = info.isLoggedIn ? "" : "none";
+          el.style.display = info.isLoggedIn ? "" : "none";
         });
         guestOnlyEls.forEach((el) => {
-            el.style.display = info.isLoggedIn ? "none" : "";
+          el.style.display = info.isLoggedIn ? "none" : "";
         });
 
         if (info.isLoggedIn && info.isPremium) {
-            if (premiumBadge) premiumBadge.style.display = "inline-flex";
-            if (premiumButton) premiumButton.style.display = "none";
-            if (adWrapper) adWrapper.style.display = "none";
+          if (premiumBadge) premiumBadge.style.display = "inline-flex";
+          if (premiumButton) premiumButton.style.display = "none";
+          if (adWrapper) adWrapper.style.display = "none";
         } else {
-            if (premiumBadge) premiumBadge.style.display = "none";
-            // Nút Go Premium trên navbar chỉ hiện với user đã login nhưng chưa premium
-            if (premiumButton)
-                premiumButton.style.display = info.isLoggedIn
-                    ? "inline-flex"
-                    : "none";
-            // Quảng cáo hiện cho mọi user chưa premium (kể cả guest)
-            if (adWrapper) adWrapper.style.display = "block";
+          if (premiumBadge) premiumBadge.style.display = "none";
+          // Nút Go Premium trên navbar chỉ hiện với user đã login nhưng chưa premium
+          if (premiumButton)
+            premiumButton.style.display = info.isLoggedIn
+              ? "inline-flex"
+              : "none";
+          // Quảng cáo hiện cho mọi user chưa premium (kể cả guest)
+          if (adWrapper) adWrapper.style.display = "block";
         }
-    }
+      }
 
-    // ========== RENDER MOVIES ==========
-    function renderMovies() {
-        const grid = document.getElementById("moviesGrid");
+      // ========== RENDER MOVIES ==========
+      async function renderMovies(isSearch = false) {
+        const container = document.getElementById("moviesContainer");
         const countEl = document.getElementById("resultCount");
-        if (!grid) return;
 
-        grid.innerHTML = "";
+        // hide or show featured and pagination depending on search state or current view
+        const featuredEl = document.getElementById('featuredMovie');
+        const paginationEl = document.querySelector('.pagination');
+        if (isSearch || currentView === 'grid') {
+          if (featuredEl) featuredEl.style.display = 'none';
+          if (paginationEl) paginationEl.style.display = 'none';
+        } else {
+          if (featuredEl) featuredEl.style.display = '';
+          if (paginationEl) paginationEl.style.display = '';
+        }
 
-        const normalizedSearch = currentSearch.trim().toLowerCase();
+        // smooth replace: wait fade out, replace, then fade in
+        await fadeOut(container);
+        container.innerHTML = "";
 
-        const source = Array.isArray(movies) ? movies : [];
+        if (isSearch) {
+          // ✅ GRID MODE (SEARCH)
+          const grid = document.createElement("div");
+          grid.className = "movies-grid";
 
-        const filtered = source.filter((item) => {
-            if (!item || !item.title) return false;
-            const matchSearch =
-                !normalizedSearch ||
-                String(item.title).toLowerCase().includes(normalizedSearch);
-            return matchSearch;
-        });
+          movies.forEach((movie) => {
+            grid.appendChild(createMovieCard(movie));
+          });
 
-        filtered.forEach((movie) => {
-            const card = document.createElement("article");
-            card.className = "movie-card";
+          container.appendChild(grid);
 
-            const isTrending =
-                typeof movie.rating === "number" && movie.rating >= 8;
+          if (countEl) {
+            countEl.textContent = `${movies.length} results`;
+          }
 
-            const imgUrl = movie.imageUrl || movie.image || "";
-            const year = movie.year || "";
-            const ratingText =
-                typeof movie.rating === "number" ? movie.rating.toFixed(1) : "N/A";
-            const typeLabel = movie.type === "tv" ? "TV Series" : "Movie";
+          await fadeIn(container);
+          return;
+        }
 
-            card.innerHTML = `
-                <div class="movie-thumb" style="background-image: url('${imgUrl}')">
-                    ${isTrending ? '<span class="movie-badge">Trending</span>' : ""}
-                    <span class="movie-type">${typeLabel}</span>
-                </div>
-                <div class="movie-body">
-                    <div class="movie-title">${movie.title}</div>
-                    <div class="movie-meta-row">
-                        <div class="movie-rating">
-                            <span class="star">★</span>
-                            <span>${ratingText}</span>
-                        </div>
-                        <div class="movie-year">${year}</div>
-                    </div>
-                </div>
-            `;
+        // ✅ NORMAL MODE (ROWS)
 
-            // Khi click vào card: nếu chưa đăng nhập thì yêu cầu login,
-            // nếu đã đăng nhập thì sau này sẽ chuyển sang trang chi tiết.
-            card.addEventListener("click", () => {
-                handleMovieClick(movie);
-            });
+        // pass full lists to renderRow; rows will only display first ROW_DISPLAY_LIMIT items
+        renderRow(
+          "🔥 Trending",
+          movies.filter((m) => m.rating >= 8),
+        );
+        renderRow(
+          "🎬 Movies",
+          movies.filter((m) => m.type === "movie"),
+        );
+        renderRow(
+          "📺 TV Series",
+          movies.filter((m) => m.type === "tv"),
+        );
 
-            grid.appendChild(card);
-        });
+        // Render top genre rows (prefer server-provided list when available)
+        const MAX_GENRE_ROWS = 12; // render more rows based on genre
+        const ROW_LIMIT = 20; // limit movies per row
+
+        if (genresFromServer && Array.isArray(genresFromServer) && genresFromServer.length) {
+          const top = genresFromServer.slice(0, MAX_GENRE_ROWS);
+          const usedIds = new Set();
+          top.forEach(g => {
+            const items = Array.isArray(g.items) ? g.items : [];
+            // filter out already used items to avoid repetition across rows
+            const deduped = items.filter(it => it && it.id && !usedIds.has(String(it.id)));
+            const fullCount = deduped.length;
+            // only render genre rows with at least 8 items after deduplication
+            if (fullCount < 8) return;
+            // mark only displayed items as used so later rows can still show remaining items
+            const displayList = deduped.slice(0, ROW_DISPLAY_LIMIT);
+            displayList.forEach(it => usedIds.add(String(it.id)));
+            // pass full deduped list to renderRow so Watch All shows everything
+            renderRow(g.name, deduped);
+          });
+
+          // also populate genres menu from server data
+          const mapForMenu = {};
+          genresFromServer.forEach(g => { mapForMenu[g.name] = g.items || []; });
+          populateGenresMenu(mapForMenu);
+        } else {
+          // fallback: build genres from movies array
+          const genresMap = collectGenres(movies);
+          // convert to array [genre, list]
+          const genreArr = Object.keys(genresMap)
+            .map(g => ({ genre: g, list: genresMap[g] }))
+            .sort((a,b) => b.list.length - a.list.length)
+            .slice(0, MAX_GENRE_ROWS);
+
+          const usedIds = new Set();
+          genreArr.forEach(g => {
+            if (!g.list || g.list.length < 1) return;
+            // dedupe by id (MovieItemDto contains id)
+            const deduped = g.list.filter(it => it && it.id && !usedIds.has(String(it.id)));
+            if (deduped.length < 8) return; // skip small genres after dedupe
+            const displayList = deduped.slice(0, ROW_DISPLAY_LIMIT);
+            displayList.forEach(it => usedIds.add(String(it.id)));
+            // pass full deduped list to renderRow so Watch All shows everything
+            renderRow(`${g.genre}`, deduped);
+          });
+
+          // populate genres menu
+          populateGenresMenu(genresMap);
+        }
 
         if (countEl) {
-
-            if (filtered.length) {
-
-                let pageInfo = "";
-
-                if (totalPages && totalPages > 1) {
-                    const pageText = getTranslation("section.page")
-                        .replace("{page}", currentPage)
-                        .replace("{total}", totalPages);
-
-                    pageInfo = pageText + " — ";
-                }
-
-                const resultText = getTranslation("section.results")
-                    .replace("{count}", filtered.length);
-
-                countEl.textContent = pageInfo + resultText;
-
-            } else {
-
-                countEl.textContent = getTranslation("section.no_result");
-
-            }
-            // const totalStr =
-            //     totalPages && totalPages > 1
-            //         ? `Trang ${currentPage}/${totalPages} — `
-            //         : "";
-            //
-            // countEl.textContent = filtered.length
-            //     ? `${totalStr}${filtered.length} kết quả hiển thị`
-            //     : "Không tìm thấy nội dung phù hợp.";
+          countEl.textContent = `${movies.length} results`;
         }
 
-        renderPagination();
-    }
-
-    function renderPagination() {
-        const paginationEl = document.getElementById("pagination");
-        if (!paginationEl) return;
-
-        paginationEl.innerHTML = "";
-
-        if (!totalPages || totalPages <= 1) {
-            return; // Không cần phân trang
+        if (!isSearch) {
+          const pagination = document.querySelector(".pagination");
+          if (pagination) pagination.innerHTML = "";
         }
 
-        const safeTotal = Math.max(1, totalPages);
+        await fadeIn(container);
+      }
 
-        const maxPagesToShow = Math.min(MAX_VISIBLE_PAGES, safeTotal);
+      function renderPagination() {
+        let pagination = document.querySelector(".pagination");
 
-        let startPage = Math.max(
-            1,
-            currentPage - Math.floor(maxPagesToShow / 2),
-        );
-        let endPage = startPage + maxPagesToShow - 1;
-
-        if (endPage > safeTotal) {
-            endPage = safeTotal;
-            startPage = Math.max(1, endPage - maxPagesToShow + 1);
+        if (!pagination) {
+          pagination = document.createElement("div");
+          pagination.className = "pagination";
+          document.querySelector("section").appendChild(pagination);
         }
 
-        const createBtn = (label, page, options = {}) => {
-            const btn = document.createElement("button");
-            btn.textContent = label;
-            btn.className = "page-button";
+        pagination.innerHTML = "";
 
-            if (options.disabled) {
-                btn.classList.add("disabled");
-            } else if (options.active) {
-                btn.classList.add("active");
-            } else {
-                btn.addEventListener("click", () => {
-                    if (page !== currentPage) {
-                        loadMovies(currentFilter, page);
-                    }
-                });
-            }
-
-            paginationEl.appendChild(btn);
+        // Prev button
+        const prev = document.createElement('button');
+        prev.className = 'page-button' + (currentPage === 1 ? ' disabled' : '');
+        prev.textContent = 'Prev';
+        prev.onclick = async () => {
+          if (currentPage > 1) await loadMovies(currentFilter, currentPage - 1);
         };
+        pagination.appendChild(prev);
 
-        // Previous
-        createBtn("«", currentPage - 1, {disabled: currentPage <= 1});
+        // Page info
+        const info = document.createElement('div');
+        info.style.minWidth = '120px';
+        info.style.textAlign = 'center';
+        info.style.color = 'var(--text-subtle)';
+        info.textContent = `Page ${currentPage} / ${totalPages}`;
+        pagination.appendChild(info);
 
-        for (let p = startPage; p <= endPage; p++) {
-            createBtn(String(p), p, {active: p === currentPage});
-        }
+        // Next button
+        const next = document.createElement('button');
+        next.className = 'page-button' + (currentPage >= totalPages ? ' disabled' : '');
+        next.textContent = 'Next';
+        next.onclick = async () => {
+          if (currentPage < totalPages) await loadMovies(currentFilter, currentPage + 1);
+        };
+        pagination.appendChild(next);
+      }
 
-        // Next
-        createBtn("»", currentPage + 1, {disabled: currentPage >= safeTotal});
-    }
+      // Fade helpers
+      function fadeOut(el) {
+        return new Promise((res) => {
+          if (!el) return res();
+          el.classList.add('fade-out');
+          setTimeout(() => res(), 300);
+        });
+      }
 
-    // ========== MOVIE DETAIL (YÊU CẦU LOGIN) ==========
-    function handleMovieClick(movie) {
+      function fadeIn(el) {
+        return new Promise((res) => {
+          if (!el) return res();
+          // ensure visible state
+          el.classList.remove('fade-out');
+          el.classList.add('fade-in');
+          setTimeout(() => {
+            el.classList.remove('fade-in');
+            res();
+          }, 300);
+        });
+      }
+
+      function renderRow(title, list) {
+        const container = document.getElementById("moviesContainer");
+
+        if (!list.length) return;
+
+        const row = document.createElement("div");
+        row.className = "movie-row";
+
+        const titleEl = document.createElement("div");
+        titleEl.className = "movie-row-title";
+        titleEl.textContent = title;
+
+        // watch all button
+        const watchAll = document.createElement('button');
+        watchAll.className = 'watch-all-btn';
+        watchAll.textContent = 'Watch All';
+        watchAll.addEventListener('click', () => showGridForList(title, list));
+
+        const scroll = document.createElement("div");
+        scroll.className = "movie-row-scroll";
+
+        // only display up to ROW_DISPLAY_LIMIT items in the horizontal row
+        const displayList = Array.isArray(list) ? list.slice(0, ROW_DISPLAY_LIMIT) : [];
+        displayList.forEach((movie) => {
+          const card = createMovieCard(movie);
+          scroll.appendChild(card);
+        });
+
+        const headerWrap = document.createElement('div');
+        headerWrap.style.display = 'flex';
+        headerWrap.style.alignItems = 'center';
+        headerWrap.style.justifyContent = 'space-between';
+        headerWrap.appendChild(titleEl);
+        headerWrap.appendChild(watchAll);
+
+        row.appendChild(headerWrap);
+        row.appendChild(scroll);
+        container.appendChild(row);
+      }
+
+      // Show a full grid for a selected list (Watch All)
+      function showGridForList(title, list) {
+        const container = document.getElementById('moviesContainer');
+        if (!container) return;
+
+        // hide featured and main pagination while viewing a grid from a row/genre
+        const featuredEl = document.getElementById('featuredMovie');
+        const paginationEl = document.querySelector('.pagination');
+
+        currentView = 'grid';
+        if (featuredEl) featuredEl.style.display = 'none';
+        if (paginationEl) paginationEl.style.display = 'none';
+
+        (async function() {
+          await fadeOut(container);
+          container.innerHTML = '';
+
+          const header = document.createElement('div');
+          header.className = 'grid-header';
+
+          const left = document.createElement('div');
+          left.innerHTML = `<div style="font-size:18px;font-weight:700">${title}</div><div class="section-subtitle">${list.length} items</div>`;
+
+          const right = document.createElement('div');
+          const back = document.createElement('button');
+          back.className = 'grid-back';
+          back.textContent = 'Back';
+          back.addEventListener('click', async () => {
+            // return to rows view
+            currentView = 'rows';
+            await fadeOut(container);
+            await renderMovies();
+            // restore featured and main pagination visually
+            if (featuredEl) featuredEl.style.display = '';
+            if (paginationEl) paginationEl.style.display = '';
+            renderFeaturedMovie();
+          });
+          right.appendChild(back);
+
+          header.appendChild(left);
+          header.appendChild(right);
+
+          container.appendChild(header);
+
+          // client-side pagination for the provided list
+          const PAGE_SIZE = 20;
+          let page = 1;
+          const totalPages = Math.max(1, Math.ceil((list && list.length) ? list.length / PAGE_SIZE : 0));
+
+          const gridWrap = document.createElement('div');
+          gridWrap.className = 'grid-wrap';
+          const grid = document.createElement('div');
+          grid.className = 'movies-grid';
+          gridWrap.appendChild(grid);
+
+          const paginationWrap = document.createElement('div');
+          paginationWrap.className = 'pagination';
+          paginationWrap.style.marginTop = '12px';
+
+          function renderGridPage(p) {
+            grid.innerHTML = '';
+            const start = (p - 1) * PAGE_SIZE;
+            const pageItems = (list || []).slice(start, start + PAGE_SIZE);
+            pageItems.forEach(m => grid.appendChild(createMovieCard(m)));
+
+            // build compact Prev / Page X / Next pagination
+            paginationWrap.innerHTML = '';
+            if (totalPages <= 1) return;
+
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'page-button' + (p === 1 ? ' disabled' : '');
+            prevBtn.textContent = 'Prev';
+            prevBtn.onclick = () => {
+              if (p > 1) {
+                page = p - 1;
+                (async () => { await fadeOut(grid); renderGridPage(page); await fadeIn(grid); })();
+              }
+            };
+
+            const info = document.createElement('div');
+            info.style.minWidth = '120px';
+            info.style.textAlign = 'center';
+            info.style.color = 'var(--text-subtle)';
+            info.textContent = `Page ${p} / ${totalPages}`;
+
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'page-button' + (p >= totalPages ? ' disabled' : '');
+            nextBtn.textContent = 'Next';
+            nextBtn.onclick = () => {
+              if (p < totalPages) {
+                page = p + 1;
+                (async () => { await fadeOut(grid); renderGridPage(page); await fadeIn(grid); })();
+              }
+            };
+
+            paginationWrap.appendChild(prevBtn);
+            paginationWrap.appendChild(info);
+            paginationWrap.appendChild(nextBtn);
+          }
+
+          // initial render
+          renderGridPage(page);
+
+          container.appendChild(gridWrap);
+          container.appendChild(paginationWrap);
+          await fadeIn(container);
+        })();
+      }
+
+      function createMovieCard(movie) {
+        const card = document.createElement("article");
+        card.className = "movie-card";
+
+        const isTrending =
+          typeof movie.rating === "number" && movie.rating >= 8;
+
+        const imgUrl = movie.imageUrl || movie.image || "";
+        const year = movie.year || "";
+        const ratingText =
+          typeof movie.rating === "number" ? movie.rating.toFixed(1) : "N/A";
+        const typeLabel = movie.type === "tv" ? "TV Series" : "Movie";
+
+        card.innerHTML = `
+                    <div class="movie-thumb" style="background-image: url('${imgUrl}')">
+                        ${isTrending ? '<span class="movie-badge">Trending</span>' : ""}
+                        <span class="movie-type">${typeLabel}</span>
+                    </div>
+                    <div class="movie-body">
+                        <div class="movie-title">${movie.title}</div>
+                        <div class="movie-meta-row">
+                            <div class="movie-rating">
+                                <span class="star">★</span>
+                                <span>${ratingText}</span>
+                            </div>
+                            <div class="movie-year">${year}</div>
+                        </div>
+                    </div>
+                `;
+
+        card.addEventListener("click", () => {
+          handleMovieClick(movie);
+        });
+
+        return card;
+      }
+
+      // ========== MOVIE DETAIL (YÊU CẦU LOGIN) ==========
+      function handleMovieClick(movie) {
         const token = localStorage.getItem("token");
         const isLoggedIn = !!token;
 
         if (!isLoggedIn) {
-            const goLogin = confirm(
-                "Bạn cần đăng nhập để xem chi tiết phim. Chuyển tới trang đăng nhập?",
-            );
-            if (goLogin) {
-                window.location.href = "login.html";
-            }
-            return;
+          const goLogin = confirm(
+            "Bạn cần đăng nhập để xem chi tiết phim. Chuyển tới trang đăng nhập?",
+          );
+          if (goLogin) {
+            window.location.href = "login.html";
+          }
+          return;
         }
 
         const type = movie.type || "movie";
         const id = movie.id;
         if (!id) {
-            alert("Không xác định được phim.");
-            return;
+          alert("Không xác định được phim.");
+          return;
         }
         window.location.href =
-            "movie-detail.html?id=" +
-            encodeURIComponent(id) +
-            "&type=" +
-            encodeURIComponent(type);
-    }
+          "movie-detail.html?id=" +
+          encodeURIComponent(id) +
+          "&type=" +
+          encodeURIComponent(type);
+      }
 
-    // ========== NAV / FILTER HANDLERS ==========
-    function initNav() {
+      // ========== NAV / FILTER HANDLERS ==========
+      function initNav() {
         const navLinks = document.querySelectorAll(".nav-link");
         navLinks.forEach((link) => {
-            link.addEventListener("click", () => {
-                const navKey = link.getAttribute("data-nav");
+          link.addEventListener("click", async () => {
+            const navKey = link.getAttribute("data-nav");
 
-                // Các link không có data-nav (như Login) giữ hành vi mặc định
-                if (!navKey) {
-                    return;
-                }
-
-                if (navKey === "home" || navKey === "movies" || navKey === "tv") {
-                    navLinks.forEach((l) => l.classList.remove("active"));
-                    // Home luôn active chính, nhưng khi chọn Movies/TV thì highlight riêng
-                    link.classList.add("active");
-
-                    if (navKey === "home") {
-                        currentFilter = "all";
-                    } else if (navKey === "movies") {
-                        currentFilter = "movie";
-                    } else if (navKey === "tv") {
-                        currentFilter = "tv";
-                    }
-                    currentPage = 1;
-                    loadMovies(currentFilter, currentPage);
-                } else {
-                    // Profile, History hiện chưa làm backend -> chỉ báo nhẹ
-                    alert("Trang này sẽ được bổ sung sau.");
-                }
-            });
-        });
-    }
-
-    // ========== SEARCH ==========
-    function initSearch() {
-        const input = document.getElementById("searchInput");
-        const button = document.getElementById("searchButton");
-        if (!input || !button) return;
-
-        // Debounced search: update currentSearch and request server results
-        let searchTimer = null;
-        const triggerSearch = (goToFirstPage = true) => {
-            currentSearch = input.value || "";
-            if (goToFirstPage) currentPage = 1;
-            loadMovies(currentFilter, currentPage);
-        };
-
-        input.addEventListener("input", () => {
-            clearTimeout(searchTimer);
-            searchTimer = setTimeout(() => triggerSearch(true), 300);
-        });
-
-        button.addEventListener("click", () => {
-            clearTimeout(searchTimer);
-            triggerSearch(true);
-        });
-
-        input.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-                e.preventDefault();
-                clearTimeout(searchTimer);
-                triggerSearch(true);
+            // Các link không có data-nav (như Login) giữ hành vi mặc định
+            if (!navKey) {
+              return;
             }
+
+            if (navKey === "home" || navKey === "movies" || navKey === "tv") {
+              navLinks.forEach((l) => l.classList.remove("active"));
+              // Home luôn active chính, nhưng khi chọn Movies/TV thì highlight riêng
+              link.classList.add("active");
+
+              if (navKey === "home") {
+                currentFilter = "all";
+              } else if (navKey === "movies") {
+                currentFilter = "movie";
+              } else if (navKey === "tv") {
+                currentFilter = "tv";
+              }
+
+              await loadMovies(currentFilter);
+            } else {
+              // Profile, History hiện chưa làm backend -> chỉ báo nhẹ
+              alert("Trang này sẽ được bổ sung sau.");
+            }
+          });
         });
-    }
-    function renderWelcomeRegion(username, region) {
+      }
+
+      // ========== GENRES HELPERS ==========
+      async function loadGenres() {
+        try {
+          const token = localStorage.getItem('token');
+          const headers = token ? { Authorization: 'Bearer ' + token } : {};
+          const res = await fetch('/api/public/movies/genres', { headers });
+          if (!res.ok) throw new Error('Genres fetch failed ' + res.status);
+          const data = await res.json();
+          // data is array of { id, name, items: [...] }
+          genresFromServer = data;
+          console.debug('[loadGenres] got', data && data.length);
+          return data;
+        } catch (e) {
+          console.debug('[loadGenres] error', e);
+          genresFromServer = null;
+          return null;
+        }
+      }
+      function collectGenres(list) {
+        const map = {};
+        (list || []).forEach(m => {
+          if (!m) return;
+
+          // helper to add a genre
+          const add = (g) => {
+            if (!g && g !== 0) return;
+            const key = String(g).trim();
+            if (!key) return;
+            if (!map[key]) map[key] = [];
+            map[key].push(m);
+          };
+
+          // collect candidate fields from many possible shapes
+          const candidates = [];
+
+          // direct arrays
+          if (Array.isArray(m.genres)) candidates.push({value: m.genres, type: 'array'});
+          if (Array.isArray(m.categories)) candidates.push({value: m.categories, type: 'array'});
+          if (Array.isArray(m.tags)) candidates.push({value: m.tags, type: 'array'});
+
+          // nested common shapes
+          if (m.details && Array.isArray(m.details.genres)) candidates.push({value: m.details.genres, type: 'array'});
+          if (m.metadata && Array.isArray(m.metadata.genres)) candidates.push({value: m.metadata.genres, type: 'array'});
+
+          // string fields
+          const maybeStr = m.genre || m.genresString || m.genresStr || m.category || m.tagsString || m.genreNames || m.genre_list;
+          if (maybeStr && typeof maybeStr === 'string') candidates.push({value: maybeStr, type: 'string'});
+
+          // object arrays with { name }
+          for (const c of candidates) {
+            if (!c.value) continue;
+            if (c.type === 'array') {
+              c.value.forEach(x => {
+                if (!x && x !== 0) return;
+                if (typeof x === 'string') add(x);
+                else if (x && (x.name || x.title)) add(x.name || x.title);
+                else add(x);
+              });
+              // if found, we consider this movie done
+              return;
+            }
+            if (c.type === 'string') {
+              const parts = String(c.value).split(/[,|;]+/).map(p => p.trim()).filter(Boolean);
+              if (parts.length) {
+                parts.forEach(add);
+                return;
+              }
+              add(c.value);
+              return;
+            }
+          }
+
+          // additional fallbacks: sometimes genre is under unexpected keys
+          const fallbackKeys = ['genre', 'genres', 'category', 'categories', 'tags', 'tagsList', 'genreNames', 'genre_list'];
+          for (const k of fallbackKeys) {
+            const v = m[k];
+            if (!v) continue;
+            if (Array.isArray(v)) {
+              v.forEach(x => add(x && (x.name || x)));
+              return;
+            }
+            if (typeof v === 'string') {
+              const parts = v.split(/[,|;]+/).map(p => p.trim()).filter(Boolean);
+              if (parts.length) { parts.forEach(add); return; }
+              add(v); return;
+            }
+          }
+
+          // no genre info found -> ignore
+        });
+
+        return map;
+      }
+
+      function populateGenresMenu(genresMap) {
+        const menu = document.getElementById('genresMenu');
+        if (!menu) return;
+        menu.innerHTML = '';
+        // prefer server-provided genres if available
+        if (genresFromServer && Array.isArray(genresFromServer) && genresFromServer.length) {
+          genresFromServer.forEach(g => {
+            const el = document.createElement('div');
+            el.className = 'genre-item';
+            const count = (Array.isArray(g.items) ? g.items.length : 0);
+            el.textContent = `${g.name} (${count})`;
+            el.addEventListener('click', () => {
+              menu.style.display = 'none';
+              showGridForList(g.name, g.items || []);
+            });
+            menu.appendChild(el);
+          });
+          return;
+        }
+
+        const keys = Object.keys(genresMap).sort((a,b)=> b.localeCompare(a));
+        if (!keys.length) {
+          const info = document.createElement('div');
+          info.className = 'genre-item';
+          info.textContent = 'No genres detected from data';
+          menu.appendChild(info);
+
+          // helpful debug hint for developers: show sample keys from first movie if available
+          try {
+            const sample = (movies && movies.length && Object.keys(movies[0]).slice(0,20)) || [];
+            const hint = document.createElement('div');
+            hint.style.marginTop = '8px';
+            hint.style.fontSize = '12px';
+            hint.style.color = 'var(--text-subtle)';
+            hint.textContent = 'Debug: sample movie fields -> ' + (sample.join(', ') || 'no sample available');
+            menu.appendChild(hint);
+          } catch (e) {
+            // ignore
+          }
+
+          return;
+        }
+
+        keys.forEach(k => {
+          const el = document.createElement('div');
+          el.className = 'genre-item';
+          el.textContent = `${k} (${genresMap[k].length})`;
+          el.addEventListener('click', () => {
+            // hide menu
+            menu.style.display = 'none';
+            // show grid for this genre
+            showGridForList(k, genresMap[k]);
+          });
+          menu.appendChild(el);
+        });
+      }
+
+      // wire genres button toggle and outside click
+      document.addEventListener('click', (e) => {
+        const gBtn = e.target.closest('#genresBtn');
+        const menu = document.getElementById('genresMenu');
+        if (gBtn) {
+          if (menu) menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+          return;
+        }
+        // click outside -> close
+        if (menu && !e.target.closest('.genres-dropdown')) {
+          menu.style.display = 'none';
+        }
+      });
+
+      // ========== SEARCH ==========
+      function initSearch() {
+        // wire the navbar search button to open the overlay
+        const navButton = document.getElementById('navSearchBtn');
+        const overlay = document.getElementById('searchOverlay');
+        const overlayInput = document.getElementById('overlaySearchInput');
+        const closeBtn = document.getElementById('closeOverlayBtn');
+
+        if (!navButton || !overlay || !overlayInput || !closeBtn) return;
+
+        navButton.addEventListener('click', () => {
+          showSearchOverlay();
+        });
+
+        closeBtn.addEventListener('click', () => hideSearchOverlay());
+
+        // live search inside overlay (debounced)
+        let overlayTimer = null;
+        overlayInput.addEventListener('input', () => {
+          clearTimeout(overlayTimer);
+          overlayTimer = setTimeout(() => performLiveSearch(overlayInput.value), 220);
+        });
+
+        overlayInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') hideSearchOverlay();
+        });
+      }
+
+      function showSearchOverlay() {
+        const overlay = document.getElementById('searchOverlay');
+        const overlayInput = document.getElementById('overlaySearchInput');
+        if (!overlay) return;
+        overlay.classList.remove('hidden');
+        overlay.setAttribute('aria-hidden', 'false');
+        // focus input
+        setTimeout(() => overlayInput && overlayInput.focus(), 80);
+        // stop featured from auto-rotating while searching
+        if (featuredInterval) clearInterval(featuredInterval);
+        currentView = 'search';
+      }
+
+      function hideSearchOverlay() {
+        const overlay = document.getElementById('searchOverlay');
+        if (!overlay) return;
+        overlay.classList.add('hidden');
+        overlay.setAttribute('aria-hidden', 'true');
+        // restore featured rotation
+        renderFeaturedMovie();
+        currentView = 'rows';
+      }
+
+      async function performLiveSearch(q) {
+        const query = (q || '').trim();
+        const grid = document.getElementById('overlayGrid');
+        const countEl = document.getElementById('overlayResultCount');
+        const paginationEl = document.getElementById('overlayPagination');
+        if (!grid || !countEl) return;
+
+        grid.innerHTML = '';
+        if (!query) {
+          countEl.textContent = 'Type to search';
+          paginationEl && (paginationEl.innerHTML = '');
+          return;
+        }
+
+        try {
+          const token = localStorage.getItem('token');
+          const headers = token ? { Authorization: 'Bearer ' + token } : {};
+          // call existing search endpoint (single-page response)
+          const res = await fetch(`/api/public/movies/search?q=${encodeURIComponent(query)}&type=all&page=1`, { headers });
+          if (!res.ok) throw new Error('Search failed ' + res.status);
+          const data = await res.json();
+          const items = data.items || [];
+          countEl.textContent = `${items.length} results`;
+
+          // show first page (client-side pagesize 20)
+          const PAGE = 1;
+          const PAGE_SIZE = 20;
+          const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+
+          const pageItems = items.slice(0, PAGE_SIZE);
+          pageItems.forEach(m => grid.appendChild(createMovieCard(m)));
+
+          // build compact pagination for overlay
+          if (paginationEl) {
+            paginationEl.innerHTML = '';
+            if (totalPages > 1) {
+              const prev = document.createElement('button');
+              prev.className = 'page-button disabled';
+              prev.textContent = 'Prev';
+              const info = document.createElement('div');
+              info.style.minWidth = '120px';
+              info.style.textAlign = 'center';
+              info.style.color = 'var(--text-subtle)';
+              info.textContent = `Page ${PAGE} / ${totalPages}`;
+              const next = document.createElement('button');
+              next.className = 'page-button';
+              next.textContent = 'Next';
+              let current = PAGE;
+              prev.onclick = () => {
+                if (current <= 1) return;
+                current--;
+                const start = (current - 1) * PAGE_SIZE;
+                grid.innerHTML = '';
+                items.slice(start, start + PAGE_SIZE).forEach(m => grid.appendChild(createMovieCard(m)));
+                info.textContent = `Page ${current} / ${totalPages}`;
+                // update disabled states
+                prev.classList.toggle('disabled', current === 1);
+                next.classList.toggle('disabled', current === totalPages);
+              };
+              next.onclick = () => {
+                if (current >= totalPages) return;
+                current++;
+                const start = (current - 1) * PAGE_SIZE;
+                grid.innerHTML = '';
+                items.slice(start, start + PAGE_SIZE).forEach(m => grid.appendChild(createMovieCard(m)));
+                info.textContent = `Page ${current} / ${totalPages}`;
+                prev.classList.toggle('disabled', current === 1);
+                next.classList.toggle('disabled', current === totalPages);
+              };
+
+              paginationEl.appendChild(prev);
+              paginationEl.appendChild(info);
+              paginationEl.appendChild(next);
+            } else {
+              paginationEl.innerHTML = '';
+            }
+          }
+        } catch (e) {
+          console.error(e);
+          countEl.textContent = 'Search failed';
+        }
+      }
+      function renderWelcomeRegion(username, region) {
         const welcomeEl = document.getElementById("welcomeMessage");
         const regionEl = document.getElementById("regionMessage");
 
         if (welcomeEl) {
-            welcomeEl.textContent = `Xin chào, ${username || "Guest"}`;
+          welcomeEl.textContent = `Xin chào, ${username || "Guest"}`;
         }
 
         if (regionEl) {
-            regionEl.textContent = `Bạn đang ở: ${region || "Unknown"}`;
+          regionEl.textContent = `Bạn đang ở: ${region || "Unknown"}`;
         }
-    }
+      }
 
-    function showPaymentPopup(message) {
+      function showPaymentPopup(message) {
         const popup = document.getElementById("paymentPopup");
         const messageEl = document.getElementById("paymentPopupMessage");
         const closeBtn = document.getElementById("closePaymentPopup");
@@ -1439,116 +2335,131 @@
         popup.style.display = "block";
 
         if (closeBtn) {
-            closeBtn.onclick = () => {
-                popup.style.display = "none";
-            };
+          closeBtn.onclick = () => {
+            popup.style.display = "none";
+          };
         }
 
         setTimeout(() => {
-            popup.style.display = "none";
+          popup.style.display = "none";
         }, 6000);
-    }
+      }
 
-    function handlePaymentReturnMessage() {
+      function handlePaymentReturnMessage() {
         const urlParams = new URLSearchParams(window.location.search);
         const payment = urlParams.get("payment");
         const expireAt = urlParams.get("expireAt");
 
         if (payment === "extend-success" && expireAt) {
-            showPaymentPopup(
-                `Bạn đã gia hạn subscription thành công. Gói của bạn sẽ hết hạn vào ngày ${decodeURIComponent(expireAt)}.`
-            );
+          showPaymentPopup(
+            `Bạn đã gia hạn subscription thành công. Gói của bạn sẽ hết hạn vào ngày ${decodeURIComponent(expireAt)}.`,
+          );
         } else if (payment === "fail") {
-            showPaymentPopup("Thanh toán thất bại hoặc đã bị hủy.");
+          showPaymentPopup("Thanh toán thất bại hoặc đã bị hủy.");
         }
 
         if (payment) {
-            const cleanUrl = window.location.pathname;
-            window.history.replaceState({}, document.title, cleanUrl);
+          const cleanUrl = window.location.pathname;
+          window.history.replaceState({}, document.title, cleanUrl);
         }
-    }
+      }
 
-    // ========== PREMIUM & LOGOUT ==========
-    function initPremiumAndLogout() {
+      // ========== PREMIUM & LOGOUT ==========
+      function initPremiumAndLogout() {
         const adUpgradeButton = document.getElementById("adUpgradeButton");
         const logoutButton = document.getElementById("logoutButton");
 
         if (adUpgradeButton) {
-            adUpgradeButton.addEventListener("click", () => {
-                window.location.href = "packs.html";
-            });
+          adUpgradeButton.addEventListener("click", () => {
+            window.location.href = "packs.html";
+          });
         }
 
         if (logoutButton) {
-            logoutButton.addEventListener("click", () => {
-                localStorage.removeItem("token");
-                localStorage.removeItem("username");
-                localStorage.removeItem("role");
-                localStorage.removeItem("region");
-                // giữ isPremium để dev test; nếu muốn xoá thì bỏ comment dòng dưới
-                // localStorage.removeItem("isPremium");
-                window.location.href = "login.html";
-            });
+          logoutButton.addEventListener("click", () => {
+            localStorage.removeItem("token");
+            localStorage.removeItem("username");
+            localStorage.removeItem("role");
+            localStorage.removeItem("region");
+            // giữ isPremium để dev test; nếu muốn xoá thì bỏ comment dòng dưới
+            // localStorage.removeItem("isPremium");
+            window.location.href = "login.html";
+          });
         }
-    }
+      }
 
-    // ========== INIT ==========
-    (async function init() {
+      // ========== INIT ==========
+      (async function init() {
         const yearEl = document.getElementById("footerYear");
         if (yearEl) {
-            yearEl.textContent = new Date().getFullYear().toString();
+          yearEl.textContent = new Date().getFullYear().toString();
         }
 
         await initUserUi();
         initNav();
         initSearch();
+        initNavbarSearchToggle();
+        adjustFeaturedHeight();
+        // unlock featured full-screen when user scrolls or touches
+        window.addEventListener('wheel', unlockFeaturedOnScroll, { passive: true });
+        window.addEventListener('touchstart', unlockFeaturedOnScroll, { passive: true });
         handlePaymentReturnMessage();
         initPremiumAndLogout();
-        loadMovies(currentFilter, currentPage);
-    })();
-</script>
-<div
-        id="paymentPopup"
-        style="
-    display: none;
-    position: fixed;
-    top: 24px;
-    right: 24px;
-    z-index: 9999;
-    max-width: 400px;
-    background: linear-gradient(135deg, #16a34a, #22c55e);
-    color: white;
-    padding: 16px 18px;
-    border-radius: 14px;
-    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.35);
-    font-size: 14px;
-    line-height: 1.5;
-  "
->
+  await loadMovies(currentFilter);
+      })();
+
+      // wire featured down button
+      document.addEventListener('click', (e) => {
+        const d = e.target.closest('#featuredDown');
+        if (!d) return;
+        // smooth scroll to movies container
+        const el = document.getElementById('moviesContainer');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        unlockFeaturedOnScroll();
+      });
+    </script>
     <div
-            style="
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-    "
+      id="paymentPopup"
+      style="
+        display: none;
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        z-index: 9999;
+        max-width: 400px;
+        background: linear-gradient(135deg, #16a34a, #22c55e);
+        color: white;
+        padding: 16px 18px;
+        border-radius: 14px;
+        box-shadow: 0 14px 35px rgba(0, 0, 0, 0.35);
+        font-size: 14px;
+        line-height: 1.5;
+      "
     >
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 12px;
+        "
+      >
         <div id="paymentPopupMessage"></div>
         <button
-                id="closePaymentPopup"
-                style="
-        border: none;
-        background: transparent;
-        color: white;
-        font-size: 20px;
-        cursor: pointer;
-        line-height: 1;
-      "
-                type="button"
+          id="closePaymentPopup"
+          style="
+            border: none;
+            background: transparent;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            line-height: 1;
+          "
+          type="button"
         >
-            ×
+          ×
         </button>
+      </div>
     </div>
-</div>
-</body>
+  </body>
 </html>
