@@ -29,6 +29,9 @@ public class Episode {
 
     private String src;
 
+    @Column(name = "src_film")
+    private String srcFilm;
+
     private Boolean published = false;
 
     @ManyToOne

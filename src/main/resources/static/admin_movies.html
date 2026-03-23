@@ -1,13 +1,12 @@
 <div class="card">
-  <h2 data-i18n="admin.films">Films</h2>
-  <div class="muted" data-i18n="admin.films_manage">
-    Manage the list of movies displayed on the homepage. Use Add to import from TMDB and Hide to hide published movies.
-  </div>
+    <h2 data-i18n="admin.films">Films</h2>
+    <div class="muted" data-i18n="admin.films_manage">
+        Manage the list of movies displayed on the homepage. Use Add to import from TMDB and Hide to hide published movies.
+    </div>
 
-  <!-- ADD FROM TMDB -->
-  <!-- BROWSE TMDB (browse trending & add) -->
-  <div
-    style="
+    <!-- ADD FROM TMDB -->
+    <div
+            style="
       margin-top: 16px;
       padding: 12px;
       border-radius: 10px;
@@ -16,970 +15,1276 @@
       flex-direction: column;
       gap: 8px;
     "
-  >
-    <div style="font-weight: 600" data-i18n="admin.browse_tmdb">Browse TMDB (select to Add)</div>
-    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
-      <select id="tmdbBrowseType" style="padding: 8px; border-radius: 8px; min-width: 140px">
-        <option value="all" data-i18n="admin.all">All</option>
-        <option value="movie" data-i18n="nav.movie">Movie</option>
-        <option value="tv" data-i18n="nav.tv">TV Series</option>
-      </select>
-      <input
-        id="tmdbSearch"
-        type="text"
-        placeholder="Filter title..."
-        style="flex: 1; min-width: 180px; padding: 8px; border-radius: 8px"
-      />
-      <button id="tmdbReload" class="btn ghost" data-i18n="admin.reload">Reload</button>
-    </div>
-    <div id="tmdbMessage" class="muted"></div>
+    >
+        <div style="font-weight: 600" data-i18n="admin.browse_tmdb">Browse TMDB (select to Add)</div>
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
+            <select id="tmdbBrowseType" style="padding: 8px; border-radius: 8px; min-width: 140px">
+                <option value="all" data-i18n="admin.all">All</option>
+                <option value="movie" data-i18n="nav.movie">Movie</option>
+                <option value="tv" data-i18n="nav.tv">TV Series</option>
+            </select>
+            <input
+                    id="tmdbSearch"
+                    type="text"
+                    placeholder="Filter title..."
+                    style="flex: 1; min-width: 180px; padding: 8px; border-radius: 8px"
+            />
+            <button id="tmdbReload" class="btn ghost" data-i18n="admin.reload">Reload</button>
+        </div>
+        <div id="tmdbMessage" class="muted"></div>
 
-  <div id="tmdbTableContainer" style="margin-top:12px; width:100%; overflow:auto" data-i18n="common.loading">Loading...</div>
+        <div id="tmdbTableContainer" style="margin-top:12px; width:100%; overflow:auto" data-i18n="common.loading">
+            Loading...
+        </div>
 
-    <div
-      style="
+        <div
+                style="
         margin-top: 12px;
         display: flex;
         justify-content: center;
         align-items: center;
         gap: 12px;
       "
-    >
-      <button id="tmdbPrev" class="btn ghost" data-i18n="admin.prev">← Prev</button>
-      <span id="tmdbPageInfo" class="muted"></span>
-      <button id="tmdbNext" class="btn ghost" data-i18n="admin.next">Next →</button>
+        >
+            <button id="tmdbPrev" class="btn ghost" data-i18n="admin.prev">← Prev</button>
+            <span id="tmdbPageInfo" class="muted"></span>
+            <button id="tmdbNext" class="btn ghost" data-i18n="admin.next">Next →</button>
+        </div>
     </div>
-  </div>
 
-  <!-- LIST / HIDE -->
-  <div
-    style="
+    <!-- LIST / HIDE -->
+    <div
+            style="
       margin-top: 18px;
       display: flex;
       gap: 8px;
       align-items: center;
       flex-wrap: wrap;
     "
-  >
-    <input
-      id="filmSearch"
-      type="text"
-      placeholder="Search by title..."
-      style="flex: 1; min-width: 200px; padding: 8px; border-radius: 8px"
-    />
-    <button id="refreshFilms" class="btn ghost" data-i18n="admin.reload">Reload</button>
-  </div>
+    >
+        <input
+                id="filmSearch"
+                type="text"
+                placeholder="Search by title..."
+                style="flex: 1; min-width: 200px; padding: 8px; border-radius: 8px"
+        />
+        <button id="refreshFilms" class="btn ghost" data-i18n="admin.reload">Reload</button>
+        <button id="backfillSrcFilmBtn" class="btn ghost">Fill src_film from R2</button>
+    </div>
 
-  <div id="filmsList" class="packs" style="margin-top: 12px" data-i18n="common.loading">Loading...</div>
+    <div id="filmsList" class="packs" style="margin-top: 12px" data-i18n="common.loading">Loading...</div>
 
-  <div
-    id="filmsPagination"
-    style="
+    <div
+            id="filmsPagination"
+            style="
       margin-top: 12px;
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 12px;
     "
-  >
-    <button id="filmsPrev" class="btn ghost" data-i18n="admin.prev">← Prev</button>
-    <span id="filmsPageInfo" class="muted"></span>
-    <button id="filmsNext" class="btn ghost" data-i18n="admin.next">Next →</button>
-  </div>
+    >
+        <button id="filmsPrev" class="btn ghost" data-i18n="admin.prev">← Prev</button>
+        <span id="filmsPageInfo" class="muted"></span>
+        <button id="filmsNext" class="btn ghost" data-i18n="admin.next">Next →</button>
+    </div>
 </div>
 
 <script data-fragment-script>
-  (async function () {
-    const { fetchJson, api, refreshCounts } = window.adminApi;// Shared utilities from adminApi
-    let filmsCache = [];
-    let currentPage = 1;
-    const pageSize = 5; 
+    (async function () {
+        const { fetchJson, api, refreshCounts } = window.adminApi;
 
-    // Render films with search and pagination
-  async function renderFilms() {
-      const container = document.getElementById("filmsList");
-      const pageInfo = document.getElementById("filmsPageInfo");
+        let filmsCache = [];
+        let currentPage = 1;
+        const pageSize = 5;
 
-      const q = (document.getElementById("filmSearch").value || "")
-        .toLowerCase()
-        .trim();
+        let tmdbPage = 1;
+        let tmdbTotalPages = 1;
+        let tmdbCache = [];
+        let existingSet = new Set();
 
-      let list = (filmsCache || []).slice();
-      // Search filter
-      if (q) {
-        list = list.filter((f) => (f.title || "").toLowerCase().includes(q));
-      }
-      // Sort alphabetically
-      list.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+        function getFilteredFilms() {
+            const q = (document.getElementById("filmSearch").value || "").toLowerCase().trim();
+            let list = (filmsCache || []).slice();
 
-      const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
-      if (currentPage > totalPages) currentPage = totalPages;
-
-      const start = (currentPage - 1) * pageSize;
-      const paginated = list.slice(start, start + pageSize);
-
-      container.innerHTML = "";
-
-      if (!paginated.length) {
-        container.innerHTML = "No films found.";
-        pageInfo.textContent = "";
-        return;
-      }
-      // Render each film row
-      paginated.forEach((f) => {
-        const row = document.createElement("div");
-        row.className = "pack-row";
-
-        const info = document.createElement("div");
-        const typeLabel = f.type === "tv" ? "TV Series" : "Movie";
-        const status = f.published ? "Published" : "Hidden";
-        const trailerStatus = f.src ? "Trailer: set" : "Trailer: not set";
-
-        info.innerHTML = `
-      <div style="font-weight:600">${f.title}</div>
-      <div class="muted">${typeLabel} · ${status} · ${trailerStatus}</div>
-    `;
-
-        const actions = document.createElement("div");
-        actions.style.display = "flex";
-        actions.style.gap = "6px";
-
-        // Trailer button
-        const trailerBtn = document.createElement("button");
-        trailerBtn.className = "btn ghost";
-        trailerBtn.textContent = f.src ? "Edit trailer" : "Set trailer";
-        trailerBtn.addEventListener("click", async () => {
-          const current = f.src || "";
-          const input = prompt("Enter YouTube trailer URL:", current);
-          if (input === null) return;
-          try {
-            await fetchJson(api.movies + "/" + f.type + "/" + f.id + "/trailer", {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ src: input.trim() || null }),
-            });
-            await loadFilms();
-            refreshCounts();
-          } catch (e) {
-            alert("Save trailer failed: " + e);
-          }
-        });
-
-        const hideBtn = document.createElement("button");
-        hideBtn.className = "btn ghost";
-        hideBtn.textContent = f.published ? "Hide" : "Show";
-
-        hideBtn.addEventListener("click", async () => {
-          try {
-            if (f.published) {
-              if (!confirm("Ẩn phim này khỏi trang chính?")) return;
-              await fetchJson(api.movies + "/" + f.type + "/" + f.id + "/hide", { method: "PUT" });
-            } else {
-              // Publish it again
-              await fetchJson(api.movies + "/" + f.type + "/" + f.id + "/publish", { method: "PUT" });
+            if (q) {
+                list = list.filter((f) => (f.title || "").toLowerCase().includes(q));
             }
-            await loadFilms();
-            refreshCounts();
-          } catch (e) {
-            alert((f.published ? "Hide" : "Publish") + " failed: " + e);
-          }
-        });
 
-        actions.appendChild(trailerBtn);
-        actions.appendChild(hideBtn);
-        // Details button for already-added movies
-        const detailsBtn = document.createElement("button");
-        detailsBtn.className = "btn ghost";
-        detailsBtn.textContent = "Details";
-        detailsBtn.addEventListener("click", async () => {
-          const msg = document.getElementById("tmdbMessage");
-          msg.textContent = "Loading details...";
-          try {
-            const details = await fetchJson(`/api/movies/details?id=${encodeURIComponent(f.id)}&type=${encodeURIComponent(f.type)}`);
-            msg.textContent = "";
-            // reuse the same modal used for TMDB browse; pass a minimal item object for display
-            showTmdbDetailModal(details, { id: f.id, type: f.type, title: f.title });
-          } catch (e) {
-            msg.textContent = "Failed to load details: " + e;
-          }
-        });
-        actions.appendChild(detailsBtn);
+            list.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+            return list;
+        }
 
-        // Region block button
-        const regionBtn = document.createElement("button");
-        regionBtn.className = "btn ghost";
-        regionBtn.textContent = "Region block";
-        regionBtn.addEventListener("click", async () => {
-          try {
-            await showRegionModal(f.type, f.id, f.title);
-          } catch (err) {
-            alert('Failed to open region modal: ' + err);
-          }
-        });
-        actions.appendChild(regionBtn);
-        row.appendChild(info);
-        row.appendChild(actions);
-        container.appendChild(row);
-      });
+        function updateExistingSet() {
+            existingSet = new Set((filmsCache || []).map((f) => `${f.type}-${f.id}`));
+        }
 
-      pageInfo.textContent = `Page ${currentPage} / ${totalPages}`;
-    }
-    // Load films from backend
-    async function loadFilms() {
-      const container = document.getElementById("filmsList");
-      container.innerHTML = "Loading...";
-      try {
-        filmsCache = (await fetchJson(api.movies)) || [];
-        await renderFilms();
-      } catch (e) {
-        container.innerHTML = "Failed to load films.";
-        console.error(e);
-      }
-    }
+        function isExistingItem(it) {
+            if (!it) return false;
+            const key = `${it.type}-${it.id}`;
+            if (existingSet.has(key)) return true;
+            return (filmsCache || []).some((f) => f.type === it.type && String(f.id) === String(it.id));
+        }
 
-    document.getElementById("filmSearch").addEventListener("input", async () => {
-      currentPage = 1;
-      try { await renderFilms(); } catch (e) { console.error('renderFilms error', e); }
-    });
-    document
-      .getElementById("refreshFilms")
-      .addEventListener("click", loadFilms);
-    // TMDB browsing and add flow
-    let tmdbPage = 1;
-    let tmdbTotalPages = 1;
-    let tmdbCache = [];
-    let existingSet = new Set(); // type-id keys for items already in DB
-
-    function updateExistingSet() {
-      existingSet = new Set((filmsCache || []).map((f) => `${f.type}-${f.id}`));
-    }
-
-    // Robust existence check: sometimes id types (string vs number) or item shape differs,
-    // so compare by scanning filmsCache (fallback) to ensure accuracy.
-    function isExistingItem(it) {
-      if (!it) return false;
-      const key = `${it.type}-${it.id}`;
-      if (existingSet.has(key)) return true;
-      // fallback: check filmsCache with loose equality on id
-      return (filmsCache || []).some((f) => f.type === it.type && String(f.id) === String(it.id));
-    }
-
-    function renderTmdb() {
-      const container = document.getElementById("tmdbTableContainer");
-      const pageInfo = document.getElementById("tmdbPageInfo");
-      const q = (document.getElementById("tmdbSearch").value || "").toLowerCase().trim();
-
-      let list = (tmdbCache || []).slice();
-      if (q) {
-        list = list.filter((it) => (it.title || "").toLowerCase().includes(q));
-      }
-
-      container.innerHTML = "";
-      if (!list.length) {
-        container.innerHTML = "No results.";
-        pageInfo.textContent = `Page ${tmdbPage} / ${Math.max(1, tmdbTotalPages)}`;
-        return;
-      }
-
-  const table = document.createElement("table");
-  table.style.width = "100%";
-  table.style.borderCollapse = "collapse";
-  // Explicit column widths so header aligns with body cells
-  table.innerHTML = `<thead><tr style=\"text-align:left\"><th style=\"width:64px\"></th><th style=\"width:50%\">Title</th><th style=\"width:12%\">Type</th><th style=\"width:8%\">Year</th><th style=\"width:8%\">Rating</th><th style=\"width:12%\"></th></tr></thead>`;
-      const tbody = document.createElement("tbody");
-
-      list.forEach((it) => {
-  const tr = document.createElement("tr");
-        tr.style.borderBottom = "1px solid rgba(255,255,255,0.03)";
-
-        const imgTd = document.createElement("td");
-        imgTd.style.width = "64px";
-        const img = document.createElement("img");
-        img.src = it.imageUrl || "/static/images/banner.png";
-        img.style.width = "48px";
-        img.style.height = "48px";
-        img.style.objectFit = "cover";
-        img.style.borderRadius = "4px";
-        imgTd.appendChild(img);
-
-        const titleTd = document.createElement("td");
-        titleTd.textContent = it.title || "";
-
-        const typeTd = document.createElement("td");
-        typeTd.textContent = it.type === "tv" ? "TV Series" : "Movie";
-
-        const yearTd = document.createElement("td");
-        yearTd.textContent = it.year || "";
-
-        const ratingTd = document.createElement("td");
-        ratingTd.textContent = it.rating != null ? it.rating.toFixed(1) : "";
-
-  const actionTd = document.createElement("td");
-  const key = `${it.type}-${it.id}`;
-  if (isExistingItem(it)) {
-          const added = document.createElement("button");
-          added.className = "btn ghost";
-          added.textContent = "Added";
-          added.disabled = true;
-          actionTd.appendChild(added);
-        } else {
-          const addBtn = document.createElement("button");
-          addBtn.className = "btn";
-          addBtn.textContent = "Add";
-          addBtn.addEventListener("click", async () => {
-            const msg = document.getElementById("tmdbMessage");
-            msg.textContent = "Loading details...";
+        async function fetchVideoAssetStatus(type, id) {
             try {
-              const details = await fetchJson(`/api/movies/details?id=${encodeURIComponent(it.id)}&type=${encodeURIComponent(it.type)}`);
-              msg.textContent = "";
-              showTmdbDetailModal(details, it);
+                return await fetchJson(`/api/admin/movies/${encodeURIComponent(type)}/${encodeURIComponent(id)}/source/latest`);
             } catch (e) {
-              msg.textContent = "Failed to load details: " + e;
+                return {
+                    status: "NOT_UPLOADED",
+                    progressPercent: 0,
+                    has360p: false,
+                    has720p: false,
+                    has1080p: false,
+                    durationSeconds: null,
+                    playbackUrl: null,
+                    errorMessage: null,
+                };
             }
-          });
-          actionTd.appendChild(addBtn);
         }
 
-        tr.appendChild(imgTd);
-        tr.appendChild(titleTd);
-        tr.appendChild(typeTd);
-        tr.appendChild(yearTd);
-        tr.appendChild(ratingTd);
-        tr.appendChild(actionTd);
-        tbody.appendChild(tr);
-      });
+        async function uploadFilmSource(type, id) {
+            const input = document.createElement("input");
+            input.type = "file";
+            input.accept = ".mp4,video/mp4";
 
-      table.appendChild(tbody);
-      container.appendChild(table);
-      pageInfo.textContent = `Page ${tmdbPage} / ${Math.max(1, tmdbTotalPages)}`;
-    }
+            input.addEventListener("change", async () => {
+                const file = input.files && input.files[0];
+                if (!file) return;
 
-    // --- Region modal support ---
-    // Minimal country list (ISO code -> name). Expand as needed.
-    const countryList = [
-      {code: 'US', name: 'United States'},
-      {code: 'GB', name: 'United Kingdom'},
-      {code: 'CA', name: 'Canada'},
-      {code: 'AU', name: 'Australia'},
-      {code: 'DE', name: 'Germany'},
-      {code: 'FR', name: 'France'},
-      {code: 'JP', name: 'Japan'},
-      {code: 'VN', name: 'Vietnam'},
-      {code: 'IN', name: 'India'},
-      {code: 'BR', name: 'Brazil'}
-    ];
+                const formData = new FormData();
+                formData.append("file", file);
 
-    async function showRegionModal(type, id, title) {
-      // fetch existing blocked regions
-      const listUrl = `/api/admin/movies/${encodeURIComponent(type)}/${encodeURIComponent(id)}/regions`;
-      const existing = await fetchJson(listUrl);
-      const blockedSet = new Set((existing || []).map(r => (r.region || '').toUpperCase()));
+                try {
+                    await fetchJson(`/api/admin/movies/${encodeURIComponent(type)}/${encodeURIComponent(id)}/source`, {
+                        method: "POST",
+                        body: formData,
+                    });
 
-      const overlay = document.createElement('div');
-      overlay.style.position = 'fixed';
-      overlay.style.left = '0';
-      overlay.style.top = '0';
-      overlay.style.right = '0';
-      overlay.style.bottom = '0';
-      overlay.style.background = 'rgba(0,0,0,0.6)';
-      overlay.style.display = 'flex';
-      overlay.style.alignItems = 'center';
-      overlay.style.justifyContent = 'center';
-      overlay.style.zIndex = '10000';
+                    alert("Upload thành công. Hệ thống đang encode video.");
+                    await loadFilms();
+                    refreshCounts();
+                } catch (e) {
+                    alert("Upload source failed: " + e);
+                }
+            });
 
-      const modal = document.createElement('div');
-      modal.style.background = '#111';
-      modal.style.padding = '18px';
-      modal.style.borderRadius = '10px';
-      modal.style.maxWidth = '720px';
-      modal.style.width = '90%';
-      modal.style.maxHeight = '80%';
-      modal.style.overflow = 'auto';
-      modal.style.color = 'white';
-
-      modal.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-weight:700">Region block for: ${title}</div><button id="closeRegionModal" class="btn ghost">Close</button></div><div id="regionGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px"></div>`;
-
-      overlay.appendChild(modal);
-      document.body.appendChild(overlay);
-
-      document.getElementById('closeRegionModal').addEventListener('click', () => overlay.remove());
-
-      const grid = modal.querySelector('#regionGrid');
-      grid.innerHTML = '';
-      countryList.forEach(c => {
-        const btn = document.createElement('button');
-        btn.className = 'btn ghost';
-        btn.style.display = 'flex';
-        btn.style.justifyContent = 'space-between';
-        btn.style.alignItems = 'center';
-        btn.textContent = c.name;
-        const codeSpan = document.createElement('span');
-        codeSpan.style.marginLeft = '8px';
-        codeSpan.textContent = c.code;
-
-        if (blockedSet.has(c.code)) {
-          btn.style.background = '#b91c1c';
-          btn.style.color = 'white';
-          btn.dataset.blocked = '1';
-        } else {
-          btn.dataset.blocked = '0';
+            input.click();
         }
 
-        btn.appendChild(codeSpan);
+        async function uploadEpisodeSource(tvId, seasonNumber, episodeNumber) {
+            const input = document.createElement("input");
+            input.type = "file";
+            input.accept = ".mp4,video/mp4";
 
-        btn.addEventListener('click', async () => {
-          try {
-            const toggleUrl = `/api/admin/movies/${encodeURIComponent(type)}/${encodeURIComponent(id)}/regions/${encodeURIComponent(c.code)}`;
-            await fetchJson(toggleUrl, { method: 'PUT' });
-            // flip UI state
-            if (btn.dataset.blocked === '1') {
-              btn.dataset.blocked = '0';
-              btn.style.background = '';
-              btn.style.color = '';
-            } else {
-              btn.dataset.blocked = '1';
-              btn.style.background = '#b91c1c';
-              btn.style.color = 'white';
+            input.addEventListener("change", async () => {
+                const file = input.files && input.files[0];
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append("file", file);
+
+                try {
+                    await fetchJson(
+                        `/api/admin/movies/tv/${encodeURIComponent(tvId)}/seasons/${encodeURIComponent(
+                            seasonNumber
+                        )}/episodes/${encodeURIComponent(episodeNumber)}/source`,
+                        {
+                            method: "POST",
+                            body: formData,
+                        }
+                    );
+
+                    alert("Episode source uploaded. Encoding started.");
+                } catch (err) {
+                    alert("Upload episode source failed: " + err);
+                }
+            });
+
+            input.click();
+        }
+
+        async function syncSingleSrcFilm(type, id, title) {
+            try {
+                const result = await fetchJson(
+                    `/api/admin/movies/${encodeURIComponent(type)}/${encodeURIComponent(id)}/sync-src-film`,
+                    { method: "POST" }
+                );
+
+                alert(result.message || `src_film synced for ${title}`);
+                await loadFilms();
+                refreshCounts();
+            } catch (err) {
+                alert("Fill src_film failed: " + err);
             }
-          } catch (err) {
-            alert('Failed to toggle region: ' + err);
-          }
-        });
-
-        grid.appendChild(btn);
-      });
-    }
-
-    async function loadTmdb() {
-      const msg = document.getElementById("tmdbMessage");
-      msg.textContent = "Loading TMDB...";
-      const type = document.getElementById("tmdbBrowseType").value || "all";
-      try {
-        const resp = await fetchJson(`/api/movies/trending?type=${encodeURIComponent(type)}&page=${tmdbPage}`);
-        tmdbCache = resp.items || [];
-        tmdbTotalPages = resp.totalPages || 1;
-        msg.textContent = "";
-        updateExistingSet();
-        renderTmdb();
-      } catch (e) {
-        msg.textContent = "Failed to load TMDB: " + e;
-        console.error(e);
-      }
-    }
-
-    // Render a modal showing TMDB details and allow confirming Add
-    async function showTmdbDetailModal(details, item) {
-      const tmdbImageBase = (window.adminApi && window.adminApi.tmdbImageBase) || 'https://image.tmdb.org/t/p/w500';
-      // details: full TMDB response including 'genres' and 'credits'
-      const overlay = document.createElement('div');
-      overlay.style.position = 'fixed';
-      overlay.style.left = '0';
-      overlay.style.top = '0';
-      overlay.style.right = '0';
-      overlay.style.bottom = '0';
-      overlay.style.background = 'rgba(0,0,0,0.6)';
-      overlay.style.display = 'flex';
-      overlay.style.alignItems = 'center';
-      overlay.style.justifyContent = 'center';
-      overlay.style.zIndex = '9999';
-
-      const modal = document.createElement('div');
-      modal.style.background = '#111';
-      modal.style.padding = '18px';
-      modal.style.borderRadius = '10px';
-      modal.style.maxWidth = '820px';
-      modal.style.width = '90%';
-      modal.style.maxHeight = '85%';
-      modal.style.overflow = 'auto';
-      modal.style.color = 'white';
-
-      const img = details.poster_path ? (details.poster_path.startsWith('http') ? details.poster_path : (window.adminApi ? window.adminApi.imageBaseUrl || null : null) ) : null;
-      const posterUrl = details.poster_path ? (details.poster_path.startsWith('http') ? details.poster_path : (details.poster_path ? details.poster_path : null)) : null;
-
-      // prepare genres
-      let genres = [];
-      if (Array.isArray(details.genres)) {
-        genres = details.genres.map(g => g.name).filter(Boolean);
-      }
-
-      // prepare cast
-      let cast = [];
-      try {
-        const credits = details.credits || {};
-        if (Array.isArray(credits.cast)) {
-          cast = credits.cast.slice(0, 8).map(c => ({ name: c.name, character: c.character }));
         }
-      } catch (ignored) {}
 
-      const title = details.title || details.name || item.title || '';
-      const overview = details.overview || '';
-      const runtime = details.runtime || (Array.isArray(details.episode_run_time) && details.episode_run_time[0]) || '';
-      const year = (details.release_date && details.release_date.slice(0,4)) || (details.first_air_date && details.first_air_date.slice(0,4)) || '';
+        async function backfillSrcFilmAll() {
+            const msg = document.getElementById("tmdbMessage");
 
-      const posterSrc = details.poster_path ? (details.poster_path.startsWith('http') ? details.poster_path : (tmdbImageBase + details.poster_path)) : '/static/images/banner.png';
+            if (!confirm("Fill src_film for old movies/episodes from R2?")) return;
 
-      modal.innerHTML = `
-        <div style="display:flex; gap:12px; align-items:flex-start">
-          <img src="${posterSrc}" alt="poster" style="width:140px; height:210px; object-fit:cover; border-radius:6px" />
-          <div style="flex:1">
-            <h3 style="margin:0 0 8px 0">${title} ${year ? `(${year})` : ''}</h3>
-            <div class="muted">${item.type === 'tv' ? 'TV Series' : 'Movie'} · ${details.vote_average ? ('★ ' + details.vote_average.toFixed ? details.vote_average.toFixed(1) : details.vote_average) : ''} ${runtime ? '· ' + runtime + ' min' : ''}</div>
-            <div style="margin-top:8px">${overview ? `<div style='margin-bottom:8px'>${overview}</div>` : ''}
-              ${genres.length ? `<div class='muted'>Genres: ${genres.join(', ')}</div>` : ''}
-            </div>
-            <div style="margin-top:10px">
-              ${cast.length ? `<div style='font-weight:600; margin-bottom:6px'>Top cast</div>` : ''}
-              ${cast.map(c => `<div class='muted'>${c.name}${c.character ? ' as ' + c.character : ''}</div>`).join('')}
-            </div>
-            ${item.type === 'tv' ? `<div id='tvEpisodesPanel' style='margin-top:10px'></div>` : ''}
-          </div>
+            msg.textContent = "Backfilling src_film from R2...";
+
+            try {
+                const result = await fetchJson("/api/admin/movies/backfill/src-film", {
+                    method: "POST",
+                });
+
+                msg.textContent =
+                    `Backfill completed. Movies updated: ${result.moviesUpdated || 0}, Episodes updated: ${result.episodesUpdated || 0}`;
+
+                await loadFilms();
+                refreshCounts();
+            } catch (e) {
+                msg.textContent = "Backfill failed: " + e;
+                alert("Backfill src_film failed: " + e);
+            }
+        }
+
+        async function showVideoStatusModal(type, id, title) {
+            const asset = await fetchVideoAssetStatus(type, id);
+
+            const overlay = document.createElement("div");
+            overlay.style.position = "fixed";
+            overlay.style.left = "0";
+            overlay.style.top = "0";
+            overlay.style.right = "0";
+            overlay.style.bottom = "0";
+            overlay.style.background = "rgba(0,0,0,0.6)";
+            overlay.style.display = "flex";
+            overlay.style.alignItems = "center";
+            overlay.style.justifyContent = "center";
+            overlay.style.zIndex = "10001";
+
+            const modal = document.createElement("div");
+            modal.style.background = "#111";
+            modal.style.color = "white";
+            modal.style.padding = "18px";
+            modal.style.borderRadius = "10px";
+            modal.style.width = "90%";
+            modal.style.maxWidth = "640px";
+            modal.style.maxHeight = "85%";
+            modal.style.overflow = "auto";
+
+            const qualities = [];
+            if (asset.has360p) qualities.push("360p");
+            if (asset.has720p) qualities.push("720p");
+            if (asset.has1080p) qualities.push("1080p");
+
+            modal.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div style="font-weight:700">Video source status: ${title}</div>
+          <button id="closeVideoStatusModal" class="btn ghost">Close</button>
         </div>
-        <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:14px">
-          <button id='tmdbCancel' class='btn ghost'>Cancel</button>
-          <button id='tmdbConfirm' class='btn'>Add this movie</button>
-        </div>
+
+        <div class="muted" style="margin-bottom:8px">Status: ${asset.status || "UNKNOWN"}</div>
+        <div class="muted" style="margin-bottom:8px">Progress: ${asset.progressPercent || 0}%</div>
+        <div class="muted" style="margin-bottom:8px">Duration: ${asset.durationSeconds || "-"} sec</div>
+        <div class="muted" style="margin-bottom:8px">Qualities: ${
+                qualities.length ? qualities.join(", ") : "None yet"
+            }</div>
+        <div class="muted" style="margin-bottom:8px;word-break:break-all">Playback URL: ${
+                asset.playbackUrl || "-"
+            }</div>
+        <div class="muted" style="margin-bottom:8px;color:#fca5a5">${asset.errorMessage || ""}</div>
       `;
 
-      overlay.appendChild(modal);
-      document.body.appendChild(overlay);
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
 
-      function close() { overlay.remove(); }
-
-      document.getElementById('tmdbCancel').addEventListener('click', close);
-
-      // If the item already exists in DB, disable the Add button and mark as Added.
-      const confirmBtn = document.getElementById('tmdbConfirm');
-      try {
-        if (isExistingItem(item)) {
-          confirmBtn.textContent = 'Added';
-          confirmBtn.className = 'btn ghost';
-          confirmBtn.disabled = true;
-        } else {
-          confirmBtn.addEventListener('click', async () => {
-            const msg = document.getElementById('tmdbMessage');
-            msg.textContent = 'Adding...';
-            try {
-              await fetchJson(api.movies + '/import', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ tmdbId: item.id, type: item.type }),
-              });
-              msg.textContent = 'Added successfully.';
-              // Refresh local film list
-              await loadFilms();
-              // Update existence set
-              updateExistingSet();
-              // If a search query is active, re-run the TMDB search to keep the displayed
-              // search results intact; otherwise reload the browse/trending results.
-              const qRaw = (document.getElementById('tmdbSearch').value || '').trim();
-              if (qRaw) {
-                // Re-run the same page of search results to preserve context
-                await performTmdbSearch(tmdbPage);
-              } else {
-                await loadTmdb();
-              }
-              refreshCounts();
-              close();
-            } catch (e) {
-              msg.textContent = 'Add failed: ' + e;
-            }
-          });
+            modal.querySelector("#closeVideoStatusModal").addEventListener("click", () => overlay.remove());
         }
-      } catch (ignored) {}
-      // If this is a TV series, render seasons and episodes panel for adding single episodes
-      try {
-        if (item.type === 'tv' && Array.isArray(details.seasons)) {
-          const panel = document.getElementById('tvEpisodesPanel');
-          panel.innerHTML = '';
-          
-          // Fetch backend seasons info for existing episodes and sources
-          let backendSeasons = [];
-          if (item.id) {
-            try {
-              backendSeasons = await fetchJson(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons`);
-            } catch (e) {
-              console.warn('failed to fetch backend seasons', e);
+
+        async function renderFilms() {
+            const container = document.getElementById("filmsList");
+            const pageInfo = document.getElementById("filmsPageInfo");
+
+            const list = getFilteredFilms();
+            const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const start = (currentPage - 1) * pageSize;
+            const paginated = list.slice(start, start + pageSize);
+
+            container.innerHTML = "";
+
+            if (!paginated.length) {
+                container.innerHTML = "No films found.";
+                pageInfo.textContent = "";
+                return;
             }
-          }
-          const backendMap = {};
-          backendSeasons.forEach(s => {
-            backendMap[s.seasonNumber] = {};
-            (s.episodes || []).forEach(ep => {
-              backendMap[s.seasonNumber][ep.episodeNumber] = ep;
-            });
-          });
-          
-          // Optional: Add "Add all episodes in show" control (admin can batch import entire show)
-          const addAllShowBtnId = 'addall-show-' + item.id;
-          const topControls = document.createElement('div');
-          topControls.style.display = 'flex';
-          topControls.style.gap = '8px';
-          topControls.style.marginBottom = '8px';
-          topControls.innerHTML = `<button id='${addAllShowBtnId}' class='btn ghost'>Add all episodes in show</button><span class='muted' style='align-self:center'>Use with caution for large shows</span>`;
-          panel.appendChild(topControls);
 
-          for (let _idx = 0; _idx < details.seasons.length; _idx++) {
-            const s = details.seasons[_idx];
-            // Raw season identifier from TMDB may be a name like 'Specials' when season_number is missing.
-            const snRaw = s.season_number || s.seasonNumber || s.season;
-            // Ensure we use a numeric seasonNumber for API routes. Try several fallbacks:
-            // 1) TMDB's numeric field (season_number / seasonNumber / season)
-            // 2) extract a number from the season name (e.g., "Season 12")
-            // 3) 'Specials' -> 0
-            // 4) deterministic fallback to index (_idx + 1)
-            let seasonNumber = parseInt(snRaw, 10);
-            if (isNaN(seasonNumber)) {
-              // Try to extract a number from the name (useful for named seasons like "Season 12" or "Part 3")
-              const nameToInspect = String(s.name || snRaw || '');
-              const m = nameToInspect.match(/(\d+)/);
-              if (m) {
-                seasonNumber = parseInt(m[1], 10);
-              } else if (s.name && nameToInspect.toLowerCase().includes('special')) {
-                // TMDB often represents specials as season 0 but may provide a name like "Specials".
-                seasonNumber = 0;
-              } else {
-                seasonNumber = _idx + 1; // deterministic fallback for unnamed/non-numeric seasons
-              }
-            }
-            const sTitle = s.name || `Season ${snRaw}`;
-            const seasonDiv = document.createElement('div');
-            seasonDiv.style.marginTop = '8px';
-            // Controls: show episode count, list toggle, add-all button
-            const epCount = s.episode_count || s.episodeCount || 10;
-            seasonDiv.innerHTML = `
-              <div style='display:flex; align-items:center; justify-content:space-between'>
-                <div style='font-weight:600'>${sTitle}</div>
-                <div style='display:flex; gap:8px; align-items:center'>
-                  <span class='muted'>Episodes: ${epCount}</span>
-                  <button id='list-season-${seasonNumber}' class='btn ghost'>List</button>
-                  <button id='addall-season-${seasonNumber}' class='btn'>Add all season</button>
-                </div>
-              </div>
-              <div class='muted' id='season-${seasonNumber}-episodes' style='display:none; margin-top:6px'></div>
-            `;
-            panel.appendChild(seasonDiv);
+            for (const f of paginated) {
+                const row = document.createElement("div");
+                row.className = "pack-row";
 
-            // Attach listeners for List and Add-all
-            (function(seasonNumber, epCount){
-              document.getElementById(`list-season-${seasonNumber}`).addEventListener('click', async function onList(){
-                const epContainer = document.getElementById(`season-${seasonNumber}-episodes`);
-                if (!epContainer) return;
-                if (epContainer.style.display === 'none' || !epContainer.innerHTML.trim()) {
-                  // expand and render episode entries
-                  epContainer.style.display = 'block';
-                  epContainer.innerHTML = '';
-                  let existing = [];
-                  try {
-                    existing = await fetchJson(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(seasonNumber)}/episodes/existing`);
-                  } catch (e) { /* ignore */ }
+                const info = document.createElement("div");
+                const typeLabel = f.type === "tv" ? "TV Series" : "Movie";
+                const status = f.published ? "Published" : "Hidden";
+                const trailerStatus = f.src ? "Trailer: set" : "Trailer: not set";
+                const srcFilmStatus = f.srcFilm ? "src_film: set" : "src_film: empty";
 
-                  for (let e = 1; e <= Math.min(epCount, 200); e++) {
-                    const epBtn = document.createElement('div');
-                    epBtn.style.display = 'flex';
-                    epBtn.style.justifyContent = 'space-between';
-                    epBtn.style.gap = '8px';
-                    epBtn.style.marginTop = '6px';
-                    const left = document.createElement('div');
-                    left.className = 'muted';
-                    left.textContent = 'Episode ' + e;
-                    const right = document.createElement('div');
-                    right.style.display = 'flex';
-                    right.style.gap = '8px';
+                let assetStatus = {
+                    status: "NOT_UPLOADED",
+                    progressPercent: 0,
+                    has360p: false,
+                    has720p: false,
+                    has1080p: false,
+                };
 
-                    const already = Array.isArray(existing) && existing.includes(e);
-                    if (!already) {
-                      const addBtn = document.createElement('button');
-                      addBtn.className = 'btn';
-                      addBtn.textContent = 'Add episode';
-                      addBtn.addEventListener('click', async () => {
-                        const msg = document.getElementById('tmdbMessage');
-                        msg.textContent = 'Adding episode...';
-                        try {
-                          await fetchJson(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(seasonNumber)}/episodes/${encodeURIComponent(e)}/import`, { method: 'POST' });
-                          msg.textContent = 'Episode added.';
-                          addBtn.textContent = 'Added';
-                          addBtn.className = 'btn ghost';
-                          addBtn.disabled = true;
-                          await loadFilms();
-                          refreshCounts();
-                        } catch (err) {
-                          msg.textContent = 'Add episode failed: ' + err;
-                        }
-                      });
-                      right.appendChild(addBtn);
-                    } else {
-                      const epInfo = backendMap[seasonNumber] && backendMap[seasonNumber][e];
-                      const trailerBtn = document.createElement('button');
-                      trailerBtn.className = 'btn ghost';
-                      trailerBtn.textContent = (epInfo && epInfo.src) ? 'Edit trailer' : 'Set trailer';
-                      trailerBtn.addEventListener('click', async () => {
-                        const current = (epInfo && epInfo.src) || "";
-                        const input = prompt("Enter episode trailer URL:", current);
-                        if (input === null) return;
-                        try {
-                          await fetchJson(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(seasonNumber)}/episodes/${encodeURIComponent(e)}/trailer`, {
+                try {
+                    assetStatus = await fetchVideoAssetStatus(f.type, f.id);
+                } catch (e) {
+                    console.warn("fetchVideoAssetStatus failed", e);
+                }
+
+                const sourceStatus =
+                    assetStatus.status === "READY"
+                        ? "Source: ready"
+                        : assetStatus.status === "PROCESSING"
+                            ? `Source: encoding ${assetStatus.progressPercent || 0}%`
+                            : assetStatus.status === "FAILED"
+                                ? "Source: failed"
+                                : "Source: not uploaded";
+
+                info.innerHTML = `
+          <div style="font-weight:600">${f.title}</div>
+          <div class="muted">${typeLabel} · ${status} · ${trailerStatus}</div>
+          <div class="muted">${sourceStatus}</div>
+          <div class="muted">${srcFilmStatus}</div>
+        `;
+
+                const actions = document.createElement("div");
+                actions.style.display = "flex";
+                actions.style.gap = "6px";
+                actions.style.flexWrap = "wrap";
+
+                const trailerBtn = document.createElement("button");
+                trailerBtn.className = "btn ghost";
+                trailerBtn.textContent = f.src ? "Edit trailer" : "Set trailer";
+                trailerBtn.addEventListener("click", async () => {
+                    const current = f.src || "";
+                    const input = prompt("Enter YouTube trailer URL:", current);
+                    if (input === null) return;
+                    try {
+                        await fetchJson(api.movies + "/" + f.type + "/" + f.id + "/trailer", {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({ src: input.trim() || null }),
-                          });
-                          alert("Trailer updated.");
-                          trailerBtn.textContent = input.trim() ? 'Edit trailer' : 'Set trailer';
-                        } catch (e) {
-                          alert("Save trailer failed: " + e);
-                        }
-                      });
-                      right.appendChild(trailerBtn);
-
-                      const publishBtn = document.createElement('button');
-                      publishBtn.className = 'btn ghost';
-                      publishBtn.textContent = (epInfo && epInfo.published) ? 'Unpublish' : 'Publish';
-                      publishBtn.addEventListener('click', async () => {
-                        try {
-                          await fetchJson(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(seasonNumber)}/episodes/${encodeURIComponent(e)}/publish`, {
-                            method: "PUT",
-                          });
-                          alert("Episode " + ((epInfo && epInfo.published) ? 'unpublished' : 'published') + ".");
-                          publishBtn.textContent = (epInfo && epInfo.published) ? 'Publish' : 'Unpublish';
-                          epInfo.published = !(epInfo && epInfo.published);
-                        } catch (e) {
-                          alert("Toggle publish failed: " + e);
-                        }
-                      });
-                      right.appendChild(publishBtn);
+                        });
+                        await loadFilms();
+                        refreshCounts();
+                    } catch (e) {
+                        alert("Save trailer failed: " + e);
                     }
-                    epBtn.appendChild(left);
-                    epBtn.appendChild(right);
-                    epContainer.appendChild(epBtn);
-                  }
-                } else {
-                  // collapse
-                  epContainer.style.display = 'none';
-                }
-              });
+                });
 
-              // Add-all season
-              document.getElementById(`addall-season-${seasonNumber}`).addEventListener('click', async function(){
-                if (!confirm(`Add all episodes (${Math.min(epCount,200)} items) for season ${seasonNumber}?`)) return;
-                const msg = document.getElementById('tmdbMessage');
-                msg.textContent = 'Adding all episodes...';
-                let existing = [];
-                try {
-                  existing = await fetchJson(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(seasonNumber)}/episodes/existing`);
-                } catch (e) {}
-                for (let e = 1; e <= Math.min(epCount, 200); e++) {
-                  if (Array.isArray(existing) && existing.includes(e)) continue;
-                  try {
-                    await fetchJson(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(seasonNumber)}/episodes/${encodeURIComponent(e)}/import`, { method: 'POST' });
-                    msg.textContent = `Added episode ${e}`;
-                  } catch (err) {
-                    console.warn('add-all error for episode', e, err);
-                  }
-                }
-                msg.textContent = 'Add-all completed.';
-                await loadFilms();
-                refreshCounts();
-              });
-            })(seasonNumber, epCount);
-          }
+                const hideBtn = document.createElement("button");
+                hideBtn.className = "btn ghost";
+                hideBtn.textContent = f.published ? "Hide" : "Show";
+                hideBtn.addEventListener("click", async () => {
+                    try {
+                        if (f.published) {
+                            if (!confirm("Ẩn phim này khỏi trang chính?")) return;
+                            await fetchJson(api.movies + "/" + f.type + "/" + f.id + "/hide", { method: "PUT" });
+                        } else {
+                            await fetchJson(api.movies + "/" + f.type + "/" + f.id + "/publish", { method: "PUT" });
+                        }
+                        await loadFilms();
+                        refreshCounts();
+                    } catch (e) {
+                        alert((f.published ? "Hide" : "Publish") + " failed: " + e);
+                    }
+                });
 
-          // Add-all show button behavior
-          document.getElementById(addAllShowBtnId).addEventListener('click', async function(){
-            if (!confirm('Add all episodes in this show? This will iterate every season and may be large. Proceed?')) return;
-            const msg = document.getElementById('tmdbMessage');
-            msg.textContent = 'Adding all episodes in show...';
-            for (let _idx2 = 0; _idx2 < details.seasons.length; _idx2++) {
-              const s2 = details.seasons[_idx2];
-              const snRaw2 = s2.season_number || s2.seasonNumber || s2.season;
-              let seasonNumber2 = parseInt(snRaw2, 10);
-              if (isNaN(seasonNumber2)) {
-                const nameToInspect = String(s2.name || snRaw2 || '');
-                const m = nameToInspect.match(/(\d+)/);
-                if (m) seasonNumber2 = parseInt(m[1],10);
-                else if (s2.name && nameToInspect.toLowerCase().includes('special')) seasonNumber2 = 0;
-                else seasonNumber2 = _idx2 + 1;
-              }
-              const epCount2 = s2.episode_count || s2.episodeCount || 10;
-              // reuse add-all logic per season
-              for (let e2 = 1; e2 <= Math.min(epCount2, 200); e2++) {
-                try { await fetchJson(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(seasonNumber2)}/episodes/${encodeURIComponent(e2)}/import`, { method: 'POST' }); }
-                catch (err) { console.warn('add-all-show error', seasonNumber2, e2, err); }
-              }
+                const detailsBtn = document.createElement("button");
+                detailsBtn.className = "btn ghost";
+                detailsBtn.textContent = "Details";
+                detailsBtn.addEventListener("click", async () => {
+                    const msg = document.getElementById("tmdbMessage");
+                    msg.textContent = "Loading details...";
+                    try {
+                        const details = await fetchJson(
+                            `/api/movies/details?id=${encodeURIComponent(f.id)}&type=${encodeURIComponent(f.type)}`
+                        );
+                        msg.textContent = "";
+                        showTmdbDetailModal(details, { id: f.id, type: f.type, title: f.title });
+                    } catch (e) {
+                        msg.textContent = "Failed to load details: " + e;
+                    }
+                });
+
+                const regionBtn = document.createElement("button");
+                regionBtn.className = "btn ghost";
+                regionBtn.textContent = "Region block";
+                regionBtn.addEventListener("click", async () => {
+                    try {
+                        await showRegionModal(f.type, f.id, f.title);
+                    } catch (err) {
+                        alert("Failed to open region modal: " + err);
+                    }
+                });
+
+                const uploadSourceBtn = document.createElement("button");
+                uploadSourceBtn.className = "btn ghost";
+                uploadSourceBtn.textContent =
+                    assetStatus.status === "READY"
+                        ? "Replace source"
+                        : assetStatus.status === "PROCESSING"
+                            ? "Re-upload source"
+                            : assetStatus.status === "FAILED"
+                                ? "Retry source"
+                                : "Upload source";
+                uploadSourceBtn.addEventListener("click", async () => {
+                    await uploadFilmSource(f.type, f.id);
+                });
+
+                const syncSrcFilmBtn = document.createElement("button");
+                syncSrcFilmBtn.className = "btn ghost";
+                syncSrcFilmBtn.textContent = "Fill src_film";
+                syncSrcFilmBtn.addEventListener("click", async () => {
+                    await syncSingleSrcFilm(f.type, f.id, f.title);
+                });
+
+                const videoStatusBtn = document.createElement("button");
+                videoStatusBtn.className = "btn ghost";
+                videoStatusBtn.textContent = "Video status";
+                videoStatusBtn.addEventListener("click", async () => {
+                    try {
+                        await showVideoStatusModal(f.type, f.id, f.title);
+                    } catch (err) {
+                        alert("Failed to load video status: " + err);
+                    }
+                });
+
+                actions.appendChild(trailerBtn);
+                actions.appendChild(hideBtn);
+                actions.appendChild(detailsBtn);
+                actions.appendChild(regionBtn);
+                actions.appendChild(uploadSourceBtn);
+                actions.appendChild(syncSrcFilmBtn);
+                actions.appendChild(videoStatusBtn);
+
+                row.appendChild(info);
+                row.appendChild(actions);
+                container.appendChild(row);
             }
-            msg.textContent = 'Add-all show completed.';
-            await loadFilms();
-            refreshCounts();
-          });
-        }
-      } catch (ignored) {}
-    }
 
-    document.getElementById("tmdbReload").addEventListener("click", async () => {
-      tmdbPage = 1;
-      const qRaw = (document.getElementById("tmdbSearch").value || "").trim();
-      if (qRaw) await performTmdbSearch(1);
-      else await loadTmdb();
-    });
-
-    document.getElementById("tmdbPrev").addEventListener("click", async () => {
-      if (tmdbPage > 1) {
-        tmdbPage--;
-        const qRaw = (document.getElementById("tmdbSearch").value || "").trim();
-        if (qRaw) await performTmdbSearch(tmdbPage);
-        else await loadTmdb();
-      }
-    });
-
-    document.getElementById("tmdbNext").addEventListener("click", async () => {
-      if (tmdbPage < tmdbTotalPages) {
-        tmdbPage++;
-        const qRaw = (document.getElementById("tmdbSearch").value || "").trim();
-        if (qRaw) await performTmdbSearch(tmdbPage);
-        else await loadTmdb();
-      }
-    });
-
-    document.getElementById("tmdbBrowseType").addEventListener("change", async () => {
-      tmdbPage = 1;
-      await loadTmdb();
-    });
-
-    // Helper: perform paginated TMDB search and render results
-    async function performTmdbSearch(page) {
-      const qRaw = (document.getElementById("tmdbSearch").value || "").trim();
-      const container = document.getElementById('tmdbTableContainer');
-      const pageInfo = document.getElementById('tmdbPageInfo');
-      if (!qRaw) {
-        renderTmdb();
-        return;
-      }
-      container.innerHTML = 'Searching TMDB...';
-      try {
-        const resp = await fetchJson(`/api/movies/search?q=${encodeURIComponent(qRaw)}&type=${encodeURIComponent(document.getElementById('tmdbBrowseType').value || 'all')}&page=${encodeURIComponent(page || 1)}`);
-  const list = resp.items || [];
-  tmdbPage = resp.page || page || 1;
-  tmdbTotalPages = resp.totalPages || 1;
-  // Persist search results to tmdbCache so renderTmdb() can reuse them
-  // (keeps the displayed list intact after actions like Add that call renderTmdb())
-  tmdbCache = list.slice();
-        if (!list.length) {
-          container.innerHTML = 'No results.';
-          pageInfo.textContent = '';
-          return;
+            pageInfo.textContent = `Page ${currentPage} / ${totalPages}`;
         }
 
-        const table = document.createElement('table');
-        table.style.width = '100%';
-        table.style.borderCollapse = 'collapse';
-        table.innerHTML = `<thead><tr style="text-align:left"><th style="width:64px"></th><th style="width:50%">Title</th><th style="width:12%">Type</th><th style="width:8%">Year</th><th style="width:8%">Rating</th><th style="width:12%"></th></tr></thead>`;
-        const tbody = document.createElement('tbody');
+        async function loadFilms() {
+            const container = document.getElementById("filmsList");
+            container.innerHTML = "Loading...";
+            try {
+                filmsCache = (await fetchJson(api.movies)) || [];
+                await renderFilms();
+            } catch (e) {
+                container.innerHTML = "Failed to load films.";
+                console.error(e);
+            }
+        }
 
-        list.forEach((it) => {
-          const tr = document.createElement('tr');
-          tr.style.borderBottom = '1px solid rgba(255,255,255,0.03)';
-
-          const imgTd = document.createElement('td');
-          imgTd.style.width = '64px';
-          const img = document.createElement('img');
-          img.src = it.imageUrl || '/static/images/banner.png';
-          img.style.width = '48px';
-          img.style.height = '48px';
-          img.style.objectFit = 'cover';
-          img.style.borderRadius = '4px';
-          imgTd.appendChild(img);
-
-          const titleTd = document.createElement('td');
-          titleTd.textContent = it.title || '';
-
-          const typeTd = document.createElement('td');
-          typeTd.textContent = it.type === 'tv' ? 'TV Series' : 'Movie';
-
-          const yearTd = document.createElement('td');
-          yearTd.textContent = it.year || '';
-
-          const ratingTd = document.createElement('td');
-          ratingTd.textContent = it.rating != null ? it.rating.toFixed(1) : '';
-
-          const actionTd = document.createElement('td');
-          if (isExistingItem(it)) {
-            const added = document.createElement('button');
-            added.className = 'btn ghost';
-            added.textContent = 'Added';
-            added.disabled = true;
-            actionTd.appendChild(added);
-          } else {
-            const addBtn = document.createElement('button');
-            addBtn.className = 'btn';
-            addBtn.textContent = 'Add';
-            addBtn.addEventListener('click', async () => {
-              const msg = document.getElementById('tmdbMessage');
-              msg.textContent = 'Loading details...';
-              try {
-                const details = await fetchJson(`/api/movies/details?id=${encodeURIComponent(it.id)}&type=${encodeURIComponent(it.type)}`);
-                msg.textContent = '';
-                showTmdbDetailModal(details, it);
-              } catch (e) {
-                msg.textContent = 'Failed to load details: ' + e;
-              }
-            });
-            actionTd.appendChild(addBtn);
-          }
-
-          tr.appendChild(imgTd);
-          tr.appendChild(titleTd);
-          tr.appendChild(typeTd);
-          tr.appendChild(yearTd);
-          tr.appendChild(ratingTd);
-          tr.appendChild(actionTd);
-          tbody.appendChild(tr);
+        document.getElementById("filmSearch").addEventListener("input", async () => {
+            currentPage = 1;
+            try {
+                await renderFilms();
+            } catch (e) {
+                console.error("renderFilms error", e);
+            }
         });
 
-        table.appendChild(tbody);
-        container.innerHTML = '';
-        container.appendChild(table);
-        pageInfo.textContent = `Page ${tmdbPage} / ${Math.max(1, tmdbTotalPages)}`;
-      } catch (err) {
-        container.innerHTML = 'Search failed: ' + err;
-        pageInfo.textContent = '';
-      }
-    }
+        document.getElementById("refreshFilms").addEventListener("click", loadFilms);
+        document.getElementById("backfillSrcFilmBtn").addEventListener("click", backfillSrcFilmAll);
 
-    let tmdbSearchTimer = null;
-    document.getElementById("tmdbSearch").addEventListener("input", (e) => {
-      clearTimeout(tmdbSearchTimer);
-      tmdbSearchTimer = setTimeout(async () => {
-        const qRaw = (document.getElementById("tmdbSearch").value || "").trim();
-        if (!qRaw) {
-          // no query -> render cached browse results
-          renderTmdb();
-          return;
+        function renderTmdb() {
+            const container = document.getElementById("tmdbTableContainer");
+            const pageInfo = document.getElementById("tmdbPageInfo");
+            const q = (document.getElementById("tmdbSearch").value || "").toLowerCase().trim();
+
+            let list = (tmdbCache || []).slice();
+            if (q) {
+                list = list.filter((it) => (it.title || "").toLowerCase().includes(q));
+            }
+
+            container.innerHTML = "";
+            if (!list.length) {
+                container.innerHTML = "No results.";
+                pageInfo.textContent = `Page ${tmdbPage} / ${Math.max(1, tmdbTotalPages)}`;
+                return;
+            }
+
+            const table = document.createElement("table");
+            table.style.width = "100%";
+            table.style.borderCollapse = "collapse";
+            table.innerHTML = `<thead><tr style="text-align:left"><th style="width:64px"></th><th style="width:50%">Title</th><th style="width:12%">Type</th><th style="width:8%">Year</th><th style="width:8%">Rating</th><th style="width:12%"></th></tr></thead>`;
+            const tbody = document.createElement("tbody");
+
+            list.forEach((it) => {
+                const tr = document.createElement("tr");
+                tr.style.borderBottom = "1px solid rgba(255,255,255,0.03)";
+
+                const imgTd = document.createElement("td");
+                imgTd.style.width = "64px";
+                const img = document.createElement("img");
+                img.src = it.imageUrl || "/static/images/banner.png";
+                img.style.width = "48px";
+                img.style.height = "48px";
+                img.style.objectFit = "cover";
+                img.style.borderRadius = "4px";
+                imgTd.appendChild(img);
+
+                const titleTd = document.createElement("td");
+                titleTd.textContent = it.title || "";
+
+                const typeTd = document.createElement("td");
+                typeTd.textContent = it.type === "tv" ? "TV Series" : "Movie";
+
+                const yearTd = document.createElement("td");
+                yearTd.textContent = it.year || "";
+
+                const ratingTd = document.createElement("td");
+                ratingTd.textContent = it.rating != null ? it.rating.toFixed(1) : "";
+
+                const actionTd = document.createElement("td");
+                if (isExistingItem(it)) {
+                    const added = document.createElement("button");
+                    added.className = "btn ghost";
+                    added.textContent = "Added";
+                    added.disabled = true;
+                    actionTd.appendChild(added);
+                } else {
+                    const addBtn = document.createElement("button");
+                    addBtn.className = "btn";
+                    addBtn.textContent = "Add";
+                    addBtn.addEventListener("click", async () => {
+                        const msg = document.getElementById("tmdbMessage");
+                        msg.textContent = "Loading details...";
+                        try {
+                            const details = await fetchJson(
+                                `/api/movies/details?id=${encodeURIComponent(it.id)}&type=${encodeURIComponent(it.type)}`
+                            );
+                            msg.textContent = "";
+                            showTmdbDetailModal(details, it);
+                        } catch (e) {
+                            msg.textContent = "Failed to load details: " + e;
+                        }
+                    });
+                    actionTd.appendChild(addBtn);
+                }
+
+                tr.appendChild(imgTd);
+                tr.appendChild(titleTd);
+                tr.appendChild(typeTd);
+                tr.appendChild(yearTd);
+                tr.appendChild(ratingTd);
+                tr.appendChild(actionTd);
+                tbody.appendChild(tr);
+            });
+
+            table.appendChild(tbody);
+            container.appendChild(table);
+            pageInfo.textContent = `Page ${tmdbPage} / ${Math.max(1, tmdbTotalPages)}`;
         }
-        // perform paginated search starting at page 1
-        await performTmdbSearch(1);
-      }, 300);
-    });
 
-    document.getElementById("filmsPrev").addEventListener("click", async () => {
-      if (currentPage > 1) {
-        currentPage--;
-        try { await renderFilms(); } catch (e) { console.error('renderFilms error', e); }
-      }
-    });
+        const countryList = [
+            { code: "US", name: "United States" },
+            { code: "GB", name: "United Kingdom" },
+            { code: "CA", name: "Canada" },
+            { code: "AU", name: "Australia" },
+            { code: "DE", name: "Germany" },
+            { code: "FR", name: "France" },
+            { code: "JP", name: "Japan" },
+            { code: "VN", name: "Vietnam" },
+            { code: "IN", name: "India" },
+            { code: "BR", name: "Brazil" },
+        ];
 
-    document.getElementById("filmsNext").addEventListener("click", async () => {
-      const totalPages = Math.ceil(filmsCache.length / pageSize);
-      if (currentPage < totalPages) {
-        currentPage++;
-        try { await renderFilms(); } catch (e) { console.error('renderFilms error', e); }
-      }
-    });
+        async function showRegionModal(type, id, title) {
+            const listUrl = `/api/admin/movies/${encodeURIComponent(type)}/${encodeURIComponent(id)}/regions`;
+            const existing = await fetchJson(listUrl);
+            const blockedSet = new Set((existing || []).map((r) => (r.region || "").toUpperCase()));
 
-    await loadFilms();
-    // Load TMDB browse after initial films are loaded so the browse table
-    // knows which items already exist in the database.
-    try {
-      await loadTmdb();
-    } catch (e) {
-      console.error('loadTmdb failed', e);
-    }
-  })();
+            const overlay = document.createElement("div");
+            overlay.style.position = "fixed";
+            overlay.style.left = "0";
+            overlay.style.top = "0";
+            overlay.style.right = "0";
+            overlay.style.bottom = "0";
+            overlay.style.background = "rgba(0,0,0,0.6)";
+            overlay.style.display = "flex";
+            overlay.style.alignItems = "center";
+            overlay.style.justifyContent = "center";
+            overlay.style.zIndex = "10000";
+
+            const modal = document.createElement("div");
+            modal.style.background = "#111";
+            modal.style.padding = "18px";
+            modal.style.borderRadius = "10px";
+            modal.style.maxWidth = "720px";
+            modal.style.width = "90%";
+            modal.style.maxHeight = "80%";
+            modal.style.overflow = "auto";
+            modal.style.color = "white";
+
+            modal.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div style="font-weight:700">Region block for: ${title}</div>
+          <button id="closeRegionModal" class="btn ghost">Close</button>
+        </div>
+        <div id="regionGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px"></div>
+      `;
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            document.getElementById("closeRegionModal").addEventListener("click", () => overlay.remove());
+
+            const grid = modal.querySelector("#regionGrid");
+            grid.innerHTML = "";
+
+            countryList.forEach((c) => {
+                const btn = document.createElement("button");
+                btn.className = "btn ghost";
+                btn.style.display = "flex";
+                btn.style.justifyContent = "space-between";
+                btn.style.alignItems = "center";
+                btn.textContent = c.name;
+
+                const codeSpan = document.createElement("span");
+                codeSpan.style.marginLeft = "8px";
+                codeSpan.textContent = c.code;
+
+                if (blockedSet.has(c.code)) {
+                    btn.style.background = "#b91c1c";
+                    btn.style.color = "white";
+                    btn.dataset.blocked = "1";
+                } else {
+                    btn.dataset.blocked = "0";
+                }
+
+                btn.appendChild(codeSpan);
+
+                btn.addEventListener("click", async () => {
+                    try {
+                        const toggleUrl = `/api/admin/movies/${encodeURIComponent(type)}/${encodeURIComponent(
+                            id
+                        )}/regions/${encodeURIComponent(c.code)}`;
+                        await fetchJson(toggleUrl, { method: "PUT" });
+
+                        if (btn.dataset.blocked === "1") {
+                            btn.dataset.blocked = "0";
+                            btn.style.background = "";
+                            btn.style.color = "";
+                        } else {
+                            btn.dataset.blocked = "1";
+                            btn.style.background = "#b91c1c";
+                            btn.style.color = "white";
+                        }
+                    } catch (err) {
+                        alert("Failed to toggle region: " + err);
+                    }
+                });
+
+                grid.appendChild(btn);
+            });
+        }
+
+        async function loadTmdb() {
+            const msg = document.getElementById("tmdbMessage");
+            msg.textContent = "Loading TMDB...";
+            const type = document.getElementById("tmdbBrowseType").value || "all";
+
+            try {
+                const resp = await fetchJson(`/api/movies/trending?type=${encodeURIComponent(type)}&page=${tmdbPage}`);
+                tmdbCache = resp.items || [];
+                tmdbTotalPages = resp.totalPages || 1;
+                msg.textContent = "";
+                updateExistingSet();
+                renderTmdb();
+            } catch (e) {
+                msg.textContent = "Failed to load TMDB: " + e;
+                console.error(e);
+            }
+        }
+
+        async function showTmdbDetailModal(details, item) {
+            const tmdbImageBase = (window.adminApi && window.adminApi.tmdbImageBase) || "https://image.tmdb.org/t/p/w500";
+
+            const overlay = document.createElement("div");
+            overlay.style.position = "fixed";
+            overlay.style.left = "0";
+            overlay.style.top = "0";
+            overlay.style.right = "0";
+            overlay.style.bottom = "0";
+            overlay.style.background = "rgba(0,0,0,0.6)";
+            overlay.style.display = "flex";
+            overlay.style.alignItems = "center";
+            overlay.style.justifyContent = "center";
+            overlay.style.zIndex = "9999";
+
+            const modal = document.createElement("div");
+            modal.style.background = "#111";
+            modal.style.padding = "18px";
+            modal.style.borderRadius = "10px";
+            modal.style.maxWidth = "820px";
+            modal.style.width = "90%";
+            modal.style.maxHeight = "85%";
+            modal.style.overflow = "auto";
+            modal.style.color = "white";
+
+            let genres = [];
+            if (Array.isArray(details.genres)) {
+                genres = details.genres.map((g) => g.name).filter(Boolean);
+            }
+
+            let cast = [];
+            try {
+                const credits = details.credits || {};
+                if (Array.isArray(credits.cast)) {
+                    cast = credits.cast.slice(0, 8).map((c) => ({ name: c.name, character: c.character }));
+                }
+            } catch (ignored) {}
+
+            const title = details.title || details.name || item.title || "";
+            const overview = details.overview || "";
+            const runtime = details.runtime || (Array.isArray(details.episode_run_time) && details.episode_run_time[0]) || "";
+            const year =
+                (details.release_date && details.release_date.slice(0, 4)) ||
+                (details.first_air_date && details.first_air_date.slice(0, 4)) ||
+                "";
+
+            const posterSrc = details.poster_path
+                ? details.poster_path.startsWith("http")
+                    ? details.poster_path
+                    : tmdbImageBase + details.poster_path
+                : "/static/images/banner.png";
+
+            modal.innerHTML = `
+        <div style="display:flex; gap:12px; align-items:flex-start">
+          <img src="${posterSrc}" alt="poster" style="width:140px; height:210px; object-fit:cover; border-radius:6px" />
+          <div style="flex:1">
+            <h3 style="margin:0 0 8px 0">${title} ${year ? `(${year})` : ""}</h3>
+            <div class="muted">${item.type === "tv" ? "TV Series" : "Movie"} · ${
+                details.vote_average
+                    ? "★ " + (typeof details.vote_average.toFixed === "function" ? details.vote_average.toFixed(1) : details.vote_average)
+                    : ""
+            } ${runtime ? "· " + runtime + " min" : ""}</div>
+            <div style="margin-top:8px">
+              ${overview ? `<div style="margin-bottom:8px">${overview}</div>` : ""}
+              ${genres.length ? `<div class="muted">Genres: ${genres.join(", ")}</div>` : ""}
+            </div>
+            <div style="margin-top:10px">
+              ${cast.length ? `<div style="font-weight:600; margin-bottom:6px">Top cast</div>` : ""}
+              ${cast.map((c) => `<div class="muted">${c.name}${c.character ? " as " + c.character : ""}</div>`).join("")}
+            </div>
+            ${item.type === "tv" ? `<div id="tvEpisodesPanel" style="margin-top:10px"></div>` : ""}
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:14px">
+          <button id="tmdbCancel" class="btn ghost">Cancel</button>
+          <button id="tmdbConfirm" class="btn">Add this movie</button>
+        </div>
+      `;
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            function close() {
+                overlay.remove();
+            }
+
+            document.getElementById("tmdbCancel").addEventListener("click", close);
+
+            const confirmBtn = document.getElementById("tmdbConfirm");
+            try {
+                if (isExistingItem(item)) {
+                    confirmBtn.textContent = "Added";
+                    confirmBtn.className = "btn ghost";
+                    confirmBtn.disabled = true;
+                } else {
+                    confirmBtn.addEventListener("click", async () => {
+                        const msg = document.getElementById("tmdbMessage");
+                        msg.textContent = "Adding...";
+                        try {
+                            await fetchJson(api.movies + "/import", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ tmdbId: item.id, type: item.type }),
+                            });
+
+                            msg.textContent = "Added successfully.";
+                            await loadFilms();
+                            updateExistingSet();
+
+                            const qRaw = (document.getElementById("tmdbSearch").value || "").trim();
+                            if (qRaw) {
+                                await performTmdbSearch(tmdbPage);
+                            } else {
+                                await loadTmdb();
+                            }
+
+                            refreshCounts();
+                            close();
+                        } catch (e) {
+                            msg.textContent = "Add failed: " + e;
+                        }
+                    });
+                }
+            } catch (ignored) {}
+
+            try {
+                if (item.type === "tv" && Array.isArray(details.seasons)) {
+                    const panel = document.getElementById("tvEpisodesPanel");
+                    panel.innerHTML = "";
+
+                    let backendSeasons = [];
+                    if (item.id) {
+                        try {
+                            backendSeasons = await fetchJson(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons`);
+                        } catch (e) {
+                            console.warn("failed to fetch backend seasons", e);
+                        }
+                    }
+
+                    const backendMap = {};
+                    backendSeasons.forEach((s) => {
+                        backendMap[s.seasonNumber] = {};
+                        (s.episodes || []).forEach((ep) => {
+                            backendMap[s.seasonNumber][ep.episodeNumber] = ep;
+                        });
+                    });
+
+                    const addAllShowBtnId = "addall-show-" + item.id;
+                    const topControls = document.createElement("div");
+                    topControls.style.display = "flex";
+                    topControls.style.gap = "8px";
+                    topControls.style.marginBottom = "8px";
+                    topControls.innerHTML = `<button id="${addAllShowBtnId}" class="btn ghost">Add all episodes in show</button><span class="muted" style="align-self:center">Use with caution for large shows</span>`;
+                    panel.appendChild(topControls);
+
+                    for (let _idx = 0; _idx < details.seasons.length; _idx++) {
+                        const s = details.seasons[_idx];
+                        const snRaw = s.season_number || s.seasonNumber || s.season;
+
+                        let seasonNumber = parseInt(snRaw, 10);
+                        if (isNaN(seasonNumber)) {
+                            const nameToInspect = String(s.name || snRaw || "");
+                            const m = nameToInspect.match(/(\d+)/);
+                            if (m) {
+                                seasonNumber = parseInt(m[1], 10);
+                            } else if (s.name && nameToInspect.toLowerCase().includes("special")) {
+                                seasonNumber = 0;
+                            } else {
+                                seasonNumber = _idx + 1;
+                            }
+                        }
+
+                        const sTitle = s.name || `Season ${snRaw}`;
+                        const seasonDiv = document.createElement("div");
+                        seasonDiv.style.marginTop = "8px";
+
+                        const epCount = s.episode_count || s.episodeCount || 10;
+                        seasonDiv.innerHTML = `
+              <div style="display:flex; align-items:center; justify-content:space-between">
+                <div style="font-weight:600">${sTitle}</div>
+                <div style="display:flex; gap:8px; align-items:center">
+                  <span class="muted">Episodes: ${epCount}</span>
+                  <button id="list-season-${seasonNumber}" class="btn ghost">List</button>
+                  <button id="addall-season-${seasonNumber}" class="btn">Add all season</button>
+                </div>
+              </div>
+              <div class="muted" id="season-${seasonNumber}-episodes" style="display:none; margin-top:6px"></div>
+            `;
+                        panel.appendChild(seasonDiv);
+
+                        (function (seasonNumber, epCount) {
+                            document.getElementById(`list-season-${seasonNumber}`).addEventListener("click", async function onList() {
+                                const epContainer = document.getElementById(`season-${seasonNumber}-episodes`);
+                                if (!epContainer) return;
+
+                                if (epContainer.style.display === "none" || !epContainer.innerHTML.trim()) {
+                                    epContainer.style.display = "block";
+                                    epContainer.innerHTML = "";
+
+                                    let existing = [];
+                                    try {
+                                        existing = await fetchJson(
+                                            `/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(
+                                                seasonNumber
+                                            )}/episodes/existing`
+                                        );
+                                    } catch (e) {}
+
+                                    for (let e = 1; e <= Math.min(epCount, 200); e++) {
+                                        const epBtn = document.createElement("div");
+                                        epBtn.style.display = "flex";
+                                        epBtn.style.justifyContent = "space-between";
+                                        epBtn.style.gap = "8px";
+                                        epBtn.style.marginTop = "6px";
+
+                                        const left = document.createElement("div");
+                                        left.className = "muted";
+                                        left.textContent = "Episode " + e;
+
+                                        const right = document.createElement("div");
+                                        right.style.display = "flex";
+                                        right.style.gap = "8px";
+                                        right.style.flexWrap = "wrap";
+
+                                        const already = Array.isArray(existing) && existing.includes(e);
+
+                                        if (!already) {
+                                            const addBtn = document.createElement("button");
+                                            addBtn.className = "btn";
+                                            addBtn.textContent = "Add episode";
+                                            addBtn.addEventListener("click", async () => {
+                                                const msg = document.getElementById("tmdbMessage");
+                                                msg.textContent = "Adding episode...";
+                                                try {
+                                                    await fetchJson(
+                                                        `/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(
+                                                            seasonNumber
+                                                        )}/episodes/${encodeURIComponent(e)}/import`,
+                                                        { method: "POST" }
+                                                    );
+                                                    msg.textContent = "Episode added.";
+                                                    addBtn.textContent = "Added";
+                                                    addBtn.className = "btn ghost";
+                                                    addBtn.disabled = true;
+                                                    await loadFilms();
+                                                    refreshCounts();
+                                                } catch (err) {
+                                                    msg.textContent = "Add episode failed: " + err;
+                                                }
+                                            });
+                                            right.appendChild(addBtn);
+                                        } else {
+                                            const epInfo = backendMap[seasonNumber] && backendMap[seasonNumber][e];
+
+                                            const trailerBtn = document.createElement("button");
+                                            trailerBtn.className = "btn ghost";
+                                            trailerBtn.textContent = epInfo && epInfo.src ? "Edit trailer" : "Set trailer";
+                                            trailerBtn.addEventListener("click", async () => {
+                                                const current = (epInfo && epInfo.src) || "";
+                                                const input = prompt("Enter episode trailer URL:", current);
+                                                if (input === null) return;
+                                                try {
+                                                    await fetchJson(
+                                                        `/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(
+                                                            seasonNumber
+                                                        )}/episodes/${encodeURIComponent(e)}/trailer`,
+                                                        {
+                                                            method: "PUT",
+                                                            headers: { "Content-Type": "application/json" },
+                                                            body: JSON.stringify({ src: input.trim() || null }),
+                                                        }
+                                                    );
+                                                    alert("Trailer updated.");
+                                                    trailerBtn.textContent = input.trim() ? "Edit trailer" : "Set trailer";
+                                                } catch (err) {
+                                                    alert("Save trailer failed: " + err);
+                                                }
+                                            });
+                                            right.appendChild(trailerBtn);
+
+                                            const publishBtn = document.createElement("button");
+                                            publishBtn.className = "btn ghost";
+                                            publishBtn.textContent = epInfo && epInfo.published ? "Unpublish" : "Publish";
+                                            publishBtn.addEventListener("click", async () => {
+                                                try {
+                                                    await fetchJson(
+                                                        `/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(
+                                                            seasonNumber
+                                                        )}/episodes/${encodeURIComponent(e)}/publish`,
+                                                        { method: "PUT" }
+                                                    );
+                                                    alert("Episode " + (epInfo && epInfo.published ? "unpublished" : "published") + ".");
+                                                    publishBtn.textContent = epInfo && epInfo.published ? "Publish" : "Unpublish";
+                                                    epInfo.published = !(epInfo && epInfo.published);
+                                                } catch (err) {
+                                                    alert("Toggle publish failed: " + err);
+                                                }
+                                            });
+                                            right.appendChild(publishBtn);
+
+                                            const uploadSourceBtn = document.createElement("button");
+                                            uploadSourceBtn.className = "btn ghost";
+                                            uploadSourceBtn.textContent = "Upload source";
+                                            uploadSourceBtn.addEventListener("click", async () => {
+                                                await uploadEpisodeSource(item.id, seasonNumber, e);
+                                            });
+                                            right.appendChild(uploadSourceBtn);
+                                        }
+
+                                        epBtn.appendChild(left);
+                                        epBtn.appendChild(right);
+                                        epContainer.appendChild(epBtn);
+                                    }
+                                } else {
+                                    epContainer.style.display = "none";
+                                }
+                            });
+
+                            document.getElementById(`addall-season-${seasonNumber}`).addEventListener("click", async function () {
+                                if (!confirm(`Add all episodes (${Math.min(epCount, 200)} items) for season ${seasonNumber}?`)) return;
+
+                                const msg = document.getElementById("tmdbMessage");
+                                msg.textContent = "Adding all episodes...";
+
+                                let existing = [];
+                                try {
+                                    existing = await fetchJson(
+                                        `/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(
+                                            seasonNumber
+                                        )}/episodes/existing`
+                                    );
+                                } catch (e) {}
+
+                                for (let e = 1; e <= Math.min(epCount, 200); e++) {
+                                    if (Array.isArray(existing) && existing.includes(e)) continue;
+                                    try {
+                                        await fetchJson(
+                                            `/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(
+                                                seasonNumber
+                                            )}/episodes/${encodeURIComponent(e)}/import`,
+                                            { method: "POST" }
+                                        );
+                                        msg.textContent = `Added episode ${e}`;
+                                    } catch (err) {
+                                        console.warn("add-all error for episode", e, err);
+                                    }
+                                }
+
+                                msg.textContent = "Add-all completed.";
+                                await loadFilms();
+                                refreshCounts();
+                            });
+                        })(seasonNumber, epCount);
+                    }
+
+                    document.getElementById(addAllShowBtnId).addEventListener("click", async function () {
+                        if (!confirm("Add all episodes in this show? This will iterate every season and may be large. Proceed?")) return;
+
+                        const msg = document.getElementById("tmdbMessage");
+                        msg.textContent = "Adding all episodes in show...";
+
+                        for (let _idx2 = 0; _idx2 < details.seasons.length; _idx2++) {
+                            const s2 = details.seasons[_idx2];
+                            const snRaw2 = s2.season_number || s2.seasonNumber || s2.season;
+
+                            let seasonNumber2 = parseInt(snRaw2, 10);
+                            if (isNaN(seasonNumber2)) {
+                                const nameToInspect = String(s2.name || snRaw2 || "");
+                                const m = nameToInspect.match(/(\d+)/);
+                                if (m) seasonNumber2 = parseInt(m[1], 10);
+                                else if (s2.name && nameToInspect.toLowerCase().includes("special")) seasonNumber2 = 0;
+                                else seasonNumber2 = _idx2 + 1;
+                            }
+
+                            const epCount2 = s2.episode_count || s2.episodeCount || 10;
+                            for (let e2 = 1; e2 <= Math.min(epCount2, 200); e2++) {
+                                try {
+                                    await fetchJson(
+                                        `/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(
+                                            seasonNumber2
+                                        )}/episodes/${encodeURIComponent(e2)}/import`,
+                                        { method: "POST" }
+                                    );
+                                } catch (err) {
+                                    console.warn("add-all-show error", seasonNumber2, e2, err);
+                                }
+                            }
+                        }
+
+                        msg.textContent = "Add-all show completed.";
+                        await loadFilms();
+                        refreshCounts();
+                    });
+                }
+            } catch (ignored) {}
+        }
+
+        async function performTmdbSearch(page) {
+            const qRaw = (document.getElementById("tmdbSearch").value || "").trim();
+            const container = document.getElementById("tmdbTableContainer");
+            const pageInfo = document.getElementById("tmdbPageInfo");
+
+            if (!qRaw) {
+                renderTmdb();
+                return;
+            }
+
+            container.innerHTML = "Searching TMDB...";
+
+            try {
+                const resp = await fetchJson(
+                    `/api/movies/search?q=${encodeURIComponent(qRaw)}&type=${encodeURIComponent(
+                        document.getElementById("tmdbBrowseType").value || "all"
+                    )}&page=${encodeURIComponent(page || 1)}`
+                );
+
+                const list = resp.items || [];
+                tmdbPage = resp.page || page || 1;
+                tmdbTotalPages = resp.totalPages || 1;
+                tmdbCache = list.slice();
+
+                if (!list.length) {
+                    container.innerHTML = "No results.";
+                    pageInfo.textContent = "";
+                    return;
+                }
+
+                const table = document.createElement("table");
+                table.style.width = "100%";
+                table.style.borderCollapse = "collapse";
+                table.innerHTML = `<thead><tr style="text-align:left"><th style="width:64px"></th><th style="width:50%">Title</th><th style="width:12%">Type</th><th style="width:8%">Year</th><th style="width:8%">Rating</th><th style="width:12%"></th></tr></thead>`;
+                const tbody = document.createElement("tbody");
+
+                list.forEach((it) => {
+                    const tr = document.createElement("tr");
+                    tr.style.borderBottom = "1px solid rgba(255,255,255,0.03)";
+
+                    const imgTd = document.createElement("td");
+                    imgTd.style.width = "64px";
+                    const img = document.createElement("img");
+                    img.src = it.imageUrl || "/static/images/banner.png";
+                    img.style.width = "48px";
+                    img.style.height = "48px";
+                    img.style.objectFit = "cover";
+                    img.style.borderRadius = "4px";
+                    imgTd.appendChild(img);
+
+                    const titleTd = document.createElement("td");
+                    titleTd.textContent = it.title || "";
+
+                    const typeTd = document.createElement("td");
+                    typeTd.textContent = it.type === "tv" ? "TV Series" : "Movie";
+
+                    const yearTd = document.createElement("td");
+                    yearTd.textContent = it.year || "";
+
+                    const ratingTd = document.createElement("td");
+                    ratingTd.textContent = it.rating != null ? it.rating.toFixed(1) : "";
+
+                    const actionTd = document.createElement("td");
+                    if (isExistingItem(it)) {
+                        const added = document.createElement("button");
+                        added.className = "btn ghost";
+                        added.textContent = "Added";
+                        added.disabled = true;
+                        actionTd.appendChild(added);
+                    } else {
+                        const addBtn = document.createElement("button");
+                        addBtn.className = "btn";
+                        addBtn.textContent = "Add";
+                        addBtn.addEventListener("click", async () => {
+                            const msg = document.getElementById("tmdbMessage");
+                            msg.textContent = "Loading details...";
+                            try {
+                                const details = await fetchJson(
+                                    `/api/movies/details?id=${encodeURIComponent(it.id)}&type=${encodeURIComponent(it.type)}`
+                                );
+                                msg.textContent = "";
+                                showTmdbDetailModal(details, it);
+                            } catch (e) {
+                                msg.textContent = "Failed to load details: " + e;
+                            }
+                        });
+                        actionTd.appendChild(addBtn);
+                    }
+
+                    tr.appendChild(imgTd);
+                    tr.appendChild(titleTd);
+                    tr.appendChild(typeTd);
+                    tr.appendChild(yearTd);
+                    tr.appendChild(ratingTd);
+                    tr.appendChild(actionTd);
+                    tbody.appendChild(tr);
+                });
+
+                table.appendChild(tbody);
+                container.innerHTML = "";
+                container.appendChild(table);
+                pageInfo.textContent = `Page ${tmdbPage} / ${Math.max(1, tmdbTotalPages)}`;
+            } catch (err) {
+                container.innerHTML = "Search failed: " + err;
+                pageInfo.textContent = "";
+            }
+        }
+
+        document.getElementById("tmdbReload").addEventListener("click", async () => {
+            tmdbPage = 1;
+            const qRaw = (document.getElementById("tmdbSearch").value || "").trim();
+            if (qRaw) await performTmdbSearch(1);
+            else await loadTmdb();
+        });
+
+        document.getElementById("tmdbPrev").addEventListener("click", async () => {
+            if (tmdbPage > 1) {
+                tmdbPage--;
+                const qRaw = (document.getElementById("tmdbSearch").value || "").trim();
+                if (qRaw) await performTmdbSearch(tmdbPage);
+                else await loadTmdb();
+            }
+        });
+
+        document.getElementById("tmdbNext").addEventListener("click", async () => {
+            if (tmdbPage < tmdbTotalPages) {
+                tmdbPage++;
+                const qRaw = (document.getElementById("tmdbSearch").value || "").trim();
+                if (qRaw) await performTmdbSearch(tmdbPage);
+                else await loadTmdb();
+            }
+        });
+
+        document.getElementById("tmdbBrowseType").addEventListener("change", async () => {
+            tmdbPage = 1;
+            await loadTmdb();
+        });
+
+        let tmdbSearchTimer = null;
+        document.getElementById("tmdbSearch").addEventListener("input", () => {
+            clearTimeout(tmdbSearchTimer);
+            tmdbSearchTimer = setTimeout(async () => {
+                const qRaw = (document.getElementById("tmdbSearch").value || "").trim();
+                if (!qRaw) {
+                    renderTmdb();
+                    return;
+                }
+                await performTmdbSearch(1);
+            }, 300);
+        });
+
+        document.getElementById("filmsPrev").addEventListener("click", async () => {
+            if (currentPage > 1) {
+                currentPage--;
+                try {
+                    await renderFilms();
+                } catch (e) {
+                    console.error("renderFilms error", e);
+                }
+            }
+        });
+
+        document.getElementById("filmsNext").addEventListener("click", async () => {
+            const totalPages = Math.max(1, Math.ceil(getFilteredFilms().length / pageSize));
+            if (currentPage < totalPages) {
+                currentPage++;
+                try {
+                    await renderFilms();
+                } catch (e) {
+                    console.error("renderFilms error", e);
+                }
+            }
+        });
+
+        await loadFilms();
+        try {
+            await loadTmdb();
+        } catch (e) {
+            console.error("loadTmdb failed", e);
+        }
+    })();
 </script>

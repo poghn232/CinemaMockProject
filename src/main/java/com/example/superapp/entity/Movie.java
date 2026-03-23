@@ -59,6 +59,9 @@ public class Movie {
 
     private String src;
 
+    @Column(name = "src_film")
+    private String srcFilm;
+
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MovieRegionBlock> regionBlocks = new HashSet<>();
     public Set<MovieRegionBlock> getRegionBlocks() {

@@ -21,6 +21,7 @@ public class AdminMovieDto {
         this.src = src;
     }
 
+
     public Long getId() {
         return id;
     }

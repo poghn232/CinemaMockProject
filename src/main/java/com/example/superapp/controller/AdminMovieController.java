@@ -1,6 +1,7 @@
 package com.example.superapp.controller;
 
 import com.example.superapp.dto.AdminMovieDto;
+import com.example.superapp.dto.VideoAssetDto;
 import com.example.superapp.service.AdminMovieService;
 import com.example.superapp.entity.TvSeries;
 import com.example.superapp.entity.Season;
@@ -8,9 +9,12 @@ import com.example.superapp.entity.Episode;
 import com.example.superapp.repository.TvSeriesRepository;
 import com.example.superapp.repository.SeasonRepository;
 import com.example.superapp.repository.EpisodeRepository;
+import com.example.superapp.service.VideoAssetService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +30,7 @@ public class AdminMovieController {
     private final TvSeriesRepository tvSeriesRepository;
     private final SeasonRepository seasonRepository;
     private final EpisodeRepository episodeRepository;
+    private final VideoAssetService videoAssetService;
 
     @GetMapping
     public List<AdminMovieDto> list(@RequestParam(name = "q", required = false) String query) {
@@ -40,7 +45,13 @@ public class AdminMovieController {
 
     @PostMapping("/import")
     public AdminMovieDto importMovie(@RequestBody ImportRequest request) {
-        return adminMovieService.importFromTmdb(request.getTmdbId(), request.getType());
+        AdminMovieDto dto = adminMovieService.importFromTmdb(request.getTmdbId(), request.getType());
+
+        if ("movie".equalsIgnoreCase(request.getType())) {
+            videoAssetService.syncExistingPlaybackFromR2("movie", request.getTmdbId());
+        }
+
+        return dto;
     }
 
     @PutMapping("/{type}/{id}/hide")
@@ -57,7 +68,21 @@ public class AdminMovieController {
     public AdminMovieDto importEpisode(@PathVariable("tvId") long tvId,
                                        @PathVariable("seasonNumber") int seasonNumber,
                                        @PathVariable("episodeNumber") int episodeNumber) {
-        return adminMovieService.importEpisodeFromTmdb(tvId, seasonNumber, episodeNumber);
+        AdminMovieDto dto = adminMovieService.importEpisodeFromTmdb(tvId, seasonNumber, episodeNumber);
+
+        Season season = seasonRepository.findByTvSeriesId(tvId).stream()
+                .filter(s -> s.getSeasonNumber() != null && s.getSeasonNumber() == seasonNumber)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Season not found"));
+
+        Episode episode = episodeRepository.findBySeasonId(season.getId()).stream()
+                .filter(e -> e.getEpisodeNumber() != null && e.getEpisodeNumber() == episodeNumber)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Episode not found"));
+
+        videoAssetService.syncExistingPlaybackFromR2("tv_episode", episode.getId());
+
+        return dto;
     }
 
     @GetMapping("/tv/{tvId}/seasons/{seasonNumber}/episodes/existing")
@@ -119,6 +144,84 @@ public class AdminMovieController {
                                   @PathVariable("episodeNumber") int episodeNumber,
                                   @RequestBody TrailerRequest request) {
         adminMovieService.setEpisodeTrailer(tvId, seasonNumber, episodeNumber, request.getSrc());
+    }
+
+    @PostMapping("/{type}/{id}/source")
+    public ResponseEntity<VideoAssetDto> uploadSource(@PathVariable("type") String type,
+                                                      @PathVariable("id") long id,
+                                                      @RequestParam("file") MultipartFile file) {
+        String ownerType = resolveOwnerType(type);
+        VideoAssetDto dto = videoAssetService.uploadSource(ownerType, id, file);
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/{type}/{id}/source/latest")
+    public ResponseEntity<VideoAssetDto> getLatestSource(@PathVariable("type") String type,
+                                                         @PathVariable("id") long id) {
+        String ownerType = resolveOwnerType(type);
+        return ResponseEntity.ok(videoAssetService.getLatestAsset(ownerType, id));
+    }
+
+    private String resolveOwnerType(String type) {
+        String t = type == null ? "" : type.trim().toLowerCase();
+        if ("movie".equals(t)) return "movie";
+        if ("tv".equals(t)) return "tv";
+        throw new IllegalArgumentException("type must be 'movie' or 'tv'");
+    }
+
+    @PostMapping("/tv/{tvId}/seasons/{seasonNumber}/episodes/{episodeNumber}/source")
+    public ResponseEntity<VideoAssetDto> uploadEpisodeSource(@PathVariable("tvId") long tvId,
+                                                             @PathVariable("seasonNumber") int seasonNumber,
+                                                             @PathVariable("episodeNumber") int episodeNumber,
+                                                             @RequestParam("file") MultipartFile file) {
+        TvSeries tv = tvSeriesRepository.findById(tvId)
+                .orElseThrow(() -> new IllegalArgumentException("TV series not found"));
+
+        Season season = seasonRepository.findByTvSeriesId(tv.getId()).stream()
+                .filter(s -> s.getSeasonNumber() != null && s.getSeasonNumber() == seasonNumber)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Season not found"));
+
+        Episode episode = episodeRepository.findBySeasonId(season.getId()).stream()
+                .filter(e -> e.getEpisodeNumber() != null && e.getEpisodeNumber() == episodeNumber)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Episode not found"));
+
+        VideoAssetDto dto = videoAssetService.uploadSource("tv_episode", episode.getId(), file);
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/tv/{tvId}/seasons/{seasonNumber}/episodes/{episodeNumber}/source/latest")
+    public ResponseEntity<VideoAssetDto> getLatestEpisodeSource(@PathVariable("tvId") long tvId,
+                                                                @PathVariable("seasonNumber") int seasonNumber,
+                                                                @PathVariable("episodeNumber") int episodeNumber) {
+        TvSeries tv = tvSeriesRepository.findById(tvId)
+                .orElseThrow(() -> new IllegalArgumentException("TV series not found"));
+
+        Season season = seasonRepository.findByTvSeriesId(tv.getId()).stream()
+                .filter(s -> s.getSeasonNumber() != null && s.getSeasonNumber() == seasonNumber)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Season not found"));
+
+        Episode episode = episodeRepository.findBySeasonId(season.getId()).stream()
+                .filter(e -> e.getEpisodeNumber() != null && e.getEpisodeNumber() == episodeNumber)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Episode not found"));
+
+        return ResponseEntity.ok(videoAssetService.getLatestAsset("tv_episode", episode.getId()));
+    }
+
+    @PostMapping("/backfill/src-film")
+    public ResponseEntity<Map<String, Object>> backfillSrcFilm() {
+        int moviesUpdated = videoAssetService.backfillMovieSrcFilmFromR2();
+        int episodesUpdated = videoAssetService.backfillEpisodeSrcFilmFromR2();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("moviesUpdated", moviesUpdated);
+        result.put("episodesUpdated", episodesUpdated);
+        result.put("message", "Backfill completed");
+
+        return ResponseEntity.ok(result);
     }
 
     @Data
