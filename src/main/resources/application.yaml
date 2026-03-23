@@ -1,4 +1,6 @@
 ﻿spring:
+  config:
+    import: optional:file:.env[.properties]
   datasource:
     url: jdbc:mysql://localhost:3306/mock_project_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Ho_Chi_Minh
     username: root
@@ -36,6 +38,11 @@
 server:
   port: 8080
 
+groq:
+  api-key-1: ${GROQ_API_KEY_1}
+  api-key-2: ${GROQ_API_KEY_2}
+  api-key-3: ${GROQ_API_KEY_3}
+
 vnpay:
   tmnCode: PYRHRA8O
   hashSecret: T2HWSMBX62REMQHPNCAPUVT8HTG3ISCX
@@ -51,5 +58,19 @@ tmdb:
 google:
   client-id: 849376005522-l2oe13172l2o9dklrqstm6i5mmcahukg.apps.googleusercontent.com
 
+app:
+  video:
+    upload-dir: ${VIDEO_UPLOAD_DIR}
+    work-dir: ${VIDEO_WORK_DIR}
+    ffmpeg-path: ${FFMPEG_PATH}
+    public-base-url: ${R2_PUBLIC_BASE_URL}
+    hls-segment-seconds: 6
 
+cloudflare:
+  r2:
+    account-id: ${CLOUDFLARE_R2_ACCOUNT_ID}
+    access-key: ${CLOUDFLARE_R2_ACCESS_KEY}
+    secret-key: ${CLOUDFLARE_R2_SECRET_KEY}
+    bucket: ${CLOUDFLARE_R2_BUCKET}
+    public-base-url: ${R2_PUBLIC_BASE_URL}
 
