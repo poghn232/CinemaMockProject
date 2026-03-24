@@ -2490,7 +2490,7 @@
         }
 
         try {
-          const token = getSanitizedToken();
+          const token = localStorage.getItem('token');
           const headers = token ? { Authorization: 'Bearer ' + token } : {};
           const moviesPromise = fetch(`/api/public/movies/search?q=${encodeURIComponent(query)}&type=all&page=1`, { headers });
           const peoplePromise = fetch(`/api/public/people/page?page=1&q=${encodeURIComponent(query)}`, { headers });
