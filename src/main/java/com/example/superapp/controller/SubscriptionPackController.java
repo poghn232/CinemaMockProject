@@ -63,4 +63,8 @@ public class SubscriptionPackController {
         adminLogsService.saveLog(new AdminLogs(saved + " is deleted from database"));
 
     }
+
+    //--------------- Profile pack controller --------------------//
+
+
 }

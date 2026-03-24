@@ -52,7 +52,7 @@ public class SecurityConfig {
                     "/movie-detail.html", "/movie-trailer.html", "/movie-watch.html",
                     "/packs.html", "/contact.html", "/detect-region.html",
                     "/index.html", "/admin.html", "/profile.html",
-                    "/choose_profile.html",
+                    "/choose_profile.html", "/add_profile.html",
                     "/css/**", "/js/**", "/images/**",
                     "/api/auth/**",
                     "/api/movies/**", "/api/contact",

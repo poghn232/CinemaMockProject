@@ -1,4 +1,4 @@
-(function () {
+( async function () {
 document.head.insertAdjacentHTML("beforeend", `
   <style>
     .banner-ad-wrapper { position: fixed; z-index: 9999; }
@@ -22,14 +22,14 @@ document.head.insertAdjacentHTML("beforeend", `
 const elementIds = ["botRowAd", "leftColAd", "rightColAd"];
 const token = localStorage.getItem("token");
 
-fetch("/api/banner", {
+await fetch("/api/banner", {
     headers: {
         "Authorization": `Bearer ${token}`
     }
 })
-    .then(res => res.json())
+    .then(async res => await res.json())
     .then(banners => {
-        banners.forEach((banner, index) => {
+        banners.forEach(async (banner, index) => {
             const elementId = elementIds[index];
 
             const wrapper = document.createElement("div");
@@ -46,12 +46,12 @@ fetch("/api/banner", {
             img.alt = "advertisement";
 
             // Fetch ảnh kèm token
-            fetch(`/api/image/${banner.id}`, {
+            await fetch(`/api/image/${banner.id}`, {
                 headers: {
                     "Authorization": `Bearer ${token}`
                 }
             })
-                .then(res => res.blob())
+                .then(async res => await res.blob())
                 .then(blob => {
                     img.src = URL.createObjectURL(blob);
                 });

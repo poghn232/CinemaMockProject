@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+    .error {
+        color: #fca5a5;
+        margin-top: 10px;
+        font-size: 12px;
+        min-height: 16px;
+    }
+</style>
+<body>
+<label for="profileName">
+    <input id="profileName" type="text">
+</label>
+
+<button type="button" id="submitBtn">Add New Profile</button>
+
+<p id="error" class="error"></p>
+
+<p id="result"></p>
+</body>
+<script>
+    clearError();
+    const btn = document.getElementById("submitBtn");
+    const result = document.getElementById("result");
+    btn.addEventListener("click", async () => {
+        const profileName = document.getElementById("profileName").value.trim();
+        if (!profileName) {
+            showError("profileName is empty/null, request failed")
+            return;
+        }
+        const response = await fetch("api/profiles/add", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
+            body: JSON.stringify(
+                {
+                    profileId: null,
+                    profileName: profileName,
+                    username: localStorage.getItem("username")
+                }
+            )
+        })
+
+        const data = await response.json();
+        if (!data) {
+            console.log("/add in ProfileController returned null")
+        }
+        result.textContent = data.textContent;
+        window.location.href = "/choose_profile.html";
+    });
+
+    function showError(msg) {
+        document.getElementById("error").innerText = msg;
+    }
+
+    function clearError() {
+        document.getElementById("error").innerText = "";
+    }
+</script>
+</html>

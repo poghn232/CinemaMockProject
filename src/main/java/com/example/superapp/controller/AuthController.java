@@ -124,6 +124,7 @@ public class AuthController {
 
         // Find existing user by googleId or email, or create a new one
         User user = userRepository.findByEmail(email).orElseGet(() -> {
+            //default profile
             Profile defaultProfile = Profile.builder().profileName("default").build();
             List<Profile> profiles = new ArrayList<>();
             profiles.add(defaultProfile);
@@ -147,7 +148,6 @@ public class AuthController {
             user.setGoogleId(googleId);
             userRepository.save(user);
         }
-
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
 
         String clientIp = IpUtil.getClientIp(httpRequest);
@@ -161,6 +161,7 @@ public class AuthController {
                                  .orElse("ROLE_CUSTOMER");
 
         LoginResponse resp = new LoginResponse(jwt);
+        resp.setUsername(user.getUsername());
         resp.setRole(role);
         resp.setRegion(region);
 

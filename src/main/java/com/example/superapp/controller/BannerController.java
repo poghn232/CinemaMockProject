@@ -35,6 +35,7 @@ public class BannerController {
 
     @GetMapping("/api/image/{id}")
     public ResponseEntity<byte[]> retrieveImage(@PathVariable int id, @AuthenticationPrincipal UserDetails userDetails) {
+        System.out.println("Called retrieve image");
         if (userDetails != null) {
             List<Subscription> subs = userService.getUserByUsername(userDetails.getUsername()).getSubscriptions();
             if (!subs.isEmpty()) {
@@ -54,14 +55,17 @@ public class BannerController {
 
     @GetMapping("/api/banner")
     public ResponseEntity<List<Map<String, Object>>> retrieveAllBanners(@AuthenticationPrincipal UserDetails userDetails) {
-
+        System.out.println("Called retrieve banner");
         if (userDetails != null) {
             List<Subscription> subs = userService.getUserByUsername(userDetails.getUsername()).getSubscriptions();
             if (!subs.isEmpty()) {
                 List<Subscription> activeSubs = subs.stream()
                                                     .filter(sub -> sub.getStatus() == SubscriptionStatus.ACTIVE)
                                                     .toList();
-                if (!activeSubs.isEmpty()) return ResponseEntity.ok(Collections.emptyList());
+                if (!activeSubs.isEmpty()){
+                    System.out.println("User is premium");
+                    return ResponseEntity.ok(Collections.emptyList());
+                }
             }
         }
         List<Banner> banners = bannerService.getAllBanners();
@@ -72,6 +76,7 @@ public class BannerController {
                                                       return map;
                                                   })
                                                   .toList();
+        System.out.println("User is not premium " + result);
         return ResponseEntity.ok(result);
     }
 
