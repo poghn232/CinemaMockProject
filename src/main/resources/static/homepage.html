@@ -2189,7 +2189,7 @@
 
       // ========== MOVIE DETAIL (YÊU CẦU LOGIN) ==========
       function handleMovieClick(movie) {
-        const token = getSanitizedToken();
+        const token = localStorage.getItem("token");
         const isLoggedIn = !!token;
 
         if (!isLoggedIn) {
