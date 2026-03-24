@@ -37,10 +37,10 @@ public class User {
     private String role;
 
     @OneToMany(mappedBy = "user")
-    private List<Subscription> subscriptions;
+    private List<Subscription> subscriptions = new java.util.ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private List<Review> reviews;
+    private List<Review> reviews = new java.util.ArrayList<>();
 
     @Column(nullable = false)
     private Boolean enabled = true;
@@ -49,4 +49,8 @@ public class User {
     @Builder.Default
     private Boolean commentDisabled = false;
 
+    @Override
+    public String toString() {
+        return "User " + username;
+    }
 }

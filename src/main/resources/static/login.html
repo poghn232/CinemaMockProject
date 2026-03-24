@@ -151,17 +151,22 @@
             font-size: 11px;
             color: #d1d5db;
         }
-
+        /* Night City Stories - Action 2025 */
         .poster-1 {
-            background-image: url("https://image.tmdb.org/t/p/w500/9TEJXta9Jjd26jKV4wLGYzFPYfC.jpg");
+            background-image: url("https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=500");
         }
-
+        /* Echoes of Stars - Science Fiction */
         .poster-2 {
-            background-image: url("https://image.tmdb.org/t/p/w500/bcERImYVxN8pPMP4RPgCvm91vB.jpg");
+            background-image: url("https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=500");
+        }
+        /* Hidden Notes - Psychological · Music */
+        .poster-3 {
+                background-image: url("https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=500");
         }
 
-        .poster-3 {
-            background-image: url("https://image.tmdb.org/t/p/w500/ixZdcct8F7zfMDfUYFhXTR2iCpL.jpg");
+        .poster-1, .poster-2, .poster-3 {
+            background-size: cover;
+            background-position: center;
         }
 
         .login-container {
@@ -247,6 +252,42 @@
 
         .login-container input::placeholder {
             color: #6b7280;
+        }
+         /* Password field with inline toggle */
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-wrapper input {
+            padding-right: 40px; /* room for the icon */
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 8px;
+            background: transparent;
+            border: none;
+            color: #9ca3af;
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .toggle-password:hover {
+            background: rgba(255,255,255,0.02);
+            color: #f97316;
+        }
+
+        .toggle-password svg {
+            width: 18px;
+            height: 18px;
         }
 
         .login-container input:focus {
@@ -508,8 +549,16 @@
                     <div class="field">
                         <div class="field-label"
                             data-i18n="auth.password">Password</div>
-                        <input type="password" id="password"
-                            placeholder="••••••••" required>
+                        <div class="password-wrapper">
+                            <input type="password" id="password"
+                                placeholder="••••••••" required>
+                            <button type="button" id="togglePassword" class="toggle-password" aria-label="Show password" aria-pressed="false">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path d="M12 5C7 5 2.73 8.11 1 12c1.73 3.89 6 7 11 7s9.27-3.11 11-7c-1.73-3.89-6-7-11-7z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></circle>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
 
                     <button type="submit" id="loginBtn" class="btn-primary"
@@ -710,6 +759,32 @@
         }, 300);
     });
 
+    // Password visibility toggle
+        (function () {
+            const pwd = document.getElementById('password');
+            const toggle = document.getElementById('togglePassword');
+            if (!pwd || !toggle) return;
+            function updateToggleState() {
+                const isShown = pwd.type === 'text';
+                toggle.setAttribute('aria-pressed', String(isShown));
+                toggle.setAttribute('aria-label', isShown ? 'Hide password' : 'Show password');
+            }
+            toggle.addEventListener('click', function (e) {
+                const selectionStart = pwd.selectionStart;
+                const selectionEnd = pwd.selectionEnd;
+                pwd.type = pwd.type === 'password' ? 'text' : 'password';
+                updateToggleState();
+                // keep focus and restore cursor position
+                pwd.focus();
+                try {
+                    pwd.setSelectionRange(selectionStart, selectionEnd);
+                } catch (err) {
+                    // ignore if not supported
+                }
+            });
+            // initialize state
+            updateToggleState();
+        })();
     // ── Facebook login ────────────────────────────────────────────────────────
     const FB_APP_ID = document.querySelector("meta[name='facebook-app-id']").content;
     const FB_REDIRECT_URI = window.location.origin + "/Fbcallback.html";

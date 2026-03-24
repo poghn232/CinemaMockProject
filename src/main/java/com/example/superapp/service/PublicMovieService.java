@@ -311,7 +311,9 @@ public class PublicMovieService {
                         .sorted(java.util.Comparator.comparing(mc -> mc.getCreditOrder() == null ? 0 : mc.getCreditOrder()))
                         .forEach(mc -> {
                             com.example.superapp.entity.Person p = mc.getPerson();
-                            if (p == null) return;
+                            if (p == null) {
+                                return;
+                            }
                             com.example.superapp.dto.CastMemberDto c = new com.example.superapp.dto.CastMemberDto();
                             c.setId(p.getId());
                             c.setName(p.getName());
@@ -326,6 +328,103 @@ public class PublicMovieService {
             }
             dto.setCast(cast);
         } catch (Exception ignored) {
+        }
+// Director: prefer stored credits where job == "Director"
+        try {
+            if (m.getCredits() != null) {
+                m.getCredits().stream()
+                        .filter(mc -> mc != null && mc.getJob() != null && "Director".equalsIgnoreCase(mc.getJob()))
+                        .findFirst()
+                        .ifPresent(mc -> {
+                            if (mc.getPerson() != null) {
+                                dto.setDirector(mc.getPerson().getName());
+                            }
+                        });
+            }
+        } catch (Exception ignored) {
+        }
+
+        // Country: prefer studio originCountry
+        try {
+            if (m.getStudios() != null && !m.getStudios().isEmpty()) {
+                m.getStudios().stream()
+                        .filter(s -> s != null && s.getOriginCountry() != null && !s.getOriginCountry().isBlank())
+                        .findFirst()
+                        .ifPresent(s -> dto.setCountry(s.getOriginCountry()));
+            }
+        } catch (Exception ignored) {
+        }
+
+        // Studio: prefer stored studio name
+        try {
+            if (m.getStudios() != null && !m.getStudios().isEmpty()) {
+                m.getStudios().stream()
+                        .filter(s -> s != null && s.getName() != null && !s.getName().isBlank())
+                        .findFirst()
+                        .ifPresent(s -> dto.setStudio(s.getName()));
+            }
+        } catch (Exception ignored) {
+        }
+
+        // Fallback: if director or country still missing, try TMDB lookup
+        if ((dto.getDirector() == null || dto.getDirector().isBlank()) || (dto.getCountry() == null || dto.getCountry().isBlank())) {
+            try {
+                java.util.Map<String, Object> tm = tmdbService.getMovieDetails(m.getId());
+                if (tm != null && !tm.isEmpty()) {
+                    if ((dto.getDirector() == null || dto.getDirector().isBlank()) && tm.containsKey("credits")) {
+                        Object creditsObj = tm.get("credits");
+                        if (creditsObj instanceof java.util.Map<?, ?> creditsMap) {
+                            Object crewObj = creditsMap.get("crew");
+                            if (crewObj instanceof java.util.List<?> crewList) {
+                                for (Object cobj : crewList) {
+                                    if (!(cobj instanceof java.util.Map)) {
+                                        continue;
+                                    }
+                                    java.util.Map<String, Object> crew = (java.util.Map<String, Object>) cobj;
+                                    String job = TmdbService.stringVal(crew.get("job"));
+                                    if (job != null && job.equalsIgnoreCase("Director")) {
+                                        String name = TmdbService.stringVal(crew.get("name"));
+                                        if (name != null) {
+                                            dto.setDirector(name);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if ((dto.getCountry() == null || dto.getCountry().isBlank()) && tm.containsKey("production_countries")) {
+                        Object pcObj = tm.get("production_countries");
+                        if (pcObj instanceof java.util.List<?> pcList && !pcList.isEmpty()) {
+                            Object first = pcList.get(0);
+                            if (first instanceof java.util.Map<?, ?> pm) {
+                                String countryName = TmdbService.stringVal(pm.get("name"));
+                                if (countryName == null) {
+                                    countryName = TmdbService.stringVal(pm.get("iso_3166_1"));
+                                }
+                                if (countryName != null) {
+                                    dto.setCountry(countryName);
+                                }
+                            }
+                        }
+                    }
+                    // TMDB production_companies -> studio name fallback
+                    if ((dto.getStudio() == null || dto.getStudio().isBlank()) && tm.containsKey("production_companies")) {
+                        Object pcObj = tm.get("production_companies");
+                        if (pcObj instanceof java.util.List<?> pcList && !pcList.isEmpty()) {
+                            Object first = pcList.get(0);
+                            if (first instanceof java.util.Map<?, ?> pm) {
+                                String studioName = TmdbService.stringVal(pm.get("name"));
+                                if (studioName != null) {
+                                    dto.setStudio(studioName);
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (Exception ignored) {
+            }
         }
 
         return dto;
@@ -361,7 +460,9 @@ public class PublicMovieService {
                         .sorted(java.util.Comparator.comparing(tc -> tc.getCreditOrder() == null ? 0 : tc.getCreditOrder()))
                         .forEach(tc -> {
                             com.example.superapp.entity.Person p = tc.getPerson();
-                            if (p == null) return;
+                            if (p == null) {
+                                return;
+                            }
                             com.example.superapp.dto.CastMemberDto c = new com.example.superapp.dto.CastMemberDto();
                             c.setId(p.getId());
                             c.setName(p.getName());
@@ -378,15 +479,21 @@ public class PublicMovieService {
                             Object castObj = creditsMap.get("cast");
                             if (castObj instanceof java.util.List<?> castList) {
                                 for (Object item : castList) {
-                                    if (!(item instanceof java.util.Map)) continue;
+                                    if (!(item instanceof java.util.Map)) {
+                                        continue;
+                                    }
                                     java.util.Map<String, Object> cm = (java.util.Map<String, Object>) item;
                                     Object pidObj = cm.get("id");
                                     Long pid = null;
-                                    if (pidObj instanceof Number n) pid = n.longValue();
+                                    if (pidObj instanceof Number n) {
+                                        pid = n.longValue();
+                                    }
                                     String pname = TmdbService.stringVal(cm.get("name"));
                                     String character = TmdbService.stringVal(cm.get("character"));
                                     String profilePath = TmdbService.stringVal(cm.get("profile_path"));
-                                    if (pname == null) continue;
+                                    if (pname == null) {
+                                        continue;
+                                    }
                                     com.example.superapp.dto.CastMemberDto c = new com.example.superapp.dto.CastMemberDto();
                                     c.setId(pid);
                                     c.setName(pname);
@@ -406,6 +513,160 @@ public class PublicMovieService {
         } catch (Exception ignored) {
         }
 
+        // For TV: director field may be unavailable; attempt to infer from credits or TMDB
+        try {
+            if (tv.getCredits() != null && !tv.getCredits().isEmpty()) {
+                tv.getCredits().stream()
+                        .filter(tc -> tc != null && tc.getJob() != null && "Director".equalsIgnoreCase(tc.getJob()))
+                        .findFirst()
+                        .ifPresent(tc -> {
+                            if (tc.getPerson() != null) {
+                                dto.setDirector(tc.getPerson().getName());
+                            }
+                        });
+            }
+        } catch (Exception ignored) {
+        }
+
+        try {
+            if (tv.getStudios() != null && !tv.getStudios().isEmpty()) {
+                tv.getStudios().stream()
+                        .filter(s -> s != null && s.getOriginCountry() != null && !s.getOriginCountry().isBlank())
+                        .findFirst()
+                        .ifPresent(s -> dto.setCountry(s.getOriginCountry()));
+            }
+        } catch (Exception ignored) {
+        }
+
+        try {
+            if (tv.getStudios() != null && !tv.getStudios().isEmpty()) {
+                tv.getStudios().stream()
+                        .filter(s -> s != null && s.getName() != null && !s.getName().isBlank())
+                        .findFirst()
+                        .ifPresent(s -> dto.setStudio(s.getName()));
+            }
+        } catch (Exception ignored) {
+        }
+
+        if ((dto.getDirector() == null || dto.getDirector().isBlank()) || (dto.getCountry() == null || dto.getCountry().isBlank())) {
+            try {
+                java.util.Map<String, Object> tm = tmdbService.getTvDetails(tv.getId());
+                if (tm != null && !tm.isEmpty()) {
+                    if ((dto.getDirector() == null || dto.getDirector().isBlank()) && tm.containsKey("credits")) {
+                        Object creditsObj = tm.get("credits");
+                        if (creditsObj instanceof java.util.Map<?, ?> creditsMap) {
+                            Object crewObj = creditsMap.get("crew");
+                            if (crewObj instanceof java.util.List<?> crewList) {
+                                for (Object cobj : crewList) {
+                                    if (!(cobj instanceof java.util.Map)) {
+                                        continue;
+                                    }
+                                    java.util.Map<String, Object> crew = (java.util.Map<String, Object>) cobj;
+                                    String job = TmdbService.stringVal(crew.get("job"));
+                                    if (job != null && job.equalsIgnoreCase("Director")) {
+                                        String name = TmdbService.stringVal(crew.get("name"));
+                                        if (name != null) {
+                                            dto.setDirector(name);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if ((dto.getCountry() == null || dto.getCountry().isBlank()) && tm.containsKey("production_countries")) {
+                        Object pcObj = tm.get("production_countries");
+                        if (pcObj instanceof java.util.List<?> pcList && !pcList.isEmpty()) {
+                            Object first = pcList.get(0);
+                            if (first instanceof java.util.Map<?, ?> pm) {
+                                String countryName = TmdbService.stringVal(pm.get("name"));
+                                if (countryName == null) {
+                                    countryName = TmdbService.stringVal(pm.get("iso_3166_1"));
+                                }
+                                if (countryName != null) {
+                                    dto.setCountry(countryName);
+                                }
+                            }
+                        }
+                    }
+                    if ((dto.getStudio() == null || dto.getStudio().isBlank()) && tm.containsKey("production_companies")) {
+                        Object pcObj = tm.get("production_companies");
+                        if (pcObj instanceof java.util.List<?> pcList && !pcList.isEmpty()) {
+                            Object first = pcList.get(0);
+                            if (first instanceof java.util.Map<?, ?> pm) {
+                                String studioName = TmdbService.stringVal(pm.get("name"));
+                                if (studioName != null) {
+                                    dto.setStudio(studioName);
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+        }
+
         return dto;
+    }
+
+    @Transactional(readOnly = true)
+    public java.util.List<com.example.superapp.dto.GenreWithItems> listGenresWithItems(HttpServletRequest request) {
+        String userRegion = extractRegionFromRequest(request);
+
+        // fetch all published movies and tv
+        List<com.example.superapp.dto.GenreWithItems> result = new ArrayList<>();
+        java.util.Map<Long, com.example.superapp.dto.GenreWithItems> map = new java.util.HashMap<>();
+
+        // helper to ensure genre entry
+        java.util.function.BiConsumer<Long, String> ensureGenre = (id, name) -> {
+            if (id == null || name == null) {
+                return;
+            }
+            if (!map.containsKey(id)) {
+                map.put(id, new com.example.superapp.dto.GenreWithItems(id, name));
+            }
+        };
+
+        // collect movies
+        for (Movie m : movieRepository.findByActiveTrueAndPublishedTrue()) {
+            if (isMovieBlockedForRegion(m, userRegion)) {
+                continue;
+            }
+            // map item
+            MovieItemDto item = mapMovie(m);
+            // attach to genres
+            if (m.getGenres() != null) {
+                for (com.example.superapp.entity.Genre g : m.getGenres()) {
+                    if (g == null) {
+                        continue;
+                    }
+                    ensureGenre.accept(g.getId(), g.getName());
+                    map.get(g.getId()).addItem(item);
+                }
+            }
+        }
+
+        // collect tv
+        for (TvSeries tv : tvSeriesRepository.findByActiveTrueAndPublishedTrue()) {
+            if (isTvBlockedForRegion(tv, userRegion)) {
+                continue;
+            }
+            MovieItemDto item = mapTv(tv);
+            if (tv.getGenres() != null) {
+                for (com.example.superapp.entity.Genre g : tv.getGenres()) {
+                    if (g == null) {
+                        continue;
+                    }
+                    ensureGenre.accept(g.getId(), g.getName());
+                    map.get(g.getId()).addItem(item);
+                }
+            }
+        }
+
+        // convert map to list and sort by size desc
+        result.addAll(map.values());
+        result.sort((a, b) -> Integer.compare(b.getItems().size(), a.getItems().size()));
+        return result;
     }
 }
