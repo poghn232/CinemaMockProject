@@ -1004,7 +1004,6 @@
       .actor-name { margin-top: 8px; font-weight:600; font-size:13px; }
 
 
-
       #heroSection.hidden {
         display: none;
       }
@@ -1661,7 +1660,8 @@
         // hide or show featured and pagination depending on search state or current view
         const featuredEl = document.getElementById('featuredMovie');
         const paginationEl = document.querySelector('.pagination');
-        if (isSearch || currentView === 'grid') {
+        const doGridMode = isSearch || currentView === 'grid';
+        if (doGridMode) {
           if (featuredEl) featuredEl.style.display = 'none';
           if (paginationEl) paginationEl.style.display = 'none';
         } else {
@@ -1673,12 +1673,12 @@
         await fadeOut(container);
         container.innerHTML = "";
 
-        if (isSearch) {
-          // ✅ GRID MODE (SEARCH)
+        if (doGridMode) {
+          // ✅ GRID MODE (search OR explicit grid view)
           const grid = document.createElement("div");
           grid.className = "movies-grid";
 
-          movies.forEach((movie) => {
+          (movies || []).forEach((movie) => {
             grid.appendChild(createMovieCard(movie));
           });
 
@@ -1693,7 +1693,6 @@
         }
 
         // ✅ NORMAL MODE (ROWS)
-
         // pass full lists to renderRow; rows will only display first ROW_DISPLAY_LIMIT items
         renderRow(
           "🔥 Trending",
@@ -1877,6 +1876,7 @@
         row.appendChild(scroll);
         container.appendChild(row);
       }
+
       // ACTORS: build a top-actors row (collect from movies' cast)
       async function collectTopActors(limit = 20) {
         // build a map id -> actor {id, name, profilePath, count}
@@ -1948,6 +1948,13 @@
         row.appendChild(scroll);
         // insert actors row after the first row (Trending)
         // find first movie-row and insert after it
+        // remove any existing actor row with same title to avoid duplicates
+        const existing = Array.from(container.querySelectorAll('.movie-row')).find(r => {
+          const t = r.querySelector('.movie-row-title');
+          return t && t.textContent === title;
+        });
+        if (existing && existing.parentElement) existing.parentElement.removeChild(existing);
+
         const firstRow = container.querySelector('.movie-row');
         if (firstRow && firstRow.parentElement) {
           container.insertBefore(row, firstRow.nextSibling);
@@ -2149,10 +2156,16 @@
 
               if (navKey === "home") {
                 currentFilter = "all";
+                // returning to homepage should restore rows view (show featured)
+                currentView = 'rows';
               } else if (navKey === "movies") {
                 currentFilter = "movie";
+                // switch to grid view for movies listing
+                currentView = 'grid';
               } else if (navKey === "tv") {
                 currentFilter = "tv";
+                // switch to grid view for tv listing
+                currentView = 'grid';
               }
 
               await loadMovies(currentFilter);
@@ -2568,7 +2581,6 @@
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         unlockFeaturedOnScroll();
       });
-
 
       // wire featured Play and More Info buttons
       document.addEventListener('click', (e) => {

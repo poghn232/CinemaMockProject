@@ -4,6 +4,7 @@ public class PersonDto {
     private Long id;
     private String name;
     private String profilePath;
+    private int creditsCount;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -13,4 +14,7 @@ public class PersonDto {
 
     public String getProfilePath() { return profilePath; }
     public void setProfilePath(String profilePath) { this.profilePath = profilePath; }
+
+    public int getCreditsCount() { return creditsCount; }
+    public void setCreditsCount(int creditsCount) { this.creditsCount = creditsCount; }
 }
