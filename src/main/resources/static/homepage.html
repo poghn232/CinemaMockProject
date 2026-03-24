@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>MovieZone | Trang chủ</title>
+    
 
     <style>
       :root {
@@ -1517,6 +1518,8 @@
   let genresFromServer = null; // populated by loadGenres()
       const ROW_DISPLAY_LIMIT = 20; // how many items to show in a row visually
 
+      
+
       async function loadMovies(type, page = 1) {
         const normalizedType = type || "all";
         const countEl = document.getElementById("resultCount");
@@ -1545,16 +1548,52 @@
             let total = 1;
 
             do {
-              const res = await fetch(
-                `/api/public/movies?type=${normalizedType}&page=${p}`,
-                { headers },
-              );
-              const data = await res.json();
+              let res;
+              try {
+                res = await fetch(`/api/public/movies?type=${normalizedType}&page=${p}`, { headers });
+              } catch (e) {
+                console.debug('[loadMovies] network error fetching movies page', p, e);
+                break;
+              }
+
+              // if server rejected authless request oddly, try again without headers
+              if (!res.ok && headers && headers.Authorization) {
+                console.debug('[loadMovies] retrying movies fetch without Authorization, status=', res.status);
+                try {
+                  res = await fetch(`/api/public/movies?type=${normalizedType}&page=${p}`);
+                } catch (e2) {
+                  console.debug('[loadMovies] retry failed', e2);
+                  break;
+                }
+              }
+
+              let data = null;
+              try {
+                data = await res.json();
+              } catch (e) {
+                console.debug('[loadMovies] failed to parse movies page json', p, e, 'status=', res.status);
+                // abort loop on unexpected response
+                break;
+              }
 
               allMovies = allMovies.concat(data.items || []);
               total = data.totalPages || 1;
               p++;
             } while (p <= total);
+
+            // If no movies collected (maybe server returned empty for paged loop), try a single page fetch without headers as a final attempt
+            if ((!allMovies || allMovies.length === 0)) {
+              try {
+                const fallbackRes = await fetch(`/api/public/movies?type=${normalizedType}&page=1`);
+                if (fallbackRes.ok) {
+                  const fallbackData = await fallbackRes.json().catch(()=>null);
+                  if (fallbackData && Array.isArray(fallbackData.items)) {
+                    allMovies = allMovies.concat(fallbackData.items || []);
+                    total = fallbackData.totalPages || total;
+                  }
+                }
+              } catch (fe) { /* ignore fallback errors */ }
+            }
 
             movies = allMovies;
             console.debug('[loadMovies] fetched allMovies count:', movies.length, 'sample:', movies.slice(0,3));
@@ -1582,8 +1621,8 @@
         }
       }
       async function fetchPremiumInfo() {
-        const token = localStorage.getItem("token");
-        const hasToken = !!token;
+  const token = localStorage.getItem("token");
+  const hasToken = !!token;
 
         if (!hasToken) {
           return {
@@ -1642,8 +1681,8 @@
         const info = await fetchPremiumInfo();
 
         if (usernameEl) {
-          usernameEl.textContent =
-            "👋 " + translations.nav.hello + ", " + info.username;
+          const hello = (translations && translations.nav && translations.nav.hello) ? translations.nav.hello : 'Hello';
+          usernameEl.textContent = "👋 " + hello + ", " + info.username;
           renderWelcomeRegion(info.username, info.region);
         }
 
@@ -2150,7 +2189,7 @@
 
       // ========== MOVIE DETAIL (YÊU CẦU LOGIN) ==========
       function handleMovieClick(movie) {
-        const token = localStorage.getItem("token");
+        const token = getSanitizedToken();
         const isLoggedIn = !!token;
 
         if (!isLoggedIn) {
@@ -2222,7 +2261,6 @@
           const token = localStorage.getItem('token');
           const headers = token ? { Authorization: 'Bearer ' + token } : {};
           const res = await fetch('/api/public/movies/genres', { headers });
-          if (!res.ok) throw new Error('Genres fetch failed ' + res.status);
           const data = await res.json();
           // data is array of { id, name, items: [...] }
           genresFromServer = data;
@@ -2452,17 +2490,12 @@
         }
 
         try {
-          const token = localStorage.getItem('token');
+          const token = getSanitizedToken();
           const headers = token ? { Authorization: 'Bearer ' + token } : {};
-          // call movie search and people search in parallel
           const moviesPromise = fetch(`/api/public/movies/search?q=${encodeURIComponent(query)}&type=all&page=1`, { headers });
-          // use the paged people endpoint so server-side search/q is applied
           const peoplePromise = fetch(`/api/public/people/page?page=1&q=${encodeURIComponent(query)}`, { headers });
 
           const [moviesRes, peopleRes] = await Promise.all([moviesPromise, peoplePromise]);
-          if (!moviesRes.ok) throw new Error('Movie search failed ' + moviesRes.status);
-          if (!peopleRes.ok) throw new Error('People search failed ' + peopleRes.status);
-
           const moviesData = await moviesRes.json();
           const peopleData = await peopleRes.json();
           const items = moviesData.items || [];
