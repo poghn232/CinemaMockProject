@@ -1406,14 +1406,33 @@
     <div id="searchOverlay" class="search-overlay hidden" aria-hidden="true">
       <div class="search-overlay-panel">
         <div class="search-overlay-header">
-          <input id="overlaySearchInput" class="search-overlay-input" placeholder="Search movies, series, genres..." />
+          <input id="overlaySearchInput" class="search-overlay-input" placeholder="Search movies, series, actors..." />
           <button id="closeOverlayBtn" class="search-overlay-close">Close</button>
         </div>
         <div id="overlayResultCount" class="section-subtitle">Type to search</div>
-        <div id="overlayGrid" class="movies-grid"></div>
+
+        <!-- Actors results (separate from movies) -->
+        <div id="overlayActorsSection" class="overlay-section" style="margin-top:10px;">
+          <div class="section-title" style="margin-bottom:8px;color:var(--text-subtle);font-weight:600">Actors</div>
+          <div id="overlayActorsGrid" class="actors-grid"></div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid rgba(148,163,184,0.06);margin:12px 0" />
+
+        <div id="overlayMoviesSection" style="margin-top:8px;">
+          <div class="section-title" style="margin-bottom:8px;color:var(--text-subtle);font-weight:600">Movies and/or series</div>
+          <div id="overlayGrid" class="movies-grid"></div>
+        </div>
         <div id="overlayPagination" class="pagination"></div>
       </div>
     </div>
+    <!-- Inline styles for overlay actor row: horizontal scroll, compact cards -->
+    <style>
+      #overlayActorsGrid { display:flex; gap:12px; overflow-x:auto; padding:8px 4px; -webkit-overflow-scrolling: touch; }
+      #overlayActorsGrid .actor-card { min-width:120px; max-width:160px; flex:0 0 auto; display:flex; flex-direction:column; align-items:center; padding:8px; }
+      #overlayActorsGrid .actor-thumb { width:100%; aspect-ratio:3/4; background-size:cover; background-position:center; border-radius:8px; }
+      #overlayActorsGrid .actor-name { margin-top:8px; font-size:13px; text-align:center; }
+    </style>
     <script>
       let featuredIndex = 0;
       let featuredList = [];
@@ -2109,6 +2128,26 @@
         return card;
       }
 
+        function createActorCard(actor) {
+          const card = document.createElement('div');
+          card.className = 'actor-card';
+          const thumb = document.createElement('div');
+          thumb.className = 'actor-thumb';
+          const imgUrl = actor.profilePath || actor.imageUrl || '/static/img/placeholder-actor.png';
+          thumb.style.backgroundImage = `url('${imgUrl}')`;
+          const name = document.createElement('div');
+          name.className = 'actor-name';
+          name.textContent = actor.name || actor.title || 'Unknown';
+          card.appendChild(thumb);
+          card.appendChild(name);
+          card.addEventListener('click', () => {
+            const id = actor.id || actor.personId || actor.profileId;
+            if (id) window.location.href = `actors.html?id=${encodeURIComponent(id)}`;
+            else window.location.href = 'actors.html';
+          });
+          return card;
+        }
+
       // ========== MOVIE DETAIL (YÊU CẦU LOGIN) ==========
       function handleMovieClick(movie) {
         const token = localStorage.getItem("token");
@@ -2401,29 +2440,58 @@
         if (!grid || !countEl) return;
 
         grid.innerHTML = '';
+        const actorsSection = document.getElementById('overlayActorsSection');
+        const actorsGrid = document.getElementById('overlayActorsGrid');
         if (!query) {
           countEl.textContent = 'Type to search';
           paginationEl && (paginationEl.innerHTML = '');
+          // hide actors area when there's no query
+          if (actorsSection) actorsSection.style.display = 'none';
+          if (actorsGrid) actorsGrid.innerHTML = '';
           return;
         }
 
         try {
           const token = localStorage.getItem('token');
           const headers = token ? { Authorization: 'Bearer ' + token } : {};
-          // call existing search endpoint (single-page response)
-          const res = await fetch(`/api/public/movies/search?q=${encodeURIComponent(query)}&type=all&page=1`, { headers });
-          if (!res.ok) throw new Error('Search failed ' + res.status);
-          const data = await res.json();
-          const items = data.items || [];
-          countEl.textContent = `${items.length} results`;
+          // call movie search and people search in parallel
+          const moviesPromise = fetch(`/api/public/movies/search?q=${encodeURIComponent(query)}&type=all&page=1`, { headers });
+          // use the paged people endpoint so server-side search/q is applied
+          const peoplePromise = fetch(`/api/public/people/page?page=1&q=${encodeURIComponent(query)}`, { headers });
 
-          // show first page (client-side pagesize 20)
+          const [moviesRes, peopleRes] = await Promise.all([moviesPromise, peoplePromise]);
+          if (!moviesRes.ok) throw new Error('Movie search failed ' + moviesRes.status);
+          if (!peopleRes.ok) throw new Error('People search failed ' + peopleRes.status);
+
+          const moviesData = await moviesRes.json();
+          const peopleData = await peopleRes.json();
+          const items = moviesData.items || [];
+          const peopleItems = Array.isArray(peopleData) ? peopleData : (peopleData.items || []);
+          const peopleTotal = Array.isArray(peopleData) ? peopleData.length : (peopleData.totalElements || (peopleItems ? peopleItems.length : 0));
+
+          // limit displayed actor count to 20; show 20+ when there are more
+          const displayedActorCount = peopleTotal > 20 ? '20+' : String(peopleTotal);
+          countEl.textContent = `${items.length} movies · ${displayedActorCount} actors`;
+
+          // show first page of movies (client-side pagesize 20)
           const PAGE = 1;
           const PAGE_SIZE = 20;
           const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
 
           const pageItems = items.slice(0, PAGE_SIZE);
           pageItems.forEach(m => grid.appendChild(createMovieCard(m)));
+
+          // render actors grid (compact) - only show when query exists; cap results to 20
+          if (actorsSection) actorsSection.style.display = (peopleItems && peopleItems.length) ? '' : 'none';
+          if (actorsGrid) {
+            actorsGrid.innerHTML = '';
+            if (!peopleItems || peopleItems.length === 0) {
+              actorsGrid.textContent = 'No actors';
+            } else {
+              // show up to 20 actors
+              peopleItems.slice(0, 20).forEach(p => actorsGrid.appendChild(createActorCard(p)));
+            }
+          }
 
           // build compact pagination for overlay
           if (paginationEl) {
