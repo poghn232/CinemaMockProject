@@ -23,11 +23,14 @@
     }
 
     /* ── Trigger Button ── */
-    .mz-chat-trigger {
-      position: fixed;
-      bottom: 28px;
-      right: 28px;
-      z-index: 9998;
+   .mz-chat-trigger {
+    position: fixed;
+    /* ensure the trigger sits above system taskbars / docking areas by
+      honoring the safe-area inset when available and adding a small offset */
+  /* nudge up a bit more to avoid being covered by OS taskbars */
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 40px);
+  right: calc(env(safe-area-inset-right, 0px) + 28px);
+    z-index: 11000;
       width: 58px;
       height: 58px;
       border-radius: 999px;
@@ -92,9 +95,11 @@
     /* ── Chat Window ── */
     .mz-chat-window {
       position: fixed;
-      bottom: 98px;
-      right: 28px;
-      z-index: 9997;
+      /* position window above the trigger and respect safe-area inset */
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 98px);
+      right: calc(env(safe-area-inset-right, 0px) + 28px);
+      /* keep window z-index below full-screen overlays but above page content */
+      z-index: 10990;
       width: 380px;
       max-height: 580px;
       height: 580px;

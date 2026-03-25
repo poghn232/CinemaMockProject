@@ -869,7 +869,9 @@
         align-items: start;
         justify-content: center;
         padding-top: 60px;
-        z-index: 60;
+        /* raise overlay above other floating UI (chat, popups)
+           — ensures search results are visible */
+        z-index: 10050;
         overflow: auto;
       }
 
@@ -879,7 +881,8 @@
 
       .search-overlay-panel {
         width: min(1180px, 96%);
-        background: transparent; /* keep darkened backdrop visible */
+        /* slightly opaque panel to improve contrast of results */
+        background: rgba(2, 6, 23, 0.85);
         border-radius: 12px;
         padding: 18px;
         color: var(--text-main);
@@ -1213,13 +1216,16 @@
         background: rgba(148, 163, 184, 0.06);
       }
 
-      .page-hidden {
+      /* animate the internal page shell instead of the <body> to avoid creating
+         a transform-containing-block on the root (which breaks position:fixed).
+         Use .page-shell.page-hidden / .page-shell.page-visible */
+      .page-shell.page-hidden {
         opacity: 0;
         transform: translateY(10px);
       }
 
       /* Visible state */
-      .page-visible {
+      .page-shell.page-visible {
         opacity: 1;
         transform: translateY(0);
         transition:
@@ -2002,7 +2008,8 @@
           });
 
           container.appendChild(grid);
-          applyFadeInAnimation();
+          // animate only this grid's cards immediately
+          applyFadeInAnimation(grid);
 
           if (countEl) {
             countEl.textContent = `${movies.length} results`;
@@ -2120,8 +2127,13 @@
         await fadeIn(container);
       }
 
-      function applyFadeInAnimation() {
-        const cards = document.querySelectorAll(".movie-card");
+      // Animate movie cards into view. If a root element is provided, only
+      // animate cards within that root. This prevents global delays when the
+      // page contains many movie cards and we only want to reveal a small
+      // overlay grid immediately.
+      function applyFadeInAnimation(root) {
+        const scope = root || document;
+        const cards = scope.querySelectorAll(".movie-card");
 
         cards.forEach((card, index) => {
           setTimeout(() => {
@@ -2473,7 +2485,7 @@
           container.appendChild(gridWrap);
           container.appendChild(paginationWrap);
           await fadeIn(container);
-          applyFadeInAnimation(); // ✅ ADD THIS LINE
+          applyFadeInAnimation(grid); // animate this grid's cards
         })();
       }
 
@@ -2932,8 +2944,43 @@
             moviesPromise,
             peoplePromise,
           ]);
-          const moviesData = await moviesRes.json();
-          const peopleData = await peopleRes.json();
+          // defensive: check for non-OK responses and log bodies for debugging
+          if (!moviesRes.ok) {
+            try {
+              const body = await moviesRes.text();
+              console.error('Movies search failed', moviesRes.status, body);
+            } catch (e) {
+              console.error('Movies search failed and body could not be read', e);
+            }
+            countEl.textContent = 'Search failed (movies)';
+            return;
+          }
+          if (!peopleRes.ok) {
+            try {
+              const body = await peopleRes.text();
+              console.error('People search failed', peopleRes.status, body);
+            } catch (e) {
+              console.error('People search failed and body could not be read', e);
+            }
+            // proceed with movies only
+          }
+
+          let moviesData;
+          let peopleData;
+          try {
+            moviesData = await moviesRes.json();
+          } catch (e) {
+            console.error('Failed to parse movies JSON', e);
+            countEl.textContent = 'Search failed (parse)';
+            return;
+          }
+          try {
+            peopleData = await peopleRes.json();
+          } catch (e) {
+            console.error('Failed to parse people JSON', e);
+            // fallback: treat as empty
+            peopleData = [];
+          }
           const items = moviesData.items || [];
           const peopleItems = Array.isArray(peopleData)
             ? peopleData
@@ -2955,6 +3002,8 @@
 
           const pageItems = items.slice(0, PAGE_SIZE);
           pageItems.forEach((m) => grid.appendChild(createMovieCard(m)));
+          // animate cards into view — movie cards are created with opacity:0 + blur
+          if (typeof applyFadeInAnimation === 'function') applyFadeInAnimation(grid);
 
           // render actors grid (compact) - only show when query exists; cap results to 20
           if (actorsSection)
@@ -3179,7 +3228,9 @@
 
       window.addEventListener("load", () => {
         setTimeout(() => {
-          document.body.classList.add("page-visible");
+          // add visible class to the page shell container instead of body
+          const shell = document.querySelector('.page-shell');
+          if (shell) shell.classList.add('page-visible');
         }, 50); // small delay makes animation visible
       });
     </script>
