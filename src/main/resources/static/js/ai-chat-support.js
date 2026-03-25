@@ -642,42 +642,11 @@
         style.textContent = CSS;
         document.head.appendChild(style);
 
-    // Inject HTML
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = HTML;
-    // Ensure the widget wrapper is fixed to the viewport so any page
-    // transforms or layout won't make the trigger behave like it's inside
-    // a transformed container (which can change fixed positioning).
-    const widgetEl = wrapper.firstElementChild;
-    if (widgetEl && widgetEl.classList) {
-      // inline styles are safe here and override page CSS if necessary
-      widgetEl.style.position = 'fixed';
-            widgetEl.style.right = '0px';
-            // lift widget a bit so the chat window bar doesn't overlap page controls
-            widgetEl.style.bottom = '8px';
-      widgetEl.style.zIndex = '100000';
-      // prevent pointer-events issues
-      widgetEl.style.pointerEvents = 'auto';
-    }
-    document.body.appendChild(widgetEl);
         // Inject HTML
         const wrapper = document.createElement('div');
         wrapper.innerHTML = HTML;
         document.body.appendChild(wrapper.firstElementChild);
-        // apply i18n lần đầu
-        if (typeof applyTranslations === "function") {
-            applyTranslations();
-        }
 
-        // 🔥 lắng nghe khi đổi ngôn ngữ
-        window.addEventListener("languageChanged", () => {
-            if (typeof applyTranslations === "function") {
-                applyTranslations();
-            }
-        });
-        if (typeof applyTranslations === "function") {
-            applyTranslations();
-        }
         // Bind events
         bindEvents();
 
@@ -686,7 +655,8 @@
             document.getElementById('mzSuggestions').style.display = 'none';
             document.getElementById('mzWelcome').style.display = 'none';
             conversationHistory.forEach(msg => {
-                if (msg.role === 'user') addUserMessage(msg.content); else if (msg.role === 'assistant') addBotMessage(msg.content);
+                if (msg.role === 'user') addUserMessage(msg.content);
+                else if (msg.role === 'assistant') addBotMessage(msg.content);
             });
         }
 
@@ -755,7 +725,7 @@
                 hasOpened = true;
                 sessionStorage.setItem('mz_chat_opened', 'true');
                 setTimeout(() => {
-                    addBotMessage(t("ai_chat.messages.welcome_bot"));
+                    addBotMessage('Xin chào! 🎬 Tôi là AI hỗ trợ của **MovieZone**. Tôi có thể giúp bạn:\n\n- 🔥 Tìm **phim đang hot** theo thể loại\n- 💎 Thông tin về **gói Premium**\n- 📊 Phim được **đánh giá cao nhất**\n- 🆕 Phim / Series **mới thêm** gần đây\n- ❓ Giải đáp mọi thắc mắc về MovieZone\n\nBạn muốn hỏi gì nào?');
                 }, 400);
             }
         }

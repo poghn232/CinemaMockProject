@@ -1033,10 +1033,10 @@
         inset: 0;
         background-size: cover;
         background-position: center;
-        transition: opacity 1s ease, transform 1s ease;
+        transition: opacity 1.2s cubic-bezier(0.22,1,0.36,1), transform 1.2s cubic-bezier(0.22,1,0.36,1);
         z-index: 0;
         opacity: 0;
-        transform: scale(1.02);
+        transform: scale(1.015);
       }
 
       .featured-bg.next { opacity: 0; }
@@ -1213,13 +1213,13 @@
         background: rgba(148, 163, 184, 0.06);
       }
 
-      .page-shell.page-hidden {
+      .page-hidden {
         opacity: 0;
         transform: translateY(10px);
       }
 
       /* Visible state */
-      .page-shell.page-visible {
+      .page-visible {
         opacity: 1;
         transform: translateY(0);
         transition:
@@ -1254,7 +1254,7 @@
           <div class="nav-logo">MZ</div>
           <div class="nav-title">
             <span class="nav-title-main">MOVIEZONE</span>
-            <span class="nav-title-sub"  data-i18n="hero.subtitle">>Find movies, series &amp; more</span>
+            <span class="nav-title-sub">Find movies, series &amp; more</span>
           </div>
         </div>
 
@@ -1269,7 +1269,6 @@
             TV Series
           </button>
 
-<<<<<<< HEAD
           <div class="genres-dropdown" style="position: relative">
             <button id="genresBtn" class="nav-link">Genres ▾</button>
             <div
@@ -1284,15 +1283,6 @@
                 z-index: 40;
               "
             >
-=======
-          <button id="navSearchBtn" class="nav-link">🔍</button>
-
-          <div class="genres-dropdown" style="position:relative;">
-            <button id="genresBtn" class="nav-link">
-              <span data-i18n="genres.title"> Genres </span> ▾
-            </button>
-            <div class="genres-menu" id="genresMenu" style="display:none; position:absolute; top:44px; left:0; min-width:200px; z-index:40;">
->>>>>>> 71790e9da6088fa531a6d9b71bf54c639740bd6c
               <!-- items populated by JS -->
             </div>
           </div>
@@ -1412,34 +1402,12 @@
             <p id="featuredDesc">Please wait...</p>
 
             <div class="featured-actions">
-              <button id="featuredPlay" class="btn-play" data-i18n="movie.play">▶ Play</button>
-              <button id="featuredInfo" class="btn-info" data-i18n="movie.more_info">More Info</button>
+              <button id="featuredPlay" class="btn-play">▶ Play</button>
+              <button id="featuredInfo" class="btn-info">More Info</button>
             </div>
           </div>
         </div>
-<<<<<<< HEAD
-        <button
-          id="featuredDown"
-          title="Scroll to content"
-          style="
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            bottom: 18px;
-            padding: 10px 14px;
-            border-radius: 999px;
-            border: none;
-            background: rgba(0, 0, 0, 0.4);
-            color: white;
-            cursor: pointer;
-            font-size: 18px;
-          "
-        >
-          ▼
-        </button>
-=======
   <button id="featuredDown" data-i18n-title="common.scroll_down" style="position:absolute;left:50%;transform:translateX(-50%);bottom:18px;padding:10px 14px;border-radius:999px;border:none;background:rgba(0,0,0,0.4);color:white;cursor:pointer;font-size:18px;">▼</button>
->>>>>>> 71790e9da6088fa531a6d9b71bf54c639740bd6c
       </section>
       <div class="ad-wrapper" id="adWrapper">
         <div class="ad-banner">
@@ -1487,13 +1455,8 @@
       <!-- FOOTER -->
       <footer class="site-footer">
         <div class="footer-inner">
-<<<<<<< HEAD
           <div style="width: 100%; text-align: center; margin-bottom: 8px">
             <div class="follow-us-line">Follow us here</div>
-=======
-          <div style="width:100%;text-align:center;margin-bottom:8px;">
-            <div class="follow-us-line" data-i18n="footer.follow_us">Follow us here</div>
->>>>>>> 71790e9da6088fa531a6d9b71bf54c639740bd6c
           </div>
           <div
             class="social-row-wrapper"
@@ -1534,7 +1497,6 @@
     <div id="searchOverlay" class="search-overlay hidden" aria-hidden="true">
       <div class="search-overlay-panel">
         <div class="search-overlay-header">
-<<<<<<< HEAD
           <input
             id="overlaySearchInput"
             class="search-overlay-input"
@@ -1564,16 +1526,6 @@
           >
             Actors
           </div>
-=======
-          <input id="overlaySearchInput" class="search-overlay-input" data-i18n-placeholder="search_overlay.placeholder"/>
-          <button id="closeOverlayBtn" class="search-overlay-close" data-i18n="search_overlay.close">Close</button>
-        </div>
-        <div id="overlayResultCount" class="section-subtitle" data-i18n="search_overlay.type_hint">Type to search</div>
-
-        <!-- Actors results (separate from movies) -->
-        <div id="overlayActorsSection" class="overlay-section" style="margin-top:10px;">
-          <div class="section-title" style="margin-bottom:8px;color:var(--text-subtle);font-weight:600" data-i18n="search_overlay.actors">Actors</div>
->>>>>>> 71790e9da6088fa531a6d9b71bf54c639740bd6c
           <div id="overlayActorsGrid" class="actors-grid"></div>
         </div>
 
@@ -1585,7 +1537,6 @@
           "
         />
 
-<<<<<<< HEAD
         <div id="overlayMoviesSection" style="margin-top: 8px">
           <div
             class="section-title"
@@ -1597,10 +1548,6 @@
           >
             Movies and/or series
           </div>
-=======
-        <div id="overlayMoviesSection" style="margin-top:8px;">
-          <div class="section-title" style="margin-bottom:8px;color:var(--text-subtle);font-weight:600" data-i18n="search_overlay.movies">Movies and/or series</div>
->>>>>>> 71790e9da6088fa531a6d9b71bf54c639740bd6c
           <div id="overlayGrid" class="movies-grid"></div>
         </div>
         <div id="overlayPagination" class="pagination"></div>
@@ -1664,23 +1611,31 @@
           .slice(0, 20); // top 5 movies
 
         featuredIndex = 0;
-        // Ensure featured background layers exist
-        const section = document.getElementById("featuredMovie");
+        // manage two layered background elements for smooth crossfade
+        const section = document.getElementById('featuredMovie');
         if (section) {
-          let bgA = section.querySelector('.featured-bg.a');
-          let bgB = section.querySelector('.featured-bg.b');
-          if (!bgA) {
-            bgA = document.createElement('div');
-            bgA.className = 'featured-bg a';
-            section.insertBefore(bgA, section.firstChild);
+          // clear any inline background image fallback
+          section.style.backgroundImage = '';
+
+          const layers = Array.from(section.querySelectorAll('.featured-bg'));
+          // remove extra layers
+          if (layers.length > 2) layers.slice(2).forEach((e) => e.remove());
+
+          let a = section.querySelector('.featured-bg.a');
+          let b = section.querySelector('.featured-bg.b');
+          if (!a) {
+            a = document.createElement('div');
+            a.className = 'featured-bg a';
+            section.insertBefore(a, section.firstChild);
           }
-          if (!bgB) {
-            bgB = document.createElement('div');
-            bgB.className = 'featured-bg b';
-            section.insertBefore(bgB, section.firstChild);
+          if (!b) {
+            b = document.createElement('div');
+            b.className = 'featured-bg b';
+            section.insertBefore(b, section.firstChild);
           }
-          // make sure one of them is active initially
-          section.querySelectorAll('.featured-bg').forEach((el) => el.classList.remove('active'));
+          // ensure one active at start
+          a.classList.add('active');
+          b.classList.remove('active');
         }
         showFeatured(featuredIndex);
 
@@ -1734,32 +1689,33 @@
         const section = document.getElementById("featuredMovie");
         if (!section) return;
 
-        // pick the two bg layers
+        // pick the two bg layers (created by renderFeaturedMovie)
         const bgA = section.querySelector('.featured-bg.a');
         const bgB = section.querySelector('.featured-bg.b');
         const active = bgA && bgA.classList.contains('active') ? bgA : bgB;
         const next = active === bgA ? bgB : bgA;
-        if (!next) {
-          // fallback to direct background update
-          section.style.backgroundImage = `url('${movie.imageUrl}')`;
-        } else {
-          // prepare next image and fade it in
+
+        if (next) {
+          // prepare and fade in next
           next.style.backgroundImage = `url('${movie.imageUrl}')`;
+          // force reflow to ensure transition
+          // eslint-disable-next-line no-unused-expressions
+          next.offsetHeight;
           next.classList.add('active');
-          // remove active from the other after transition
+          // after transition, remove active from previous
           setTimeout(() => {
             if (active) active.classList.remove('active');
-          }, 1000); // match CSS transition (1s)
+          }, 1000); // match CSS transition duration
+        } else {
+          // fallback
+          section.style.backgroundImage = `url('${movie.imageUrl}')`;
         }
 
-<<<<<<< HEAD
-        // update content with a gentle fade
+        // update content with gentle fade
         const titleEl = document.getElementById("featuredTitle");
         const descEl = document.getElementById("featuredDesc");
         const content = section.querySelector('.featured-content');
-        if (content) {
-          content.classList.add('fade-out');
-        }
+        if (content) content.classList.add('fade-out');
         setTimeout(() => {
           if (titleEl) titleEl.textContent = movie.title;
           if (descEl) descEl.textContent = movie.description || "Top trending movie right now.";
@@ -1769,14 +1725,6 @@
             setTimeout(() => content.classList.remove('fade-in'), 600);
           }
         }, 220);
-=======
-          document.getElementById("featuredTitle").textContent = movie.title;
-          document.getElementById("featuredDesc").textContent =
-            movie.description || t("featured.default_desc");
-
-          section.classList.remove("fade");
-        }, 200);
->>>>>>> 71790e9da6088fa531a6d9b71bf54c639740bd6c
       }
       // ========== STATE ==========
       let currentFilter = "all"; // all | movie | tv
@@ -1991,17 +1939,11 @@
         const info = await fetchPremiumInfo();
 
         if (usernameEl) {
-<<<<<<< HEAD
           const hello =
             translations && translations.nav && translations.nav.hello
               ? translations.nav.hello
               : "Hello";
           usernameEl.textContent = "👋 " + hello + ", " + info.username;
-=======
-          // const hello = (translations && translations.nav && translations.nav.hello) ? translations.nav.hello : 'Hello';
-          // usernameEl.textContent = "👋 " + hello + ", " + info.username;
-          renderUsername();
->>>>>>> 71790e9da6088fa531a6d9b71bf54c639740bd6c
           renderWelcomeRegion(info.username, info.region);
         }
 
@@ -2129,7 +2071,7 @@
             const displayList = deduped.slice(0, ROW_DISPLAY_LIMIT);
             displayList.forEach((it) => usedIds.add(String(it.id)));
             // pass full deduped list to renderRow so Watch All shows everything
-            renderRow(translateGenre(g.name), deduped);
+            renderRow(g.name, deduped);
           });
 
           // also populate genres menu from server data
@@ -2190,11 +2132,6 @@
           }, index * 30);
         });
       }
-      window.addEventListener("languageChanged", () => {
-        if (window.renderMovies) {
-          renderMovies();
-        }
-      });
 
       function renderPagination() {
         let pagination = document.querySelector(".pagination");
@@ -2297,21 +2234,6 @@
 
         row.appendChild(headerWrap);
         row.appendChild(scroll);
-
-        // animate movie cards in this horizontal row (they are created with
-        // initial hidden styles in createMovieCard). Staggered reveal like actors.
-        (function animateRowCards() {
-          const cards = scroll.querySelectorAll(".movie-card");
-          cards.forEach((card, index) => {
-            setTimeout(() => {
-              card.style.transition = "all 0.6s ease";
-              card.style.opacity = "1";
-              card.style.transform = "translateY(0)";
-              card.style.filter = "blur(0)";
-            }, index * 40);
-          });
-        })();
-
         container.appendChild(row);
       }
 
@@ -2840,7 +2762,6 @@
         if (!menu) return;
         menu.innerHTML = "";
         // prefer server-provided genres if available
-<<<<<<< HEAD
         if (
           genresFromServer &&
           Array.isArray(genresFromServer) &&
@@ -2854,16 +2775,6 @@
             
             el.addEventListener("click", () => {
               menu.style.display = "none";
-=======
-        if (genresFromServer && Array.isArray(genresFromServer) && genresFromServer.length) {
-          genresFromServer.forEach(g => {
-            const el = document.createElement('div');
-            el.className = 'genre-item';
-            const count = (Array.isArray(g.items) ? g.items.length : 0);
-            el.textContent = `${translateGenre(g.name)} (${count})`;
-            el.addEventListener('click', () => {
-              menu.style.display = 'none';
->>>>>>> 71790e9da6088fa531a6d9b71bf54c639740bd6c
               showGridForList(g.name, g.items || []);
             });
             menu.appendChild(el);
@@ -2900,7 +2811,6 @@
           return;
         }
 
-<<<<<<< HEAD
         keys.forEach((k) => {
           const el = document.createElement("div");
           el.className = "genre-item";
@@ -2908,14 +2818,6 @@
           el.textContent = `${translateGenre(k)}`;
 
           el.addEventListener("click", () => {
-=======
-        keys.forEach(k => {
-          const el = document.createElement('div');
-          el.className = 'genre-item';
-          // el.textContent = `${k} (${genresMap[k].length})`;
-          el.textContent = `${translateGenre(k)} (${genresMap[k].length})`;
-          el.addEventListener('click', () => {
->>>>>>> 71790e9da6088fa531a6d9b71bf54c639740bd6c
             // hide menu
             menu.style.display = "none";
             // show grid for this genre
@@ -3053,18 +2955,6 @@
 
           const pageItems = items.slice(0, PAGE_SIZE);
           pageItems.forEach((m) => grid.appendChild(createMovieCard(m)));
-
-          // Fix: ensure overlay movie cards are visible immediately.
-          // createMovieCard initially sets them hidden for page animations;
-          // the overlay search needs to force them visible after append.
-          requestAnimationFrame(() => {
-            const cards = grid.querySelectorAll('.movie-card');
-            cards.forEach((c) => {
-              c.style.opacity = '1';
-              c.style.transform = 'none';
-              c.style.filter = 'none';
-            });
-          });
 
           // render actors grid (compact) - only show when query exists; cap results to 20
           if (actorsSection)
@@ -3289,8 +3179,7 @@
 
       window.addEventListener("load", () => {
         setTimeout(() => {
-          const shell = document.querySelector('.page-shell');
-          if (shell) shell.classList.add("page-visible");
+          document.body.classList.add("page-visible");
         }, 50); // small delay makes animation visible
       });
     </script>
