@@ -48,13 +48,13 @@ public class ProfileController {
                                          .orElseThrow(() -> new IllegalArgumentException("field profileName in ProfileController addProfile is empty/null or smth. cannot fetch user from db"));
 
         int currentTotalProfiles = currentUser.getProfiles().size();
-        short maxProfiles = currentUser.getSubscriptions()
+        short maxProfilesAllowed = currentUser.getSubscriptions()
                                        .stream()
                                        .filter(sub -> sub.getStatus() == SubscriptionStatus.ACTIVE)
                                        .map(sub -> sub.getPack().getMaxProfiles())
                                        .toList().getFirst();
 
-        if (currentTotalProfiles == maxProfiles) {
+        if (currentTotalProfiles == maxProfilesAllowed) {
             return ResponseEntity.status(409).body(null);
         }
 
