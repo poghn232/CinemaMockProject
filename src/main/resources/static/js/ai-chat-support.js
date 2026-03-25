@@ -638,10 +638,24 @@
         style.textContent = CSS;
         document.head.appendChild(style);
 
-        // Inject HTML
-        const wrapper = document.createElement('div');
-        wrapper.innerHTML = HTML;
-        document.body.appendChild(wrapper.firstElementChild);
+    // Inject HTML
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = HTML;
+    // Ensure the widget wrapper is fixed to the viewport so any page
+    // transforms or layout won't make the trigger behave like it's inside
+    // a transformed container (which can change fixed positioning).
+    const widgetEl = wrapper.firstElementChild;
+    if (widgetEl && widgetEl.classList) {
+      // inline styles are safe here and override page CSS if necessary
+      widgetEl.style.position = 'fixed';
+            widgetEl.style.right = '0px';
+            // lift widget a bit so the chat window bar doesn't overlap page controls
+            widgetEl.style.bottom = '8px';
+      widgetEl.style.zIndex = '100000';
+      // prevent pointer-events issues
+      widgetEl.style.pointerEvents = 'auto';
+    }
+    document.body.appendChild(widgetEl);
 
         // Bind events
         bindEvents();

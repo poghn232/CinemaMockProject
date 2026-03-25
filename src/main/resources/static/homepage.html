@@ -3,7 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <title>MovieZone | Trang chủ</title>
-    
 
     <style>
       :root {
@@ -45,6 +44,7 @@
           linear-gradient(135deg, #020617, #030712 50%, #020617);
         color: var(--text-main);
         min-height: 100vh;
+        
       }
 
       .page-shell {
@@ -515,7 +515,9 @@
 
       /* Smooth content fades */
       .fadeable {
-        transition: opacity 0.28s ease, transform 0.28s ease;
+        transition:
+          opacity 0.28s ease,
+          transform 0.28s ease;
         opacity: 1;
         transform: translateY(0);
       }
@@ -862,7 +864,7 @@
       .search-overlay {
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,0.72);
+        background: rgba(0, 0, 0, 0.72);
         display: flex;
         align-items: start;
         justify-content: center;
@@ -871,7 +873,9 @@
         overflow: auto;
       }
 
-      .search-overlay.hidden { display: none; }
+      .search-overlay.hidden {
+        display: none;
+      }
 
       .search-overlay-panel {
         width: min(1180px, 96%);
@@ -892,18 +896,18 @@
         flex: 1;
         padding: 12px 16px;
         border-radius: 12px;
-        border: 1px solid rgba(148,163,184,0.22);
-        background: rgba(2,6,23,0.65);
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        background: rgba(2, 6, 23, 0.65);
         color: var(--text-main);
         font-size: 18px;
-        box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+        box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
       }
 
       .search-overlay-close {
         padding: 8px 12px;
         border-radius: 10px;
-        background: rgba(15,23,42,0.9);
-        border: 1px solid rgba(148,163,184,0.12);
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.12);
         color: var(--text-main);
         cursor: pointer;
       }
@@ -913,7 +917,9 @@
         background: transparent;
       }
 
-      .search-overlay .section-subtitle { color: var(--text-subtle); }
+      .search-overlay .section-subtitle {
+        color: var(--text-subtle);
+      }
       .welcome-region-card {
         margin-top: 18px;
         padding: 16px 18px;
@@ -984,14 +990,14 @@
 
       /* ACTOR ROW */
       .actor-card {
-        background: rgba(15,23,42,0.96);
+        background: rgba(15, 23, 42, 0.96);
         border-radius: 12px;
         padding: 8px;
         width: 140px;
         flex-shrink: 0;
         text-align: center;
         cursor: pointer;
-        border: 1px solid rgba(31,41,55,0.9);
+        border: 1px solid rgba(31, 41, 55, 0.9);
       }
 
       .actor-thumb {
@@ -1002,8 +1008,11 @@
         border-radius: 8px;
       }
 
-      .actor-name { margin-top: 8px; font-weight:600; font-size:13px; }
-
+      .actor-name {
+        margin-top: 8px;
+        font-weight: 600;
+        font-size: 13px;
+      }
 
       #heroSection.hidden {
         display: none;
@@ -1011,25 +1020,34 @@
 
       .featured {
         margin-top: 24px;
-        /* Make featured occupy the full viewport until user scrolls */
         height: calc(100vh - 120px);
         border-radius: 22px;
         overflow: hidden;
         position: relative;
 
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+      }
+
+      .featured-bg {
+        position: absolute;
+        inset: 0;
         background-size: cover;
         background-position: center;
-
-        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
-        transition: background-image 0.5s ease-in-out;
-      }
-
-      .featured.fade {
+        transition: opacity 1s ease, transform 1s ease;
+        z-index: 0;
         opacity: 0;
-        transition: opacity 0.4s ease;
+        transform: scale(1.02);
       }
+
+      .featured-bg.next { opacity: 0; }
+      .featured-bg.active { opacity: 1; transform: scale(1); }
+
+      .featured.fade { opacity: 0; transition: opacity 0.5s ease; }
 
       .featured-overlay {
+        position: relative;
+        z-index: 2;
+
         width: 100%;
         height: 100%;
         padding: 30px;
@@ -1047,6 +1065,17 @@
 
       .featured-content {
         max-width: 500px;
+        transition: all 0.5s ease;
+      }
+
+      .featured-content.fade-out {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      .featured-content.fade-in {
+        opacity: 1;
+        transform: translateY(0);
       }
 
       .featured h1 {
@@ -1077,8 +1106,13 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        box-shadow: 0 10px 30px rgba(249, 115, 22, 0.18), 0 2px 6px rgba(0, 0, 0, 0.4);
-        transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+        box-shadow:
+          0 10px 30px rgba(249, 115, 22, 0.18),
+          0 2px 6px rgba(0, 0, 0, 0.4);
+        transition:
+          transform 0.12s ease,
+          box-shadow 0.12s ease,
+          filter 0.12s ease;
       }
 
       .btn-play:hover {
@@ -1108,7 +1142,10 @@
         gap: 8px;
         font-weight: 600;
         box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
-        transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+        transition:
+          transform 0.12s ease,
+          background 0.12s ease,
+          border-color 0.12s ease;
       }
 
       .btn-info:hover {
@@ -1130,8 +1167,8 @@
       .watch-all-btn {
         padding: 6px 10px;
         border-radius: 999px;
-        border: 1px solid rgba(148,163,184,0.25);
-        background: rgba(15,23,42,0.7);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        background: rgba(15, 23, 42, 0.7);
         color: var(--text-main);
         font-size: 13px;
         cursor: pointer;
@@ -1149,19 +1186,19 @@
       .grid-back {
         padding: 8px 12px;
         border-radius: 10px;
-        border: 1px solid rgba(148,163,184,0.2);
-        background: rgba(15,23,42,0.9);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        background: rgba(15, 23, 42, 0.9);
         color: var(--text-main);
         cursor: pointer;
       }
 
       /* Genres menu */
       .genres-menu {
-        background: rgba(15,23,42,0.98);
-        border: 1px solid rgba(148,163,184,0.12);
+        background: rgba(15, 23, 42, 0.98);
+        border: 1px solid rgba(148, 163, 184, 0.12);
         border-radius: 10px;
         padding: 8px;
-        box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
       }
 
       .genres-menu .genre-item {
@@ -1173,7 +1210,39 @@
       }
 
       .genres-menu .genre-item:hover {
-        background: rgba(148,163,184,0.06);
+        background: rgba(148, 163, 184, 0.06);
+      }
+
+      .page-shell.page-hidden {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      /* Visible state */
+      .page-shell.page-visible {
+        opacity: 1;
+        transform: translateY(0);
+        transition:
+          opacity 0.8s ease,
+          transform 0.8s ease;
+      }
+
+      .genres-menu {
+        display: flex;
+        flex-wrap: wrap; /* allow ~3 lines */
+        justify-content: center;
+        gap: 8px;
+        align-items: center;
+        white-space: normal;
+        overflow-y: auto;
+        max-height: 110px; /* ~2 lines */
+        width: 700px;
+        max-width: calc(100vw - 40px);
+      }
+
+       .genres-menu .genre-item.ellipsis {
+        cursor: default;
+        opacity: 0.7;
       }
     </style>
   </head>
@@ -1200,21 +1269,38 @@
             TV Series
           </button>
 
-          <button id="navSearchBtn" class="nav-link">🔍</button>
-
-          <div class="genres-dropdown" style="position:relative;">
+          <div class="genres-dropdown" style="position: relative">
             <button id="genresBtn" class="nav-link">Genres ▾</button>
-            <div class="genres-menu" id="genresMenu" style="display:none; position:absolute; top:44px; left:0; min-width:200px; z-index:40;">
+            <div
+              class="genres-menu"
+              id="genresMenu"
+              style="
+                display: none;
+                position: absolute;
+                top: 44px;
+                left: 0;
+                min-width: 200px;
+                z-index: 40;
+              "
+            >
               <!-- items populated by JS -->
             </div>
           </div>
 
-          <!-- Các mục chỉ hiện khi đã đăng nhập -->
-          <a
-            href="actors.html"
+          <button
+            id="navSearchBtn"
             class="nav-link"
-            data-i18n="nav.actors"
+            style="
+              background: rgba(2, 6, 23, 0.95);
+              color: var(--text-main);
+              border: 1px solid rgba(148, 163, 184, 0.18);
+            "
           >
+            🔍
+          </button>
+
+          <!-- Các mục chỉ hiện khi đã đăng nhập -->
+          <a href="actors.html" class="nav-link" data-i18n="nav.actors">
             Actors
           </a>
           <a
@@ -1304,7 +1390,7 @@
 
       <!-- HERO -->
       <section class="hero" id="heroSection">
-  <!-- search removed from hero; uses overlay search instead -->
+        <!-- search removed from hero; uses overlay search instead -->
 
         <!-- ADS: shown for non-premium users (handled in initUserUi) -->
       </section>
@@ -1321,7 +1407,25 @@
             </div>
           </div>
         </div>
-  <button id="featuredDown" title="Scroll to content" style="position:absolute;left:50%;transform:translateX(-50%);bottom:18px;padding:10px 14px;border-radius:999px;border:none;background:rgba(0,0,0,0.4);color:white;cursor:pointer;font-size:18px;">▼</button>
+        <button
+          id="featuredDown"
+          title="Scroll to content"
+          style="
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 18px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: none;
+            background: rgba(0, 0, 0, 0.4);
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+          "
+        >
+          ▼
+        </button>
       </section>
       <div class="ad-wrapper" id="adWrapper">
         <div class="ad-banner">
@@ -1369,11 +1473,14 @@
       <!-- FOOTER -->
       <footer class="site-footer">
         <div class="footer-inner">
-          <div style="width:100%;text-align:center;margin-bottom:8px;">
+          <div style="width: 100%; text-align: center; margin-bottom: 8px">
             <div class="follow-us-line">Follow us here</div>
           </div>
-          <div class="social-row-wrapper" style="width:100%;margin-bottom:14px;">
-            <div class="social-row" style="justify-content:center;">
+          <div
+            class="social-row-wrapper"
+            style="width: 100%; margin-bottom: 14px"
+          >
+            <div class="social-row" style="justify-content: center">
               <a class="social-pill" href="javascript:void(0)">
                 <span class="icon">f</span>
                 <span>Facebook</span>
@@ -1403,36 +1510,109 @@
     <script src="/js/i18n.js"></script>
     <script src="js/bannerads.js"></script>
     <script src="js/notification-bell.js"></script>
+    <script src="js/ai-chat-support.js"></script>
     <!-- Search overlay for Netflix-like search experience -->
     <div id="searchOverlay" class="search-overlay hidden" aria-hidden="true">
       <div class="search-overlay-panel">
         <div class="search-overlay-header">
-          <input id="overlaySearchInput" class="search-overlay-input" placeholder="Search movies, series, actors..." />
-          <button id="closeOverlayBtn" class="search-overlay-close">Close</button>
+          <input
+            id="overlaySearchInput"
+            class="search-overlay-input"
+            placeholder="Search movies, series, actors..."
+          />
+          <button id="closeOverlayBtn" class="search-overlay-close">
+            Close
+          </button>
         </div>
-        <div id="overlayResultCount" class="section-subtitle">Type to search</div>
+        <div id="overlayResultCount" class="section-subtitle">
+          Type to search
+        </div>
 
         <!-- Actors results (separate from movies) -->
-        <div id="overlayActorsSection" class="overlay-section" style="margin-top:10px;">
-          <div class="section-title" style="margin-bottom:8px;color:var(--text-subtle);font-weight:600">Actors</div>
+        <div
+          id="overlayActorsSection"
+          class="overlay-section"
+          style="margin-top: 10px"
+        >
+          <div
+            class="section-title"
+            style="
+              margin-bottom: 8px;
+              color: var(--text-subtle);
+              font-weight: 600;
+            "
+          >
+            Actors
+          </div>
           <div id="overlayActorsGrid" class="actors-grid"></div>
         </div>
 
-        <hr style="border:none;border-top:1px solid rgba(148,163,184,0.06);margin:12px 0" />
+        <hr
+          style="
+            border: none;
+            border-top: 1px solid rgba(148, 163, 184, 0.06);
+            margin: 12px 0;
+          "
+        />
 
-        <div id="overlayMoviesSection" style="margin-top:8px;">
-          <div class="section-title" style="margin-bottom:8px;color:var(--text-subtle);font-weight:600">Movies and/or series</div>
+        <div id="overlayMoviesSection" style="margin-top: 8px">
+          <div
+            class="section-title"
+            style="
+              margin-bottom: 8px;
+              color: var(--text-subtle);
+              font-weight: 600;
+            "
+          >
+            Movies and/or series
+          </div>
           <div id="overlayGrid" class="movies-grid"></div>
         </div>
         <div id="overlayPagination" class="pagination"></div>
       </div>
     </div>
+
+    <script>
+      // ad CTA -> packs
+      (function () {
+        const b = document.getElementById("adUpgradeButton");
+        if (b)
+          b.addEventListener(
+            "click",
+            () => (window.location.href = "packs.html"),
+          );
+      })();
+    </script>
     <!-- Inline styles for overlay actor row: horizontal scroll, compact cards -->
     <style>
-      #overlayActorsGrid { display:flex; gap:12px; overflow-x:auto; padding:8px 4px; -webkit-overflow-scrolling: touch; }
-      #overlayActorsGrid .actor-card { min-width:120px; max-width:160px; flex:0 0 auto; display:flex; flex-direction:column; align-items:center; padding:8px; }
-      #overlayActorsGrid .actor-thumb { width:100%; aspect-ratio:3/4; background-size:cover; background-position:center; border-radius:8px; }
-      #overlayActorsGrid .actor-name { margin-top:8px; font-size:13px; text-align:center; }
+      #overlayActorsGrid {
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        padding: 8px 4px;
+        -webkit-overflow-scrolling: touch;
+      }
+      #overlayActorsGrid .actor-card {
+        min-width: 120px;
+        max-width: 160px;
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 8px;
+      }
+      #overlayActorsGrid .actor-thumb {
+        width: 100%;
+        aspect-ratio: 3/4;
+        background-size: cover;
+        background-position: center;
+        border-radius: 8px;
+      }
+      #overlayActorsGrid .actor-name {
+        margin-top: 8px;
+        font-size: 13px;
+        text-align: center;
+      }
     </style>
     <script>
       let featuredIndex = 0;
@@ -1446,9 +1626,27 @@
         featuredList = [...movies]
           .filter((m) => m.imageUrl)
           .sort((a, b) => b.rating - a.rating)
-          .slice(0, 10); // top 5 movies
+          .slice(0, 20); // top 5 movies
 
         featuredIndex = 0;
+        // Ensure featured background layers exist
+        const section = document.getElementById("featuredMovie");
+        if (section) {
+          let bgA = section.querySelector('.featured-bg.a');
+          let bgB = section.querySelector('.featured-bg.b');
+          if (!bgA) {
+            bgA = document.createElement('div');
+            bgA.className = 'featured-bg a';
+            section.insertBefore(bgA, section.firstChild);
+          }
+          if (!bgB) {
+            bgB = document.createElement('div');
+            bgB.className = 'featured-bg b';
+            section.insertBefore(bgB, section.firstChild);
+          }
+          // make sure one of them is active initially
+          section.querySelectorAll('.featured-bg').forEach((el) => el.classList.remove('active'));
+        }
         showFeatured(featuredIndex);
 
         // clear old interval if exists
@@ -1464,14 +1662,14 @@
       function initNavbarSearchToggle() {
         const btn = document.getElementById("navSearchBtn");
         const hero = document.getElementById("heroSection");
-  if (!btn) return;
-  // Open overlay search when nav search is clicked
-  btn.addEventListener('click', () => showSearchOverlay());
+        if (!btn) return;
+        // Open overlay search when nav search is clicked
+        btn.addEventListener("click", () => showSearchOverlay());
       }
 
       // Make featured cover the viewport until user scrolls
       function adjustFeaturedHeight() {
-        const feat = document.getElementById('featuredMovie');
+        const feat = document.getElementById("featuredMovie");
         if (!feat) return;
         // account for navbar height ~80-100px; use 120 for spacing
         feat.style.height = `calc(100vh - 120px)`;
@@ -1481,13 +1679,17 @@
       function unlockFeaturedOnScroll() {
         if (!featuredLocked) return;
         featuredLocked = false;
-        const feat = document.getElementById('featuredMovie');
+        const feat = document.getElementById("featuredMovie");
         if (feat) {
-          feat.style.position = 'relative';
-          feat.style.height = '';
+          feat.style.position = "relative";
+          feat.style.height = "";
         }
-        window.removeEventListener('wheel', unlockFeaturedOnScroll, { passive: true });
-        window.removeEventListener('touchstart', unlockFeaturedOnScroll, { passive: true });
+        window.removeEventListener("wheel", unlockFeaturedOnScroll, {
+          passive: true,
+        });
+        window.removeEventListener("touchstart", unlockFeaturedOnScroll, {
+          passive: true,
+        });
       }
 
       function showFeatured(index) {
@@ -1495,18 +1697,42 @@
         if (!movie) return;
 
         const section = document.getElementById("featuredMovie");
+        if (!section) return;
 
-        section.classList.add("fade");
-
-        setTimeout(() => {
+        // pick the two bg layers
+        const bgA = section.querySelector('.featured-bg.a');
+        const bgB = section.querySelector('.featured-bg.b');
+        const active = bgA && bgA.classList.contains('active') ? bgA : bgB;
+        const next = active === bgA ? bgB : bgA;
+        if (!next) {
+          // fallback to direct background update
           section.style.backgroundImage = `url('${movie.imageUrl}')`;
+        } else {
+          // prepare next image and fade it in
+          next.style.backgroundImage = `url('${movie.imageUrl}')`;
+          next.classList.add('active');
+          // remove active from the other after transition
+          setTimeout(() => {
+            if (active) active.classList.remove('active');
+          }, 1000); // match CSS transition (1s)
+        }
 
-          document.getElementById("featuredTitle").textContent = movie.title;
-          document.getElementById("featuredDesc").textContent =
-            movie.description || "Top trending movie right now.";
-
-          section.classList.remove("fade");
-        }, 200);
+        // update content with a gentle fade
+        const titleEl = document.getElementById("featuredTitle");
+        const descEl = document.getElementById("featuredDesc");
+        const content = section.querySelector('.featured-content');
+        if (content) {
+          content.classList.add('fade-out');
+        }
+        setTimeout(() => {
+          if (titleEl) titleEl.textContent = movie.title;
+          if (descEl) descEl.textContent = movie.description || "Top trending movie right now.";
+          if (content) {
+            content.classList.remove('fade-out');
+            content.classList.add('fade-in');
+            setTimeout(() => content.classList.remove('fade-in'), 600);
+          }
+        }, 220);
       }
       // ========== STATE ==========
       let currentFilter = "all"; // all | movie | tv
@@ -1514,11 +1740,9 @@
       let movies = [];
       let currentPage = 1;
       let totalPages = 1;
-  let currentView = 'rows'; // 'rows' | 'grid' | 'search'
-  let genresFromServer = null; // populated by loadGenres()
+      let currentView = "rows"; // 'rows' | 'grid' | 'search'
+      let genresFromServer = null; // populated by loadGenres()
       const ROW_DISPLAY_LIMIT = 20; // how many items to show in a row visually
-
-      
 
       async function loadMovies(type, page = 1) {
         const normalizedType = type || "all";
@@ -1550,19 +1774,31 @@
             do {
               let res;
               try {
-                res = await fetch(`/api/public/movies?type=${normalizedType}&page=${p}`, { headers });
+                res = await fetch(
+                  `/api/public/movies?type=${normalizedType}&page=${p}`,
+                  { headers },
+                );
               } catch (e) {
-                console.debug('[loadMovies] network error fetching movies page', p, e);
+                console.debug(
+                  "[loadMovies] network error fetching movies page",
+                  p,
+                  e,
+                );
                 break;
               }
 
               // if server rejected authless request oddly, try again without headers
               if (!res.ok && headers && headers.Authorization) {
-                console.debug('[loadMovies] retrying movies fetch without Authorization, status=', res.status);
+                console.debug(
+                  "[loadMovies] retrying movies fetch without Authorization, status=",
+                  res.status,
+                );
                 try {
-                  res = await fetch(`/api/public/movies?type=${normalizedType}&page=${p}`);
+                  res = await fetch(
+                    `/api/public/movies?type=${normalizedType}&page=${p}`,
+                  );
                 } catch (e2) {
-                  console.debug('[loadMovies] retry failed', e2);
+                  console.debug("[loadMovies] retry failed", e2);
                   break;
                 }
               }
@@ -1571,7 +1807,13 @@
               try {
                 data = await res.json();
               } catch (e) {
-                console.debug('[loadMovies] failed to parse movies page json', p, e, 'status=', res.status);
+                console.debug(
+                  "[loadMovies] failed to parse movies page json",
+                  p,
+                  e,
+                  "status=",
+                  res.status,
+                );
                 // abort loop on unexpected response
                 break;
               }
@@ -1582,23 +1824,38 @@
             } while (p <= total);
 
             // If no movies collected (maybe server returned empty for paged loop), try a single page fetch without headers as a final attempt
-            if ((!allMovies || allMovies.length === 0)) {
+            if (!allMovies || allMovies.length === 0) {
               try {
-                const fallbackRes = await fetch(`/api/public/movies?type=${normalizedType}&page=1`);
+                const fallbackRes = await fetch(
+                  `/api/public/movies?type=${normalizedType}&page=1`,
+                );
                 if (fallbackRes.ok) {
-                  const fallbackData = await fallbackRes.json().catch(()=>null);
+                  const fallbackData = await fallbackRes
+                    .json()
+                    .catch(() => null);
                   if (fallbackData && Array.isArray(fallbackData.items)) {
                     allMovies = allMovies.concat(fallbackData.items || []);
                     total = fallbackData.totalPages || total;
                   }
                 }
-              } catch (fe) { /* ignore fallback errors */ }
+              } catch (fe) {
+                /* ignore fallback errors */
+              }
             }
 
             movies = allMovies;
-            console.debug('[loadMovies] fetched allMovies count:', movies.length, 'sample:', movies.slice(0,3));
+            console.debug(
+              "[loadMovies] fetched allMovies count:",
+              movies.length,
+              "sample:",
+              movies.slice(0, 3),
+            );
             // try fetching server-side genres (combined movie+tv)
-            try { await loadGenres(); } catch(e) { console.debug('[loadMovies] loadGenres failed', e); }
+            try {
+              await loadGenres();
+            } catch (e) {
+              console.debug("[loadMovies] loadGenres failed", e);
+            }
             renderMovies();
             renderFeaturedMovie();
             return;
@@ -1609,8 +1866,17 @@
           const data = await res.json();
 
           movies = data.items || [];
-          console.debug('[loadMovies] search response items:', movies.length, 'sample:', movies.slice(0,3));
-          try { await loadGenres(); } catch(e) { console.debug('[loadMovies] loadGenres failed', e); }
+          console.debug(
+            "[loadMovies] search response items:",
+            movies.length,
+            "sample:",
+            movies.slice(0, 3),
+          );
+          try {
+            await loadGenres();
+          } catch (e) {
+            console.debug("[loadMovies] loadGenres failed", e);
+          }
           totalPages = data.totalPages || 1;
 
           renderMovies(true); // search mode
@@ -1621,8 +1887,8 @@
         }
       }
       async function fetchPremiumInfo() {
-  const token = localStorage.getItem("token");
-  const hasToken = !!token;
+        const token = localStorage.getItem("token");
+        const hasToken = !!token;
 
         if (!hasToken) {
           return {
@@ -1681,7 +1947,10 @@
         const info = await fetchPremiumInfo();
 
         if (usernameEl) {
-          const hello = (translations && translations.nav && translations.nav.hello) ? translations.nav.hello : 'Hello';
+          const hello =
+            translations && translations.nav && translations.nav.hello
+              ? translations.nav.hello
+              : "Hello";
           usernameEl.textContent = "👋 " + hello + ", " + info.username;
           renderWelcomeRegion(info.username, info.region);
         }
@@ -1716,15 +1985,15 @@
         const countEl = document.getElementById("resultCount");
 
         // hide or show featured and pagination depending on search state or current view
-        const featuredEl = document.getElementById('featuredMovie');
-        const paginationEl = document.querySelector('.pagination');
-        const doGridMode = isSearch || currentView === 'grid';
+        const featuredEl = document.getElementById("featuredMovie");
+        const paginationEl = document.querySelector(".pagination");
+        const doGridMode = isSearch || currentView === "grid";
         if (doGridMode) {
-          if (featuredEl) featuredEl.style.display = 'none';
-          if (paginationEl) paginationEl.style.display = 'none';
+          if (featuredEl) featuredEl.style.display = "none";
+          if (paginationEl) paginationEl.style.display = "none";
         } else {
-          if (featuredEl) featuredEl.style.display = '';
-          if (paginationEl) paginationEl.style.display = '';
+          if (featuredEl) featuredEl.style.display = "";
+          if (paginationEl) paginationEl.style.display = "";
         }
 
         // smooth replace: wait fade out, replace, then fade in
@@ -1741,6 +2010,7 @@
           });
 
           container.appendChild(grid);
+          applyFadeInAnimation();
 
           if (countEl) {
             countEl.textContent = `${movies.length} results`;
@@ -1749,6 +2019,16 @@
           await fadeIn(container);
           return;
         }
+        try {
+          const recommendations = await loadMaybeYouWantToWatch(12);
+          if (recommendations && recommendations.length) {
+            renderRow("Maybe You Want to Watch", recommendations);
+          }
+        } catch (e) {
+          console.debug("[recommendations] failed", e);
+        }
+
+        
 
         // ✅ NORMAL MODE (ROWS)
         // pass full lists to renderRow; rows will only display first ROW_DISPLAY_LIMIT items
@@ -1761,8 +2041,10 @@
         (async () => {
           try {
             const topActors = await collectTopActors(20);
-            renderActorRow('👥 Top Actors', topActors);
-          } catch (e) { console.debug('actor row build failed', e); }
+            renderActorRow("👥 Top Actors", topActors);
+          } catch (e) {
+            console.debug("actor row build failed", e);
+          }
         })();
         renderRow(
           "🎬 Movies",
@@ -1777,44 +2059,54 @@
         const MAX_GENRE_ROWS = 12; // render more rows based on genre
         const ROW_LIMIT = 20; // limit movies per row
 
-        if (genresFromServer && Array.isArray(genresFromServer) && genresFromServer.length) {
+        if (
+          genresFromServer &&
+          Array.isArray(genresFromServer) &&
+          genresFromServer.length
+        ) {
           const top = genresFromServer.slice(0, MAX_GENRE_ROWS);
           const usedIds = new Set();
-          top.forEach(g => {
+          top.forEach((g) => {
             const items = Array.isArray(g.items) ? g.items : [];
             // filter out already used items to avoid repetition across rows
-            const deduped = items.filter(it => it && it.id && !usedIds.has(String(it.id)));
+            const deduped = items.filter(
+              (it) => it && it.id && !usedIds.has(String(it.id)),
+            );
             const fullCount = deduped.length;
             // only render genre rows with at least 8 items after deduplication
             if (fullCount < 8) return;
             // mark only displayed items as used so later rows can still show remaining items
             const displayList = deduped.slice(0, ROW_DISPLAY_LIMIT);
-            displayList.forEach(it => usedIds.add(String(it.id)));
+            displayList.forEach((it) => usedIds.add(String(it.id)));
             // pass full deduped list to renderRow so Watch All shows everything
             renderRow(g.name, deduped);
           });
 
           // also populate genres menu from server data
           const mapForMenu = {};
-          genresFromServer.forEach(g => { mapForMenu[g.name] = g.items || []; });
+          genresFromServer.forEach((g) => {
+            mapForMenu[g.name] = g.items || [];
+          });
           populateGenresMenu(mapForMenu);
         } else {
           // fallback: build genres from movies array
           const genresMap = collectGenres(movies);
           // convert to array [genre, list]
           const genreArr = Object.keys(genresMap)
-            .map(g => ({ genre: g, list: genresMap[g] }))
-            .sort((a,b) => b.list.length - a.list.length)
+            .map((g) => ({ genre: g, list: genresMap[g] }))
+            .sort((a, b) => b.list.length - a.list.length)
             .slice(0, MAX_GENRE_ROWS);
 
           const usedIds = new Set();
-          genreArr.forEach(g => {
+          genreArr.forEach((g) => {
             if (!g.list || g.list.length < 1) return;
             // dedupe by id (MovieItemDto contains id)
-            const deduped = g.list.filter(it => it && it.id && !usedIds.has(String(it.id)));
+            const deduped = g.list.filter(
+              (it) => it && it.id && !usedIds.has(String(it.id)),
+            );
             if (deduped.length < 8) return; // skip small genres after dedupe
             const displayList = deduped.slice(0, ROW_DISPLAY_LIMIT);
-            displayList.forEach(it => usedIds.add(String(it.id)));
+            displayList.forEach((it) => usedIds.add(String(it.id)));
             // pass full deduped list to renderRow so Watch All shows everything
             renderRow(`${g.genre}`, deduped);
           });
@@ -1831,8 +2123,22 @@
           const pagination = document.querySelector(".pagination");
           if (pagination) pagination.innerHTML = "";
         }
+        applyFadeInAnimation(); // ✅ keep
 
         await fadeIn(container);
+      }
+
+      function applyFadeInAnimation() {
+        const cards = document.querySelectorAll(".movie-card");
+
+        cards.forEach((card, index) => {
+          setTimeout(() => {
+            card.style.transition = "all 0.6s ease";
+            card.style.opacity = "1";
+            card.style.transform = "translateY(0)";
+            card.style.filter = "blur(0)";
+          }, index * 30);
+        });
       }
 
       function renderPagination() {
@@ -1847,28 +2153,30 @@
         pagination.innerHTML = "";
 
         // Prev button
-        const prev = document.createElement('button');
-        prev.className = 'page-button' + (currentPage === 1 ? ' disabled' : '');
-        prev.textContent = 'Prev';
+        const prev = document.createElement("button");
+        prev.className = "page-button" + (currentPage === 1 ? " disabled" : "");
+        prev.textContent = "Prev";
         prev.onclick = async () => {
           if (currentPage > 1) await loadMovies(currentFilter, currentPage - 1);
         };
         pagination.appendChild(prev);
 
         // Page info
-        const info = document.createElement('div');
-        info.style.minWidth = '120px';
-        info.style.textAlign = 'center';
-        info.style.color = 'var(--text-subtle)';
+        const info = document.createElement("div");
+        info.style.minWidth = "120px";
+        info.style.textAlign = "center";
+        info.style.color = "var(--text-subtle)";
         info.textContent = `Page ${currentPage} / ${totalPages}`;
         pagination.appendChild(info);
 
         // Next button
-        const next = document.createElement('button');
-        next.className = 'page-button' + (currentPage >= totalPages ? ' disabled' : '');
-        next.textContent = 'Next';
+        const next = document.createElement("button");
+        next.className =
+          "page-button" + (currentPage >= totalPages ? " disabled" : "");
+        next.textContent = "Next";
         next.onclick = async () => {
-          if (currentPage < totalPages) await loadMovies(currentFilter, currentPage + 1);
+          if (currentPage < totalPages)
+            await loadMovies(currentFilter, currentPage + 1);
         };
         pagination.appendChild(next);
       }
@@ -1877,7 +2185,7 @@
       function fadeOut(el) {
         return new Promise((res) => {
           if (!el) return res();
-          el.classList.add('fade-out');
+          el.classList.add("fade-out");
           setTimeout(() => res(), 300);
         });
       }
@@ -1886,10 +2194,10 @@
         return new Promise((res) => {
           if (!el) return res();
           // ensure visible state
-          el.classList.remove('fade-out');
-          el.classList.add('fade-in');
+          el.classList.remove("fade-out");
+          el.classList.add("fade-in");
           setTimeout(() => {
-            el.classList.remove('fade-in');
+            el.classList.remove("fade-in");
             res();
           }, 300);
         });
@@ -1908,30 +2216,47 @@
         titleEl.textContent = title;
 
         // watch all button
-        const watchAll = document.createElement('button');
-        watchAll.className = 'watch-all-btn';
-        watchAll.textContent = 'Watch All';
-        watchAll.addEventListener('click', () => showGridForList(title, list));
+        const watchAll = document.createElement("button");
+        watchAll.className = "watch-all-btn";
+        watchAll.textContent = "Watch All";
+        watchAll.addEventListener("click", () => showGridForList(title, list));
 
         const scroll = document.createElement("div");
         scroll.className = "movie-row-scroll";
 
         // only display up to ROW_DISPLAY_LIMIT items in the horizontal row
-        const displayList = Array.isArray(list) ? list.slice(0, ROW_DISPLAY_LIMIT) : [];
+        const displayList = Array.isArray(list)
+          ? list.slice(0, ROW_DISPLAY_LIMIT)
+          : [];
         displayList.forEach((movie) => {
           const card = createMovieCard(movie);
           scroll.appendChild(card);
         });
 
-        const headerWrap = document.createElement('div');
-        headerWrap.style.display = 'flex';
-        headerWrap.style.alignItems = 'center';
-        headerWrap.style.justifyContent = 'space-between';
+        const headerWrap = document.createElement("div");
+        headerWrap.style.display = "flex";
+        headerWrap.style.alignItems = "center";
+        headerWrap.style.justifyContent = "space-between";
         headerWrap.appendChild(titleEl);
         headerWrap.appendChild(watchAll);
 
         row.appendChild(headerWrap);
         row.appendChild(scroll);
+
+        // animate movie cards in this horizontal row (they are created with
+        // initial hidden styles in createMovieCard). Staggered reveal like actors.
+        (function animateRowCards() {
+          const cards = scroll.querySelectorAll(".movie-card");
+          cards.forEach((card, index) => {
+            setTimeout(() => {
+              card.style.transition = "all 0.6s ease";
+              card.style.opacity = "1";
+              card.style.transform = "translateY(0)";
+              card.style.filter = "blur(0)";
+            }, index * 40);
+          });
+        })();
+
         container.appendChild(row);
       }
 
@@ -1945,7 +2270,9 @@
           const it = movies[i];
           if (!it || !it.id) continue;
           try {
-            const res = await fetch(`/api/public/movies/detail?type=${encodeURIComponent(it.type)}&id=${encodeURIComponent(it.id)}`);
+            const res = await fetch(
+              `/api/public/movies/detail?type=${encodeURIComponent(it.type)}&id=${encodeURIComponent(it.id)}`,
+            );
             if (!res.ok) continue;
             const d = await res.json();
             const cast = d.cast || [];
@@ -1953,9 +2280,15 @@
               const c = cast[j];
               if (!c || !c.id) continue;
               const key = String(c.id);
-              const existing = map.get(key) || { id: c.id, name: c.name || c.original_name || 'Unknown', profilePath: c.profilePath || c.profile_path || null, count: 0 };
+              const existing = map.get(key) || {
+                id: c.id,
+                name: c.name || c.original_name || "Unknown",
+                profilePath: c.profilePath || c.profile_path || null,
+                count: 0,
+              };
               existing.count = (existing.count || 0) + 1;
-              existing.profilePath = existing.profilePath || c.profilePath || c.profile_path || null;
+              existing.profilePath =
+                existing.profilePath || c.profilePath || c.profile_path || null;
               map.set(key, existing);
             }
           } catch (e) {
@@ -1965,55 +2298,78 @@
           if (map.size >= limit * 3) break; // gather a bit more to allow sorting
         }
 
-        const arr = Array.from(map.values()).sort((a,b) => b.count - a.count).slice(0, limit);
+        const arr = Array.from(map.values())
+          .sort((a, b) => b.count - a.count)
+          .slice(0, limit);
         return arr;
       }
 
       function renderActorRow(title, list) {
         if (!list || !list.length) return;
-        const container = document.getElementById('moviesContainer');
-        const row = document.createElement('div');
-        row.className = 'movie-row';
+        const container = document.getElementById("moviesContainer");
+        const row = document.createElement("div");
+        row.className = "movie-row";
 
-        const titleEl = document.createElement('div');
-        titleEl.className = 'movie-row-title';
+        const titleEl = document.createElement("div");
+        titleEl.className = "movie-row-title";
         titleEl.textContent = title;
 
-        const watchAll = document.createElement('button');
-        watchAll.className = 'watch-all-btn';
-        watchAll.textContent = 'See all';
-        watchAll.addEventListener('click', () => { window.location.href = 'actors.html'; });
+        const watchAll = document.createElement("button");
+        watchAll.className = "watch-all-btn";
+        watchAll.textContent = "See all";
+        watchAll.addEventListener("click", () => {
+          window.location.href = "actors.html";
+        });
 
-        const headerWrap = document.createElement('div');
-        headerWrap.style.display = 'flex';
-        headerWrap.style.alignItems = 'center';
-        headerWrap.style.justifyContent = 'space-between';
+        const headerWrap = document.createElement("div");
+        headerWrap.style.display = "flex";
+        headerWrap.style.alignItems = "center";
+        headerWrap.style.justifyContent = "space-between";
         headerWrap.appendChild(titleEl);
         headerWrap.appendChild(watchAll);
 
-        const scroll = document.createElement('div');
-        scroll.className = 'movie-row-scroll';
+        const scroll = document.createElement("div");
+        scroll.className = "movie-row-scroll";
 
-        list.forEach(actor => {
-          const card = document.createElement('div');
-          card.className = 'actor-card';
-          card.innerHTML = `<div class="actor-thumb" style="background-image:url('${actor.profilePath || 'https://via.placeholder.com/300x400?text=No+Image'}')"></div><div class="actor-name">${actor.name}</div>`;
-          card.addEventListener('click', () => { window.location.href = `actors.html?id=${encodeURIComponent(actor.id)}`; });
+        list.forEach((actor) => {
+          const card = document.createElement("div");
+          card.className = "actor-card";
+          card.style.opacity = "0";
+          card.style.transform = "translateY(25px)";
+          card.style.filter = "blur(4px)";
+          card.innerHTML = `<div class="actor-thumb" style="background-image:url('${actor.profilePath || "https://via.placeholder.com/300x400?text=No+Image"}')"></div><div class="actor-name">${actor.name}</div>`;
+          card.addEventListener("click", () => {
+            window.location.href = `actors.html?id=${encodeURIComponent(actor.id)}`;
+          });
           scroll.appendChild(card);
         });
 
         row.appendChild(headerWrap);
         row.appendChild(scroll);
+        const cards = scroll.querySelectorAll(".actor-card");
+
+        cards.forEach((card, index) => {
+          setTimeout(() => {
+            card.style.transition = "all 0.6s ease";
+            card.style.opacity = "1";
+            card.style.transform = "translateY(0)";
+            card.style.filter = "blur(0)";
+          }, index * 40);
+        });
+
         // insert actors row after the first row (Trending)
         // find first movie-row and insert after it
         // remove any existing actor row with same title to avoid duplicates
-        const existing = Array.from(container.querySelectorAll('.movie-row')).find(r => {
-          const t = r.querySelector('.movie-row-title');
+        const existing = Array.from(
+          container.querySelectorAll(".movie-row"),
+        ).find((r) => {
+          const t = r.querySelector(".movie-row-title");
           return t && t.textContent === title;
         });
-        if (existing && existing.parentElement) existing.parentElement.removeChild(existing);
+        if (existing && existing.parentElement)
+          existing.parentElement.removeChild(existing);
 
-        const firstRow = container.querySelector('.movie-row');
+        const firstRow = container.querySelector(".movie-row");
         if (firstRow && firstRow.parentElement) {
           container.insertBefore(row, firstRow.nextSibling);
         } else {
@@ -2023,39 +2379,39 @@
 
       // Show a full grid for a selected list (Watch All)
       function showGridForList(title, list) {
-        const container = document.getElementById('moviesContainer');
+        const container = document.getElementById("moviesContainer");
         if (!container) return;
 
         // hide featured and main pagination while viewing a grid from a row/genre
-        const featuredEl = document.getElementById('featuredMovie');
-        const paginationEl = document.querySelector('.pagination');
+        const featuredEl = document.getElementById("featuredMovie");
+        const paginationEl = document.querySelector(".pagination");
 
-        currentView = 'grid';
-        if (featuredEl) featuredEl.style.display = 'none';
-        if (paginationEl) paginationEl.style.display = 'none';
+        currentView = "grid";
+        if (featuredEl) featuredEl.style.display = "none";
+        if (paginationEl) paginationEl.style.display = "none";
 
-        (async function() {
+        (async function () {
           await fadeOut(container);
-          container.innerHTML = '';
+          container.innerHTML = "";
 
-          const header = document.createElement('div');
-          header.className = 'grid-header';
+          const header = document.createElement("div");
+          header.className = "grid-header";
 
-          const left = document.createElement('div');
+          const left = document.createElement("div");
           left.innerHTML = `<div style="font-size:18px;font-weight:700">${title}</div><div class="section-subtitle">${list.length} items</div>`;
 
-          const right = document.createElement('div');
-          const back = document.createElement('button');
-          back.className = 'grid-back';
-          back.textContent = 'Back';
-          back.addEventListener('click', async () => {
+          const right = document.createElement("div");
+          const back = document.createElement("button");
+          back.className = "grid-back";
+          back.textContent = "Back";
+          back.addEventListener("click", async () => {
             // return to rows view
-            currentView = 'rows';
+            currentView = "rows";
             await fadeOut(container);
             await renderMovies();
             // restore featured and main pagination visually
-            if (featuredEl) featuredEl.style.display = '';
-            if (paginationEl) paginationEl.style.display = '';
+            if (featuredEl) featuredEl.style.display = "";
+            if (paginationEl) paginationEl.style.display = "";
             renderFeaturedMovie();
           });
           right.appendChild(back);
@@ -2068,51 +2424,64 @@
           // client-side pagination for the provided list
           const PAGE_SIZE = 20;
           let page = 1;
-          const totalPages = Math.max(1, Math.ceil((list && list.length) ? list.length / PAGE_SIZE : 0));
+          const totalPages = Math.max(
+            1,
+            Math.ceil(list && list.length ? list.length / PAGE_SIZE : 0),
+          );
 
-          const gridWrap = document.createElement('div');
-          gridWrap.className = 'grid-wrap';
-          const grid = document.createElement('div');
-          grid.className = 'movies-grid';
+          const gridWrap = document.createElement("div");
+          gridWrap.className = "grid-wrap";
+          const grid = document.createElement("div");
+          grid.className = "movies-grid";
           gridWrap.appendChild(grid);
 
-          const paginationWrap = document.createElement('div');
-          paginationWrap.className = 'pagination';
-          paginationWrap.style.marginTop = '12px';
+          const paginationWrap = document.createElement("div");
+          paginationWrap.className = "pagination";
+          paginationWrap.style.marginTop = "12px";
 
           function renderGridPage(p) {
-            grid.innerHTML = '';
+            grid.innerHTML = "";
             const start = (p - 1) * PAGE_SIZE;
             const pageItems = (list || []).slice(start, start + PAGE_SIZE);
-            pageItems.forEach(m => grid.appendChild(createMovieCard(m)));
+            pageItems.forEach((m) => grid.appendChild(createMovieCard(m)));
 
             // build compact Prev / Page X / Next pagination
-            paginationWrap.innerHTML = '';
+            paginationWrap.innerHTML = "";
             if (totalPages <= 1) return;
 
-            const prevBtn = document.createElement('button');
-            prevBtn.className = 'page-button' + (p === 1 ? ' disabled' : '');
-            prevBtn.textContent = 'Prev';
+            const prevBtn = document.createElement("button");
+            prevBtn.className = "page-button" + (p === 1 ? " disabled" : "");
+            prevBtn.textContent = "Prev";
             prevBtn.onclick = () => {
               if (p > 1) {
                 page = p - 1;
-                (async () => { await fadeOut(grid); renderGridPage(page); await fadeIn(grid); })();
+                (async () => {
+                  await fadeOut(grid);
+                  renderGridPage(page);
+                  await fadeIn(grid);
+                  applyFadeInAnimation(); // ✅ ADD THIS LINE
+                })();
               }
             };
 
-            const info = document.createElement('div');
-            info.style.minWidth = '120px';
-            info.style.textAlign = 'center';
-            info.style.color = 'var(--text-subtle)';
+            const info = document.createElement("div");
+            info.style.minWidth = "120px";
+            info.style.textAlign = "center";
+            info.style.color = "var(--text-subtle)";
             info.textContent = `Page ${p} / ${totalPages}`;
 
-            const nextBtn = document.createElement('button');
-            nextBtn.className = 'page-button' + (p >= totalPages ? ' disabled' : '');
-            nextBtn.textContent = 'Next';
+            const nextBtn = document.createElement("button");
+            nextBtn.className =
+              "page-button" + (p >= totalPages ? " disabled" : "");
+            nextBtn.textContent = "Next";
             nextBtn.onclick = () => {
               if (p < totalPages) {
                 page = p + 1;
-                (async () => { await fadeOut(grid); renderGridPage(page); await fadeIn(grid); })();
+                (async () => {
+                  await fadeOut(grid);
+                  renderGridPage(page);
+                  await fadeIn(grid);
+                })();
               }
             };
 
@@ -2127,12 +2496,16 @@
           container.appendChild(gridWrap);
           container.appendChild(paginationWrap);
           await fadeIn(container);
+          applyFadeInAnimation(); // ✅ ADD THIS LINE
         })();
       }
 
       function createMovieCard(movie) {
         const card = document.createElement("article");
         card.className = "movie-card";
+        card.style.opacity = "0";
+        card.style.transform = "translateY(25px)";
+        card.style.filter = "blur(4px)";
 
         const isTrending =
           typeof movie.rating === "number" && movie.rating >= 8;
@@ -2167,25 +2540,29 @@
         return card;
       }
 
-        function createActorCard(actor) {
-          const card = document.createElement('div');
-          card.className = 'actor-card';
-          const thumb = document.createElement('div');
-          thumb.className = 'actor-thumb';
-          const imgUrl = actor.profilePath || actor.imageUrl || '/static/img/placeholder-actor.png';
-          thumb.style.backgroundImage = `url('${imgUrl}')`;
-          const name = document.createElement('div');
-          name.className = 'actor-name';
-          name.textContent = actor.name || actor.title || 'Unknown';
-          card.appendChild(thumb);
-          card.appendChild(name);
-          card.addEventListener('click', () => {
-            const id = actor.id || actor.personId || actor.profileId;
-            if (id) window.location.href = `actors.html?id=${encodeURIComponent(id)}`;
-            else window.location.href = 'actors.html';
-          });
-          return card;
-        }
+      function createActorCard(actor) {
+        const card = document.createElement("div");
+        card.className = "actor-card";
+        const thumb = document.createElement("div");
+        thumb.className = "actor-thumb";
+        const imgUrl =
+          actor.profilePath ||
+          actor.imageUrl ||
+          "/static/img/placeholder-actor.png";
+        thumb.style.backgroundImage = `url('${imgUrl}')`;
+        const name = document.createElement("div");
+        name.className = "actor-name";
+        name.textContent = actor.name || actor.title || "Unknown";
+        card.appendChild(thumb);
+        card.appendChild(name);
+        card.addEventListener("click", () => {
+          const id = actor.id || actor.personId || actor.profileId;
+          if (id)
+            window.location.href = `actors.html?id=${encodeURIComponent(id)}`;
+          else window.location.href = "actors.html";
+        });
+        return card;
+      }
 
       // ========== MOVIE DETAIL (YÊU CẦU LOGIN) ==========
       function handleMovieClick(movie) {
@@ -2235,15 +2612,15 @@
               if (navKey === "home") {
                 currentFilter = "all";
                 // returning to homepage should restore rows view (show featured)
-                currentView = 'rows';
+                currentView = "rows";
               } else if (navKey === "movies") {
                 currentFilter = "movie";
                 // switch to grid view for movies listing
-                currentView = 'grid';
+                currentView = "grid";
               } else if (navKey === "tv") {
                 currentFilter = "tv";
                 // switch to grid view for tv listing
-                currentView = 'grid';
+                currentView = "grid";
               }
 
               await loadMovies(currentFilter);
@@ -2258,23 +2635,46 @@
       // ========== GENRES HELPERS ==========
       async function loadGenres() {
         try {
-          const token = localStorage.getItem('token');
-          const headers = token ? { Authorization: 'Bearer ' + token } : {};
-          const res = await fetch('/api/public/movies/genres', { headers });
+          const token = localStorage.getItem("token");
+          const headers = token ? { Authorization: "Bearer " + token } : {};
+          const res = await fetch("/api/public/movies/genres", { headers });
           const data = await res.json();
           // data is array of { id, name, items: [...] }
           genresFromServer = data;
-          console.debug('[loadGenres] got', data && data.length);
+          console.debug("[loadGenres] got", data && data.length);
           return data;
         } catch (e) {
-          console.debug('[loadGenres] error', e);
+          console.debug("[loadGenres] error", e);
           genresFromServer = null;
           return null;
         }
       }
+
+      async function loadMaybeYouWantToWatch(limit = 12) {
+        const token = localStorage.getItem("token");
+        if (!token) return [];
+
+        try {
+          const headers = {
+            Authorization: "Bearer " + token,
+          };
+          const res = await fetch(
+            `/api/user/recommendations/maybe-you-want-to-watch?limit=${encodeURIComponent(limit)}`,
+            { headers },
+          );
+          if (!res.ok) return [];
+
+          const data = await res.json();
+          return Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : []);
+        } catch (e) {
+          console.debug("[loadMaybeYouWantToWatch] failed", e);
+          return [];
+        }
+        
+      }
       function collectGenres(list) {
         const map = {};
-        (list || []).forEach(m => {
+        (list || []).forEach((m) => {
           if (!m) return;
 
           // helper to add a genre
@@ -2290,33 +2690,49 @@
           const candidates = [];
 
           // direct arrays
-          if (Array.isArray(m.genres)) candidates.push({value: m.genres, type: 'array'});
-          if (Array.isArray(m.categories)) candidates.push({value: m.categories, type: 'array'});
-          if (Array.isArray(m.tags)) candidates.push({value: m.tags, type: 'array'});
+          if (Array.isArray(m.genres))
+            candidates.push({ value: m.genres, type: "array" });
+          if (Array.isArray(m.categories))
+            candidates.push({ value: m.categories, type: "array" });
+          if (Array.isArray(m.tags))
+            candidates.push({ value: m.tags, type: "array" });
 
           // nested common shapes
-          if (m.details && Array.isArray(m.details.genres)) candidates.push({value: m.details.genres, type: 'array'});
-          if (m.metadata && Array.isArray(m.metadata.genres)) candidates.push({value: m.metadata.genres, type: 'array'});
+          if (m.details && Array.isArray(m.details.genres))
+            candidates.push({ value: m.details.genres, type: "array" });
+          if (m.metadata && Array.isArray(m.metadata.genres))
+            candidates.push({ value: m.metadata.genres, type: "array" });
 
           // string fields
-          const maybeStr = m.genre || m.genresString || m.genresStr || m.category || m.tagsString || m.genreNames || m.genre_list;
-          if (maybeStr && typeof maybeStr === 'string') candidates.push({value: maybeStr, type: 'string'});
+          const maybeStr =
+            m.genre ||
+            m.genresString ||
+            m.genresStr ||
+            m.category ||
+            m.tagsString ||
+            m.genreNames ||
+            m.genre_list;
+          if (maybeStr && typeof maybeStr === "string")
+            candidates.push({ value: maybeStr, type: "string" });
 
           // object arrays with { name }
           for (const c of candidates) {
             if (!c.value) continue;
-            if (c.type === 'array') {
-              c.value.forEach(x => {
+            if (c.type === "array") {
+              c.value.forEach((x) => {
                 if (!x && x !== 0) return;
-                if (typeof x === 'string') add(x);
+                if (typeof x === "string") add(x);
                 else if (x && (x.name || x.title)) add(x.name || x.title);
                 else add(x);
               });
               // if found, we consider this movie done
               return;
             }
-            if (c.type === 'string') {
-              const parts = String(c.value).split(/[,|;]+/).map(p => p.trim()).filter(Boolean);
+            if (c.type === "string") {
+              const parts = String(c.value)
+                .split(/[,|;]+/)
+                .map((p) => p.trim())
+                .filter(Boolean);
               if (parts.length) {
                 parts.forEach(add);
                 return;
@@ -2327,18 +2743,34 @@
           }
 
           // additional fallbacks: sometimes genre is under unexpected keys
-          const fallbackKeys = ['genre', 'genres', 'category', 'categories', 'tags', 'tagsList', 'genreNames', 'genre_list'];
+          const fallbackKeys = [
+            "genre",
+            "genres",
+            "category",
+            "categories",
+            "tags",
+            "tagsList",
+            "genreNames",
+            "genre_list",
+          ];
           for (const k of fallbackKeys) {
             const v = m[k];
             if (!v) continue;
             if (Array.isArray(v)) {
-              v.forEach(x => add(x && (x.name || x)));
+              v.forEach((x) => add(x && (x.name || x)));
               return;
             }
-            if (typeof v === 'string') {
-              const parts = v.split(/[,|;]+/).map(p => p.trim()).filter(Boolean);
-              if (parts.length) { parts.forEach(add); return; }
-              add(v); return;
+            if (typeof v === "string") {
+              const parts = v
+                .split(/[,|;]+/)
+                .map((p) => p.trim())
+                .filter(Boolean);
+              if (parts.length) {
+                parts.forEach(add);
+                return;
+              }
+              add(v);
+              return;
             }
           }
 
@@ -2349,18 +2781,23 @@
       }
 
       function populateGenresMenu(genresMap) {
-        const menu = document.getElementById('genresMenu');
+        const menu = document.getElementById("genresMenu");
         if (!menu) return;
-        menu.innerHTML = '';
+        menu.innerHTML = "";
         // prefer server-provided genres if available
-        if (genresFromServer && Array.isArray(genresFromServer) && genresFromServer.length) {
-          genresFromServer.forEach(g => {
-            const el = document.createElement('div');
-            el.className = 'genre-item';
-            const count = (Array.isArray(g.items) ? g.items.length : 0);
-            el.textContent = `${g.name} (${count})`;
-            el.addEventListener('click', () => {
-              menu.style.display = 'none';
+        if (
+          genresFromServer &&
+          Array.isArray(genresFromServer) &&
+          genresFromServer.length
+        ) {
+          genresFromServer.forEach((g) => {
+            const el = document.createElement("div");
+            el.className = "genre-item";
+            el.textContent = `${translateGenre(g.name)}`;
+
+            
+            el.addEventListener("click", () => {
+              menu.style.display = "none";
               showGridForList(g.name, g.items || []);
             });
             menu.appendChild(el);
@@ -2368,21 +2805,27 @@
           return;
         }
 
-        const keys = Object.keys(genresMap).sort((a,b)=> b.localeCompare(a));
+        const keys = Object.keys(genresMap).sort((a, b) => b.localeCompare(a));
         if (!keys.length) {
-          const info = document.createElement('div');
-          info.className = 'genre-item';
-          info.textContent = 'No genres detected from data';
+          const info = document.createElement("div");
+          info.className = "genre-item";
+          info.textContent = "No genres detected from data";
           menu.appendChild(info);
 
           // helpful debug hint for developers: show sample keys from first movie if available
           try {
-            const sample = (movies && movies.length && Object.keys(movies[0]).slice(0,20)) || [];
-            const hint = document.createElement('div');
-            hint.style.marginTop = '8px';
-            hint.style.fontSize = '12px';
-            hint.style.color = 'var(--text-subtle)';
-            hint.textContent = 'Debug: sample movie fields -> ' + (sample.join(', ') || 'no sample available');
+            const sample =
+              (movies &&
+                movies.length &&
+                Object.keys(movies[0]).slice(0, 20)) ||
+              [];
+            const hint = document.createElement("div");
+            hint.style.marginTop = "8px";
+            hint.style.fontSize = "12px";
+            hint.style.color = "var(--text-subtle)";
+            hint.textContent =
+              "Debug: sample movie fields -> " +
+              (sample.join(", ") || "no sample available");
             menu.appendChild(hint);
           } catch (e) {
             // ignore
@@ -2391,13 +2834,15 @@
           return;
         }
 
-        keys.forEach(k => {
-          const el = document.createElement('div');
-          el.className = 'genre-item';
-          el.textContent = `${k} (${genresMap[k].length})`;
-          el.addEventListener('click', () => {
+        keys.forEach((k) => {
+          const el = document.createElement("div");
+          el.className = "genre-item";
+          
+          el.textContent = `${translateGenre(k)}`;
+
+          el.addEventListener("click", () => {
             // hide menu
-            menu.style.display = 'none';
+            menu.style.display = "none";
             // show grid for this genre
             showGridForList(k, genresMap[k]);
           });
@@ -2406,104 +2851,124 @@
       }
 
       // wire genres button toggle and outside click
-      document.addEventListener('click', (e) => {
-        const gBtn = e.target.closest('#genresBtn');
-        const menu = document.getElementById('genresMenu');
+      document.addEventListener("click", (e) => {
+        const gBtn = e.target.closest("#genresBtn");
+        const menu = document.getElementById("genresMenu");
         if (gBtn) {
-          if (menu) menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+          if (menu)
+            menu.style.display =
+              menu.style.display === "flex" ? "none" : "flex";
           return;
         }
         // click outside -> close
-        if (menu && !e.target.closest('.genres-dropdown')) {
-          menu.style.display = 'none';
+        if (menu && !e.target.closest(".genres-dropdown")) {
+          menu.style.display = "none";
         }
       });
 
       // ========== SEARCH ==========
       function initSearch() {
         // wire the navbar search button to open the overlay
-        const navButton = document.getElementById('navSearchBtn');
-        const overlay = document.getElementById('searchOverlay');
-        const overlayInput = document.getElementById('overlaySearchInput');
-        const closeBtn = document.getElementById('closeOverlayBtn');
+        const navButton = document.getElementById("navSearchBtn");
+        const overlay = document.getElementById("searchOverlay");
+        const overlayInput = document.getElementById("overlaySearchInput");
+        const closeBtn = document.getElementById("closeOverlayBtn");
 
         if (!navButton || !overlay || !overlayInput || !closeBtn) return;
 
-        navButton.addEventListener('click', () => {
+        navButton.addEventListener("click", () => {
           showSearchOverlay();
         });
 
-        closeBtn.addEventListener('click', () => hideSearchOverlay());
+        closeBtn.addEventListener("click", () => hideSearchOverlay());
 
         // live search inside overlay (debounced)
         let overlayTimer = null;
-        overlayInput.addEventListener('input', () => {
+        overlayInput.addEventListener("input", () => {
           clearTimeout(overlayTimer);
-          overlayTimer = setTimeout(() => performLiveSearch(overlayInput.value), 220);
+          overlayTimer = setTimeout(
+            () => performLiveSearch(overlayInput.value),
+            220,
+          );
         });
 
-        overlayInput.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape') hideSearchOverlay();
+        overlayInput.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") hideSearchOverlay();
         });
       }
 
       function showSearchOverlay() {
-        const overlay = document.getElementById('searchOverlay');
-        const overlayInput = document.getElementById('overlaySearchInput');
+        const overlay = document.getElementById("searchOverlay");
+        const overlayInput = document.getElementById("overlaySearchInput");
         if (!overlay) return;
-        overlay.classList.remove('hidden');
-        overlay.setAttribute('aria-hidden', 'false');
+        overlay.classList.remove("hidden");
+        overlay.setAttribute("aria-hidden", "false");
         // focus input
         setTimeout(() => overlayInput && overlayInput.focus(), 80);
         // stop featured from auto-rotating while searching
         if (featuredInterval) clearInterval(featuredInterval);
-        currentView = 'search';
+        currentView = "search";
       }
 
       function hideSearchOverlay() {
-        const overlay = document.getElementById('searchOverlay');
+        const overlay = document.getElementById("searchOverlay");
         if (!overlay) return;
-        overlay.classList.add('hidden');
-        overlay.setAttribute('aria-hidden', 'true');
+        overlay.classList.add("hidden");
+        overlay.setAttribute("aria-hidden", "true");
         // restore featured rotation
         renderFeaturedMovie();
-        currentView = 'rows';
+        currentView = "rows";
       }
 
       async function performLiveSearch(q) {
-        const query = (q || '').trim();
-        const grid = document.getElementById('overlayGrid');
-        const countEl = document.getElementById('overlayResultCount');
-        const paginationEl = document.getElementById('overlayPagination');
+        const query = (q || "").trim();
+        const grid = document.getElementById("overlayGrid");
+        const countEl = document.getElementById("overlayResultCount");
+        const paginationEl = document.getElementById("overlayPagination");
         if (!grid || !countEl) return;
 
-        grid.innerHTML = '';
-        const actorsSection = document.getElementById('overlayActorsSection');
-        const actorsGrid = document.getElementById('overlayActorsGrid');
+        grid.innerHTML = "";
+        const actorsSection = document.getElementById("overlayActorsSection");
+        const actorsGrid = document.getElementById("overlayActorsGrid");
         if (!query) {
-          countEl.textContent = 'Type to search';
-          paginationEl && (paginationEl.innerHTML = '');
+          countEl.textContent = "Type to search";
+          paginationEl && (paginationEl.innerHTML = "");
           // hide actors area when there's no query
-          if (actorsSection) actorsSection.style.display = 'none';
-          if (actorsGrid) actorsGrid.innerHTML = '';
+          if (actorsSection) actorsSection.style.display = "none";
+          if (actorsGrid) actorsGrid.innerHTML = "";
           return;
         }
 
         try {
-          const token = localStorage.getItem('token');
-          const headers = token ? { Authorization: 'Bearer ' + token } : {};
-          const moviesPromise = fetch(`/api/public/movies/search?q=${encodeURIComponent(query)}&type=all&page=1`, { headers });
-          const peoplePromise = fetch(`/api/public/people/page?page=1&q=${encodeURIComponent(query)}`, { headers });
+          const token = localStorage.getItem("token");
+          const headers = token ? { Authorization: "Bearer " + token } : {};
+          const moviesPromise = fetch(
+            `/api/public/movies/search?q=${encodeURIComponent(query)}&type=all&page=1`,
+            { headers },
+          );
+          const peoplePromise = fetch(
+            `/api/public/people/page?page=1&q=${encodeURIComponent(query)}`,
+            { headers },
+          );
 
-          const [moviesRes, peopleRes] = await Promise.all([moviesPromise, peoplePromise]);
+          const [moviesRes, peopleRes] = await Promise.all([
+            moviesPromise,
+            peoplePromise,
+          ]);
           const moviesData = await moviesRes.json();
           const peopleData = await peopleRes.json();
           const items = moviesData.items || [];
-          const peopleItems = Array.isArray(peopleData) ? peopleData : (peopleData.items || []);
-          const peopleTotal = Array.isArray(peopleData) ? peopleData.length : (peopleData.totalElements || (peopleItems ? peopleItems.length : 0));
+          const peopleItems = Array.isArray(peopleData)
+            ? peopleData
+            : peopleData.items || [];
+          const peopleTotal = Array.isArray(peopleData)
+            ? peopleData.length
+            : peopleData.totalElements ||
+              (peopleItems ? peopleItems.length : 0);
 
           // limit displayed actor count to 20; show 20+ when there are more
-          const displayedActorCount = peopleTotal > 20 ? '20+' : String(peopleTotal);
+          const displayedActorCount =
+            peopleTotal > 20 ? "20+" : String(peopleTotal);
           countEl.textContent = `${items.length} movies · ${displayedActorCount} actors`;
 
           // show first page of movies (client-side pagesize 20)
@@ -2512,68 +2977,88 @@
           const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
 
           const pageItems = items.slice(0, PAGE_SIZE);
-          pageItems.forEach(m => grid.appendChild(createMovieCard(m)));
+          pageItems.forEach((m) => grid.appendChild(createMovieCard(m)));
+
+          // Fix: ensure overlay movie cards are visible immediately.
+          // createMovieCard initially sets them hidden for page animations;
+          // the overlay search needs to force them visible after append.
+          requestAnimationFrame(() => {
+            const cards = grid.querySelectorAll('.movie-card');
+            cards.forEach((c) => {
+              c.style.opacity = '1';
+              c.style.transform = 'none';
+              c.style.filter = 'none';
+            });
+          });
 
           // render actors grid (compact) - only show when query exists; cap results to 20
-          if (actorsSection) actorsSection.style.display = (peopleItems && peopleItems.length) ? '' : 'none';
+          if (actorsSection)
+            actorsSection.style.display =
+              peopleItems && peopleItems.length ? "" : "none";
           if (actorsGrid) {
-            actorsGrid.innerHTML = '';
+            actorsGrid.innerHTML = "";
             if (!peopleItems || peopleItems.length === 0) {
-              actorsGrid.textContent = 'No actors';
+              actorsGrid.textContent = "No actors";
             } else {
               // show up to 20 actors
-              peopleItems.slice(0, 20).forEach(p => actorsGrid.appendChild(createActorCard(p)));
+              peopleItems
+                .slice(0, 20)
+                .forEach((p) => actorsGrid.appendChild(createActorCard(p)));
             }
           }
 
           // build compact pagination for overlay
           if (paginationEl) {
-            paginationEl.innerHTML = '';
+            paginationEl.innerHTML = "";
             if (totalPages > 1) {
-              const prev = document.createElement('button');
-              prev.className = 'page-button disabled';
-              prev.textContent = 'Prev';
-              const info = document.createElement('div');
-              info.style.minWidth = '120px';
-              info.style.textAlign = 'center';
-              info.style.color = 'var(--text-subtle)';
+              const prev = document.createElement("button");
+              prev.className = "page-button disabled";
+              prev.textContent = "Prev";
+              const info = document.createElement("div");
+              info.style.minWidth = "120px";
+              info.style.textAlign = "center";
+              info.style.color = "var(--text-subtle)";
               info.textContent = `Page ${PAGE} / ${totalPages}`;
-              const next = document.createElement('button');
-              next.className = 'page-button';
-              next.textContent = 'Next';
+              const next = document.createElement("button");
+              next.className = "page-button";
+              next.textContent = "Next";
               let current = PAGE;
               prev.onclick = () => {
                 if (current <= 1) return;
                 current--;
                 const start = (current - 1) * PAGE_SIZE;
-                grid.innerHTML = '';
-                items.slice(start, start + PAGE_SIZE).forEach(m => grid.appendChild(createMovieCard(m)));
+                grid.innerHTML = "";
+                items
+                  .slice(start, start + PAGE_SIZE)
+                  .forEach((m) => grid.appendChild(createMovieCard(m)));
                 info.textContent = `Page ${current} / ${totalPages}`;
                 // update disabled states
-                prev.classList.toggle('disabled', current === 1);
-                next.classList.toggle('disabled', current === totalPages);
+                prev.classList.toggle("disabled", current === 1);
+                next.classList.toggle("disabled", current === totalPages);
               };
               next.onclick = () => {
                 if (current >= totalPages) return;
                 current++;
                 const start = (current - 1) * PAGE_SIZE;
-                grid.innerHTML = '';
-                items.slice(start, start + PAGE_SIZE).forEach(m => grid.appendChild(createMovieCard(m)));
+                grid.innerHTML = "";
+                items
+                  .slice(start, start + PAGE_SIZE)
+                  .forEach((m) => grid.appendChild(createMovieCard(m)));
                 info.textContent = `Page ${current} / ${totalPages}`;
-                prev.classList.toggle('disabled', current === 1);
-                next.classList.toggle('disabled', current === totalPages);
+                prev.classList.toggle("disabled", current === 1);
+                next.classList.toggle("disabled", current === totalPages);
               };
 
               paginationEl.appendChild(prev);
               paginationEl.appendChild(info);
               paginationEl.appendChild(next);
             } else {
-              paginationEl.innerHTML = '';
+              paginationEl.innerHTML = "";
             }
           }
         } catch (e) {
           console.error(e);
-          countEl.textContent = 'Search failed';
+          countEl.textContent = "Search failed";
         }
       }
       function renderWelcomeRegion(username, region) {
@@ -2666,36 +3151,40 @@
         initNavbarSearchToggle();
         adjustFeaturedHeight();
         // unlock featured full-screen when user scrolls or touches
-        window.addEventListener('wheel', unlockFeaturedOnScroll, { passive: true });
-        window.addEventListener('touchstart', unlockFeaturedOnScroll, { passive: true });
+        window.addEventListener("wheel", unlockFeaturedOnScroll, {
+          passive: true,
+        });
+        window.addEventListener("touchstart", unlockFeaturedOnScroll, {
+          passive: true,
+        });
         handlePaymentReturnMessage();
         initPremiumAndLogout();
-  await loadMovies(currentFilter);
+        await loadMovies(currentFilter);
       })();
 
       // wire featured down button
-      document.addEventListener('click', (e) => {
-        const d = e.target.closest('#featuredDown');
+      document.addEventListener("click", (e) => {
+        const d = e.target.closest("#featuredDown");
         if (!d) return;
         // smooth scroll to movies container
-        const el = document.getElementById('moviesContainer');
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const el = document.getElementById("moviesContainer");
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
         unlockFeaturedOnScroll();
       });
 
       // wire featured Play and More Info buttons
-      document.addEventListener('click', (e) => {
-        const playBtn = e.target.closest('#featuredPlay');
-        const infoBtn = e.target.closest('#featuredInfo');
+      document.addEventListener("click", (e) => {
+        const playBtn = e.target.closest("#featuredPlay");
+        const infoBtn = e.target.closest("#featuredInfo");
 
         if (playBtn) {
           e.stopPropagation();
           const movie = featuredList && featuredList[featuredIndex];
           if (!movie || !movie.id) {
-            alert('No movie selected to play.');
+            alert("No movie selected to play.");
             return;
           }
-          const type = movie.type || 'movie';
+          const type = movie.type || "movie";
           // navigate to watch page
           window.location.href = `movie-watch.html?id=${encodeURIComponent(movie.id)}&type=${encodeURIComponent(type)}`;
           return;
@@ -2705,22 +3194,29 @@
           e.stopPropagation();
           const movie = featuredList && featuredList[featuredIndex];
           if (!movie || !movie.id) {
-            alert('No movie selected.');
+            alert("No movie selected.");
             return;
           }
-          const type = movie.type || 'movie';
+          const type = movie.type || "movie";
           // require login to view details (keep same UX as card click)
-          const token = localStorage.getItem('token');
+          const token = localStorage.getItem("token");
           if (!token) {
             const goLogin = confirm(
-              'Bạn cần đăng nhập để xem chi tiết phim. Chuyển tới trang đăng nhập?',
+              "Bạn cần đăng nhập để xem chi tiết phim. Chuyển tới trang đăng nhập?",
             );
-            if (goLogin) window.location.href = 'login.html';
+            if (goLogin) window.location.href = "login.html";
             return;
           }
           window.location.href = `movie-detail.html?id=${encodeURIComponent(movie.id)}&type=${encodeURIComponent(type)}`;
           return;
         }
+      });
+
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          const shell = document.querySelector('.page-shell');
+          if (shell) shell.classList.add("page-visible");
+        }, 50); // small delay makes animation visible
       });
     </script>
     <div
@@ -2766,6 +3262,6 @@
         </button>
       </div>
     </div>
-    <script src="js/ai-chat-support.js"></script>
+    
   </body>
 </html>

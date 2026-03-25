@@ -1,276 +1,646 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>Actors · MovieZone</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <style>
-    :root {
-      --bg-primary: #020617;
-      --text-main: #e5e7eb;
-      --text-subtle: #9ca3af;
-      --accent: #f97316;
-    }
-    body { font-family: Poppins, system-ui, -apple-system, 'Segoe UI', sans-serif; background: linear-gradient(135deg,#020617,#030712); color:var(--text-main); margin:0; min-height:100vh; }
-    .page-shell { max-width:1320px; margin:0 auto; padding:20px 28px 48px; }
-    .navbar { display:flex;align-items:center;gap:16px;padding:12px 20px;border-radius:14px;background:rgba(15,23,42,0.96);box-shadow:0 0 0 1px rgba(148,163,184,0.12);backdrop-filter: blur(8px); }
-    .nav-left{display:flex;align-items:center;gap:12px}
-    .nav-logo{width:40px;height:40px;border-radius:999px;background:radial-gradient(circle at 30% 20%,#f97316,#ec4899 55%,#4f46e5);display:flex;align-items:center;justify-content:center;font-weight:700}
-    .nav-title-main{font-weight:700;font-size:14px}
-    .nav-center{flex:1;display:flex;justify-content:center}
-    .nav-right{display:flex;align-items:center}
-    .search-input-wrap{display:flex;flex-direction:column;background:#020617;border-radius:999px;padding:8px 14px;border:1px solid rgba(148,163,184,0.25);width:520px;max-width:72%;}
-    .search-input{border:none;background:transparent;color:var(--text-main);font-size:14px;outline:none}
-    .search-placeholder-sub{font-size:11px;color:var(--text-subtle);margin-top:2px}
-    .actors-grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(150px,1fr)); gap:18px; margin-top:20px; }
-    .actor-card { background: rgba(15,23,42,0.9); padding:12px; border-radius:12px; text-align:center; cursor:pointer; border:1px solid rgba(148,163,184,0.06); }
-    .actor-thumb { width:100%; aspect-ratio: 3/4; background-size:cover; background-position:center; border-radius:8px; }
-    .actor-name { margin-top:8px; font-weight:600; }
-    .actor-sub { color:var(--text-subtle); font-size:13px; }
-    .nav-button{padding:8px 12px;border-radius:8px;border:1px solid rgba(148,163,184,0.08);background:rgba(15,23,42,0.9);color:var(--text-main);cursor:pointer}
-    .person-detail { margin-top:18px; display:flex; gap:18px; }
-    .person-meta { width:260px; }
-    .person-bio { flex:1; background: rgba(2,6,23,0.5); padding:12px; border-radius:10px; }
-    .movies-list { margin-top:12px; display:grid; grid-template-columns: repeat(auto-fill,minmax(130px,1fr)); gap:12px; }
-    .pagination-wrap { display:flex; gap:8px; justify-content:center; align-items:center; margin-top:18px; }
-  /* slide-over panel */
-  .backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; opacity:0; transition:opacity .22s ease; z-index:50; }
-  /* full-screen slide-over panel */
-  .detail-panel { position:fixed; inset:0; height:100vh; width:100%; background:linear-gradient(180deg, rgba(2,6,23,0.98), rgba(6,8,27,0.98)); box-shadow:none; padding:20px; overflow:auto; transform:translateX(100%); transition:transform .28s ease; z-index:60; }
-  .detail-panel.open { transform:translateX(0); }
-  </style>
-</head>
-<body>
-  <div class="page-shell">
-    <div class="navbar">
-      <div class="nav-left">
-        <div class="nav-logo">MZ</div>
-        <div class="nav-title">
-          <div class="nav-title-main">MovieZone</div>
-          <div class="nav-title-sub" style="color:var(--text-subtle);font-size:12px">Actors</div>
+  <head>
+    <meta charset="utf-8" />
+    <title>Actors · MovieZone</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+
+      :root {
+        --bg-primary: #020617;
+        --text-main: #e5e7eb;
+        --text-subtle: #9ca3af;
+        --accent: #f97316;
+      }
+      body {
+        font-family:
+          Poppins,
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          sans-serif;
+        background: linear-gradient(135deg, #020617, #030712);
+        color: var(--text-main);
+        margin: 0;
+        min-height: 100vh;
+      }
+      .page-shell {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 20px 28px 48px;
+      }
+      .navbar {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 20px;
+        border-radius: 14px;
+        background: rgba(15, 23, 42, 0.96);
+        box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.12);
+        backdrop-filter: blur(8px);
+      }
+      .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .nav-logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        background: radial-gradient(
+          circle at 30% 20%,
+          #f97316,
+          #ec4899 55%,
+          #4f46e5
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+      }
+      .nav-title-main {
+        font-weight: 700;
+        font-size: 14px;
+      }
+      /* AD BANNER styles (minimal, match homepage) */
+      .ad-wrapper {
+        margin-top: 18px;
+      }
+      .ad-banner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #f97316, #facc15);
+        color: #111827;
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25);
+      }
+      .ad-text {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .ad-title {
+        font-weight: 700;
+        font-size: 14px;
+      }
+      .ad-subtitle {
+        font-size: 12px;
+      }
+      .ad-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        opacity: 0.9;
+      }
+      .ad-cta {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: none;
+        background: #111827;
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .nav-center {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+      }
+      .nav-right {
+        display: flex;
+        align-items: center;
+      }
+      .search-input-wrap {
+        display: flex;
+        flex-direction: column;
+        background: #020617;
+        border-radius: 999px;
+        padding: 8px 14px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        width: 520px;
+        max-width: 72%;
+      }
+      .search-input {
+        border: none;
+        background: transparent;
+        color: var(--text-main);
+        font-size: 14px;
+        outline: none;
+      }
+      .search-placeholder-sub {
+        font-size: 11px;
+        color: var(--text-subtle);
+        margin-top: 2px;
+      }
+      .actors-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 18px;
+        margin-top: 20px;
+      }
+      .actor-card {
+        background: rgba(15, 23, 42, 0.9);
+        padding: 12px;
+        border-radius: 12px;
+        text-align: center;
+        cursor: pointer;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+        opacity: 0 ;
+      }
+      .actor-thumb {
+        width: 100%;
+        aspect-ratio: 3/4;
+        background-size: cover;
+        background-position: center;
+        border-radius: 8px;
+      }
+      .actor-name {
+        margin-top: 8px;
+        font-weight: 600;
+      }
+      .actor-sub {
+        color: var(--text-subtle);
+        font-size: 13px;
+      }
+      .nav-button {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(148, 163, 184, 0.08);
+        background: rgba(15, 23, 42, 0.9);
+        color: var(--text-main);
+        cursor: pointer;
+      }
+      .person-detail {
+        margin-top: 18px;
+        display: flex;
+        gap: 18px;
+      }
+      .person-meta {
+        width: 260px;
+      }
+      .person-bio {
+        flex: 1;
+        background: rgba(2, 6, 23, 0.5);
+        padding: 12px;
+        border-radius: 10px;
+      }
+      .movies-list {
+        margin-top: 12px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 12px;
+      }
+      .pagination-wrap {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        align-items: center;
+        margin-top: 18px;
+      }
+      /* slide-over panel */
+      .backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: none;
+        opacity: 0;
+        transition: opacity 0.22s ease;
+        z-index: 50;
+      }
+      /* full-screen slide-over panel */
+      .detail-panel {
+        position: fixed;
+        inset: 0;
+        height: 100vh;
+        width: 100%;
+        background: linear-gradient(
+          180deg,
+          rgba(2, 6, 23, 0.98),
+          rgba(6, 8, 27, 0.98)
+        );
+        box-shadow: none;
+        padding: 20px;
+        overflow: auto;
+        transform: translateX(100%);
+        transition: transform 0.28s ease;
+        z-index: 60;
+      }
+      .detail-panel.open {
+        transform: translateX(0);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-shell">
+      <div class="navbar">
+        <div class="nav-left">
+          <div class="nav-logo">MZ</div>
+          <div class="nav-title">
+            <div class="nav-title-main">MovieZone</div>
+            <div
+              class="nav-title-sub"
+              style="color: var(--text-subtle); font-size: 12px"
+            >
+              Actors
+            </div>
+          </div>
+        </div>
+        <div class="nav-center">
+          <div class="search-input-wrap">
+            <input
+              id="actorSearch"
+              class="search-input"
+              placeholder="Search actors by name or title..."
+            />
+          </div>
+        </div>
+        <div class="nav-right">
+          <a href="homepage.html" class="nav-button">Home</a>
         </div>
       </div>
-      <div class="nav-center">
-        <div class="search-input-wrap">
-          <input id="actorSearch" class="search-input" placeholder="Search actors by name or title..." />
+
+      <!-- PREMIUM AD BANNER (same as homepage) -->
+      <div class="ad-wrapper" id="adWrapper" style="margin-top: 18px">
+        <div class="ad-banner">
+          <div class="ad-text">
+            <span class="ad-label">Ad · MovieZone Premium</span>
+            <span class="ad-title">Watch movies without ads, high speed.</span>
+            <span class="ad-subtitle"
+              >Upgrade to Premium to remove ads, prioritize servers, and unlock
+              more content.</span
+            >
+          </div>
+          <button class="ad-cta" type="button" id="adUpgradeButton">
+            Upgrade Now
+          </button>
         </div>
       </div>
-      <div class="nav-right">
-        <a href="homepage.html" class="nav-button">Home</a>
+
+      <div id="actorsList" class="actors-grid">Loading actors...</div>
+
+      <div id="paginationWrap" class="pagination-wrap"></div>
+
+      <div id="backdrop" class="backdrop"></div>
+      <div id="personDetailWrap" class="detail-panel" aria-hidden="true">
+        <a
+          href="#"
+          id="closePerson"
+          class="nav-button"
+          style="margin-bottom: 12px; display: inline-block"
+          >Close</a
+        >
+        <div id="personDetail" class="person-detail" style="margin-top: 6px">
+          <div class="person-meta">
+            <div
+              id="personThumb"
+              style="
+                width: 100%;
+                aspect-ratio: 3/4;
+                background-size: cover;
+                border-radius: 8px;
+                background-position: center;
+              "
+            ></div>
+            <div
+              id="personName"
+              style="margin-top: 10px; font-weight: 700"
+            ></div>
+            <div id="personBorn" class="actor-sub"></div>
+          </div>
+          <div class="person-bio">
+            <div id="personBio"></div>
+            <h3 style="margin-top: 12px">Known for on MovieZone</h3>
+            <div id="personMovies" class="movies-list"></div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div id="actorsList" class="actors-grid">Loading actors...</div>
-
-    <div id="paginationWrap" class="pagination-wrap"></div>
-
-    <div id="backdrop" class="backdrop"></div>
-    <div id="personDetailWrap" class="detail-panel" aria-hidden="true">
-      <a href="#" id="closePerson" class="nav-button" style="margin-bottom:12px;display:inline-block;">Close</a>
-      <div id="personDetail" class="person-detail" style="margin-top:6px;">
-        <div class="person-meta">
-          <div id="personThumb" style="width:100%;aspect-ratio:3/4;background-size:cover;border-radius:8px;background-position:center;"></div>
-          <div id="personName" style="margin-top:10px;font-weight:700;"></div>
-          <div id="personBorn" class="actor-sub"></div>
-        </div>
-        <div class="person-bio">
-          <div id="personBio"></div>
-          <h3 style="margin-top:12px;">Known for on MovieZone</h3>
-          <div id="personMovies" class="movies-list"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // Loads paged actors from server API (20 per page) and supports server-side search
-    async function loadActorsPage(page = 1, q = '') {
-      const el = document.getElementById('actorsList');
-      el.textContent = 'Loading actors...';
-      try {
-        const params = new URLSearchParams();
-        params.set('page', String(page));
-        if (q) params.set('q', q);
-        const res = await fetch('/api/public/people/page?' + params.toString());
-        if (!res.ok) throw new Error('Failed to fetch');
-        const data = await res.json();
-        window.__actorsCurrentQuery = q;
-        window.__actorsCurrentPage = data.page || page;
-        window.__actorsTotalPages = data.totalPages || 1;
-        window.__actorsArray = data.items || [];
-        window.__actorsMap = {};
-        (data.items || []).forEach(a => window.__actorsMap[String(a.id)] = a);
-        renderActorsList(data.items || []);
-        renderPagination(window.__actorsCurrentPage, window.__actorsTotalPages);
-      } catch (e) {
-        el.textContent = 'Failed to load actors';
-        console.error(e);
-      }
-    }
-
-    function renderActorsList(list) {
-      const el = document.getElementById('actorsList');
-      el.innerHTML = '';
-      if (!list || list.length === 0) {
-        el.textContent = 'No actors found';
-        return;
-      }
-      list.forEach(a => {
-        const card = document.createElement('div');
-        card.className = 'actor-card';
-        const img = document.createElement('div');
-        img.className = 'actor-thumb';
-        img.style.backgroundImage = `url('${a.profilePath || '/static/img/placeholder-actor.png'}')`;
-        const name = document.createElement('div');
-        name.className = 'actor-name';
-        name.textContent = a.name;
-  const count = document.createElement('div');
-  count.className = 'actor-sub';
-  count.textContent = (a.creditsCount ? a.creditsCount + ' credits' : '');
-        const sub = document.createElement('div');
-        sub.className = 'actor-sub';
-        sub.textContent = a.knownFor || '';
-        card.appendChild(img);
-        card.appendChild(name);
-  card.appendChild(count);
-        card.appendChild(sub);
-        card.addEventListener('click', () => showPersonDetail(a.id));
-        el.appendChild(card);
-      });
-    }
-
-    // debounce helper
-    function debounce(fn, wait){ let t; return (...args)=>{ clearTimeout(t); t = setTimeout(()=>fn(...args), wait); }; }
-
-    document.addEventListener('DOMContentLoaded', ()=>{
-      const input = document.getElementById('actorSearch');
-      if (!input) return;
-      input.addEventListener('input', debounce((e)=>{
-        const q = (e.target.value || '').trim();
-        loadActorsPage(1, q);
-      }, 300));
-      // initial load and auto-open actor if ?id= present
-      (async ()=>{
-        await loadActorsPage(1, '');
-        const params = new URLSearchParams(window.location.search);
-        const aid = params.get('id');
-        if (aid) {
-          showPersonDetail(aid);
+    <script>
+      // Loads paged actors from server API (20 per page) and supports server-side search
+      async function loadActorsPage(page = 1, q = "") {
+        const el = document.getElementById("actorsList");
+        el.textContent = "Loading actors...";
+        try {
+          const params = new URLSearchParams();
+          params.set("page", String(page));
+          if (q) params.set("q", q);
+          const res = await fetch(
+            "/api/public/people/page?" + params.toString(),
+          );
+          if (!res.ok) throw new Error("Failed to fetch");
+          const data = await res.json();
+          window.__actorsCurrentQuery = q;
+          window.__actorsCurrentPage = data.page || page;
+          window.__actorsTotalPages = data.totalPages || 1;
+          window.__actorsArray = data.items || [];
+          window.__actorsMap = {};
+          (data.items || []).forEach(
+            (a) => (window.__actorsMap[String(a.id)] = a),
+          );
+          renderActorsList(data.items || []);
+          renderPagination(
+            window.__actorsCurrentPage,
+            window.__actorsTotalPages,
+          );
+        } catch (e) {
+          el.textContent = "Failed to load actors";
+          console.error(e);
         }
-      })();
-    });
+      }
 
-    function renderPagination(page, total) {
-      const wrap = document.getElementById('paginationWrap');
-      wrap.innerHTML = '';
-      if (total <= 1) return;
-      const makeBtn = (txt, p, disabled=false) => {
-        const b = document.createElement('button');
-        b.className = 'nav-button';
-        b.textContent = txt;
-        b.disabled = disabled;
-        b.addEventListener('click', ()=> loadActorsPage(p, window.__actorsCurrentQuery || ''));
-        return b;
-      };
-      wrap.appendChild(makeBtn('First', 1, page===1));
-      wrap.appendChild(makeBtn('Prev', Math.max(1, page-1), page===1));
-      const info = document.createElement('div');
-      info.style.color = 'var(--text-subtle)';
-      info.style.padding = '6px 10px';
-      info.textContent = `Page ${page} of ${total}`;
-      wrap.appendChild(info);
-      wrap.appendChild(makeBtn('Next', Math.min(total, page+1), page===total));
-      wrap.appendChild(makeBtn('Last', total, page===total));
-    }
+      function applyActorFadeIn() {
+        const cards = document.querySelectorAll(".actor-card");
 
-    // Show person detail by fetching server detail (includes credits)
-    async function showPersonDetail(id) {
-      const wrap = document.getElementById('personDetailWrap');
-      const list = document.getElementById('actorsList');
-      let p = window.__actorsMap && window.__actorsMap[String(id)];
+        cards.forEach((card, index) => {
+          card.style.opacity = "0";
+          card.style.transform = "translateY(20px)";
+          card.style.filter = "blur(4px)";
 
-      // set placeholders from local map if available
-      document.getElementById('personThumb').style.backgroundImage = `url('${(p && p.profilePath) || '/static/img/placeholder-actor.png'}')`;
-      document.getElementById('personName').textContent = p && p.name ? p.name : '';
-      document.getElementById('personBorn').textContent = '';
-      document.getElementById('personBio').textContent = '';
+          setTimeout(() => {
+            card.style.transition = "all 0.5s ease";
+            card.style.opacity = "1";
+            card.style.transform = "translateY(0)";
+            card.style.filter = "blur(0)";
+          }, index * 30); // 🔥 smooth stagger
+        });
+      }
 
-      try {
-        const res = await fetch('/api/public/people/' + encodeURIComponent(id));
-        if (res.ok) {
-          const pd = await res.json();
-          if (pd) {
-            // if name not present locally, set it
-            if (!p) {
-              p = { id: pd.id, name: pd.name, profilePath: pd.profilePath };
-            }
-            // show biography and birthday
-            document.getElementById('personBio').textContent = pd.biography || '';
-            if (pd.birthday) document.getElementById('personBorn').textContent = 'Born: ' + pd.birthday;
-            // ensure thumbnail uses server value if available
-            if (pd.profilePath) document.getElementById('personThumb').style.backgroundImage = `url('${pd.profilePath}')`;
+      function renderActorsList(list) {
+        const el = document.getElementById("actorsList");
+        el.innerHTML = "";
+        if (!list || list.length === 0) {
+          el.textContent = "No actors found";
+          return;
+        }
+        list.forEach((a) => {
+          const card = document.createElement("div");
+          card.className = "actor-card";
+          const img = document.createElement("div");
+          img.className = "actor-thumb";
+          img.style.backgroundImage = `url('${a.profilePath || "/static/img/placeholder-actor.png"}')`;
+          const name = document.createElement("div");
+          name.className = "actor-name";
+          name.textContent = a.name;
+          const count = document.createElement("div");
+          count.className = "actor-sub";
+          count.textContent = a.creditsCount ? a.creditsCount + " credits" : "";
+          const sub = document.createElement("div");
+          sub.className = "actor-sub";
+          sub.textContent = a.knownFor || "";
+          card.appendChild(img);
+          card.appendChild(name);
+          card.appendChild(count);
+          card.appendChild(sub);
+          card.addEventListener("click", () => showPersonDetail(a.id));
+          el.appendChild(card);
+        });
+          applyActorFadeIn();
+      }
 
-            // render credits
-            const moviesEl = document.getElementById('personMovies');
-            moviesEl.innerHTML = '';
-            (pd.credits || []).forEach(m => {
-              const card = document.createElement('div');
-              card.style.cursor = 'pointer';
-              card.className = 'movie-card';
-              card.innerHTML = `<div style="background-image:url('${m.imageUrl || ''}');height:160px;background-size:cover;background-position:center;border-radius:6px;"></div><div style="margin-top:6px;font-weight:600">${m.title}</div><div style='color:var(--text-subtle);font-size:12px'>${m.type || ''}</div>`;
-                card.addEventListener('click', () => {
-                  const token = localStorage.getItem('token');
+      // debounce helper
+      function debounce(fn, wait) {
+        let t;
+        return (...args) => {
+          clearTimeout(t);
+          t = setTimeout(() => fn(...args), wait);
+        };
+      }
+
+      async function fetchPremiumInfo() {
+        const token = localStorage.getItem("token");
+        const hasToken = !!token;
+
+        if (!hasToken) {
+          return {
+            isLoggedIn: false,
+            isPremium: false,
+            username: "Guest",
+            region: "Unknown",
+          };
+        }
+
+        try {
+          const res = await fetch("/api/user/profile", {
+            headers: { Authorization: "Bearer " + token },
+          });
+
+          if (!res.ok) {
+            return {
+              isLoggedIn: false,
+              isPremium: false,
+              username: "Guest",
+              region: "Unknown",
+            };
+          }
+
+          const data = await res.json();
+          const subs = Array.isArray(data.subscriptions)
+            ? data.subscriptions
+            : [];
+          const hasActive = subs.some((s) => s && s.status === "ACTIVE");
+          const usernameFromApi =
+            data.username || localStorage.getItem("username") || "User";
+
+          return {
+            isLoggedIn: true,
+            isPremium: hasActive,
+            username: usernameFromApi,
+            region: localStorage.getItem("region") || "Unknown",
+          };
+        } catch (e) {
+          return {
+            isLoggedIn: false,
+            isPremium: false,
+            username: "Guest",
+            region: "Unknown",
+          };
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        const input = document.getElementById("actorSearch");
+        if (!input) return;
+        input.addEventListener(
+          "input",
+          debounce((e) => {
+            const q = (e.target.value || "").trim();
+            loadActorsPage(1, q);
+          }, 300),
+        );
+        // initial load and auto-open actor if ?id= present
+        (async () => {
+          await loadActorsPage(1, "");
+          const params = new URLSearchParams(window.location.search);
+          const aid = params.get("id");
+          if (aid) {
+            showPersonDetail(aid);
+          }
+        })();
+
+        // hide premium ad if user is premium (mirror homepage behavior)
+        try {
+          const info = await fetchPremiumInfo();
+          const isPremium = info && info.isPremium;
+          const adWrapper = document.getElementById("adWrapper");
+          const premiumButton = document.getElementById("premiumButton");
+          if (isPremium) {
+            if (adWrapper) adWrapper.style.display = "none";
+            if (premiumButton) premiumButton.style.display = "none";
+          } else {
+            if (adWrapper) adWrapper.style.display = "block";
+          }
+        } catch (e) {
+          /* ignore */
+        }
+      });
+
+      function renderPagination(page, total) {
+        const wrap = document.getElementById("paginationWrap");
+        wrap.innerHTML = "";
+        if (total <= 1) return;
+        const makeBtn = (txt, p, disabled = false) => {
+          const b = document.createElement("button");
+          b.className = "nav-button";
+          b.textContent = txt;
+          b.disabled = disabled;
+          b.addEventListener("click", () =>
+            loadActorsPage(p, window.__actorsCurrentQuery || ""),
+          );
+          return b;
+        };
+        wrap.appendChild(makeBtn("First", 1, page === 1));
+        wrap.appendChild(makeBtn("Prev", Math.max(1, page - 1), page === 1));
+        const info = document.createElement("div");
+        info.style.color = "var(--text-subtle)";
+        info.style.padding = "6px 10px";
+        info.textContent = `Page ${page} of ${total}`;
+        wrap.appendChild(info);
+        wrap.appendChild(
+          makeBtn("Next", Math.min(total, page + 1), page === total),
+        );
+        wrap.appendChild(makeBtn("Last", total, page === total));
+      }
+
+      // Show person detail by fetching server detail (includes credits)
+      async function showPersonDetail(id) {
+        const wrap = document.getElementById("personDetailWrap");
+        const list = document.getElementById("actorsList");
+        let p = window.__actorsMap && window.__actorsMap[String(id)];
+
+        // set placeholders from local map if available
+        document.getElementById("personThumb").style.backgroundImage =
+          `url('${(p && p.profilePath) || "/static/img/placeholder-actor.png"}')`;
+        document.getElementById("personName").textContent =
+          p && p.name ? p.name : "";
+        document.getElementById("personBorn").textContent = "";
+        document.getElementById("personBio").textContent = "";
+
+        try {
+          const res = await fetch(
+            "/api/public/people/" + encodeURIComponent(id),
+          );
+          if (res.ok) {
+            const pd = await res.json();
+            if (pd) {
+              // if name not present locally, set it
+              if (!p) {
+                p = { id: pd.id, name: pd.name, profilePath: pd.profilePath };
+              }
+              // show biography and birthday
+              document.getElementById("personBio").textContent =
+                pd.biography || "";
+              if (pd.birthday)
+                document.getElementById("personBorn").textContent =
+                  "Born: " + pd.birthday;
+              // ensure thumbnail uses server value if available
+              if (pd.profilePath)
+                document.getElementById("personThumb").style.backgroundImage =
+                  `url('${pd.profilePath}')`;
+
+              // render credits
+              const moviesEl = document.getElementById("personMovies");
+              moviesEl.innerHTML = "";
+              (pd.credits || []).forEach((m) => {
+                const card = document.createElement("div");
+                card.style.cursor = "pointer";
+                card.className = "movie-card";
+                card.innerHTML = `<div style="background-image:url('${m.imageUrl || ""}');height:160px;background-size:cover;background-position:center;border-radius:6px;"></div><div style="margin-top:6px;font-weight:600">${m.title}</div><div style='color:var(--text-subtle);font-size:12px'>${m.type || ""}</div>`;
+                card.addEventListener("click", () => {
+                  const token = localStorage.getItem("token");
                   if (!token) {
-                    const goLogin = confirm('Bạn cần đăng nhập để xem chi tiết phim. Chuyển tới trang đăng nhập?');
-                    if (goLogin) window.location.href = 'login.html';
+                    const goLogin = confirm(
+                      "Bạn cần đăng nhập để xem chi tiết phim. Chuyển tới trang đăng nhập?",
+                    );
+                    if (goLogin) window.location.href = "login.html";
                     return;
                   }
-                  window.location.href = '/movie-detail.html?id=' + encodeURIComponent(m.id) + '&type=' + encodeURIComponent(m.type);
+                  window.location.href =
+                    "/movie-detail.html?id=" +
+                    encodeURIComponent(m.id) +
+                    "&type=" +
+                    encodeURIComponent(m.type);
                 });
-              moviesEl.appendChild(card);
-            });
+                moviesEl.appendChild(card);
+              });
+            }
           }
+        } catch (e) {
+          console.debug("person detail fetch failed", e);
         }
-      } catch (e) {
-        console.debug('person detail fetch failed', e);
+
+        // show full-screen panel: display & fade backdrop, open panel and lock page scroll
+        const backdrop = document.getElementById("backdrop");
+        backdrop.style.display = "";
+        // small timeout to allow CSS transition to run
+        setTimeout(() => (backdrop.style.opacity = "1"), 10);
+        wrap.classList.add("open");
+        wrap.setAttribute("aria-hidden", "false");
+        // lock body scroll
+        document.body.style.overflow = "hidden";
       }
 
-  // show full-screen panel: display & fade backdrop, open panel and lock page scroll
-  const backdrop = document.getElementById('backdrop');
-  backdrop.style.display = '';
-  // small timeout to allow CSS transition to run
-  setTimeout(()=> backdrop.style.opacity = '1', 10);
-  wrap.classList.add('open');
-  wrap.setAttribute('aria-hidden','false');
-  // lock body scroll
-  document.body.style.overflow = 'hidden';
-    }
-
-    // close slide-over
-    document.addEventListener('click', (e)=>{
-      if (e.target && e.target.id === 'closePerson') {
-  e.preventDefault();
-  const wrap = document.getElementById('personDetailWrap');
-  wrap.classList.remove('open');
-  wrap.setAttribute('aria-hidden','true');
-  const backdrop = document.getElementById('backdrop');
-  backdrop.style.opacity = '0';
-  setTimeout(()=> backdrop.style.display = 'none', 240);
-  // restore body scroll
-  document.body.style.overflow = '';
-      }
-    });
-    // clicking backdrop also closes
-    document.getElementById('backdrop').addEventListener('click', ()=>{
-      const wrap = document.getElementById('personDetailWrap');
-      wrap.classList.remove('open');
-      wrap.setAttribute('aria-hidden','true');
-      const backdrop = document.getElementById('backdrop');
-      backdrop.style.opacity = '0';
-      setTimeout(()=> backdrop.style.display = 'none', 240);
-      document.body.style.overflow = '';
-    });
-  </script>
-  <script src="js/ai-chat-support.js"></script>
-</body>
+      // close slide-over
+      document.addEventListener("click", (e) => {
+        if (e.target && e.target.id === "closePerson") {
+          e.preventDefault();
+          const wrap = document.getElementById("personDetailWrap");
+          wrap.classList.remove("open");
+          wrap.setAttribute("aria-hidden", "true");
+          const backdrop = document.getElementById("backdrop");
+          backdrop.style.opacity = "0";
+          setTimeout(() => (backdrop.style.display = "none"), 240);
+          // restore body scroll
+          document.body.style.overflow = "";
+        }
+      });
+      // clicking backdrop also closes
+      document.getElementById("backdrop").addEventListener("click", () => {
+        const wrap = document.getElementById("personDetailWrap");
+        wrap.classList.remove("open");
+        wrap.setAttribute("aria-hidden", "true");
+        const backdrop = document.getElementById("backdrop");
+        backdrop.style.opacity = "0";
+        setTimeout(() => (backdrop.style.display = "none"), 240);
+        document.body.style.overflow = "";
+      });
+    </script>
+    <script>
+      // ad CTA -> packs
+      (function () {
+        const b = document.getElementById("adUpgradeButton");
+        if (b)
+          b.addEventListener(
+            "click",
+            () => (window.location.href = "packs.html"),
+          );
+      })();
+    </script>
+    <script src="js/bannerads.js"></script>
+    <script src="js/ai-chat-support.js"></script>
+  </body>
 </html>
