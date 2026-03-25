@@ -10,7 +10,9 @@
     "contact": "ဆက်သွယ်ရန်",
     "premium": "Premium သို့ အဆင့်မြှင့်ရန်",
     "premium_plan": "Premium အစီအစဉ်",
-    "hello": "မင်္ဂလာပါ"
+    "actors": "သရုပ်ဆောင်များ",
+    "hello": "မင်္ဂလာပါ",
+    "hello_user": "မင်္ဂလာပါ, {{name}}"
   },
   "hero": {
     "subtitle": "ရုပ်ရှင်များ၊ စီးရီးများနှင့် အခြားအရာများကို ရှာဖွေပါ"
@@ -19,6 +21,41 @@
     "placeholder": "ရုပ်ရှင်၊ စီးရီး၊ အမျိုးအစားများကို ရှာဖွေပါ...",
     "fast": "အကြောင်းအရာအားလုံးကို မြန်ဆန်စွာ ရှာဖွေနိုင်သည်",
     "button": "ရှာဖွေပါ"
+  },
+  "search_overlay": {
+    "placeholder": "ရုပ်ရှင်များ၊ စီးရီးများ၊ သရုပ်ဆောင်များကို ရှာဖွေပါ...",
+    "close": "ပိတ်ရန်",
+    "type_hint": "ရှာရန် စာရိုက်ပါ",
+    "actors": "သရုပ်ဆောင်များ",
+    "movies": "ရုပ်ရှင် / စီးရီး"
+  },
+  "movie": {
+    "play": "▶ ကြည့်ရန်",
+    "more_info": "အသေးစိတ်"
+  },
+  "genres": {
+    "title": "အမျိုးအစားများ",
+    "action": "အက်ရှင်",
+    "action_and_adventure": "အက်ရှင်နှင့် စွန့်စားမှု",
+    "adventure": "စွန့်စားမှု",
+    "animation": "ကာတွန်း",
+    "comedy": "ဟာသ",
+    "crime": "မှုခင်း",
+    "drama": "ဒရာမာ",
+    "family": "မိသားစု",
+    "fantasy": "ဖန်တီးမှု",
+    "history": "သမိုင်း",
+    "horror": "ကြောက်စရာ",
+    "music": "ဂီတ",
+    "mystery": "လျှို့ဝှက်ချက်",
+    "romance": "အချစ်",
+    "sci_fi_and_fantasy": "သိပ္ပံစိတ်ကူးယဉ်နှင့် ဖန်တီးမှု",
+    "science_fiction": "သိပ္ပံစိတ်ကူးယဉ်",
+    "thriller": "စိတ်လှုပ်ရှားဖွယ်",
+    "western": "အနောက်တိုင်း"
+  },
+  "featured": {
+    "default_desc": "လက်ရှိ အရမ်းလူကြိုက်များနေသော ရုပ်ရှင်။"
   },
   "social": {
     "follow": "MovieZone ကို လိုက်နာပါ"
@@ -38,7 +75,8 @@
   "footer": {
     "title": "MovieZone · နေ့စဉ် ရုပ်ရှင်ကြည့်ရှုပါ",
     "copyright": "အွန်လိုင်း ရုပ်ရှင် Streaming Platform Project",
-    "bottom": "© 2025 MovieZone. Demo Project — အတွေ့အကြုံရရန် Login / Sign Up လုပ်ပါ"
+    "bottom": "© 2025 MovieZone. Demo Project — အတွေ့အကြုံရရန် Login / Sign Up လုပ်ပါ",
+    "follow_us": "ကျွန်ုပ်တို့ကို ဒီမှာ လိုက်နာပါ"
   },
   "admin": {
     "title": "MovieZone Admin",
@@ -136,7 +174,8 @@
     "loading": "Loading...",
     "search": "ရှာဖွေပါ",
     "reset": "Reset",
-    "save": "သိမ်းဆည်းရန်"
+    "save": "သိမ်းရန်",
+    "scroll_down": "အောက်သို့ လှိမ့်ပါ"
   },
   "google_setup": {
     "title_line1": "Google Login ကို ပထမဆုံး အသုံးပြုပါသလား?",

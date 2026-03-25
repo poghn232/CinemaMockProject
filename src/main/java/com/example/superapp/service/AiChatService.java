@@ -132,6 +132,7 @@ public class AiChatService {
                 - If user writes in Vietnamese → reply in Vietnamese
                 - If user writes in Japanese → reply in Japanese
                 - Never switch languages unless the user does first.
+                - The movie data may contain mixed languages — use the user's message language only.
                 
                 Response rules:
                 - Be friendly, concise and easy to understand.

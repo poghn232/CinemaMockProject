@@ -10,7 +10,9 @@
     "contact": "Kontakt",
     "premium": "Premium holen",
     "premium_plan": "Premium-Plan",
-    "hello": "Hallo"
+    "actors": "Schauspieler",
+    "hello": "Hallo",
+    "hello_user": "Hallo, {{name}}"
   },
   "hero": {
     "subtitle": "Filme, Serien und mehr entdecken"
@@ -19,6 +21,41 @@
     "placeholder": "Filme, Serien, Genres suchen...",
     "fast": "Schnelle Suche für alle Inhalte",
     "button": "Suchen"
+  },
+  "search_overlay": {
+    "placeholder": "Filme, Serien, Schauspieler suchen...",
+    "close": "Schließen",
+    "type_hint": "Zum Suchen eingeben",
+    "actors": "Schauspieler",
+    "movies": "Filme / Serien"
+  },
+  "movie": {
+    "play": "▶ Abspielen",
+    "more_info": "Mehr Infos"
+  },
+  "genres": {
+    "title": "Genres",
+    "action": "Action",
+    "action_and_adventure": "Action & Abenteuer",
+    "adventure": "Abenteuer",
+    "animation": "Animation",
+    "comedy": "Komödie",
+    "crime": "Krimi",
+    "drama": "Drama",
+    "family": "Familie",
+    "fantasy": "Fantasy",
+    "history": "Geschichte",
+    "horror": "Horror",
+    "music": "Musik",
+    "mystery": "Mystery",
+    "romance": "Romanze",
+    "sci_fi_and_fantasy": "Sci-Fi & Fantasy",
+    "science_fiction": "Science-Fiction",
+    "thriller": "Thriller",
+    "western": "Western"
+  },
+  "featured": {
+    "default_desc": "Der aktuell angesagteste Film."
   },
   "social": {
     "follow": "MovieZone folgen"
@@ -38,7 +75,8 @@
   "footer": {
     "title": "MovieZone · Jeden Tag Filme schauen.",
     "copyright": "Online-Film-Streaming-Plattform Projekt",
-    "bottom": "© 2025 MovieZone. Demo-Projekt — Melde dich an / Registriere dich, um es zu erleben."
+    "bottom": "© 2025 MovieZone. Demo-Projekt — Melde dich an / Registriere dich, um es zu erleben.",
+    "follow_us": "Folge uns hier"
   },
   "admin": {
     "title": "MovieZone Admin",
@@ -136,7 +174,8 @@
     "loading": "Laden...",
     "search": "Suchen",
     "reset": "Zurücksetzen",
-    "save": "Speichern"
+    "save": "Speichern",
+    "scroll_down": "Nach unten scrollen"
   },
   "google_setup": {
     "title_line1": "Erstes Mal Google Login?",

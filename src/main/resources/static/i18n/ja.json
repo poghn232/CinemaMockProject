@@ -10,7 +10,9 @@
     "contact": "お問い合わせ",
     "premium": "プレミアムにアップグレード",
     "premium_plan": "プレミアムプラン",
-    "hello": "こんにちは"
+    "actors": "俳優",
+    "hello": "こんにちは",
+    "hello_user": "こんにちは, {{name}}"
   },
   "hero": {
     "subtitle": "映画、シリーズなどを見つけよう"
@@ -19,6 +21,41 @@
     "placeholder": "映画、シリーズ、ジャンルを検索...",
     "fast": "すべてのコンテンツを高速検索",
     "button": "検索"
+  },
+  "search_overlay": {
+    "placeholder": "映画・シリーズ・俳優を検索...",
+    "close": "閉じる",
+    "type_hint": "入力して検索",
+    "actors": "俳優",
+    "movies": "映画 / シリーズ"
+  },
+  "movie": {
+    "play": "▶ 再生",
+    "more_info": "詳細"
+  },
+  "genres": {
+    "title": "ジャンル",
+    "action": "アクション",
+    "action_and_adventure": "アクション＆アドベンチャー",
+    "adventure": "アドベンチャー",
+    "animation": "アニメーション",
+    "comedy": "コメディ",
+    "crime": "犯罪",
+    "drama": "ドラマ",
+    "family": "ファミリー",
+    "fantasy": "ファンタジー",
+    "history": "歴史",
+    "horror": "ホラー",
+    "music": "音楽",
+    "mystery": "ミステリー",
+    "romance": "ロマンス",
+    "sci_fi_and_fantasy": "SF＆ファンタジー",
+    "science_fiction": "サイエンスフィクション",
+    "thriller": "スリラー",
+    "western": "西部劇"
+  },
+  "featured": {
+    "default_desc": "現在人気急上昇の映画です。"
   },
   "social": {
     "follow": "MovieZone をフォロー"
@@ -38,7 +75,8 @@
   "footer": {
     "title": "MovieZone · 毎日映画を楽しもう。",
     "copyright": "オンライン映画ストリーミングプラットフォームプロジェクト",
-    "bottom": "© 2025 MovieZone。デモプロジェクト — 体験するにはログイン / サインアップしてください。"
+    "bottom": "© 2025 MovieZone。デモプロジェクト — 体験するにはログイン / サインアップしてください。",
+    "follow_us": "こちらでフォロー"
   },
   "admin": {
     "title": "MovieZone 管理",
@@ -136,7 +174,8 @@
     "loading": "読み込み中...",
     "search": "検索",
     "reset": "リセット",
-    "save": "保存"
+    "save": "保存",
+    "scroll_down": "下にスクロール"
   },
   "google_setup": {
     "title_line1": "Googleログインを初めて使用しますか？",

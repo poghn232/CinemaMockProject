@@ -646,7 +646,17 @@
         const wrapper = document.createElement('div');
         wrapper.innerHTML = HTML;
         document.body.appendChild(wrapper.firstElementChild);
+        // apply i18n lần đầu
+        if (typeof applyTranslations === "function") {
+            applyTranslations();
+        }
 
+        // 🔥 lắng nghe khi đổi ngôn ngữ
+        window.addEventListener("languageChanged", () => {
+            if (typeof applyTranslations === "function") {
+                applyTranslations();
+            }
+        });
         if (typeof applyTranslations === "function") {
             applyTranslations();
         }
