@@ -159,6 +159,20 @@ function translateGenre(name) {
     return translated === `genres.${key}` ? name : translated;
 }
 
+window.addEventListener("languageChanged", () => {
+    // render lại genres menu
+    if (genresFromServer) {
+        const map = {};
+        genresFromServer.forEach(g => {
+            map[g.name] = g.items || [];
+        });
+        populateGenresMenu(map);
+    } else {
+        const genresMap = collectGenres(movies);
+        populateGenresMenu(genresMap);
+    }
+});
+
 // init khi load page
 document.addEventListener("DOMContentLoaded", () => {
 

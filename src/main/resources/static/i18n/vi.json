@@ -12,7 +12,8 @@
     "premium_plan": "Gói Premium",
     "actors": "Diễn viên",
     "hello": "Xin chào",
-    "hello_user": "Xin chào, {{name}}"
+    "hello_user": "Xin chào, {{name}}",
+    "subtitle": "Tìm phim, series và nhiều hơn nữa"
   },
   "hero": {
     "subtitle": "Tìm phim, series và nhiều hơn nữa"
@@ -20,7 +21,11 @@
   "search": {
     "placeholder": "Tìm phim, series, thể loại...",
     "fast": "Tìm kiếm nhanh toàn bộ nội dung",
-    "button": "Tìm kiếm"
+    "button": "Tìm kiếm",
+    "placeholder_2": "Tìm phim, series, diễn viên...",
+    "type_to_search": "Nhập để tìm kiếm",
+    "actors": "Diễn viên",
+    "movies_series": "Phim lẻ / Phim bộ"
   },
   "search_overlay": {
     "placeholder": "Tìm phim, series, diễn viên...",
@@ -34,7 +39,7 @@
     "more_info": "Thông tin"
   },
   "genres": {
-    "title": "Thể loại",
+    "title": "Thể loại ▾",
     "action": "Hành động",
     "action_and_adventure": "Hành động & Phiêu lưu",
     "adventure": "Phiêu lưu",
@@ -59,6 +64,13 @@
   },
   "social": {
     "follow": "Theo dõi MovieZone"
+  },
+  "home": {
+    "maybe_watch": "Có thể bạn muốn xem",
+    "trending": "🔥 Thịnh hành",
+    "top_actors": "👥 Diễn viên nổi bật",
+    "movies": "🎬 Phim lẻ",
+    "tv_series": "📺 Phim bộ"
   },
   "ads": {
     "label": "Quảng cáo · MovieZone Premium",
@@ -175,7 +187,10 @@
     "search": "Tìm kiếm",
     "reset": "Đặt lại",
     "save": "Lưu",
-    "scroll_down": "Cuộn xuống nội dung"
+    "scroll_down": "Cuộn xuống nội dung",
+    "watch_all": "Xem tất cả",
+    "see_all": "Xem thêm",
+    "close": "Đóng"
   },
   "google_setup": {
     "title_line1": "Đăng nhập Google lần đầu?",

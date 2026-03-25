@@ -12,7 +12,8 @@
     "premium_plan": "プレミアムプラン",
     "actors": "俳優",
     "hello": "こんにちは",
-    "hello_user": "こんにちは, {{name}}"
+    "hello_user": "こんにちは, {{name}}",
+    "subtitle": "映画・シリーズなどを探す"
   },
   "hero": {
     "subtitle": "映画、シリーズなどを見つけよう"
@@ -20,7 +21,11 @@
   "search": {
     "placeholder": "映画、シリーズ、ジャンルを検索...",
     "fast": "すべてのコンテンツを高速検索",
-    "button": "検索"
+    "button": "検索",
+    "placeholder_2": "映画・シリーズ・俳優を検索...",
+    "type_to_search": "入力して検索",
+    "actors": "俳優",
+    "movies_series": "映画・TVシリーズ"
   },
   "search_overlay": {
     "placeholder": "映画・シリーズ・俳優を検索...",
@@ -34,7 +39,7 @@
     "more_info": "詳細"
   },
   "genres": {
-    "title": "ジャンル",
+    "title": "ジャンル ▾",
     "action": "アクション",
     "action_and_adventure": "アクション＆アドベンチャー",
     "adventure": "アドベンチャー",
@@ -59,6 +64,13 @@
   },
   "social": {
     "follow": "MovieZone をフォロー"
+  },
+  "home": {
+    "maybe_watch": "おすすめ作品",
+    "trending": "🔥 トレンド",
+    "top_actors": "👥 人気俳優",
+    "movies": "🎬 映画",
+    "tv_series": "📺 TVシリーズ"
   },
   "ads": {
     "label": "広告 · MovieZone プレミアム",
@@ -175,7 +187,10 @@
     "search": "検索",
     "reset": "リセット",
     "save": "保存",
-    "scroll_down": "下にスクロール"
+    "scroll_down": "下にスクロール",
+    "watch_all": "すべて見る",
+    "see_all": "もっと見る",
+    "close": "閉じる"
   },
   "google_setup": {
     "title_line1": "Googleログインを初めて使用しますか？",

@@ -12,7 +12,8 @@
     "premium_plan": "Premium Plan",
     "actors": "Actors",
     "hello": "Hello",
-    "hello_user": "Hello, {{name}}"
+    "hello_user": "Hello, {{name}}",
+    "subtitle": "Find movies, series & more"
   },
   "hero": {
     "subtitle": "Find movies, series & more"
@@ -20,7 +21,11 @@
   "search": {
     "placeholder": "Search movies, series, genres...",
     "fast": "Fast search for all content",
-    "button": "Search"
+    "button": "Search",
+    "placeholder_2": "Search movies, series, actors...",
+    "type_to_search": "Type to search",
+    "actors": "Actors",
+    "movies_series": "Movies and/or series"
   },
   "search_overlay": {
     "placeholder": "Search movies, series, actors...",
@@ -34,7 +39,7 @@
     "more_info": "More Info"
   },
   "genres": {
-    "title": "Genres",
+    "title": "Genres ▾",
     "action": "Action",
     "action_and_adventure": "Action & Adventure",
     "adventure": "Adventure",
@@ -59,6 +64,13 @@
   },
   "social": {
     "follow": "Follow MovieZone"
+  },
+  "home": {
+    "maybe_watch": "Maybe You Want to Watch",
+    "trending": "🔥 Trending",
+    "top_actors": "👥 Top Actors",
+    "movies": "🎬 Movies",
+    "tv_series": "📺 TV Series"
   },
   "ads": {
     "label": "Ad · MovieZone Premium",
@@ -175,7 +187,10 @@
     "search": "Search",
     "reset": "Reset",
     "save": "Save",
-    "follow_us": "Follow us here"
+    "follow_us": "Follow us here",
+    "watch_all": "Watch All",
+    "see_all": "See all",
+    "close": "Close"
   },
   "google_setup": {
     "title_line1": "First time using Google Login?",

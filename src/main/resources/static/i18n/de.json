@@ -12,7 +12,8 @@
     "premium_plan": "Premium-Plan",
     "actors": "Schauspieler",
     "hello": "Hallo",
-    "hello_user": "Hallo, {{name}}"
+    "hello_user": "Hallo, {{name}}",
+    "subtitle": "Finde Filme, Serien und mehr"
   },
   "hero": {
     "subtitle": "Filme, Serien und mehr entdecken"
@@ -20,7 +21,11 @@
   "search": {
     "placeholder": "Filme, Serien, Genres suchen...",
     "fast": "Schnelle Suche für alle Inhalte",
-    "button": "Suchen"
+    "button": "Suchen",
+    "placeholder_2": "Filme, Serien, Schauspieler suchen...",
+    "type_to_search": "Tippen zum Suchen",
+    "actors": "Schauspieler",
+    "movies_series": "Filme und/oder Serien"
   },
   "search_overlay": {
     "placeholder": "Filme, Serien, Schauspieler suchen...",
@@ -34,7 +39,7 @@
     "more_info": "Mehr Infos"
   },
   "genres": {
-    "title": "Genres",
+    "title": "Genres ▾",
     "action": "Action",
     "action_and_adventure": "Action & Abenteuer",
     "adventure": "Abenteuer",
@@ -59,6 +64,13 @@
   },
   "social": {
     "follow": "MovieZone folgen"
+  },
+  "home": {
+    "maybe_watch": "Vielleicht möchten Sie sehen",
+    "trending": "🔥 Im Trend",
+    "top_actors": "👥 Top-Schauspieler",
+    "movies": "🎬 Filme",
+    "tv_series": "📺 Serien"
   },
   "ads": {
     "label": "Anzeige · MovieZone Premium",
@@ -175,7 +187,10 @@
     "search": "Suchen",
     "reset": "Zurücksetzen",
     "save": "Speichern",
-    "scroll_down": "Nach unten scrollen"
+    "scroll_down": "Nach unten scrollen",
+    "watch_all": "Alle ansehen",
+    "see_all": "Mehr anzeigen",
+    "close": "Schließen"
   },
   "google_setup": {
     "title_line1": "Erstes Mal Google Login?",
