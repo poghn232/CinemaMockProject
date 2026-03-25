@@ -226,5 +226,31 @@
     "removed_toast": "💔 Von der Wunschliste entfernt",
     "login_required": "Bitte melden Sie sich an, um die Wunschliste zu verwenden.",
     "error": "Etwas ist schief gelaufen."
+  },
+  "ai_chat": {
+    "welcome_title": "👋 Hallo! Ich bin der KI-Assistent von MovieZone",
+    "welcome_sub": "Fragen Sie mich nach beliebten Filmen, Premium-Paketen oder irgendetwas über MovieZone!",
+    "suggestions": {
+      "hot": "🔥 Beliebte Filme",
+      "premium": "💎 Premium-Pakete",
+      "action": "🎬 Actionfilme",
+      "tv": "📺 Serien",
+      "high_rated": "⭐ Bestbewertet",
+      "new": "🆕 Kürzlich hinzugefügt"
+    },
+    "header": {
+      "name": "MovieZone AI",
+      "status": "Immer bereit zu helfen"
+    },
+    "input": {
+      "placeholder": "Fragen Sie nach Filmen, Premium...",
+      "footer": "Powered by LLaMA AI · MovieZone"
+    },
+    "messages": {
+      "welcome_bot": "Hallo! 🎬 Ich bin der KI-Assistent von **MovieZone**. Ich kann Ihnen helfen bei:\n\n- 🔥 **Beliebte Filme** nach Genre finden\n- 💎 Informationen über **Premium-Pakete**\n- 📊 Die **bestbewerteten** Filme\n- 🆕 Kürzlich hinzugefügte **Filme/Serien**\n- ❓ Fragen zu MovieZone beantworten\n\nWas möchten Sie wissen?",
+      "error": "Entschuldigung, ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut! 😅",
+      "cleared": "Chat-Verlauf wurde gelöscht. Wie kann ich Ihnen helfen? 😊",
+      "busy": "Entschuldigung, ich kann gerade nicht antworten."
+    }
   }
 }

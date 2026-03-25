@@ -226,5 +226,31 @@
     "removed_toast": "💔 お気に入りから削除しました",
     "login_required": "お気に入りを使うにはログインしてください。",
     "error": "エラーが発生しました。"
+  },
+  "ai_chat": {
+    "welcome_title": "👋 こんにちは！MovieZoneのAIアシスタントです",
+    "welcome_sub": "人気の映画、プレミアムプラン、その他MovieZoneに関するご質問にお答えします！",
+    "suggestions": {
+      "hot": "🔥 人気の映画",
+      "premium": "💎 プレミアムプラン",
+      "action": "🎬 アクション映画",
+      "tv": "📺 TVシリーズ",
+      "high_rated": "⭐ 高評価",
+      "new": "🆕 最近追加"
+    },
+    "header": {
+      "name": "MovieZone AI",
+      "status": "いつでもサポートします"
+    },
+    "input": {
+      "placeholder": "映画、プレミアムプランについて質問...",
+      "footer": "Powered by LLaMA AI · MovieZone"
+    },
+    "messages": {
+      "welcome_bot": "こんにちは！🎬 私は**MovieZone**のAIアシスタントです。お手伝いできること：\n\n- 🔥 ジャンル別の**人気の映画**を探す\n- 💎 **プレミアムプラン**に関する情報\n- 📊 **最高評価**の映画\n- 🆕 最近追加された**映画/シリーズ**\n- ❓ MovieZoneに関するあらゆる質問\n\n何についてお尋ねになりたいですか？",
+      "error": "申し訳ありません、エラーが発生しました。後でもう一度お試しください！😅",
+      "cleared": "チャット履歴が消去されました。何かお手伝いできることはありますか？😊",
+      "busy": "申し訳ありませんが、今すぐにはお答えできません。"
+    }
   }
 }

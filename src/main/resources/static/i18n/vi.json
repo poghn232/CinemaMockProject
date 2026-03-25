@@ -211,5 +211,31 @@
     "removed_toast": "💔 Đã xóa khỏi danh sách yêu thích",
     "login_required": "Vui lòng đăng nhập để dùng danh sách yêu thích.",
     "error": "Đã xảy ra lỗi."
+  },
+  "ai_chat": {
+    "welcome_title": "👋 Xin chào! Tôi là AI hỗ trợ của MovieZone",
+    "welcome_sub": "Hỏi tôi về phim hot, gói Premium, hoặc bất kỳ điều gì về MovieZone nhé!",
+    "suggestions": {
+      "hot": "🔥 Phim đang hot",
+      "premium": "💎 Gói Premium",
+      "action": "🎬 Phim hành động",
+      "tv": "📺 Series hay",
+      "high_rated": "⭐ Đánh giá cao",
+      "new": "🆕 Mới thêm gần đây"
+    },
+    "header": {
+      "name": "MovieZone AI",
+      "status": "Luôn sẵn sàng hỗ trợ"
+    },
+    "input": {
+      "placeholder": "Hỏi về phim, gói Premium...",
+      "footer": "Powered by LLaMA AI · MovieZone"
+    },
+    "messages": {
+      "welcome_bot": "Xin chào! 🎬 Tôi là AI hỗ trợ của **MovieZone**. Tôi có thể giúp bạn:\n\n- 🔥 Tìm **phim đang hot** theo thể loại\n- 💎 Thông tin về **gói Premium**\n- 📊 Phim được **đánh giá cao nhất**\n- 🆕 Phim / Series **mới thêm** gần đây\n- ❓ Giải đáp mọi thắc mắc về MovieZone\n\nBạn muốn hỏi gì nào?",
+      "error": "Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại sau! 😅",
+      "cleared": "Lịch sử chat đã được xóa. Tôi có thể giúp gì cho bạn? 😊",
+      "busy": "Xin lỗi, tôi không thể trả lời ngay lúc này."
+    }
   }
 }

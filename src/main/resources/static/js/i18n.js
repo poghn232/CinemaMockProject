@@ -33,6 +33,12 @@ function applyTranslations() {
 
         if (value) el.placeholder = value;
     });
+
+    document.querySelectorAll("[data-i18n-title]").forEach(el => {
+        const key = el.getAttribute("data-i18n-title");
+        const value = getTranslation(key);
+        if (value) el.title = value;
+    });
 }
 
 // load json language

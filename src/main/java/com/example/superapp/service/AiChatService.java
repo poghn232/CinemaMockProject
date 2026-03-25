@@ -55,7 +55,7 @@ public class AiChatService {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("model", GROQ_MODEL);
         body.put("messages", messages);
-        body.put("max_tokens", 1024);
+        body.put("max_tokens", 500);
         body.put("temperature", 0.7);
 
         HttpHeaders headers = new HttpHeaders();
@@ -88,7 +88,7 @@ public class AiChatService {
 
         if (req.getMessages() != null) {
             List<AiChatRequest.AiMessage> history = req.getMessages();
-            int start = Math.max(0, history.size() - 10);
+            int start = Math.max(0, history.size() - 6);
             for (AiChatRequest.AiMessage m : history.subList(start, history.size())) {
                 messages.add(Map.of("role", m.getRole(), "content", m.getContent()));
             }
@@ -159,8 +159,8 @@ public class AiChatService {
                 ));
 
                 if (m.getOverview() != null && !m.getOverview().isBlank()) {
-                    String overview = m.getOverview().length() > 200
-                            ? m.getOverview().substring(0, 200) + "..."
+                    String overview = m.getOverview().length() > 80
+                            ? m.getOverview().substring(0, 80) + "..."
                             : m.getOverview();
                     sb.append("  Overview: ").append(overview).append("\n");
                 }
@@ -179,6 +179,7 @@ public class AiChatService {
                     m.getCredits().stream()
                             .sorted(Comparator.comparingInt(
                                     c -> c.getCreditOrder() == null ? 999 : c.getCreditOrder()))
+                            .limit(7)
                             .forEach(credit -> {
                                 if (credit.getPerson() == null) return;
                                 String name = credit.getPerson().getName();
@@ -213,8 +214,8 @@ public class AiChatService {
                 ));
 
                 if (tv.getOverview() != null && !tv.getOverview().isBlank()) {
-                    String overview = tv.getOverview().length() > 200
-                            ? tv.getOverview().substring(0, 200) + "..."
+                    String overview = tv.getOverview().length() > 80
+                            ? tv.getOverview().substring(0, 80) + "..."
                             : tv.getOverview();
                     sb.append("  Overview: ").append(overview).append("\n");
                 }
@@ -231,7 +232,7 @@ public class AiChatService {
                             .sorted(Comparator.comparingInt(
                                     c -> c.getCreditOrder() == null ? 999 : c.getCreditOrder()))
                             .filter(c -> c.getPerson() != null)
-                            .limit(50)
+                            .limit(8)
                             .map(c -> c.getPerson().getName())
                             .collect(Collectors.toList());
 

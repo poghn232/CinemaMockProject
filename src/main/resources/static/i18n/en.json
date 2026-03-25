@@ -226,5 +226,31 @@
     "removed_toast": "💔 Removed from Wishlist",
     "login_required": "Please log in to use wishlist.",
     "error": "Something went wrong."
+  },
+  "ai_chat": {
+    "welcome_title": "👋 Hi! I'm MovieZone's AI Assistant",
+    "welcome_sub": "Ask me about hot movies, Premium plans, or anything about MovieZone!",
+    "suggestions": {
+      "hot": "🔥 Hot movies",
+      "premium": "💎 Premium plans",
+      "action": "🎬 Action movies",
+      "tv": "📺 TV Series",
+      "high_rated": "⭐ Top rated",
+      "new": "🆕 Recently added"
+    },
+    "header": {
+      "name": "MovieZone AI",
+      "status": "Always ready to help"
+    },
+    "input": {
+      "placeholder": "Ask about movies, Premium plans...",
+      "footer": "Powered by LLaMA AI · MovieZone"
+    },
+    "messages": {
+      "welcome_bot": "Hi! 🎬 I'm **MovieZone's** AI assistant. I can help you with:\n\n- 🔥 Finding **hot movies** by genre\n- 💎 Information about **Premium plans**\n- 📊 The **highest-rated** films\n- 🆕 Recently added **movies/series**\n- ❓ Answering any questions about MovieZone\n\nWhat would you like to ask?",
+      "error": "Sorry, an error occurred. Please try again later! 😅",
+      "cleared": "Chat history has been cleared. How can I help you? 😊",
+      "busy": "Sorry, I can't answer right now."
+    }
   }
 }

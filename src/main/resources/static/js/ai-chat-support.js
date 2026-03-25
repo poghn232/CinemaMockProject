@@ -227,10 +227,12 @@
       padding: 10px 14px 6px;
       display: flex;
       gap: 6px;
-      flex-wrap: nowrap;
-      overflow-x: auto;
+      flex-wrap: wrap;
+      overflow-x: hidden;
       flex-shrink: 0;
       scrollbar-width: none;
+      position: relative;
+      z-index: 5;
     }
 
     .mz-suggestions::-webkit-scrollbar { display: none; }
@@ -265,6 +267,8 @@
       flex-direction: column;
       gap: 12px;
       scroll-behavior: smooth;
+      position: relative;
+      z-index: 1;
     }
 
     .mz-messages::-webkit-scrollbar {
@@ -558,21 +562,21 @@
         <div class="mz-chat-header">
           <div class="mz-avatar">🎬</div>
           <div class="mz-header-info">
-            <div class="mz-header-name">MovieZone AI</div>
+            <div class="mz-header-name" data-i18n="ai_chat.header.name">MovieZone AI</div>
             <div class="mz-header-status">
               <div class="mz-status-dot"></div>
-              Luôn sẵn sàng hỗ trợ
+              <span data-i18n="ai_chat.header.status"> Luôn sẵn sàng hỗ trợ </span>
             </div>
           </div>
           <div class="mz-header-actions">
-            <button class="mz-header-btn" id="mzClearBtn" title="Xóa lịch sử chat">
+            <button class="mz-header-btn" id="mzClearBtn" data-i18n-title="ai_chat.actions.clear">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                 <polyline points="3 6 5 6 21 6"/>
                 <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
                 <path d="M10 11v6M14 11v6"/>
               </svg>
             </button>
-            <button class="mz-header-btn" id="mzMinimizeBtn" title="Thu nhỏ">
+            <button class="mz-header-btn" id="mzMinimizeBtn" data-i18n-title="ai_chat.actions.minimize">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
                 <line x1="5" y1="12" x2="19" y2="12"/>
               </svg>
@@ -583,19 +587,19 @@
         <!-- Welcome card shown only on first open -->
         <div class="mz-welcome" id="mzWelcome">
           <div class="mz-welcome-card">
-            <div class="mz-welcome-title">👋 Xin chào! Tôi là AI hỗ trợ của MovieZone</div>
-            <div class="mz-welcome-sub">Hỏi tôi về phim hot, gói Premium, hoặc bất kỳ điều gì về MovieZone nhé!</div>
+            <div class="mz-welcome-title" data-i18n="ai_chat.welcome_title">👋 Xin chào! Tôi là AI hỗ trợ của MovieZone</div>
+            <div class="mz-welcome-sub" data-i18n="ai_chat.welcome_sub">Hỏi tôi về phim hot, gói Premium, hoặc bất kỳ điều gì về MovieZone nhé!</div>
           </div>
         </div>
 
         <!-- Quick suggestions -->
         <div class="mz-suggestions" id="mzSuggestions">
-          <button class="mz-suggestion-chip">🔥 Phim đang hot</button>
-          <button class="mz-suggestion-chip">💎 Gói Premium</button>
-          <button class="mz-suggestion-chip">🎬 Phim hành động</button>
-          <button class="mz-suggestion-chip">📺 Series hay</button>
-          <button class="mz-suggestion-chip">⭐ Đánh giá cao</button>
-          <button class="mz-suggestion-chip">🆕 Mới thêm gần đây</button>
+          <button class="mz-suggestion-chip" data-i18n="ai_chat.suggestions.premium">💎 Gói Premium</button>
+          <button class="mz-suggestion-chip" data-i18n="ai_chat.suggestions.hot">🔥 Phim đang hot</button>
+          <button class="mz-suggestion-chip" data-i18n="ai_chat.suggestions.action">🎬 Phim hành động</button>
+          <button class="mz-suggestion-chip" data-i18n="ai_chat.suggestions.tv">📺 Series hay</button>
+          <button class="mz-suggestion-chip" data-i18n="ai_chat.suggestions.high_rated">⭐ Đánh giá cao</button>
+          <button class="mz-suggestion-chip" data-i18n="ai_chat.suggestions.new">🆕 Mới thêm gần đây</button>
         </div>
 
         <!-- Messages -->
@@ -608,7 +612,7 @@
               <textarea
                 class="mz-input"
                 id="mzInput"
-                placeholder="Hỏi về phim, gói Premium..."
+                data-i18n-placeholder="ai_chat.input.placeholder"
                 rows="1"
               ></textarea>
             </div>
@@ -619,7 +623,7 @@
               </svg>
             </button>
           </div>
-          <div class="mz-input-footer">Powered by <span>LLaMA AI</span> · MovieZone</div>
+          <div class="mz-input-footer" data-i18n="ai_chat.input.footer">Powered by LLaMA AI · MovieZone</div>
         </div>
       </div>
     </div>
@@ -643,6 +647,9 @@
         wrapper.innerHTML = HTML;
         document.body.appendChild(wrapper.firstElementChild);
 
+        if (typeof applyTranslations === "function") {
+            applyTranslations();
+        }
         // Bind events
         bindEvents();
 
@@ -651,8 +658,7 @@
             document.getElementById('mzSuggestions').style.display = 'none';
             document.getElementById('mzWelcome').style.display = 'none';
             conversationHistory.forEach(msg => {
-                if (msg.role === 'user') addUserMessage(msg.content);
-                else if (msg.role === 'assistant') addBotMessage(msg.content);
+                if (msg.role === 'user') addUserMessage(msg.content); else if (msg.role === 'assistant') addBotMessage(msg.content);
             });
         }
 
@@ -721,7 +727,7 @@
                 hasOpened = true;
                 sessionStorage.setItem('mz_chat_opened', 'true');
                 setTimeout(() => {
-                    addBotMessage('Xin chào! 🎬 Tôi là AI hỗ trợ của **MovieZone**. Tôi có thể giúp bạn:\n\n- 🔥 Tìm **phim đang hot** theo thể loại\n- 💎 Thông tin về **gói Premium**\n- 📊 Phim được **đánh giá cao nhất**\n- 🆕 Phim / Series **mới thêm** gần đây\n- ❓ Giải đáp mọi thắc mắc về MovieZone\n\nBạn muốn hỏi gì nào?');
+                    addBotMessage(t("ai_chat.messages.welcome_bot"));
                 }, 400);
             }
         }
@@ -759,14 +765,10 @@
 
             // Call backend API
             const response = await fetch('/api/ai-chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(localStorage.getItem('token') ? {'Authorization': 'Bearer ' + localStorage.getItem('token')} : {})
-                },
-                body: JSON.stringify({
-                    messages: conversationHistory,
-                    context: contextData
+                method: 'POST', headers: {
+                    'Content-Type': 'application/json', ...(localStorage.getItem('token') ? {'Authorization': 'Bearer ' + localStorage.getItem('token')} : {})
+                }, body: JSON.stringify({
+                    messages: conversationHistory, context: contextData
                 })
             });
 
@@ -777,7 +779,7 @@
             }
 
             const data = await response.json();
-            const reply = data.reply || data.message || 'Xin lỗi, tôi không thể trả lời ngay lúc này.';
+            const reply = data.reply || data.message || t("ai_chat.messages.busy");
 
             addBotMessage(reply);
             conversationHistory.push({role: 'assistant', content: reply});
@@ -785,7 +787,7 @@
         } catch (err) {
             removeTyping(typingId);
             console.error('[MovieZone AI]', err);
-            addBotMessage('Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại sau! 😅');
+            addBotMessage(t("ai_chat.messages.error"));
         } finally {
             isLoading = false;
             sendBtn.disabled = !input.value.trim();
@@ -804,11 +806,7 @@
             if (moviesRes.ok) {
                 const moviesData = await moviesRes.json();
                 ctx.movies = (moviesData.items || []).slice(0, 20).map(m => ({
-                    id: m.id,
-                    title: m.title,
-                    type: m.type,
-                    year: m.year,
-                    rating: m.rating
+                    id: m.id, title: m.title, type: m.type, year: m.year, rating: m.rating
                 }));
             }
 
@@ -906,7 +904,7 @@
         document.getElementById('mzWelcome').style.display = '';
         hasOpened = false;
         setTimeout(() => {
-            addBotMessage('Lịch sử chat đã được xóa. Tôi có thể giúp gì cho bạn? 😊');
+            addBotMessage(t("ai_chat.messages.cleared"));
             hasOpened = true;
         }, 100);
     }
@@ -919,7 +917,13 @@
     }
 
     function getTime() {
-        return new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'});
+        const lang = localStorage.getItem("lang") || "en";
+        const localeMap = {
+            vi: "vi-VN", en: "en-US", my: "my-MY", ja: "ja-JP", de: "de-DE"
+        };
+        return new Date().toLocaleTimeString(localeMap[lang] || "en-US", {
+            hour: '2-digit', minute: '2-digit'
+        });
     }
 
     function escapeHtml(str) {
