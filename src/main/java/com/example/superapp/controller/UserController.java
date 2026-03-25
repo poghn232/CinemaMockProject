@@ -53,6 +53,7 @@ public class UserController {
                         packMap.put("packName", sub.getPack().getPackName());
                         packMap.put("packPrice", sub.getPack().getPackPrice());
                         packMap.put("durationDays", sub.getPack().getDurationDays());
+                        packMap.put("maxProfiles", sub.getPack().getMaxProfiles());
                         subMap.put("pack", packMap);
                     }
                     return subMap;

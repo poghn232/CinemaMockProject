@@ -609,6 +609,7 @@
                     <p class="pack-name">${p.packName}</p>
                     <p class="pack-price">${moneyVND(p.packPrice)}</p>
                     <p class="pack-meta">Duration: ${p.durationDays ?? 30} days</p>
+                    <p class="pack-meta">${p.maxProfiles > 1 ? p.maxProfiles + " profiles" : p.maxProfiles + " profile"}</p>
                     <button onclick="buy(${p.packId})">Buy Now</button>
                 `;
                 grid.appendChild(el);

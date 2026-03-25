@@ -25,9 +25,21 @@
 </body>
 <script>
     clearError();
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        window.location.href = "login.html";
+    }
+
+
     const btn = document.getElementById("submitBtn");
     const result = document.getElementById("result");
     btn.addEventListener("click", async () => {
+        const info = await fetchPremiumInfo();
+        if (!info.isPremium) {
+            showError("You are not subscribed yet");
+            return;
+        }
         const profileName = document.getElementById("profileName").value.trim();
         if (!profileName) {
             showError("profileName is empty/null, request failed")
@@ -37,7 +49,7 @@
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": "Bearer " + localStorage.getItem("token")
+                "Authorization": "Bearer " + token
             },
             body: JSON.stringify(
                 {
@@ -47,6 +59,11 @@
                 }
             )
         })
+
+        if (response.status === 409) {
+            showError("You have reached maximum profiles!");
+            return;
+        }
 
         const data = await response.json();
         if (!data) {
@@ -63,5 +80,64 @@
     function clearError() {
         document.getElementById("error").innerText = "";
     }
+
+    async function fetchPremiumInfo() {
+        const token = localStorage.getItem("token");
+        const hasToken = !!token;
+
+        if (!hasToken) {
+            return {
+                isLoggedIn: false,
+                isPremium: false,
+                username: "Guest",
+                region: "Unknown",
+            };
+        }
+
+        try {
+            const res = await fetch("/api/user/profile", {
+                headers: {
+                    Authorization: "Bearer " + token,
+                },
+            });
+
+            if (!res.ok) {
+                throw new Error("Profile error " + res.status);
+            }
+
+            const data = await res.json();
+            const subs = Array.isArray(data.subscriptions)
+                ? data.subscriptions
+                : [];
+            const hasActive = subs.some((s) => s && s.status === "ACTIVE");
+
+            const profileRes = await fetch("api/profiles/" + localStorage.getItem("profileId"), {
+                headers: {
+                    Authorization: "Bearer " + token
+                }
+            });
+
+            const profile = await profileRes.json();
+
+            const usernameFromApi =
+                profile.profileName || localStorage.getItem("username") || "User";
+
+            return {
+                isLoggedIn: true,
+                isPremium: hasActive,
+                username: usernameFromApi,
+                region: localStorage.getItem("region") || "Unknown",
+            };
+        } catch (e) {
+            const fallbackName = localStorage.getItem("username") || "User";
+            return {
+                isLoggedIn: true,
+                isPremium: false,
+                username: fallbackName,
+                region: localStorage.getItem("region") || "Unknown",
+            };
+        }
+    }
+
 </script>
 </html>

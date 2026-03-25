@@ -28,7 +28,7 @@
             const p =  document.createElement("div");
             const a = document.createElement("a");
             a.href= 'homepage.html';
-            a.textContent = 'Profile ' + profile.profileId;
+            a.textContent = 'Profile ' + profile.profileName;
             p.appendChild(a);
             a.addEventListener("click", () => {
                 localStorage.setItem("profileId", profile.profileId);

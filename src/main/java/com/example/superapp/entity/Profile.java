@@ -40,6 +40,10 @@ public class Profile {
     @Builder.Default
     private List<WatchHistory> watchHistories = new ArrayList<>();
 
+    @Column(name = "enabled")
+    @Builder.Default
+    private boolean enabled = true;
+
     @Override
     public String toString() {
         return "Profile: " + profileName;

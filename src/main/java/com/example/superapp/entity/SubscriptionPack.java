@@ -1,7 +1,9 @@
 package com.example.superapp.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -24,6 +26,8 @@ public class SubscriptionPack {
     private BigDecimal packPrice;
 
     private Integer durationDays; // ví dụ 30, 90, 365
+
+    private short maxProfiles = 1;
 
     @OneToMany(mappedBy = "pack")
     private List<Subscription> subscriptions;

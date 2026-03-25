@@ -2,6 +2,7 @@ package com.example.superapp.controller;
 
 import com.example.superapp.dto.ProfileDto;
 import com.example.superapp.entity.Profile;
+import com.example.superapp.entity.SubscriptionStatus;
 import com.example.superapp.entity.User;
 import com.example.superapp.repository.ProfileRepository;
 import com.example.superapp.repository.UserRepository;
@@ -46,18 +47,29 @@ public class ProfileController {
         User currentUser = userRepository.findByUsername(dto.getUsername())
                                          .orElseThrow(() -> new IllegalArgumentException("field profileName in ProfileController addProfile is empty/null or smth. cannot fetch user from db"));
 
+        int currentTotalProfiles = currentUser.getProfiles().size();
+        short maxProfiles = currentUser.getSubscriptions()
+                                       .stream()
+                                       .filter(sub -> sub.getStatus() == SubscriptionStatus.ACTIVE)
+                                       .map(sub -> sub.getPack().getMaxProfiles())
+                                       .toList().getFirst();
+
+        if (currentTotalProfiles == maxProfiles) {
+            return ResponseEntity.status(409).body(null);
+        }
+
+
         Profile newProfile = Profile.builder()
                                     .profileId(currentUser.getUserId() + 1)
                                     .profileName(dto.getProfileName())
                                     .user(currentUser)
                                     .build();
-        Profile saved = profileRepository.save(newProfile);
 
         List<Profile> profiles = currentUser.getProfiles();
         profiles.add(newProfile);
         currentUser.setProfiles(profiles);
         userRepository.save(currentUser);
-        return ResponseEntity.ok(new ProfileDto(saved.getProfileId(), saved.getProfileName(), saved.getUser().getUsername()));
+        return ResponseEntity.ok(new ProfileDto(newProfile.getProfileId(), newProfile.getProfileName(), newProfile.getUser().getUsername()));
     }
 
 }
