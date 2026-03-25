@@ -10,7 +10,9 @@
     "contact": "Kontakt",
     "premium": "Premium holen",
     "premium_plan": "Premium-Plan",
-    "hello": "Hallo"
+    "actors": "Schauspieler",
+    "hello": "Hallo",
+    "hello_user": "Hallo, {{name}}"
   },
   "hero": {
     "subtitle": "Filme, Serien und mehr entdecken"
@@ -19,6 +21,41 @@
     "placeholder": "Filme, Serien, Genres suchen...",
     "fast": "Schnelle Suche für alle Inhalte",
     "button": "Suchen"
+  },
+  "search_overlay": {
+    "placeholder": "Filme, Serien, Schauspieler suchen...",
+    "close": "Schließen",
+    "type_hint": "Zum Suchen eingeben",
+    "actors": "Schauspieler",
+    "movies": "Filme / Serien"
+  },
+  "movie": {
+    "play": "▶ Abspielen",
+    "more_info": "Mehr Infos"
+  },
+  "genres": {
+    "title": "Genres",
+    "action": "Action",
+    "action_and_adventure": "Action & Abenteuer",
+    "adventure": "Abenteuer",
+    "animation": "Animation",
+    "comedy": "Komödie",
+    "crime": "Krimi",
+    "drama": "Drama",
+    "family": "Familie",
+    "fantasy": "Fantasy",
+    "history": "Geschichte",
+    "horror": "Horror",
+    "music": "Musik",
+    "mystery": "Mystery",
+    "romance": "Romanze",
+    "sci_fi_and_fantasy": "Sci-Fi & Fantasy",
+    "science_fiction": "Science-Fiction",
+    "thriller": "Thriller",
+    "western": "Western"
+  },
+  "featured": {
+    "default_desc": "Der aktuell angesagteste Film."
   },
   "social": {
     "follow": "MovieZone folgen"
@@ -38,7 +75,8 @@
   "footer": {
     "title": "MovieZone · Jeden Tag Filme schauen.",
     "copyright": "Online-Film-Streaming-Plattform Projekt",
-    "bottom": "© 2025 MovieZone. Demo-Projekt — Melde dich an / Registriere dich, um es zu erleben."
+    "bottom": "© 2025 MovieZone. Demo-Projekt — Melde dich an / Registriere dich, um es zu erleben.",
+    "follow_us": "Folge uns hier"
   },
   "admin": {
     "title": "MovieZone Admin",
@@ -136,7 +174,8 @@
     "loading": "Laden...",
     "search": "Suchen",
     "reset": "Zurücksetzen",
-    "save": "Speichern"
+    "save": "Speichern",
+    "scroll_down": "Nach unten scrollen"
   },
   "google_setup": {
     "title_line1": "Erstes Mal Google Login?",
@@ -226,5 +265,31 @@
     "removed_toast": "💔 Von der Wunschliste entfernt",
     "login_required": "Bitte melden Sie sich an, um die Wunschliste zu verwenden.",
     "error": "Etwas ist schief gelaufen."
+  },
+  "ai_chat": {
+    "welcome_title": "👋 Hallo! Ich bin der KI-Assistent von MovieZone",
+    "welcome_sub": "Fragen Sie mich nach beliebten Filmen, Premium-Paketen oder irgendetwas über MovieZone!",
+    "suggestions": {
+      "hot": "🔥 Beliebte Filme",
+      "premium": "💎 Premium-Pakete",
+      "action": "🎬 Actionfilme",
+      "tv": "📺 Serien",
+      "high_rated": "⭐ Bestbewertet",
+      "new": "🆕 Kürzlich hinzugefügt"
+    },
+    "header": {
+      "name": "MovieZone AI",
+      "status": "Immer bereit zu helfen"
+    },
+    "input": {
+      "placeholder": "Fragen Sie nach Filmen, Premium...",
+      "footer": "Powered by LLaMA AI · MovieZone"
+    },
+    "messages": {
+      "welcome_bot": "Hallo! 🎬 Ich bin der KI-Assistent von **MovieZone**. Ich kann Ihnen helfen bei:\n\n- 🔥 **Beliebte Filme** nach Genre finden\n- 💎 Informationen über **Premium-Pakete**\n- 📊 Die **bestbewerteten** Filme\n- 🆕 Kürzlich hinzugefügte **Filme/Serien**\n- ❓ Fragen zu MovieZone beantworten\n\nWas möchten Sie wissen?",
+      "error": "Entschuldigung, ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut! 😅",
+      "cleared": "Chat-Verlauf wurde gelöscht. Wie kann ich Ihnen helfen? 😊",
+      "busy": "Entschuldigung, ich kann gerade nicht antworten."
+    }
   }
 }

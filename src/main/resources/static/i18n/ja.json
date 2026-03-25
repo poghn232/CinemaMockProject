@@ -10,7 +10,9 @@
     "contact": "お問い合わせ",
     "premium": "プレミアムにアップグレード",
     "premium_plan": "プレミアムプラン",
-    "hello": "こんにちは"
+    "actors": "俳優",
+    "hello": "こんにちは",
+    "hello_user": "こんにちは, {{name}}"
   },
   "hero": {
     "subtitle": "映画、シリーズなどを見つけよう"
@@ -19,6 +21,41 @@
     "placeholder": "映画、シリーズ、ジャンルを検索...",
     "fast": "すべてのコンテンツを高速検索",
     "button": "検索"
+  },
+  "search_overlay": {
+    "placeholder": "映画・シリーズ・俳優を検索...",
+    "close": "閉じる",
+    "type_hint": "入力して検索",
+    "actors": "俳優",
+    "movies": "映画 / シリーズ"
+  },
+  "movie": {
+    "play": "▶ 再生",
+    "more_info": "詳細"
+  },
+  "genres": {
+    "title": "ジャンル",
+    "action": "アクション",
+    "action_and_adventure": "アクション＆アドベンチャー",
+    "adventure": "アドベンチャー",
+    "animation": "アニメーション",
+    "comedy": "コメディ",
+    "crime": "犯罪",
+    "drama": "ドラマ",
+    "family": "ファミリー",
+    "fantasy": "ファンタジー",
+    "history": "歴史",
+    "horror": "ホラー",
+    "music": "音楽",
+    "mystery": "ミステリー",
+    "romance": "ロマンス",
+    "sci_fi_and_fantasy": "SF＆ファンタジー",
+    "science_fiction": "サイエンスフィクション",
+    "thriller": "スリラー",
+    "western": "西部劇"
+  },
+  "featured": {
+    "default_desc": "現在人気急上昇の映画です。"
   },
   "social": {
     "follow": "MovieZone をフォロー"
@@ -38,7 +75,8 @@
   "footer": {
     "title": "MovieZone · 毎日映画を楽しもう。",
     "copyright": "オンライン映画ストリーミングプラットフォームプロジェクト",
-    "bottom": "© 2025 MovieZone。デモプロジェクト — 体験するにはログイン / サインアップしてください。"
+    "bottom": "© 2025 MovieZone。デモプロジェクト — 体験するにはログイン / サインアップしてください。",
+    "follow_us": "こちらでフォロー"
   },
   "admin": {
     "title": "MovieZone 管理",
@@ -136,7 +174,8 @@
     "loading": "読み込み中...",
     "search": "検索",
     "reset": "リセット",
-    "save": "保存"
+    "save": "保存",
+    "scroll_down": "下にスクロール"
   },
   "google_setup": {
     "title_line1": "Googleログインを初めて使用しますか？",
@@ -226,5 +265,31 @@
     "removed_toast": "💔 お気に入りから削除しました",
     "login_required": "お気に入りを使うにはログインしてください。",
     "error": "エラーが発生しました。"
+  },
+  "ai_chat": {
+    "welcome_title": "👋 こんにちは！MovieZoneのAIアシスタントです",
+    "welcome_sub": "人気の映画、プレミアムプラン、その他MovieZoneに関するご質問にお答えします！",
+    "suggestions": {
+      "hot": "🔥 人気の映画",
+      "premium": "💎 プレミアムプラン",
+      "action": "🎬 アクション映画",
+      "tv": "📺 TVシリーズ",
+      "high_rated": "⭐ 高評価",
+      "new": "🆕 最近追加"
+    },
+    "header": {
+      "name": "MovieZone AI",
+      "status": "いつでもサポートします"
+    },
+    "input": {
+      "placeholder": "映画、プレミアムプランについて質問...",
+      "footer": "Powered by LLaMA AI · MovieZone"
+    },
+    "messages": {
+      "welcome_bot": "こんにちは！🎬 私は**MovieZone**のAIアシスタントです。お手伝いできること：\n\n- 🔥 ジャンル別の**人気の映画**を探す\n- 💎 **プレミアムプラン**に関する情報\n- 📊 **最高評価**の映画\n- 🆕 最近追加された**映画/シリーズ**\n- ❓ MovieZoneに関するあらゆる質問\n\n何についてお尋ねになりたいですか？",
+      "error": "申し訳ありません、エラーが発生しました。後でもう一度お試しください！😅",
+      "cleared": "チャット履歴が消去されました。何かお手伝いできることはありますか？😊",
+      "busy": "申し訳ありませんが、今すぐにはお答えできません。"
+    }
   }
 }

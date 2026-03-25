@@ -1254,7 +1254,7 @@
           <div class="nav-logo">MZ</div>
           <div class="nav-title">
             <span class="nav-title-main">MOVIEZONE</span>
-            <span class="nav-title-sub">Find movies, series &amp; more</span>
+            <span class="nav-title-sub"  data-i18n="hero.subtitle">>Find movies, series &amp; more</span>
           </div>
         </div>
 
@@ -1269,6 +1269,7 @@
             TV Series
           </button>
 
+<<<<<<< HEAD
           <div class="genres-dropdown" style="position: relative">
             <button id="genresBtn" class="nav-link">Genres ▾</button>
             <div
@@ -1283,6 +1284,15 @@
                 z-index: 40;
               "
             >
+=======
+          <button id="navSearchBtn" class="nav-link">🔍</button>
+
+          <div class="genres-dropdown" style="position:relative;">
+            <button id="genresBtn" class="nav-link">
+              <span data-i18n="genres.title"> Genres </span> ▾
+            </button>
+            <div class="genres-menu" id="genresMenu" style="display:none; position:absolute; top:44px; left:0; min-width:200px; z-index:40;">
+>>>>>>> 71790e9da6088fa531a6d9b71bf54c639740bd6c
               <!-- items populated by JS -->
             </div>
           </div>
@@ -1402,11 +1412,12 @@
             <p id="featuredDesc">Please wait...</p>
 
             <div class="featured-actions">
-              <button id="featuredPlay" class="btn-play">▶ Play</button>
-              <button id="featuredInfo" class="btn-info">More Info</button>
+              <button id="featuredPlay" class="btn-play" data-i18n="movie.play">▶ Play</button>
+              <button id="featuredInfo" class="btn-info" data-i18n="movie.more_info">More Info</button>
             </div>
           </div>
         </div>
+<<<<<<< HEAD
         <button
           id="featuredDown"
           title="Scroll to content"
@@ -1426,6 +1437,9 @@
         >
           ▼
         </button>
+=======
+  <button id="featuredDown" data-i18n-title="common.scroll_down" style="position:absolute;left:50%;transform:translateX(-50%);bottom:18px;padding:10px 14px;border-radius:999px;border:none;background:rgba(0,0,0,0.4);color:white;cursor:pointer;font-size:18px;">▼</button>
+>>>>>>> 71790e9da6088fa531a6d9b71bf54c639740bd6c
       </section>
       <div class="ad-wrapper" id="adWrapper">
         <div class="ad-banner">
@@ -1473,8 +1487,13 @@
       <!-- FOOTER -->
       <footer class="site-footer">
         <div class="footer-inner">
+<<<<<<< HEAD
           <div style="width: 100%; text-align: center; margin-bottom: 8px">
             <div class="follow-us-line">Follow us here</div>
+=======
+          <div style="width:100%;text-align:center;margin-bottom:8px;">
+            <div class="follow-us-line" data-i18n="footer.follow_us">Follow us here</div>
+>>>>>>> 71790e9da6088fa531a6d9b71bf54c639740bd6c
           </div>
           <div
             class="social-row-wrapper"
@@ -1515,6 +1534,7 @@
     <div id="searchOverlay" class="search-overlay hidden" aria-hidden="true">
       <div class="search-overlay-panel">
         <div class="search-overlay-header">
+<<<<<<< HEAD
           <input
             id="overlaySearchInput"
             class="search-overlay-input"
@@ -1544,6 +1564,16 @@
           >
             Actors
           </div>
+=======
+          <input id="overlaySearchInput" class="search-overlay-input" data-i18n-placeholder="search_overlay.placeholder"/>
+          <button id="closeOverlayBtn" class="search-overlay-close" data-i18n="search_overlay.close">Close</button>
+        </div>
+        <div id="overlayResultCount" class="section-subtitle" data-i18n="search_overlay.type_hint">Type to search</div>
+
+        <!-- Actors results (separate from movies) -->
+        <div id="overlayActorsSection" class="overlay-section" style="margin-top:10px;">
+          <div class="section-title" style="margin-bottom:8px;color:var(--text-subtle);font-weight:600" data-i18n="search_overlay.actors">Actors</div>
+>>>>>>> 71790e9da6088fa531a6d9b71bf54c639740bd6c
           <div id="overlayActorsGrid" class="actors-grid"></div>
         </div>
 
@@ -1555,6 +1585,7 @@
           "
         />
 
+<<<<<<< HEAD
         <div id="overlayMoviesSection" style="margin-top: 8px">
           <div
             class="section-title"
@@ -1566,6 +1597,10 @@
           >
             Movies and/or series
           </div>
+=======
+        <div id="overlayMoviesSection" style="margin-top:8px;">
+          <div class="section-title" style="margin-bottom:8px;color:var(--text-subtle);font-weight:600" data-i18n="search_overlay.movies">Movies and/or series</div>
+>>>>>>> 71790e9da6088fa531a6d9b71bf54c639740bd6c
           <div id="overlayGrid" class="movies-grid"></div>
         </div>
         <div id="overlayPagination" class="pagination"></div>
@@ -1717,6 +1752,7 @@
           }, 1000); // match CSS transition (1s)
         }
 
+<<<<<<< HEAD
         // update content with a gentle fade
         const titleEl = document.getElementById("featuredTitle");
         const descEl = document.getElementById("featuredDesc");
@@ -1733,6 +1769,14 @@
             setTimeout(() => content.classList.remove('fade-in'), 600);
           }
         }, 220);
+=======
+          document.getElementById("featuredTitle").textContent = movie.title;
+          document.getElementById("featuredDesc").textContent =
+            movie.description || t("featured.default_desc");
+
+          section.classList.remove("fade");
+        }, 200);
+>>>>>>> 71790e9da6088fa531a6d9b71bf54c639740bd6c
       }
       // ========== STATE ==========
       let currentFilter = "all"; // all | movie | tv
@@ -1947,11 +1991,17 @@
         const info = await fetchPremiumInfo();
 
         if (usernameEl) {
+<<<<<<< HEAD
           const hello =
             translations && translations.nav && translations.nav.hello
               ? translations.nav.hello
               : "Hello";
           usernameEl.textContent = "👋 " + hello + ", " + info.username;
+=======
+          // const hello = (translations && translations.nav && translations.nav.hello) ? translations.nav.hello : 'Hello';
+          // usernameEl.textContent = "👋 " + hello + ", " + info.username;
+          renderUsername();
+>>>>>>> 71790e9da6088fa531a6d9b71bf54c639740bd6c
           renderWelcomeRegion(info.username, info.region);
         }
 
@@ -2079,7 +2129,7 @@
             const displayList = deduped.slice(0, ROW_DISPLAY_LIMIT);
             displayList.forEach((it) => usedIds.add(String(it.id)));
             // pass full deduped list to renderRow so Watch All shows everything
-            renderRow(g.name, deduped);
+            renderRow(translateGenre(g.name), deduped);
           });
 
           // also populate genres menu from server data
@@ -2140,6 +2190,11 @@
           }, index * 30);
         });
       }
+      window.addEventListener("languageChanged", () => {
+        if (window.renderMovies) {
+          renderMovies();
+        }
+      });
 
       function renderPagination() {
         let pagination = document.querySelector(".pagination");
@@ -2785,6 +2840,7 @@
         if (!menu) return;
         menu.innerHTML = "";
         // prefer server-provided genres if available
+<<<<<<< HEAD
         if (
           genresFromServer &&
           Array.isArray(genresFromServer) &&
@@ -2798,6 +2854,16 @@
             
             el.addEventListener("click", () => {
               menu.style.display = "none";
+=======
+        if (genresFromServer && Array.isArray(genresFromServer) && genresFromServer.length) {
+          genresFromServer.forEach(g => {
+            const el = document.createElement('div');
+            el.className = 'genre-item';
+            const count = (Array.isArray(g.items) ? g.items.length : 0);
+            el.textContent = `${translateGenre(g.name)} (${count})`;
+            el.addEventListener('click', () => {
+              menu.style.display = 'none';
+>>>>>>> 71790e9da6088fa531a6d9b71bf54c639740bd6c
               showGridForList(g.name, g.items || []);
             });
             menu.appendChild(el);
@@ -2834,6 +2900,7 @@
           return;
         }
 
+<<<<<<< HEAD
         keys.forEach((k) => {
           const el = document.createElement("div");
           el.className = "genre-item";
@@ -2841,6 +2908,14 @@
           el.textContent = `${translateGenre(k)}`;
 
           el.addEventListener("click", () => {
+=======
+        keys.forEach(k => {
+          const el = document.createElement('div');
+          el.className = 'genre-item';
+          // el.textContent = `${k} (${genresMap[k].length})`;
+          el.textContent = `${translateGenre(k)} (${genresMap[k].length})`;
+          el.addEventListener('click', () => {
+>>>>>>> 71790e9da6088fa531a6d9b71bf54c639740bd6c
             // hide menu
             menu.style.display = "none";
             // show grid for this genre

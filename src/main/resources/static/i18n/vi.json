@@ -10,7 +10,9 @@
     "contact": "Liên hệ",
     "premium": "Nâng cấp Premium",
     "premium_plan": "Gói Premium",
-    "hello": "Xin chào"
+    "actors": "Diễn viên",
+    "hello": "Xin chào",
+    "hello_user": "Xin chào, {{name}}"
   },
   "hero": {
     "subtitle": "Tìm phim, series và nhiều hơn nữa"
@@ -19,6 +21,41 @@
     "placeholder": "Tìm phim, series, thể loại...",
     "fast": "Tìm kiếm nhanh toàn bộ nội dung",
     "button": "Tìm kiếm"
+  },
+  "search_overlay": {
+    "placeholder": "Tìm phim, series, diễn viên...",
+    "close": "Đóng",
+    "type_hint": "Nhập để tìm kiếm",
+    "actors": "Diễn viên",
+    "movies": "Phim / Series"
+  },
+  "movie": {
+    "play": "▶ Xem",
+    "more_info": "Thông tin"
+  },
+  "genres": {
+    "title": "Thể loại",
+    "action": "Hành động",
+    "action_and_adventure": "Hành động & Phiêu lưu",
+    "adventure": "Phiêu lưu",
+    "animation": "Hoạt hình",
+    "comedy": "Hài",
+    "crime": "Tội phạm",
+    "drama": "Tâm lý",
+    "family": "Gia đình",
+    "fantasy": "Giả tưởng",
+    "history": "Lịch sử",
+    "horror": "Kinh dị",
+    "music": "Âm nhạc",
+    "mystery": "Bí ẩn",
+    "romance": "Lãng mạn",
+    "sci_fi_and_fantasy": "Khoa học viễn tưởng & Giả tưởng",
+    "science_fiction": "Khoa học viễn tưởng",
+    "thriller": "Giật gân",
+    "western": "Viễn Tây"
+  },
+  "featured": {
+    "default_desc": "Phim đang thịnh hành nhất hiện nay."
   },
   "social": {
     "follow": "Theo dõi MovieZone"
@@ -38,7 +75,8 @@
   "footer": {
     "title": "MovieZone · Xem phim mỗi ngày.",
     "copyright": "Dự án nền tảng xem phim trực tuyến",
-    "bottom": "© 2025 MovieZone. Dự án demo — Đăng nhập / Đăng ký để trải nghiệm."
+    "bottom": "© 2025 MovieZone. Dự án demo — Đăng nhập / Đăng ký để trải nghiệm.",
+    "follow_us": "Theo dõi chúng tôi tại đây"
   },
   "admin": {
     "title": "MovieZone Quản trị",
@@ -136,7 +174,8 @@
     "loading": "Đang tải...",
     "search": "Tìm kiếm",
     "reset": "Đặt lại",
-    "save": "Lưu"
+    "save": "Lưu",
+    "scroll_down": "Cuộn xuống nội dung"
   },
   "google_setup": {
     "title_line1": "Đăng nhập Google lần đầu?",
@@ -211,5 +250,31 @@
     "removed_toast": "💔 Đã xóa khỏi danh sách yêu thích",
     "login_required": "Vui lòng đăng nhập để dùng danh sách yêu thích.",
     "error": "Đã xảy ra lỗi."
+  },
+  "ai_chat": {
+    "welcome_title": "👋 Xin chào! Tôi là AI hỗ trợ của MovieZone",
+    "welcome_sub": "Hỏi tôi về phim hot, gói Premium, hoặc bất kỳ điều gì về MovieZone nhé!",
+    "suggestions": {
+      "hot": "🔥 Phim đang hot",
+      "premium": "💎 Gói Premium",
+      "action": "🎬 Phim hành động",
+      "tv": "📺 Series hay",
+      "high_rated": "⭐ Đánh giá cao",
+      "new": "🆕 Mới thêm gần đây"
+    },
+    "header": {
+      "name": "MovieZone AI",
+      "status": "Luôn sẵn sàng hỗ trợ"
+    },
+    "input": {
+      "placeholder": "Hỏi về phim, gói Premium...",
+      "footer": "Powered by LLaMA AI · MovieZone"
+    },
+    "messages": {
+      "welcome_bot": "Xin chào! 🎬 Tôi là AI hỗ trợ của **MovieZone**. Tôi có thể giúp bạn:\n\n- 🔥 Tìm **phim đang hot** theo thể loại\n- 💎 Thông tin về **gói Premium**\n- 📊 Phim được **đánh giá cao nhất**\n- 🆕 Phim / Series **mới thêm** gần đây\n- ❓ Giải đáp mọi thắc mắc về MovieZone\n\nBạn muốn hỏi gì nào?",
+      "error": "Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại sau! 😅",
+      "cleared": "Lịch sử chat đã được xóa. Tôi có thể giúp gì cho bạn? 😊",
+      "busy": "Xin lỗi, tôi không thể trả lời ngay lúc này."
+    }
   }
 }

@@ -10,7 +10,9 @@
     "contact": "Contact",
     "premium": "Go Premium",
     "premium_plan": "Premium Plan",
-    "hello": "Hello"
+    "actors": "Actors",
+    "hello": "Hello",
+    "hello_user": "Hello, {{name}}"
   },
   "hero": {
     "subtitle": "Find movies, series & more"
@@ -19,6 +21,41 @@
     "placeholder": "Search movies, series, genres...",
     "fast": "Fast search for all content",
     "button": "Search"
+  },
+  "search_overlay": {
+    "placeholder": "Search movies, series, actors...",
+    "close": "Close",
+    "type_hint": "Type to search",
+    "actors": "Actors",
+    "movies": "Movies / Series"
+  },
+  "movie": {
+    "play": "▶ Play",
+    "more_info": "More Info"
+  },
+  "genres": {
+    "title": "Genres",
+    "action": "Action",
+    "action_and_adventure": "Action & Adventure",
+    "adventure": "Adventure",
+    "animation": "Animation",
+    "comedy": "Comedy",
+    "crime": "Crime",
+    "drama": "Drama",
+    "family": "Family",
+    "fantasy": "Fantasy",
+    "history": "History",
+    "horror": "Horror",
+    "music": "Music",
+    "mystery": "Mystery",
+    "romance": "Romance",
+    "sci_fi_and_fantasy": "Sci-Fi & Fantasy",
+    "science_fiction": "Science Fiction",
+    "thriller": "Thriller",
+    "western": "Western"
+  },
+  "featured": {
+    "default_desc": "Top trending movie right now."
   },
   "social": {
     "follow": "Follow MovieZone"
@@ -38,7 +75,8 @@
   "footer": {
     "title": "MovieZone · Watch movies everyday.",
     "copyright": "Online Movie Streaming Platform Project",
-    "bottom": "© 2025 MovieZone. Demo Project — Login / Sign Up to experience."
+    "bottom": "© 2025 MovieZone. Demo Project — Login / Sign Up to experience.",
+    "follow_us": "Follow us here"
   },
   "admin": {
     "title": "MovieZone Admin",
@@ -136,7 +174,8 @@
     "loading": "Loading...",
     "search": "Search",
     "reset": "Reset",
-    "save": "Save"
+    "save": "Save",
+    "follow_us": "Follow us here"
   },
   "google_setup": {
     "title_line1": "First time using Google Login?",
@@ -226,5 +265,31 @@
     "removed_toast": "💔 Removed from Wishlist",
     "login_required": "Please log in to use wishlist.",
     "error": "Something went wrong."
+  },
+  "ai_chat": {
+    "welcome_title": "👋 Hi! I'm MovieZone's AI Assistant",
+    "welcome_sub": "Ask me about hot movies, Premium plans, or anything about MovieZone!",
+    "suggestions": {
+      "hot": "🔥 Hot movies",
+      "premium": "💎 Premium plans",
+      "action": "🎬 Action movies",
+      "tv": "📺 TV Series",
+      "high_rated": "⭐ Top rated",
+      "new": "🆕 Recently added"
+    },
+    "header": {
+      "name": "MovieZone AI",
+      "status": "Always ready to help"
+    },
+    "input": {
+      "placeholder": "Ask about movies, Premium plans...",
+      "footer": "Powered by LLaMA AI · MovieZone"
+    },
+    "messages": {
+      "welcome_bot": "Hi! 🎬 I'm **MovieZone's** AI assistant. I can help you with:\n\n- 🔥 Finding **hot movies** by genre\n- 💎 Information about **Premium plans**\n- 📊 The **highest-rated** films\n- 🆕 Recently added **movies/series**\n- ❓ Answering any questions about MovieZone\n\nWhat would you like to ask?",
+      "error": "Sorry, an error occurred. Please try again later! 😅",
+      "cleared": "Chat history has been cleared. How can I help you? 😊",
+      "busy": "Sorry, I can't answer right now."
+    }
   }
 }

@@ -1,20 +1,21 @@
 let translations = {};
+let cache = {};
 
 // lấy value từ key dạng nav.home
 function getTranslation(key) {
-    const keys = key.split(".");
-    let value = translations;
+    return key.split(".").reduce((obj, k) => obj?.[k], translations);
+}
 
-    keys.forEach(k => {
-        if (value) value = value[k];
+function t(key, params = {}) {
+    let value = getTranslation(key);
+    if (value == null) return key;
+
+    // replace {{variable}}
+    Object.keys(params).forEach(k => {
+        value = value.replace(new RegExp(`{{${k}}}`, "g"), params[k]);
     });
 
     return value;
-}
-
-function t(key) {
-    const value = getTranslation(key);
-    return value || key;
 }
 
 // áp dụng text
@@ -22,16 +23,22 @@ function applyTranslations() {
 
     document.querySelectorAll("[data-i18n]").forEach(el => {
         const key = el.getAttribute("data-i18n");
-        const value = getTranslation(key);
+        const value = t(key);
 
         if (value) el.textContent = value;
     });
 
     document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
         const key = el.getAttribute("data-i18n-placeholder");
-        const value = getTranslation(key);
+        const value = t(key);
 
         if (value) el.placeholder = value;
+    });
+
+    document.querySelectorAll("[data-i18n-title]").forEach(el => {
+        const key = el.getAttribute("data-i18n-title");
+        const value = t(key);
+        if (value) el.title = value;
     });
 }
 
@@ -39,14 +46,18 @@ function applyTranslations() {
 async function loadLanguage(lang) {
 
     try {
-        const res = await fetch(`/i18n/${lang}.json`);
-        translations = await res.json();
+        if (!cache[lang]) {
+            const res = await fetch(`/i18n/${lang}.json`);
+            cache[lang] = await res.json();
+        }
+
+        translations = cache[lang];
 
         applyTranslations();
         updateLangFlag();
-        if (window.renderMovies) {
-            renderMovies();
-        }
+        renderUsername();
+
+        window.dispatchEvent(new Event("languageChanged"));
 
     } catch (err) {
         console.error("Failed to load language:", err);
@@ -60,11 +71,6 @@ function changeLanguage(lang) {
 
     // load file ngôn ngữ rồi apply lại translation
     loadLanguage(lang).then(() => {
-
-        // dịch lại toàn bộ DOM hiện tại
-        if (typeof applyTranslations === "function") {
-            applyTranslations();
-        }
 
         // nếu đang ở trang admin thì reload fragment đang mở
         if (window.adminApi && window.adminApi.loadFragment) {
@@ -124,6 +130,33 @@ function initLangDropdown() {
             dropdown.classList.remove("open");
         }
     });
+}
+
+function renderUsername() {
+    const usernameEl = document.getElementById("navUsername");
+    if (!usernameEl) return;
+
+    const username = localStorage.getItem("username") || "User";
+
+    const text = t("nav.hello_user", {
+        name: username
+    });
+
+    usernameEl.textContent = "👋 " + text;
+}
+
+function normalizeGenreKey(name) {
+    return name
+        .toLowerCase()
+        .replace(/&/g, "and")        // Action & Adventure → action_and_adventure
+        .replace(/[^a-z0-9]+/g, "_") // space, - → _
+        .replace(/^_|_$/g, "");      // remove _ đầu/cuối
+}
+
+function translateGenre(name) {
+    const key = normalizeGenreKey(name);
+    const translated = t(`genres.${key}`);
+    return translated === `genres.${key}` ? name : translated;
 }
 
 // init khi load page
