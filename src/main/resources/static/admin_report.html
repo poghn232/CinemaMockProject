@@ -1,6 +1,6 @@
 <div class="card">
   <h2>Reports (Pending)</h2>
-  <div class="muted">Review and moderate reported comments. Approve to remove the comment and disable commenting for the reported user; Reject to notify the reporter.</div>
+  <div class="muted">Review and moderate reported comments. Approve to remove the comment and disable commenting for the reported profile; Reject to notify the reporter.</div>
 
   <div id="reportsMessage" style="margin-top:12px"></div>
 
@@ -10,7 +10,7 @@
         <tr style="opacity:0.9; background: rgba(255,255,255,0.02)">
           <th style="padding:10px; text-align:left;">ID</th>
           <th style="padding:10px; text-align:left;">Review ID</th>
-          <th style="padding:10px; text-align:left;">Reported User</th>
+          <th style="padding:10px; text-align:left;">Reported Profile</th>
           <th style="padding:10px; text-align:left;">Reporter</th>
           <th style="padding:10px; text-align:left;">Reason</th>
           <th style="padding:10px; text-align:left;">Created At</th>
@@ -75,8 +75,8 @@
           tr.innerHTML = `
             <td style="padding:10px">${r.id}</td>
             <td style="padding:10px">${r.reviewId || ''}</td>
-            <td style="padding:10px">${r.reportedUsername || ''}</td>
-            <td style="padding:10px">${r.reporterUsername || ''}</td>
+            <td style="padding:10px">${r.reportedProfile || ''}</td>
+            <td style="padding:10px">${r.reporterProfile || ''}</td>
             <td style="padding:10px; max-width:420px">${escapeHtml(r.reason || '')}</td>
             <td style="padding:10px">${r.createdAt ? new Date(r.createdAt).toLocaleString() : ''}</td>
             <td style="padding:10px">

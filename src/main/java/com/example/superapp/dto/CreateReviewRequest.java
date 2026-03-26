@@ -1,32 +1,14 @@
 package com.example.superapp.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class CreateReviewRequest {
 
+    private long profileId;
     private Long movieId;
     private Long episodeId;
     private String comment;
-
-    public Long getMovieId() {
-        return movieId;
-    }
-
-    public void setMovieId(Long movieId) {
-        this.movieId = movieId;
-    }
-
-    public Long getEpisodeId() {
-        return episodeId;
-    }
-
-    public void setEpisodeId(Long episodeId) {
-        this.episodeId = episodeId;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
 }

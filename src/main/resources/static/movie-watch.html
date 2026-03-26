@@ -676,6 +676,8 @@
         initializeComments();
     }
 
+    const profileId = localStorage.getItem("profileId");
+
     function initializeComments() {
         console.log("Initializing comments section");
 
@@ -718,7 +720,7 @@
 
                 const author = document.createElement("div");
                 author.className = "comment-author";
-                author.textContent = review.username || "Anonymous";
+                author.textContent = review.profileId.toString() !== profileId ? review.profileName || "Anonymous" : "You";
 
                 const time = document.createElement("div");
                 time.className = "comment-time";
@@ -775,7 +777,7 @@
                                             "Content-Type": "application/json",
                                             Authorization: `Bearer ${token}`,
                                         },
-                                        body: JSON.stringify({reason}),
+                                        body: JSON.stringify({reason, profileId}),
                                     },
                                 );
 
@@ -1024,6 +1026,8 @@
                         }
                         body.movieId = _currentMovieId;
                     }
+
+                    body.profileId = profileId;
 
                     const res = await fetch("/api/user/reviews", {
                         method: "POST",
@@ -1428,7 +1432,6 @@
     const _histType = _histParams.get("type") || "movie";
     const _histToken = localStorage.getItem("token");
     const _tParam = _histParams.get("t"); // seek position only
-    const profileId = localStorage.getItem("profileId");
 
     let _durationSec = 0; // set from getDuration() in _onPlayerReady
     let _firstPlay = true; // triggers immediate DB insert on first play

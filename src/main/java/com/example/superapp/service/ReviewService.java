@@ -37,7 +37,7 @@ public class ReviewService {
 
     //TODO: refactor this method
     @Transactional
-    public ReviewDto createComment(String profileName, Long movieId, Long episodeId, String comment) {
+    public ReviewDto createComment(long profileId, Long movieId, Long episodeId, String comment) {
         if ((movieId == null && episodeId == null) || (movieId != null && episodeId != null)) {
             throw new IllegalArgumentException("Either movieId or episodeId must be provided");
         }
@@ -50,11 +50,11 @@ public class ReviewService {
             throw new IllegalArgumentException("Comment is too long (max 1000 characters)");
         }
 
-        Profile profile = profileRepository.findByProfileName(profileName)
+        Profile commentedProfile = profileRepository.findByProfileId(profileId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         // Block commenting for users flagged as commentDisabled
-        if (Boolean.TRUE.equals(profile.getCommentDisabled())) {
+        if (Boolean.TRUE.equals(commentedProfile.getCommentDisabled())) {
             // friendlier, more natural message returned to clients
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't post comments right now.");
         }
@@ -71,7 +71,7 @@ public class ReviewService {
         review.setEpisode(episode);
     }
 
-    review.setProfile(new Profile());
+    review.setProfile(commentedProfile);
         // keep rating field present to satisfy schema; default to 0 for comments
         review.setRating(0);
     review.setComment(comment == null ? null : comment.trim());
@@ -103,8 +103,9 @@ public class ReviewService {
 
     private ReviewDto toDto(Review review) {
         ReviewDto dto = new ReviewDto();
+        dto.setProfileId(review.getProfile().getProfileId());
         dto.setReviewId(review.getReviewId());
-        dto.setUsername(review.getProfile().getUser() != null ? review.getProfile().getUser().getUsername() : "Unknown");
+        dto.setProfileName(review.getProfile() != null ? review.getProfile().getProfileName() : "Unknown");
         dto.setComment(review.getComment());
         dto.setCreatedDate(review.getCreatedDate() != null ? review.getCreatedDate() : LocalDateTime.now());
         return dto;
