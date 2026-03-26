@@ -730,7 +730,16 @@
                 hasOpened = true;
                 sessionStorage.setItem('mz_chat_opened', 'true');
                 setTimeout(() => {
-                    addBotMessage('Xin chào! 🎬 Tôi là AI hỗ trợ của **MovieZone**. Tôi có thể giúp bạn:\n\n- 🔥 Tìm **phim đang hot** theo thể loại\n- 💎 Thông tin về **gói Premium**\n- 📊 Phim được **đánh giá cao nhất**\n- 🆕 Phim / Series **mới thêm** gần đây\n- ❓ Giải đáp mọi thắc mắc về MovieZone\n\nBạn muốn hỏi gì nào?');
+                    // addBotMessage(t("ai_chat.messages.welcome_bot"));
+                    setTimeout(() => {
+                        const welcomeMsg = t("ai_chat.messages.welcome_bot");
+
+                        addBotMessage(
+                            welcomeMsg === "ai_chat.messages.welcome_bot"
+                                ? "Hi! 🎬 I'm MovieZone AI. How can I help you?" // fallback nếu chưa load lang
+                                : welcomeMsg
+                        );
+                    }, 400);
                 }, 400);
             }
         }
