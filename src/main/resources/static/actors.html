@@ -33,7 +33,8 @@
         /* keep navbar visible when overlays open */
         position: sticky;
         top: 18px;
-        z-index: 100; /* must be higher than detail-panel (60) */
+        /* raise above popped cards */
+        z-index: 1000; /* must be higher than detail-panel (60) */
         display: flex;
         align-items: center;
         gap: 16px;
@@ -153,7 +154,19 @@
         text-align: center;
         cursor: pointer;
         border: 1px solid rgba(148, 163, 184, 0.06);
-        opacity: 0 ;
+        opacity: 1;
+      }
+      /* fade-in animation via classes (avoid inline transform so hover works) */
+      .actor-card.init {
+        opacity: 0;
+        transform: translateY(20px);
+        filter: blur(4px);
+      }
+      .actor-card.in {
+        transition: all 0.5s ease;
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
       }
       .actor-thumb {
         width: 100%;
@@ -162,6 +175,28 @@
         display: block;
         border-radius: 8px;
         background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      }
+      /* hover / active glow and pop-out */
+      .actor-card, .movie-card {
+        /* ensure shadow isn't clipped by siblings and allow stacking for glow */
+        position: relative;
+        /* baseline stacking so hover z-index can take effect without overlapping navbar */
+        z-index: 1;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+        will-change: transform, box-shadow;
+      }
+      /* slightly smaller pop to avoid clipping in grid rows */
+      .actor-card:hover, .movie-card:hover {
+        transform: translateY(-6px) scale(1.04);
+        box-shadow: 0 20px 44px rgba(249,115,22,0.14), 0 0 30px rgba(249,115,22,0.10);
+        /* lift above sibling cards but stay under the navbar (z-index:1000) */
+        z-index: 500;
+      }
+      .actor-card.active, .movie-card.active {
+        transform: translateY(-8px) scale(1.06);
+        box-shadow: 0 36px 84px rgba(249,115,22,0.20), 0 0 48px rgba(249,115,22,0.14);
+        border-color: rgba(249,115,22,0.30);
+        z-index: 40;
       }
       /* skeleton card to improve perceived load time */
       .skeleton {
@@ -356,7 +391,7 @@
         el.innerHTML = "";
         for (let i = 0; i < count; i++) {
           const card = document.createElement("div");
-          card.className = "actor-card";
+          card.className = "actor-card init";
           const s = document.createElement("div");
           s.className = "skeleton";
           card.appendChild(s);
@@ -457,18 +492,12 @@
 
       function applyActorFadeIn() {
         const cards = document.querySelectorAll(".actor-card");
-
         cards.forEach((card, index) => {
-          card.style.opacity = "0";
-          card.style.transform = "translateY(20px)";
-          card.style.filter = "blur(4px)";
-
+          card.classList.add('init');
           setTimeout(() => {
-            card.style.transition = "all 0.5s ease";
-            card.style.opacity = "1";
-            card.style.transform = "translateY(0)";
-            card.style.filter = "blur(0)";
-          }, index * 30); // 🔥 smooth stagger
+            card.classList.add('in');
+            card.classList.remove('init');
+          }, index * 30);
         });
       }
 
@@ -503,7 +532,14 @@
           card.appendChild(name);
           card.appendChild(count);
           card.appendChild(sub);
-          card.addEventListener("click", () => showPersonDetail(a.id));
+          // make clicked card visually active (glow + pop-out)
+          const makeActive = () => {
+            document.querySelectorAll('.actor-card.active').forEach(c=>c.classList.remove('active'));
+            card.classList.add('active');
+          };
+          card.addEventListener("click", () => { makeActive(); showPersonDetail(a.id); });
+          card.tabIndex = 0;
+          card.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { makeActive(); showPersonDetail(a.id); } });
           el.appendChild(card);
         });
         applyActorFadeIn();
