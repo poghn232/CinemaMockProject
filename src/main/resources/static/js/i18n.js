@@ -126,6 +126,7 @@ function initLangDropdown() {
     });
 
     document.addEventListener("click", e => {
+        if (!dropdown) return;
         if (!dropdown.contains(e.target)) {
             dropdown.classList.remove("open");
         }
@@ -159,20 +160,6 @@ function translateGenre(name) {
     return translated === `genres.${key}` ? name : translated;
 }
 
-window.addEventListener("languageChanged", () => {
-    // render lại genres menu
-    if (genresFromServer) {
-        const map = {};
-        genresFromServer.forEach(g => {
-            map[g.name] = g.items || [];
-        });
-        populateGenresMenu(map);
-    } else {
-        const genresMap = collectGenres(movies);
-        populateGenresMenu(genresMap);
-    }
-});
-
 // init khi load page
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -181,4 +168,23 @@ document.addEventListener("DOMContentLoaded", () => {
     loadLanguage(lang);
 
     initLangDropdown();
+});
+
+window.addEventListener("languageChanged", () => {
+    // reload UI genres
+    if (typeof genresFromServer !== "undefined" && genresFromServer) {
+        const map = {};
+        genresFromServer.forEach(g => {
+            map[g.name] = g.items || [];
+        });
+        populateGenresMenu(map);
+    } else if (typeof movies !== "undefined") {
+        const genresMap = collectGenres(movies);
+        populateGenresMenu(genresMap);
+    }
+
+    // reload data
+    if (typeof loadUserData === "function") loadUserData();
+    if (typeof loadHistory === "function") loadHistory();
+    if (typeof loadWishlist === "function") loadWishlist();
 });

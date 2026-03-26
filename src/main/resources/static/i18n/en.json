@@ -152,7 +152,12 @@
     "email_placeholder": "Enter your email",
     "password_placeholder": "At least 6 characters",
     "already_account": "Already have an account?",
-    "forgot_subtitle": "Please enter your username. The system will generate a new password and send it to the registered email."
+    "forgot_subtitle": "Please enter your username. The system will generate a new password and send it to the registered email.",
+    "enter_current_password": "Enter current password",
+    "auth.password_min": "Error: New password must be at least 6 characters long!",
+    "password_not_match": "Error: Password confirmation does not match!",
+    "session_expired": "Login expired. Please log in again.",
+    "logout_confirm": "Are you sure you want to log out of MovieZone?"
   },
   "contact": {
     "title": "Contact Us",
@@ -180,7 +185,28 @@
     "current_password": "Current password",
     "new_password": "New password",
     "confirm_password": "Confirm new password",
-    "update_password": "Update password"
+    "subscription.empty": "You have not purchased any successful subscription yet.",
+    "start_date": "Start Date:",
+    "end_date": "End Date:",
+    "price": "Price:",
+    "subscription.extend": "Extend Subscription",
+    "update_success": "Username updated successfully!",
+    "update_password": "Update password",
+    "wishlist_title": "My Wishlist",
+    "history_title": "Watch History",
+    "history_sub": {
+      "empty": "You haven't watched anything recently.",
+      "browse": "Browse movies now →",
+      "loading": "Loading your history..."
+    },
+    "wishlist": {
+      "empty": "You have no wishlisted movies yet.",
+      "loading": "Loading wishlist..."
+    },
+    "subscription": {
+      "empty": "You have not purchased any subscription yet.",
+      "extend": "Extend Subscription"
+    }
   },
   "common": {
     "loading": "Loading...",
@@ -190,7 +216,8 @@
     "follow_us": "Follow us here",
     "watch_all": "Watch All",
     "see_all": "See all",
-    "close": "Close"
+    "close": "Close",
+    "processing": "Processing..."
   },
   "google_setup": {
     "title_line1": "First time using Google Login?",

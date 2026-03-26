@@ -152,7 +152,12 @@
     "email_placeholder": "E-Mail eingeben",
     "password_placeholder": "Mindestens 6 Zeichen",
     "already_account": "Hast du bereits ein Konto?",
-    "forgot_subtitle": "Bitte gib deinen Benutzernamen ein. Das System erstellt ein neues Passwort und sendet es an die registrierte E-Mail."
+    "forgot_subtitle": "Bitte gib deinen Benutzernamen ein. Das System erstellt ein neues Passwort und sendet es an die registrierte E-Mail.",
+    "enter_current_password": "Aktuelles Passwort eingeben",
+    "auth.password_min": "Fehler: Das neue Passwort muss mindestens 6 Zeichen lang sein!",
+    "password_not_match": "Fehler: Passwortbestätigung stimmt nicht überein!",
+    "session_expired": "Sitzung abgelaufen. Bitte erneut einloggen.",
+    "logout_confirm": "Möchten Sie sich wirklich von MovieZone abmelden?"
   },
   "contact": {
     "title": "Kontakt",
@@ -180,7 +185,28 @@
     "current_password": "Aktuelles Passwort",
     "new_password": "Neues Passwort",
     "confirm_password": "Neues Passwort bestätigen",
-    "update_password": "Passwort aktualisieren"
+    "subscription.empty": "Sie haben noch kein erfolgreiches Abonnement gekauft.",
+    "start_date": "Startdatum:",
+    "end_date": "Enddatum:",
+    "price": "Preis:",
+    "subscription.extend": "Abonnement verlängern",
+    "update_success": "Benutzername erfolgreich aktualisiert!",
+    "update_password": "Passwort aktualisieren",
+    "wishlist_title": "Meine Wunschliste",
+    "history_title": "Verlauf",
+    "history_sub": {
+      "empty": "Sie haben kürzlich nichts angesehen.",
+      "browse": "Jetzt Filme entdecken →",
+      "loading": "Verlauf wird geladen..."
+    },
+    "wishlist": {
+      "empty": "Sie haben keine Filme auf Ihrer Wunschliste.",
+      "loading": "Wunschliste wird geladen..."
+    },
+    "subscription": {
+      "empty": "Sie haben noch kein Abonnement gekauft.",
+      "extend": "Abonnement verlängern"
+    }
   },
   "common": {
     "loading": "Laden...",
@@ -190,7 +216,8 @@
     "scroll_down": "Nach unten scrollen",
     "watch_all": "Alle ansehen",
     "see_all": "Mehr anzeigen",
-    "close": "Schließen"
+    "close": "Schließen",
+    "processing": "Wird verarbeitet..."
   },
   "google_setup": {
     "title_line1": "Erstes Mal Google Login?",

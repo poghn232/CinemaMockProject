@@ -152,7 +152,12 @@
     "email_placeholder": "Nhập email của bạn",
     "password_placeholder": "Ít nhất 6 ký tự",
     "already_account": "Đã có tài khoản?",
-    "forgot_subtitle": "Vui lòng nhập tên đăng nhập. Hệ thống sẽ tạo mật khẩu mới và gửi về email đã đăng ký."
+    "forgot_subtitle": "Vui lòng nhập tên đăng nhập. Hệ thống sẽ tạo mật khẩu mới và gửi về email đã đăng ký.",
+    "enter_current_password": "Nhập mật khẩu hiện tại",
+    "auth.password_min": "Lỗi: Mật khẩu mới phải có ít nhất 6 ký tự!",
+    "password_not_match": "Lỗi: Xác nhận mật khẩu không khớp!",
+    "session_expired": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+    "logout_confirm": "Bạn có chắc chắn muốn đăng xuất khỏi MovieZone không?"
   },
   "contact": {
     "title": "Liên hệ",
@@ -180,7 +185,28 @@
     "current_password": "Mật khẩu hiện tại",
     "new_password": "Mật khẩu mới",
     "confirm_password": "Xác nhận mật khẩu",
-    "update_password": "Cập nhật mật khẩu"
+    "subscription.empty": "Bạn chưa mua gói đăng ký thành công nào.",
+    "start_date": "Ngày bắt đầu:",
+    "end_date": "Ngày kết thúc:",
+    "price": "Giá:",
+    "subscription.extend": "Gia hạn gói",
+    "update_success": "Cập nhật tên người dùng thành công!",
+    "update_password": "Cập nhật mật khẩu",
+    "wishlist_title": "Danh sách yêu thích",
+    "history_title": "Lịch sử xem",
+    "history_sub": {
+      "empty": "Bạn chưa xem nội dung nào gần đây.",
+      "browse": "Xem phim ngay →",
+      "loading": "Đang tải lịch sử..."
+    },
+    "wishlist": {
+      "empty": "Bạn chưa có phim nào trong danh sách yêu thích.",
+      "loading": "Đang tải danh sách yêu thích..."
+    },
+    "subscription": {
+      "empty": "Bạn chưa mua gói đăng ký nào.",
+      "extend": "Gia hạn gói"
+    }
   },
   "common": {
     "loading": "Đang tải...",
@@ -190,7 +216,8 @@
     "scroll_down": "Cuộn xuống nội dung",
     "watch_all": "Xem tất cả",
     "see_all": "Xem thêm",
-    "close": "Đóng"
+    "close": "Đóng",
+    "processing": "Đang xử lý..."
   },
   "google_setup": {
     "title_line1": "Đăng nhập Google lần đầu?",

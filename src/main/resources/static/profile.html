@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="vi">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>MovieZone | User Profile</title>
-        <link rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieZone | User Profile</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-        <script>
+    <script>
         if (!localStorage.getItem('token')) {
             window.location.replace('login.html');
         }
     </script>
 
-        <style>
+    <style>
         :root {
             --bg-main: #0b1120;
             --bg-secondary: #161d2d;
@@ -760,227 +760,227 @@
             padding: 20px 0;
         }
     </style>
-    </head>
+</head>
 
-    <body>
-        <div id="toastNotification" class="toast">
-            <i id="toastIcon" class="fas fa-check-circle"></i> <span
-                id="toastMessage">Success!</span>
-        </div>
+<body>
+<div id="toastNotification" class="toast">
+    <i id="toastIcon" class="fas fa-check-circle"></i> <span
+        id="toastMessage">Success!</span>
+</div>
 
-        <header class="navbar">
-            <div class="nav-left">
-                <div class="nav-logo">MZ</div>
-                <div class="nav-title">
-                    <span class="nav-title-main">MOVIEZONE</span>
-                    <span class="nav-title-sub" data-i18n="hero.subtitle">Find
+<header class="navbar">
+    <div class="nav-left">
+        <div class="nav-logo">MZ</div>
+        <div class="nav-title">
+            <span class="nav-title-main">MOVIEZONE</span>
+            <span class="nav-title-sub" data-i18n="hero.subtitle">Find
                         movies, series &amp;
                         more</span>
+        </div>
+    </div>
+    <nav class="nav-center">
+        <a href="homepage.html" class="nav-link"
+           data-i18n="nav.home">Home</a>
+        <button class="nav-link active" data-nav="profile"
+                data-i18n="nav.profile"
+                disabled>Profile
+        </button>
+        <a
+                href="contact.html"
+                class="nav-link nav-link-contact"
+                id="contactButton"
+                data-i18n="nav.contact">
+            Contact
+        </a>
+        <div class="lang-dropdown">
+            <button class="lang-current" id="langCurrent">
+                <img id="langFlag" src="https://flagcdn.com/w40/gb.png">
+            </button>
+
+            <div class="lang-menu" id="langMenu">
+                <div class="lang-item" onclick="changeLanguage('vi')">
+                    <img src="https://flagcdn.com/w40/vn.png">
+                    <span>Tiếng Việt</span>
                 </div>
-            </div>
-            <nav class="nav-center">
-                <a href="homepage.html" class="nav-link"
-                    data-i18n="nav.home">Home</a>
-                <button class="nav-link active" data-nav="profile"
-                    data-i18n="nav.profile"
-                    disabled>Profile
-                </button>
-                <a
-                    href="contact.html"
-                    class="nav-link nav-link-contact"
-                    id="contactButton"
-                    data-i18n="nav.contact">
-                    Contact
-                </a>
-                <div class="lang-dropdown">
-                    <button class="lang-current" id="langCurrent">
-                        <img id="langFlag" src="https://flagcdn.com/w40/gb.png">
-                    </button>
 
-                    <div class="lang-menu" id="langMenu">
-                        <div class="lang-item" onclick="changeLanguage('vi')">
-                            <img src="https://flagcdn.com/w40/vn.png">
-                            <span>Tiếng Việt</span>
-                        </div>
-
-                        <div class="lang-item" onclick="changeLanguage('en')">
-                            <img src="https://flagcdn.com/w40/gb.png">
-                            <span>English</span>
-                        </div>
-                        <div class="lang-item" onclick="changeLanguage('my')">
-                            <img src="https://flagcdn.com/w40/mm.png">
-                            <span>မြန်မာဘာသာ</span>
-                        </div>
-
-                        <div class="lang-item" onclick="changeLanguage('ja')">
-                            <img src="https://flagcdn.com/w40/jp.png">
-                            <span>日本語</span>
-                        </div>
-
-                        <div class="lang-item" onclick="changeLanguage('de')">
-                            <img src="https://flagcdn.com/w40/de.png">
-                            <span>Deutsch</span>
-                        </div>
-                    </div>
+                <div class="lang-item" onclick="changeLanguage('en')">
+                    <img src="https://flagcdn.com/w40/gb.png">
+                    <span>English</span>
                 </div>
-                <button class="nav-link nav-link-logout" id="logoutButton"
-                    data-i18n="nav.logout"
-                    type="button">Logout
-                </button>
-            </nav>
-            <div class="nav-right">
-                <span class="nav-username" id="navUsername"
-                    data-i18n="common.loading">Loading...</span>
-            </div>
-        </header>
+                <div class="lang-item" onclick="changeLanguage('my')">
+                    <img src="https://flagcdn.com/w40/mm.png">
+                    <span>မြန်မာဘာသာ</span>
+                </div>
 
-        <div class="profile-banner">
-            <div class="banner-container">
-                <div class="user-info">
-                    <h2 id="bannerName"
-                        data-i18n="common.loading">Loading...</h2>
-                    <p id="bannerRole" data-i18n="common.loading">Loading...</p>
+                <div class="lang-item" onclick="changeLanguage('ja')">
+                    <img src="https://flagcdn.com/w40/jp.png">
+                    <span>日本語</span>
+                </div>
+
+                <div class="lang-item" onclick="changeLanguage('de')">
+                    <img src="https://flagcdn.com/w40/de.png">
+                    <span>Deutsch</span>
                 </div>
             </div>
         </div>
+        <button class="nav-link nav-link-logout" id="logoutButton"
+                data-i18n="nav.logout"
+                type="button">Logout
+        </button>
+    </nav>
+    <div class="nav-right">
+                <span class="nav-username" id="navUsername"
+                >Loading...</span>
+    </div>
+</header>
 
-        <main class="main-container">
-            <aside class="sidebar">
-                <ul class="sidebar-menu">
-                    <li class="sidebar-item active" data-target="section-info">
-                        <i class="fas fa-user-circle"></i>
-                        <span data-i18n="profile.user_information">User
+<div class="profile-banner">
+    <div class="banner-container">
+        <div class="user-info">
+            <h2 id="bannerName"
+            >Loading...</h2>
+            <p id="bannerRole">Loading...</p>
+        </div>
+    </div>
+</div>
+
+<main class="main-container">
+    <aside class="sidebar">
+        <ul class="sidebar-menu">
+            <li class="sidebar-item active" data-target="section-info">
+                <i class="fas fa-user-circle"></i>
+                <span data-i18n="profile.user_information">User
                             Information</span>
-                    </li>
-                    <li class="sidebar-item" data-target="section-history">
-                        <i class="fas fa-history"></i>
-                        <span data-i18n="profile.history">History</span>
-                    </li>
-                    <li class="sidebar-item" data-target="section-subscription">
-                        <i class="fas fa-credit-card"></i>
-                        <span
-                            data-i18n="profile.subscriptions">Subscriptions</span>
-                    </li>
-                    <li class="sidebar-item" data-target="section-wishlist">
-                        <i class="fas fa-heart"></i>
-                        <span>My Wishlist</span>
-                    </li>
-                    <li class="sidebar-item" data-target="section-password">
-                        <i class="fas fa-lock"></i>
-                        <span data-i18n="profile.change_password">Change
+            </li>
+            <li class="sidebar-item" data-target="section-history">
+                <i class="fas fa-history"></i>
+                <span data-i18n="profile.history">History</span>
+            </li>
+            <li class="sidebar-item" data-target="section-subscription">
+                <i class="fas fa-credit-card"></i>
+                <span
+                        data-i18n="profile.subscriptions">Subscriptions</span>
+            </li>
+            <li class="sidebar-item" data-target="section-wishlist">
+                <i class="fas fa-heart"></i>
+                <span data-i18n="profile.wishlist_title">My Wishlist</span>
+            </li>
+            <li class="sidebar-item" data-target="section-password">
+                <i class="fas fa-lock"></i>
+                <span data-i18n="profile.change_password">Change
                             password</span>
-                    </li>
-                </ul>
-                <button class="btn btn-logout-full"><i
-                        class="fas fa-sign-out-alt"></i>
-                    <span data-i18n="nav.logout">Log out</span>
-                </button>
-            </aside>
+            </li>
+        </ul>
+        <button class="btn btn-logout-full"><i
+                class="fas fa-sign-out-alt"></i>
+            <span data-i18n="nav.logout">Log out</span>
+        </button>
+    </aside>
 
-            <div class="content-area">
+    <div class="content-area">
 
-                <section id="section-info" class="content-section active">
-                    <h3 data-i18n="profile.user_information">User
-                        Information</h3>
-                    <form id="profileForm">
-                        <div class="form-group" style="max-width: 600px;">
-                            <label data-i18n="profile.username">Username</label>
-                            <input type="text" id="inputUsername" required
-                                title="You can edit your username">
-                        </div>
-                        <div class="form-group" style="max-width: 600px;">
-                            <label data-i18n="profile.email">Email</label>
-                            <input type="email" id="inputEmail" readonly
-                                title="Email cannot be changed">
-                        </div>
-                        <div class="form-group" style="max-width: 600px;">
-                            <label data-i18n="profile.role">Role</label>
-                            <input type="text" id="inputRole" readonly
-                                title="Role cannot be changed">
-                        </div>
-                        <div class="form-actions"
-                            style="max-width: 600px; justify-content: flex-start;">
-                            <button type="submit" class="btn btn-save"
-                                id="saveProfileBtn"
-                                data-i18n="profile.save_changes">>Save changes
-                            </button>
-                        </div>
-                    </form>
-                </section>
-
-                <!-- History Tab -->
-                <section id="section-history" class="content-section">
-                    <h3>Watch History</h3>
-                    <div id="historyContainer" class="history-grid"></div>
-                </section>
-
-                <section id="section-subscription" class="content-section">
-                    <h3 data-i18n="profile.my_subscriptions">My
-                        Subscriptions</h3>
-                    <div id="subscriptionContainer">
-                    </div>
-                </section>
-
-                <section id="section-wishlist" class="content-section">
-                    <h3>My Wishlist</h3>
-                    <div id="wishlistContainer" class="history-grid"></div>
-                </section>
-
-                <section id="section-password" class="content-section">
-                    <h3 data-i18n="profile.change_password">Change password</h3>
-                    <form id="passwordForm">
-                        <div class="form-group">
-                            <label data-i18n="profile.current_password">Current
-                                password</label>
-                            <input type="password" id="oldPassword"
-                                data-i18n-placeholder="profile.current_password"
-                                placeholder="Enter current password" required>
-                        </div>
-                        <div class="form-group">
-                            <label data-i18n="profile.new_password">New
-                                password</label>
-                            <input type="password" id="newPassword"
-                                data-i18n-placeholder="auth.enter_new_password"
-                                placeholder="Enter new password" minlength="6"
-                                required>
-                        </div>
-                        <div class="form-group">
-                            <label data-i18n="profile.confirm_password">Confirm
-                                new password</label>
-                            <input type="password" id="confirmPassword"
-                                data-i18n-placeholder="profile.confirm_password"
-                                placeholder="Confirm new password" minlength="6"
-                                required>
-                        </div>
-                        <div class="form-actions" style="margin-top: 30px;">
-                            <button type="submit" class="btn btn-save"
-                                data-i18n="profile.update_password"
-                                id="updatePassBtn">Update password
-                            </button>
-                        </div>
-                    </form>
-                </section>
-            </div>
-        </main>
-        <script src="/js/i18n.js"></script>
-        <footer class="site-footer">
-            <div class="footer-inner">
-                <div class="footer-brand">
-                    <div class="footer-logo">MZ</div>
-                    <span class="footer-title">MOVIEZONE</span>
+        <section id="section-info" class="content-section active">
+            <h3 data-i18n="profile.user_information">User
+                Information</h3>
+            <form id="profileForm">
+                <div class="form-group" style="max-width: 600px;">
+                    <label data-i18n="profile.username">Username</label>
+                    <input type="text" id="inputUsername" required
+                           title="You can edit your username">
                 </div>
-                <div class="footer-links">
-                    <a href="homepage.html">Home</a>
-                    <a href="packs.html">Premium Plan</a>
-                    <a href="contact.html">Contact</a>
+                <div class="form-group" style="max-width: 600px;">
+                    <label data-i18n="profile.email">Email</label>
+                    <input type="email" id="inputEmail" readonly
+                           title="Email cannot be changed">
                 </div>
+                <div class="form-group" style="max-width: 600px;">
+                    <label data-i18n="profile.role">Role</label>
+                    <input type="text" id="inputRole" readonly
+                           title="Role cannot be changed">
+                </div>
+                <div class="form-actions"
+                     style="max-width: 600px; justify-content: flex-start;">
+                    <button type="submit" class="btn btn-save"
+                            id="saveProfileBtn"
+                            data-i18n="profile.save_changes">Save changes
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- History Tab -->
+        <section id="section-history" class="content-section">
+            <h3 data-i18n="profile.history_title">Watch History</h3>
+            <div id="historyContainer" class="history-grid"></div>
+        </section>
+
+        <section id="section-subscription" class="content-section">
+            <h3 data-i18n="profile.my_subscriptions">My
+                Subscriptions</h3>
+            <div id="subscriptionContainer">
             </div>
-            <div class="footer-bottom">
-                © 2025 MovieZone. Demo Project.
-            </div>
-        </footer>
-        <script src="js/bannerads.js"></script>
-        <script>
+        </section>
+
+        <section id="section-wishlist" class="content-section">
+            <h3 data-i18n="profile.wishlist_title">My Wishlist</h3>
+            <div id="wishlistContainer" class="history-grid"></div>
+        </section>
+
+        <section id="section-password" class="content-section">
+            <h3 data-i18n="profile.change_password">Change password</h3>
+            <form id="passwordForm">
+                <div class="form-group">
+                    <label data-i18n="profile.current_password">Current
+                        password</label>
+                    <input type="password" id="oldPassword"
+                           data-i18n-placeholder="profile.current_password"
+                           placeholder="Enter current password" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="profile.new_password">New
+                        password</label>
+                    <input type="password" id="newPassword"
+                           data-i18n-placeholder="auth.enter_new_password"
+                           placeholder="Enter new password" minlength="6"
+                           required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="profile.confirm_password">Confirm
+                        new password</label>
+                    <input type="password" id="confirmPassword"
+                           data-i18n-placeholder="profile.confirm_password"
+                           placeholder="Confirm new password" minlength="6"
+                           required>
+                </div>
+                <div class="form-actions" style="margin-top: 30px;">
+                    <button type="submit" class="btn btn-save"
+                            data-i18n="profile.update_password"
+                            id="updatePassBtn">Update password
+                    </button>
+                </div>
+            </form>
+        </section>
+    </div>
+</main>
+<script src="/js/i18n.js"></script>
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <div class="footer-logo">MZ</div>
+            <span class="footer-title">MOVIEZONE</span>
+        </div>
+        <div class="footer-links">
+            <a href="homepage.html" data-i18n="nav.home">Home</a>
+            <a href="packs.html" data-i18n="nav.premium_plan">Premium Plan</a>
+            <a href="contact.html" data-i18n="nav.contact">Contact</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <span data-i18n="footer.bottom">© 2025 MovieZone. Demo Project</span>
+    </div>
+</footer>
+<script src="js/bannerads.js"></script>
+<script>
     document.addEventListener('DOMContentLoaded', () => {
 
         // --- CẤU HÌNH API ---
@@ -1003,7 +1003,7 @@
                 const expTime = payload.exp * 1000;
 
                 if (Date.now() >= expTime) {
-                    alert("Login expired. Please log in again.");
+                    alert(t("auth.session_expired"));
                     localStorage.removeItem('token');
                     window.location.replace('login.html');
                 }
@@ -1048,7 +1048,7 @@
         }
 
         // --- LẤY DỮ LIỆU TỪ MYSQL (KHÔNG CÒN MOCK DATA) ---
-        function loadUserData() {
+        window.loadUserData = function () {
             fetch(`${API_URL}/profile`, {
                 method: 'GET',
                 headers: getAuthHeaders()
@@ -1080,7 +1080,8 @@
         }
 
         function renderUserInfo(username, email, role) {
-            document.getElementById('navUsername').textContent = "Xin chào, " + username;
+            document.getElementById('navUsername').textContent =
+                "👋 " + t("nav.hello_user", {name: username});
             document.getElementById('bannerName').textContent = username;
             document.getElementById('bannerRole').textContent = "Role: " + role;
             document.getElementById('inputUsername').value = username;
@@ -1095,7 +1096,11 @@
             const successfulSubs = (subs || []).filter(sub => sub.status === 'ACTIVE');
 
             if (successfulSubs.length === 0) {
-                subContainer.innerHTML = '<p style="color: var(--text-secondary);">You have not purchased any successful subscription yet.</p>';
+                subContainer.innerHTML = `
+                    <p style="color: var(--text-secondary);">
+                          ${t("profile.subscription.empty")}
+                     </p>
+                `;
                 return;
             }
 
@@ -1106,8 +1111,8 @@
                 if (sub.startDate && sub.endDate) {
                     dateHtml = `
                 <div class="sub-details">
-                    <p><strong>Start Date:</strong> ${new Date(sub.startDate).toLocaleDateString()}</p>
-                    <p><strong>End Date:</strong> ${new Date(sub.endDate).toLocaleDateString()}</p>
+                    <p><strong>${t("profile.start_date")}</strong> ${new Date(sub.startDate).toLocaleDateString()}</p>
+                    <p><strong>${t("profile.end_date")}</strong> ${new Date(sub.endDate).toLocaleDateString()}</p>
                 </div>
             `;
                 }
@@ -1120,7 +1125,7 @@
                     actionsHtml = `
                 <div class="sub-actions">
                     <button class="btn btn-save" onclick="extendSubscription(${sub.subId})">
-                        Extend Subscription
+                        ${t("profile.subscription.extend")}
                     </button>
                 </div>
             `;
@@ -1133,7 +1138,7 @@
                     <span class="badge ${statusClass}">${sub.status}</span>
                 </div>
                 <p class="sub-desc" style="font-weight: bold; color: #fff;">
-                    Price: ${price.toLocaleString('vi-VN')}đ
+                    ${t("profile.price")} ${price.toLocaleString('vi-VN')}đ
                 </p>
                 ${dateHtml}
                 ${actionsHtml}
@@ -1152,7 +1157,7 @@
 
             if (!confirm(confirmMsg)) return;
 
-            btn.textContent = "Processing...";
+            btn.textContent = t("common.processing");
             btn.disabled = true;
 
             fetch(`${API_URL}/subscription/${subId}/${action}`, {
@@ -1190,7 +1195,7 @@
         logoutBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
-                if (confirm('Are you sure you want to log out of MovieZone?')) {
+                if (confirm(t("auth.logout_confirm"))) {
                     localStorage.removeItem('token');
                     window.location.replace('login.html');
                 }
@@ -1222,9 +1227,10 @@
                         }
                         const data = await res.json().catch(() => ({}));
                         if (res.ok) {
-                            document.getElementById('navUsername').textContent = "Hello, " + newUsername;
+                            document.getElementById('navUsername').textContent =
+                                t("nav.hello_user", {name: newUsername});
                             document.getElementById('bannerName').textContent = newUsername;
-                            showToast(data.message || 'Username updated successfully!');
+                            showToast(data.message || t("profile.update_success"));
                         } else {
                             throw new Error(data.message || "Update failed!");
                         }
@@ -1251,12 +1257,12 @@
 
                 // THÊM ĐOẠN KIỂM TRA ĐỘ DÀI NÀY
                 if (newPass.length < 6) {
-                    showToast('Error: New password must be at least 6 characters long!', true);
+                    showToast(t("auth.password_min"), true);
                     return;
-                }
 
+                }
                 if (newPass !== confirmPass) {
-                    showToast('Error: Password confirmation does not match!', true);
+                    showToast(t("auth.password_not_match"), true);
                     return;
                 }
 
@@ -1352,7 +1358,7 @@
         container.innerHTML = `
             <div class="history-loading">
             <i class="fas fa-spinner fa-spin"></i>
-            <p>Loading your history...</p>
+            <p>${t("profile.history_sub.loading")}</p>
             </div>`;
 
         try {
@@ -1387,8 +1393,8 @@
             container.innerHTML = `
             <div class="history-empty">
                 <i class="fas fa-film"></i>
-                <p>You haven't watched anything recently.</p>
-                <a href="homepage.html">Browse movies now →</a>
+                <p>${t("profile.history_sub.empty")}</p>
+                <a href="homepage.html">${t("profile.history_sub.browse")}</a>
             </div>`;
             return;
         }
@@ -1464,7 +1470,7 @@
         container.innerHTML = `
         <div class="history-loading">
             <i class="fas fa-spinner fa-spin"></i>
-            <p>Loading wishlist...</p>
+            <p>${t("profile.wishlist.loading")}</p>
         </div>`;
 
         try {
@@ -1487,7 +1493,11 @@
             container.innerHTML = '';
 
             if (!items || items.length === 0) {
-                container.innerHTML = '<p class="wishlist-empty">You have no wishlisted movies yet.</p>';
+                container.innerHTML = `
+                     <p class="wishlist-empty">
+                           ${t("profile.wishlist.empty")}
+                     </p>
+                `;
                 return;
             }
 
@@ -1573,6 +1583,6 @@
         }
     }
 </script>
-        <script src="js/ai-chat-support.js"></script>
-    </body>
+<script src="js/ai-chat-support.js"></script>
+</body>
 </html>

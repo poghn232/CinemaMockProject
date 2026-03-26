@@ -152,7 +152,12 @@
     "email_placeholder": "メールを入力",
     "password_placeholder": "6文字以上",
     "already_account": "すでにアカウントをお持ちですか？",
-    "forgot_subtitle": "ユーザー名を入力してください。システムが新しいパスワードを生成して登録メールへ送信します。"
+    "forgot_subtitle": "ユーザー名を入力してください。システムが新しいパスワードを生成して登録メールへ送信します。",
+    "enter_current_password": "現在のパスワードを入力してください",
+    "auth.password_min": "エラー：新しいパスワードは6文字以上である必要があります！",
+    "password_not_match": "エラー：パスワード確認が一致しません！",
+    "session_expired": "ログインの有効期限が切れました。再度ログインしてください。",
+    "logout_confirm": "MovieZoneからログアウトしてもよろしいですか？"
   },
   "contact": {
     "title": "お問い合わせ",
@@ -180,7 +185,28 @@
     "current_password": "現在のパスワード",
     "new_password": "新しいパスワード",
     "confirm_password": "新しいパスワード確認",
-    "update_password": "パスワード更新"
+    "subscription.empty": "まだ有効なサブスクリプションを購入していません。",
+    "start_date": "開始日：",
+    "end_date": "終了日：",
+    "price": "価格：",
+    "subscription.extend": "サブスクリプションを延長",
+    "update_success": "ユーザー名が正常に更新されました！",
+    "update_password": "パスワードを更新",
+    "wishlist_title": "お気に入りリスト",
+    "history_title": "視聴履歴",
+    "history_sub": {
+      "empty": "最近視聴したコンテンツはありません。",
+      "browse": "今すぐ映画を探す →",
+      "loading": "履歴を読み込み中..."
+    },
+    "wishlist": {
+      "empty": "お気に入りに追加された映画はありません。",
+      "loading": "お気に入りを読み込み中..."
+    },
+    "subscription": {
+      "empty": "サブスクリプションを購入していません。",
+      "extend": "サブスクリプションを延長"
+    }
   },
   "common": {
     "loading": "読み込み中...",
@@ -190,7 +216,8 @@
     "scroll_down": "下にスクロール",
     "watch_all": "すべて見る",
     "see_all": "もっと見る",
-    "close": "閉じる"
+    "close": "閉じる",
+    "processing": "処理中..."
   },
   "google_setup": {
     "title_line1": "Googleログインを初めて使用しますか？",

@@ -152,7 +152,12 @@
     "email_placeholder": "Email ထည့်ပါ",
     "password_placeholder": "အနည်းဆုံး စာလုံး 6 လုံး",
     "already_account": "အကောင့် ရှိပြီးသားလား?",
-    "forgot_subtitle": "Username ထည့်ပါ။ စနစ်က စကားဝှက်အသစ် ဖန်တီးပြီး Email သို့ ပို့ပေးမည်"
+    "forgot_subtitle": "Username ထည့်ပါ။ စနစ်က စကားဝှက်အသစ် ဖန်တီးပြီး Email သို့ ပို့ပေးမည်",
+    "enter_current_password": "လက်ရှိစကားဝှက်ကိုထည့်ပါ",
+    "auth.password_min": "အမှား - စကားဝှက်အသစ်မှာ အနည်းဆုံး စာလုံး ၆ လုံးရှိရမည်!",
+    "password_not_match": "အမှား - စကားဝှက်အတည်ပြုမှု မကိုက်ညီပါ!",
+    "session_expired": "လော့ဂ်အင်သက်တမ်းကုန်သွားပါပြီ။ ကျေးဇူးပြု၍ ပြန်လည်လော့ဂ်အင်လုပ်ပါ။",
+    "logout_confirm": "MovieZone မှ ထွက်ရန် သေချာပါသလား?"
   },
   "contact": {
     "title": "ဆက်သွယ်ရန်",
@@ -180,7 +185,28 @@
     "current_password": "လက်ရှိ စကားဝှက်",
     "new_password": "စကားဝှက်အသစ်",
     "confirm_password": "စကားဝှက်အသစ် အတည်ပြု",
-    "update_password": "စကားဝှက် အပ်ဒိတ်"
+    "subscription.empty": "သင် အောင်မြင်သော subscription မဝယ်ရသေးပါ။",
+    "start_date": "စတင်နေ့:",
+    "end_date": "ကုန်ဆုံးနေ့:",
+    "price": "စျေးနှုန်း:",
+    "subscription.extend": "Subscription သက်တမ်းတိုးရန်",
+    "update_success": "အသုံးပြုသူအမည်ကို အောင်မြင်စွာ ပြောင်းလဲပြီးပါပြီ!",
+    "update_password": "စကားဝှက်ပြောင်းရန်",
+    "wishlist_title": "အကြိုက်စာရင်း",
+    "history_title": "ကြည့်ရှုမှတ်တမ်း",
+    "history_sub": {
+      "empty": "မကြာသေးမီက သင်ဘာမျှ မကြည့်ရသေးပါ။",
+      "browse": "ရုပ်ရှင်များကို ကြည့်ရှုရန် →",
+      "loading": "မှတ်တမ်းကို တင်နေသည်..."
+    },
+    "wishlist": {
+      "empty": "သင်၏ wishlist တွင် ရုပ်ရှင်မရှိသေးပါ။",
+      "loading": "Wishlist ကို တင်နေသည်..."
+    },
+    "subscription": {
+      "empty": "သင် subscription မဝယ်ရသေးပါ။",
+      "extend": "Subscription သက်တမ်းတိုးရန်"
+    }
   },
   "common": {
     "loading": "Loading...",
@@ -190,7 +216,8 @@
     "scroll_down": "အောက်သို့ လှိမ့်ပါ",
     "watch_all": "အားလုံးကြည့်ရန်",
     "see_all": "ပိုမိုကြည့်ရန်",
-    "close": "ပိတ်ရန်"
+    "close": "ပိတ်ရန်",
+    "processing": "လုပ်ဆောင်နေသည်..."
   },
   "google_setup": {
     "title_line1": "Google Login ကို ပထမဆုံး အသုံးပြုပါသလား?",
