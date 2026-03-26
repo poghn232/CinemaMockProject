@@ -30,6 +30,10 @@
         padding: 20px 28px 48px;
       }
       .navbar {
+        /* keep navbar visible when overlays open */
+        position: sticky;
+        top: 18px;
+        z-index: 100; /* must be higher than detail-panel (60) */
         display: flex;
         align-items: center;
         gap: 16px;
@@ -154,10 +158,30 @@
       .actor-thumb {
         width: 100%;
         aspect-ratio: 3/4;
-        background-size: cover;
-        background-position: center;
+        object-fit: cover;
+        display: block;
         border-radius: 8px;
+        background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
       }
+      /* skeleton card to improve perceived load time */
+      .skeleton {
+        background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+        border-radius: 8px;
+        min-height: 160px;
+        position: relative;
+        overflow: hidden;
+      }
+      .skeleton::after {
+        content: "";
+        position: absolute;
+        left: -120px;
+        top: 0;
+        height: 100%;
+        width: 120px;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+        animation: shimmer 1.1s infinite;
+      }
+      @keyframes shimmer { to { transform: translateX(240%); } }
       .actor-name {
         margin-top: 8px;
         font-weight: 600;
@@ -213,6 +237,7 @@
       }
       /* full-screen slide-over panel */
       .detail-panel {
+        /* full-screen panel; paddingTop will be adjusted via JS to sit below navbar */
         position: fixed;
         inset: 0;
         height: 100vh;
@@ -223,7 +248,7 @@
           rgba(6, 8, 27, 0.98)
         );
         box-shadow: none;
-        padding: 20px;
+        padding: 20px; /* default padding; JS will add extra top offset */
         overflow: auto;
         transform: translateX(100%);
         transition: transform 0.28s ease;
@@ -321,19 +346,70 @@
     </div>
 
     <script>
-      // Loads paged actors from server API (20 per page) and supports server-side search
+  // Loads paged actors from server API (20 per page) and supports server-side search
+  // guard values to prevent out-of-order fetch responses from clobbering UI
+  window.__actorsRequestId = window.__actorsRequestId || 0;
+  window.__actorsLoading = window.__actorsLoading || false;
+
+  async function renderSkeletons(count = 8) {
+        const el = document.getElementById("actorsList");
+        el.innerHTML = "";
+        for (let i = 0; i < count; i++) {
+          const card = document.createElement("div");
+          card.className = "actor-card";
+          const s = document.createElement("div");
+          s.className = "skeleton";
+          card.appendChild(s);
+          el.appendChild(card);
+        }
+      }
+
       async function loadActorsPage(page = 1, q = "") {
         const el = document.getElementById("actorsList");
-        el.textContent = "Loading actors...";
+        // try to show cached data immediately for perceived speed
+        const cacheKey = `actors_page_${page}_q_${q}`;
+        try {
+          const cached = sessionStorage.getItem(cacheKey);
+          if (cached) {
+            const data = JSON.parse(cached);
+            window.__actorsCurrentQuery = q;
+            window.__actorsCurrentPage = data.page || page;
+            window.__actorsTotalPages = data.totalPages || 1;
+            window.__actorsArray = data.items || [];
+            window.__actorsMap = {};
+            (data.items || []).forEach((a) => (window.__actorsMap[String(a.id)] = a));
+            renderActorsList(data.items || []);
+            renderPagination(window.__actorsCurrentPage, window.__actorsTotalPages);
+            // still fetch fresh data in background; tag with request id so
+            // background results don't override a newer user navigation
+            const bgId = ++window.__actorsRequestId;
+            fetchActorsAndUpdateCache(page, q, cacheKey, bgId);
+            return;
+          }
+        } catch (e) {
+          console.debug("cache read failed", e);
+        }
+        // no cache: show skeletons quickly then fetch
+        renderSkeletons();
+        // start a fresh request id and mark loading
+        const currentId = ++window.__actorsRequestId;
+        window.__actorsLoading = true;
+        renderPagination(window.__actorsCurrentPage || 1, window.__actorsTotalPages || 1);
         try {
           const params = new URLSearchParams();
           params.set("page", String(page));
           if (q) params.set("q", q);
-          const res = await fetch(
-            "/api/public/people/page?" + params.toString(),
-          );
+          const res = await fetch("/api/public/people/page?" + params.toString());
           if (!res.ok) throw new Error("Failed to fetch");
           const data = await res.json();
+          // drop response if a newer request was started
+          if (currentId !== window.__actorsRequestId) return;
+          // cache fresh response for quick subsequent loads
+          try {
+            sessionStorage.setItem(cacheKey, JSON.stringify(data));
+          } catch (e) {
+            /* ignore storage errors */
+          }
           window.__actorsCurrentQuery = q;
           window.__actorsCurrentPage = data.page || page;
           window.__actorsTotalPages = data.totalPages || 1;
@@ -343,13 +419,39 @@
             (a) => (window.__actorsMap[String(a.id)] = a),
           );
           renderActorsList(data.items || []);
-          renderPagination(
-            window.__actorsCurrentPage,
-            window.__actorsTotalPages,
-          );
+          renderPagination(window.__actorsCurrentPage, window.__actorsTotalPages);
+          window.__actorsLoading = false;
         } catch (e) {
-          el.textContent = "Failed to load actors";
+            el.textContent = "Failed to load actors";
           console.error(e);
+          window.__actorsLoading = false;
+        }
+      }
+
+      // helper that fetches fresh data without blocking initial render
+      async function fetchActorsAndUpdateCache(page = 1, q = "", cacheKey, requestId) {
+        try {
+          const params = new URLSearchParams();
+          params.set("page", String(page));
+          if (q) params.set("q", q);
+          const res = await fetch("/api/public/people/page?" + params.toString());
+          if (!res.ok) return;
+          const data = await res.json();
+          // only update UI if this background fetch wasn't superseded
+          if (typeof requestId !== "undefined" && requestId !== window.__actorsRequestId) return;
+          window.__actorsCurrentQuery = q;
+          window.__actorsCurrentPage = data.page || page;
+          window.__actorsTotalPages = data.totalPages || 1;
+          window.__actorsArray = data.items || [];
+          window.__actorsMap = {};
+          (data.items || []).forEach((a) => (window.__actorsMap[String(a.id)] = a));
+          renderActorsList(data.items || []);
+          renderPagination(window.__actorsCurrentPage, window.__actorsTotalPages);
+          try {
+            if (cacheKey) sessionStorage.setItem(cacheKey, JSON.stringify(data));
+          } catch (e) {}
+        } catch (e) {
+          /* ignore background fetch errors */
         }
       }
 
@@ -380,9 +482,14 @@
         list.forEach((a) => {
           const card = document.createElement("div");
           card.className = "actor-card";
-          const img = document.createElement("div");
+
+          // use an <img> so browser can lazy-load and decode efficiently
+          const img = document.createElement("img");
           img.className = "actor-thumb";
-          img.style.backgroundImage = `url('${a.profilePath || "/static/img/placeholder-actor.png"}')`;
+          img.loading = "lazy";
+          img.alt = a.name || "actor";
+          img.src = a.profilePath || "/static/img/placeholder-actor.png";
+
           const name = document.createElement("div");
           name.className = "actor-name";
           name.textContent = a.name;
@@ -399,7 +506,7 @@
           card.addEventListener("click", () => showPersonDetail(a.id));
           el.appendChild(card);
         });
-          applyActorFadeIn();
+        applyActorFadeIn();
       }
 
       // debounce helper
@@ -497,20 +604,24 @@
         } catch (e) {
           /* ignore */
         }
+  // set detail panel offset initially
+  applyDetailPanelOffset();
+  // update on resize
+  window.addEventListener('resize', applyDetailPanelOffset);
       });
 
       function renderPagination(page, total) {
         const wrap = document.getElementById("paginationWrap");
         wrap.innerHTML = "";
         if (total <= 1) return;
+        const loading = !!window.__actorsLoading;
         const makeBtn = (txt, p, disabled = false) => {
           const b = document.createElement("button");
           b.className = "nav-button";
           b.textContent = txt;
+          // allow navigation even while loading to keep UI responsive
           b.disabled = disabled;
-          b.addEventListener("click", () =>
-            loadActorsPage(p, window.__actorsCurrentQuery || ""),
-          );
+          b.addEventListener("click", () => loadActorsPage(p, window.__actorsCurrentQuery || ""));
           return b;
         };
         wrap.appendChild(makeBtn("First", 1, page === 1));
@@ -518,7 +629,7 @@
         const info = document.createElement("div");
         info.style.color = "var(--text-subtle)";
         info.style.padding = "6px 10px";
-        info.textContent = `Page ${page} of ${total}`;
+        info.textContent = loading ? "Loading..." : `Page ${page} of ${total}`;
         wrap.appendChild(info);
         wrap.appendChild(
           makeBtn("Next", Math.min(total, page + 1), page === total),
@@ -596,12 +707,32 @@
         // show full-screen panel: display & fade backdrop, open panel and lock page scroll
         const backdrop = document.getElementById("backdrop");
         backdrop.style.display = "";
+        // ensure panel content sits below navbar
+        applyDetailPanelOffset();
         // small timeout to allow CSS transition to run
         setTimeout(() => (backdrop.style.opacity = "1"), 10);
         wrap.classList.add("open");
         wrap.setAttribute("aria-hidden", "false");
         // lock body scroll
         document.body.style.overflow = "hidden";
+      }
+
+      // calculate navbar height and ensure detail panel content (and close button)
+      // sits below it. Called on load, resize, and when opening the panel.
+      function applyDetailPanelOffset() {
+        const nav = document.querySelector('.navbar');
+        const wrap = document.getElementById('personDetailWrap');
+        if (!nav || !wrap) return;
+        const navRect = nav.getBoundingClientRect();
+        // compute desired top offset (nav height + small gap)
+        const topOffset = Math.ceil(navRect.height + 8);
+        // set paddingTop so content moves down; keep existing padding (20)
+        wrap.style.paddingTop = (topOffset + 12) + 'px';
+        // also position the close button (if present) to remain below navbar
+        const closeBtn = document.getElementById('closePerson');
+        if (closeBtn) {
+          closeBtn.style.marginTop = (topOffset - 6) + 'px';
+        }
       }
 
       // close slide-over
