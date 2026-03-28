@@ -568,7 +568,7 @@
           const base = masterUrl.substring(0, idx);
           return `${base}/${variantName}/playlist.m3u8`;
       }
-      function renderQualityDropdown(masterUrl, variants) {
+      function renderQualityDropdown(masterUrl, variants, isPremiumUser = false) {
           const wrap = document.getElementById("qualityWrap");
           const select = document.getElementById("qualitySelect");
 
@@ -577,7 +577,9 @@
           _currentPlaybackMasterUrl = masterUrl || "";
           _currentVariants = Array.isArray(variants) ? variants : [];
 
-          select.innerHTML = `<option value="auto">Auto</option>`;
+          select.innerHTML = isPremiumUser
+              ? `<option value="auto">Auto</option>`
+              : "";
 
           if (!_currentPlaybackMasterUrl || _currentVariants.length === 0) {
               wrap.style.display = "none";
@@ -1127,12 +1129,14 @@
 
       function setupMovie(movieData) {
           const videoUrl = movieData.srcFilm || movieData.src || "";
-          const variants = Array.isArray(movieData.variants) ? movieData.variants : [];
+          const variants = Array.isArray(movieData.allowedVariants)
+              ? movieData.allowedVariants
+              : [];
+          const isPremiumUser = movieData.premiumUser === true;
 
-          renderQualityDropdown(videoUrl, variants);
+          renderQualityDropdown(videoUrl, variants, isPremiumUser);
           loadVideo(videoUrl, window._resumeSec || 0);
       }
-
       function setupTVSeries(
         movieData,
         seasonsData,
@@ -1227,8 +1231,12 @@
                 window._resumeSec = 0; // clear after first use
                   if (ep && (ep.srcFilm || ep.src)) {
                       const videoUrl = ep.srcFilm || ep.src;
-                      const variants = Array.isArray(ep.variants) ? ep.variants : [];
-                      renderQualityDropdown(videoUrl, variants);
+                      const variants = Array.isArray(ep.allowedVariants)
+                          ? ep.allowedVariants
+                          : [];
+                      const isPremiumUser = ep.premiumUser === true;
+
+                      renderQualityDropdown(videoUrl, variants, isPremiumUser);
                       loadVideo(videoUrl, resumeOnLoad);
                   } else {
                       renderQualityDropdown("", []);
@@ -1258,8 +1266,15 @@
             if (firstButton) {
               firstButton.click();
             } else if (firstEpisode.srcFilm || firstEpisode.src) {
-              loadVideo(firstEpisode.srcFilm || firstEpisode.src, window._resumeSec || 0);
-              window._resumeSec = 0;
+                const videoUrl = firstEpisode.srcFilm || firstEpisode.src;
+                const variants = Array.isArray(ep.allowedVariants)
+                    ? ep.allowedVariants
+                    : [];
+                const isPremiumUser = ep.premiumUser === true;
+
+                renderQualityDropdown(videoUrl, variants, isPremiumUser);
+                loadVideo(videoUrl, window._resumeSec || 0);
+                window._resumeSec = 0;
             }
           }
         } else {
@@ -1272,8 +1287,12 @@
           );
             if (ep && (ep.srcFilm || ep.src)) {
                 const videoUrl = ep.srcFilm || ep.src;
-                const variants = Array.isArray(ep.variants) ? ep.variants : [];
-                renderQualityDropdown(videoUrl, variants);
+                const variants = Array.isArray(ep.allowedVariants)
+                    ? ep.allowedVariants
+                    : [];
+                const isPremiumUser = ep.premiumUser === true;
+
+                renderQualityDropdown(videoUrl, variants, isPremiumUser);
                 loadVideo(videoUrl, window._resumeSec || 0);
                 window._resumeSec = 0;
             }

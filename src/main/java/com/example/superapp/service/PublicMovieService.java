@@ -5,7 +5,9 @@ import com.example.superapp.dto.MovieItemDto;
 import com.example.superapp.dto.MoviePageResponse;
 import com.example.superapp.entity.*;
 import com.example.superapp.repository.MovieRepository;
+import com.example.superapp.repository.SubscriptionRepository;
 import com.example.superapp.repository.TvSeriesRepository;
+import com.example.superapp.repository.UserRepository;
 import com.example.superapp.repository.VideoAssetRepository;
 import com.example.superapp.utils.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,8 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -33,7 +37,8 @@ public class PublicMovieService {
     private final VideoAssetService videoAssetService;
     private final R2StorageService r2StorageService;
     private final VideoAssetRepository videoAssetRepository;
-
+    private final UserRepository userRepository;
+    private final SubscriptionRepository subscriptionRepository;
 
     @Value("${tmdb.image-base-url}")
     private String imageBaseUrl;
@@ -151,6 +156,7 @@ public class PublicMovieService {
         }
 
         String userRegion = extractRegionFromRequest(request);
+        boolean premiumUser = isPremiumUser(request);
 
         if (t.equals("movie")) {
             Movie m = movieRepository.findById(id)
@@ -167,7 +173,7 @@ public class PublicMovieService {
                 );
             }
 
-            return mapMovieDetail(m);
+            return mapMovieDetail(m, premiumUser);
         } else {
             TvSeries tv = tvSeriesRepository.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("TV series not found"));
@@ -183,7 +189,7 @@ public class PublicMovieService {
                 );
             }
 
-            return mapTvDetail(tv);
+            return mapTvDetail(tv, premiumUser);
         }
     }
 
@@ -208,6 +214,32 @@ public class PublicMovieService {
             return region.trim().toUpperCase();
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    private boolean isPremiumUser(HttpServletRequest request) {
+        if (request == null) {
+            return false;
+        }
+
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return false;
+        }
+
+        try {
+            String token = authHeader.substring(7);
+            String username = jwtUtils.extractUsername(token);
+
+            return userRepository.findByUsername(username)
+                    .map(user -> subscriptionRepository.existsByUser_UserIdAndStatusAndEndDateAfter(
+                            user.getUserId(),
+                            SubscriptionStatus.ACTIVE,
+                            LocalDateTime.now()
+                    ))
+                    .orElse(false);
+        } catch (Exception e) {
+            return false;
         }
     }
 
@@ -281,7 +313,7 @@ public class PublicMovieService {
         return dto;
     }
 
-    private MovieDetailDto mapMovieDetail(Movie m) {
+    private MovieDetailDto mapMovieDetail(Movie m, boolean premiumUser) {
         MovieDetailDto dto = new MovieDetailDto();
         dto.setId(m.getId());
         dto.setType("movie");
@@ -290,6 +322,7 @@ public class PublicMovieService {
         dto.setRating(m.getVoteAverage());
         dto.setVoteCount(m.getVoteCount());
         dto.setRuntime(m.getRuntime());
+        dto.setPremiumUser(premiumUser);
 
         LocalDate release = m.getReleaseDate();
         if (release != null) {
@@ -305,18 +338,33 @@ public class PublicMovieService {
 
         dto.setSrc(m.getSrc());
         dto.setSrcFilm(m.getSrcFilm());
+
+        List<String> variants = Collections.emptyList();
+
         VideoAsset latest = videoAssetRepository
                 .findTopByOwnerTypeAndOwnerIdOrderByCreatedAtDesc("movie", m.getId())
                 .orElse(null);
 
         if (latest != null) {
-            dto.setVariants(r2StorageService.findVariants("movie", m.getId(), latest.getId()));
+            variants = r2StorageService.findVariants("movie", m.getId(), latest.getId());
 
             if (latest.getPlaybackUrl() != null && !latest.getPlaybackUrl().isBlank()) {
                 dto.setSrcFilm(latest.getPlaybackUrl());
             }
+        }
+
+        dto.setVariants(variants);
+
+        if (premiumUser) {
+            dto.setAllowedVariants(variants);
         } else {
-            dto.setVariants(java.util.Collections.emptyList());
+            dto.setAllowedVariants(
+                    variants.contains("v0") ? List.of("v0") : Collections.emptyList()
+            );
+
+            if (dto.getSrcFilm() != null && !dto.getSrcFilm().isBlank() && variants.contains("v0")) {
+                dto.setSrcFilm(buildVariantPlaylistUrl(dto.getSrcFilm(), "v0"));
+            }
         }
 
         try {
@@ -344,7 +392,7 @@ public class PublicMovieService {
             dto.setCast(cast);
         } catch (Exception ignored) {
         }
-// Director: prefer stored credits where job == "Director"
+
         try {
             if (m.getCredits() != null) {
                 m.getCredits().stream()
@@ -359,7 +407,6 @@ public class PublicMovieService {
         } catch (Exception ignored) {
         }
 
-        // Country: prefer studio originCountry
         try {
             if (m.getStudios() != null && !m.getStudios().isEmpty()) {
                 m.getStudios().stream()
@@ -370,7 +417,6 @@ public class PublicMovieService {
         } catch (Exception ignored) {
         }
 
-        // Studio: prefer stored studio name
         try {
             if (m.getStudios() != null && !m.getStudios().isEmpty()) {
                 m.getStudios().stream()
@@ -381,7 +427,6 @@ public class PublicMovieService {
         } catch (Exception ignored) {
         }
 
-        // Fallback: if director or country still missing, try TMDB lookup
         if ((dto.getDirector() == null || dto.getDirector().isBlank()) || (dto.getCountry() == null || dto.getCountry().isBlank())) {
             try {
                 java.util.Map<String, Object> tm = tmdbService.getMovieDetails(m.getId());
@@ -424,7 +469,7 @@ public class PublicMovieService {
                             }
                         }
                     }
-                    // TMDB production_companies -> studio name fallback
+
                     if ((dto.getStudio() == null || dto.getStudio().isBlank()) && tm.containsKey("production_companies")) {
                         Object pcObj = tm.get("production_companies");
                         if (pcObj instanceof java.util.List<?> pcList && !pcList.isEmpty()) {
@@ -445,7 +490,7 @@ public class PublicMovieService {
         return dto;
     }
 
-    private MovieDetailDto mapTvDetail(TvSeries tv) {
+    private MovieDetailDto mapTvDetail(TvSeries tv, boolean premiumUser) {
         MovieDetailDto dto = new MovieDetailDto();
         dto.setId(tv.getId());
         dto.setType("tv");
@@ -453,6 +498,7 @@ public class PublicMovieService {
         dto.setOverview(tv.getOverview());
         dto.setRating(tv.getVoteAverage());
         dto.setVoteCount(tv.getVoteCount());
+        dto.setPremiumUser(premiumUser);
 
         LocalDate firstAir = tv.getFirstAirDate();
         if (firstAir != null) {
@@ -467,7 +513,8 @@ public class PublicMovieService {
         }
 
         dto.setSrc(tv.getSrc());
-        dto.setVariants(java.util.Collections.emptyList());
+        dto.setVariants(Collections.emptyList());
+        dto.setAllowedVariants(Collections.emptyList());
 
         try {
             List<com.example.superapp.dto.CastMemberDto> cast = new ArrayList<>();
@@ -529,7 +576,6 @@ public class PublicMovieService {
         } catch (Exception ignored) {
         }
 
-        // For TV: director field may be unavailable; attempt to infer from credits or TMDB
         try {
             if (tv.getCredits() != null && !tv.getCredits().isEmpty()) {
                 tv.getCredits().stream()
@@ -626,15 +672,28 @@ public class PublicMovieService {
         return dto;
     }
 
+    private String buildVariantPlaylistUrl(String masterUrl, String variantName) {
+        if (masterUrl == null || masterUrl.isBlank() || variantName == null || variantName.isBlank()) {
+            return masterUrl;
+        }
+
+        String marker = "/master.m3u8";
+        int idx = masterUrl.lastIndexOf(marker);
+        if (idx < 0) {
+            return masterUrl;
+        }
+
+        String base = masterUrl.substring(0, idx);
+        return base + "/" + variantName + "/playlist.m3u8";
+    }
+
     @Transactional(readOnly = true)
     public java.util.List<com.example.superapp.dto.GenreWithItems> listGenresWithItems(HttpServletRequest request) {
         String userRegion = extractRegionFromRequest(request);
 
-        // fetch all published movies and tv
         List<com.example.superapp.dto.GenreWithItems> result = new ArrayList<>();
         java.util.Map<Long, com.example.superapp.dto.GenreWithItems> map = new java.util.HashMap<>();
 
-        // helper to ensure genre entry
         java.util.function.BiConsumer<Long, String> ensureGenre = (id, name) -> {
             if (id == null || name == null) {
                 return;
@@ -644,14 +703,11 @@ public class PublicMovieService {
             }
         };
 
-        // collect movies
         for (Movie m : movieRepository.findByActiveTrueAndPublishedTrue()) {
             if (isMovieBlockedForRegion(m, userRegion)) {
                 continue;
             }
-            // map item
             MovieItemDto item = mapMovie(m);
-            // attach to genres
             if (m.getGenres() != null) {
                 for (com.example.superapp.entity.Genre g : m.getGenres()) {
                     if (g == null) {
@@ -663,7 +719,6 @@ public class PublicMovieService {
             }
         }
 
-        // collect tv
         for (TvSeries tv : tvSeriesRepository.findByActiveTrueAndPublishedTrue()) {
             if (isTvBlockedForRegion(tv, userRegion)) {
                 continue;
@@ -680,7 +735,6 @@ public class PublicMovieService {
             }
         }
 
-        // convert map to list and sort by size desc
         result.addAll(map.values());
         result.sort((a, b) -> Integer.compare(b.getItems().size(), a.getItems().size()));
         return result;

@@ -19,6 +19,24 @@ public class MovieDetailDto {
     private String director;
     private String country;
     private String studio;
+    private List<String> allowedVariants;
+    private Boolean premiumUser;
+
+    public List<String> getAllowedVariants() {
+        return allowedVariants;
+    }
+
+    public void setAllowedVariants(List<String> allowedVariants) {
+        this.allowedVariants = allowedVariants;
+    }
+
+    public Boolean getPremiumUser() {
+        return premiumUser;
+    }
+
+    public void setPremiumUser(Boolean premiumUser) {
+        this.premiumUser = premiumUser;
+    }
 
     public List<String> getVariants() {
         return variants;
