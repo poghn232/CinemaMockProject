@@ -2,9 +2,11 @@ package com.example.superapp.service;
 
 import com.example.superapp.config.VideoPropertiesConfig.VideoProperties;
 import com.example.superapp.dto.VideoAssetDto;
+import com.example.superapp.entity.Ad;
 import com.example.superapp.entity.Episode;
 import com.example.superapp.entity.Movie;
 import com.example.superapp.entity.VideoAsset;
+import com.example.superapp.repository.AdRepository;
 import com.example.superapp.repository.EpisodeRepository;
 import com.example.superapp.repository.MovieRepository;
 import com.example.superapp.repository.VideoAssetRepository;
@@ -29,6 +31,7 @@ public class VideoAssetService {
     private final R2StorageService r2StorageService;
     private final MovieRepository movieRepository;
     private final EpisodeRepository episodeRepository;
+    private final AdRepository adRepository;
 
     public VideoAssetDto uploadSource(String ownerType, Long ownerId, MultipartFile file) {
         validateFile(file);
@@ -220,6 +223,14 @@ public class VideoAssetService {
             return;
         }
 
+        if ("ad".equalsIgnoreCase(asset.getOwnerType())) {
+            Ad ad = adRepository.findById(asset.getOwnerId())
+                    .orElseThrow(() -> new IllegalArgumentException("Ad not found: " + asset.getOwnerId()));
+            ad.setSrcFilm(playbackUrl);
+            adRepository.save(ad);
+            return;
+        }
+
         throw new IllegalArgumentException("Unsupported ownerType: " + asset.getOwnerType());
     }
     public void syncExistingPlaybackFromR2(String ownerType, Long ownerId) {
@@ -239,6 +250,14 @@ public class VideoAssetService {
                         .orElseThrow(() -> new IllegalArgumentException("Episode not found: " + ownerId));
                 episode.setSrcFilm(playbackUrl);
                 episodeRepository.save(episode);
+                return;
+            }
+
+            if ("ad".equalsIgnoreCase(ownerType)) {
+                Ad ad = adRepository.findById(ownerId)
+                        .orElseThrow(() -> new IllegalArgumentException("Ad not found: " + ownerId));
+                ad.setSrcFilm(playbackUrl);
+                adRepository.save(ad);
                 return;
             }
 
@@ -305,6 +324,14 @@ public class VideoAssetService {
                     .orElseThrow(() -> new IllegalArgumentException("Episode not found: " + ownerId));
             episode.setSrcFilm(playbackUrl);
             episodeRepository.save(episode);
+            return true;
+        }
+
+        if ("ad".equalsIgnoreCase(ownerType)) {
+            Ad ad = adRepository.findById(ownerId)
+                    .orElseThrow(() -> new IllegalArgumentException("Ad not found: " + ownerId));
+            ad.setSrcFilm(playbackUrl);
+            adRepository.save(ad);
             return true;
         }
 
