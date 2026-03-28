@@ -1,5 +1,7 @@
 package com.example.superapp.dto;
 
+import java.util.List;
+
 public class MovieDetailDto {
 
     private Long id;
@@ -18,6 +20,15 @@ public class MovieDetailDto {
     private String country;
     private String studio;
 
+    public List<String> getVariants() {
+        return variants;
+    }
+
+    public void setVariants(List<String> variants) {
+        this.variants = variants;
+    }
+
+    private List<String> variants;
     private java.util.List<CastMemberDto> cast;
 
     public Long getId() {

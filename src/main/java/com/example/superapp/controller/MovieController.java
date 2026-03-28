@@ -1,6 +1,9 @@
 package com.example.superapp.controller;
 
 import com.example.superapp.dto.MoviePageResponse;
+import com.example.superapp.entity.VideoAsset;
+import com.example.superapp.repository.VideoAssetRepository;
+import com.example.superapp.service.R2StorageService;
 import com.example.superapp.service.TmdbService;
 import com.example.superapp.entity.TvSeries;
 import com.example.superapp.entity.Season;
@@ -23,12 +26,16 @@ public class MovieController {
     private final TvSeriesRepository tvSeriesRepository;
     private final SeasonRepository seasonRepository;
     private final EpisodeRepository episodeRepository;
+    private final VideoAssetRepository videoAssetRepository;
+    private final R2StorageService r2StorageService;
 
-    public MovieController(TmdbService tmdbService, TvSeriesRepository tvSeriesRepository, SeasonRepository seasonRepository, EpisodeRepository episodeRepository) {
+    public MovieController(TmdbService tmdbService, TvSeriesRepository tvSeriesRepository, SeasonRepository seasonRepository, EpisodeRepository episodeRepository, VideoAssetRepository videoAssetRepository, R2StorageService r2StorageService) {
         this.tmdbService = tmdbService;
         this.tvSeriesRepository = tvSeriesRepository;
         this.seasonRepository = seasonRepository;
         this.episodeRepository = episodeRepository;
+        this.videoAssetRepository = videoAssetRepository;
+        this.r2StorageService = r2StorageService;
     }
 
     @GetMapping("/trending")
@@ -83,6 +90,17 @@ public class MovieController {
                         em.put("src", e.getSrc());
                         em.put("srcFilm", e.getSrcFilm());
                         em.put("published", e.getPublished());
+
+                        VideoAsset latest = videoAssetRepository
+                                .findTopByOwnerTypeAndOwnerIdOrderByCreatedAtDesc("tv_episode", e.getId())
+                                .orElse(null);
+
+                        if (latest != null) {
+                            em.put("variants", r2StorageService.findVariants("tv_episode", e.getId(), latest.getId()));
+                        } else {
+                            em.put("variants", java.util.Collections.emptyList());
+                        }
+
                         return em;
                     }).collect(java.util.stream.Collectors.toList());
             m.put("episodes", eps);

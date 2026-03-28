@@ -424,6 +424,14 @@
         <div class="video-section">
           <div class="video-container">
             <div id="videoPlayer" class="video-player"></div> </div>
+            <div id="qualityWrap" style="margin-top:12px; display:none;">
+                <label for="qualitySelect" style="font-size:13px; color: var(--text-subtle); margin-right:8px;">
+                    Quality:
+                </label>
+                <select id="qualitySelect" class="btn ghost" style="padding:8px 12px;">
+                    <option value="auto">Auto</option>
+                </select>
+            </div>
         </div>
 
         <!-- EPISODE SELECTOR (hidden for movies) -->
@@ -477,7 +485,7 @@
         </div>
       </div>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="js/bannerads.js"></script>
     <script>
       console.log("movie-watch script loaded");
@@ -501,6 +509,8 @@
       let _currentMovieId = null;
       let _currentType = null;
       let _currentEpisodeId = null;
+      let _currentVariants = [];
+      let _currentPlaybackMasterUrl = "";
 
       async function loadWatchPage() {
         const params = new URLSearchParams(window.location.search);
@@ -550,6 +560,49 @@
           document.getElementById("loading").textContent =
             "Failed to load movie.";
         }
+      }
+      function buildVariantPlaylistUrl(masterUrl, variantName) {
+          if (!masterUrl || !variantName) return masterUrl;
+          const idx = masterUrl.lastIndexOf("/master.m3u8");
+          if (idx === -1) return masterUrl;
+          const base = masterUrl.substring(0, idx);
+          return `${base}/${variantName}/playlist.m3u8`;
+      }
+      function renderQualityDropdown(masterUrl, variants) {
+          const wrap = document.getElementById("qualityWrap");
+          const select = document.getElementById("qualitySelect");
+
+          if (!wrap || !select) return;
+
+          _currentPlaybackMasterUrl = masterUrl || "";
+          _currentVariants = Array.isArray(variants) ? variants : [];
+
+          select.innerHTML = `<option value="auto">Auto</option>`;
+
+          if (!_currentPlaybackMasterUrl || _currentVariants.length === 0) {
+              wrap.style.display = "none";
+              return;
+          }
+
+          _currentVariants.forEach((v) => {
+              const option = document.createElement("option");
+              option.value = v;
+              option.textContent = v;
+              select.appendChild(option);
+          });
+
+          wrap.style.display = "block";
+
+          select.onchange = () => {
+              const selected = select.value;
+              const resume = _getCurrentTime() || 0;
+
+              if (selected === "auto") {
+                  loadVideo(_currentPlaybackMasterUrl, resume);
+              } else {
+                  loadVideo(buildVariantPlaylistUrl(_currentPlaybackMasterUrl, selected), resume);
+              }
+          };
       }
 
       function renderWatchPage(
@@ -1073,9 +1126,11 @@
       }
 
       function setupMovie(movieData) {
-        const videoUrl = movieData.srcFilm || movieData.src || "";
-        // _resumeSec is set by the tracker block below before loadWatchPage() runs
-        loadVideo(videoUrl, window._resumeSec || 0);
+          const videoUrl = movieData.srcFilm || movieData.src || "";
+          const variants = Array.isArray(movieData.variants) ? movieData.variants : [];
+
+          renderQualityDropdown(videoUrl, variants);
+          loadVideo(videoUrl, window._resumeSec || 0);
       }
 
       function setupTVSeries(
@@ -1170,11 +1225,15 @@
                 // not when the user manually picks a different episode
                 const resumeOnLoad = window._resumeSec || 0;
                 window._resumeSec = 0; // clear after first use
-                if (ep && (ep.srcFilm || ep.src)) {
-                  loadVideo(ep.srcFilm || ep.src, resumeOnLoad);
-                } else {
-                  loadVideo("", 0);
-                }
+                  if (ep && (ep.srcFilm || ep.src)) {
+                      const videoUrl = ep.srcFilm || ep.src;
+                      const variants = Array.isArray(ep.variants) ? ep.variants : [];
+                      renderQualityDropdown(videoUrl, variants);
+                      loadVideo(videoUrl, resumeOnLoad);
+                  } else {
+                      renderQualityDropdown("", []);
+                      loadVideo("", 0);
+                  }
 
                 // Refresh episode-specific comments when switching
                 if (typeof window._loadComments === "function") {
@@ -1211,10 +1270,13 @@
           const ep = season?.episodes?.find(
             (e) => e.episodeNumber == selectedEpisode && e.published,
           );
-          if (ep && (ep.srcFilm || ep.src)) {
-            loadVideo(ep.srcFilm || ep.src, window._resumeSec || 0);
-            window._resumeSec = 0;
-          }
+            if (ep && (ep.srcFilm || ep.src)) {
+                const videoUrl = ep.srcFilm || ep.src;
+                const variants = Array.isArray(ep.variants) ? ep.variants : [];
+                renderQualityDropdown(videoUrl, variants);
+                loadVideo(videoUrl, window._resumeSec || 0);
+                window._resumeSec = 0;
+            }
         }
       }
 
@@ -1337,22 +1399,37 @@
             if (_firstPlay) { _firstPlay = false; _doSave(); }
           }
         } else if (/\.(mp4|webm|ogg|mov)([\?#]|$)/i.test(videoUrl) || videoUrl.includes(".m3u8")) {
-          // Native <video> element — full JS seek support
-          const container = document.querySelector(".video-container");
-          const vid = document.createElement("video");
-          vid.id = "videoPlayer";
-          vid.className = "video-player";
-          vid.controls = true;
-          vid.style.background = "#000";
-          vid.addEventListener("loadedmetadata", () => {
-            if (vid.duration > 0) _durationSec = Math.floor(vid.duration);
-            if (start > 0) vid.currentTime = start;
-          }, { once: true });
-          vid.src = videoUrl;
-          container.innerHTML = "";
-          container.appendChild(vid);
-          _nativeVideo = vid;
-          if (_firstPlay) { _firstPlay = false; _doSave(); }
+            const container = document.querySelector(".video-container");
+            const vid = document.createElement("video");
+            vid.id = "videoPlayer";
+            vid.className = "video-player";
+            vid.controls = true;
+            vid.style.background = "#000";
+
+            container.innerHTML = "";
+            container.appendChild(vid);
+            _nativeVideo = vid;
+
+            if (videoUrl.includes(".m3u8")) {
+                if (vid.canPlayType("application/vnd.apple.mpegurl")) {
+                    vid.src = videoUrl;
+                } else if (window.Hls && Hls.isSupported()) {
+                    const hls = new Hls();
+                    hls.loadSource(videoUrl);
+                    hls.attachMedia(vid);
+                } else {
+                    console.error("HLS is not supported in this browser");
+                }
+            } else {
+                vid.src = videoUrl;
+            }
+
+            vid.addEventListener("loadedmetadata", () => {
+                if (vid.duration > 0) _durationSec = Math.floor(vid.duration);
+                if (start > 0) vid.currentTime = start;
+            }, { once: true });
+
+            if (_firstPlay) { _firstPlay = false; _doSave(); }
         } else {
           // Generic embedded iframe
           const container = document.querySelector(".video-container");

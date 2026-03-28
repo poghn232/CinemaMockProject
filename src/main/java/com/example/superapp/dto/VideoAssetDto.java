@@ -3,6 +3,8 @@ package com.example.superapp.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Builder
 public class VideoAssetDto {
@@ -19,6 +21,9 @@ public class VideoAssetDto {
     private Boolean has1080p;
     private Integer durationSeconds;
     private String originalFileName;
+
+    private List<String> variants;
+
 
 
 }

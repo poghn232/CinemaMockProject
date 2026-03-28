@@ -101,6 +101,32 @@ public class R2StorageService {
                 .max(Comparator.comparing(this::extractAssetIdSafely));
     }
 
+    public java.util.List<String> findVariants(String ownerType, Long ownerId, Long assetId) {
+        String prefix = "videos/" + ownerType + "/" + ownerId + "/asset-" + assetId + "/hls/";
+
+        ListObjectsV2Request request = ListObjectsV2Request.builder()
+                .bucket(r2Properties.getBucket())
+                .prefix(prefix)
+                .build();
+
+        ListObjectsV2Response response = r2S3Client.listObjectsV2(request);
+
+        return response.contents().stream()
+                .map(S3Object::key)
+                .map(key -> key.substring(prefix.length()))
+                .filter(rest -> rest.matches("v\\d+/playlist\\.m3u8"))
+                .map(rest -> rest.substring(0, rest.indexOf("/")))
+                .distinct()
+                .sorted(java.util.Comparator.comparingInt(v -> {
+                    try {
+                        return Integer.parseInt(v.substring(1));
+                    } catch (Exception e) {
+                        return Integer.MAX_VALUE;
+                    }
+                }))
+                .toList();
+    }
+
     private long extractAssetIdSafely(String key) {
         try {
             int idx = key.indexOf("/asset-");

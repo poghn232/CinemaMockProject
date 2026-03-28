@@ -173,6 +173,20 @@ public class VideoAssetService {
     }
 
     private VideoAssetDto toDto(VideoAsset asset) {
+        java.util.List<String> variants = java.util.Collections.emptyList();
+
+        if (asset.getId() != null && asset.getOwnerType() != null && asset.getOwnerId() != null) {
+            try {
+                variants = r2StorageService.findVariants(
+                        asset.getOwnerType(),
+                        asset.getOwnerId(),
+                        asset.getId()
+                );
+            } catch (Exception e) {
+                variants = java.util.Collections.emptyList();
+            }
+        }
+
         return VideoAssetDto.builder()
                 .id(asset.getId())
                 .ownerType(asset.getOwnerType())
@@ -186,6 +200,7 @@ public class VideoAssetService {
                 .has720p(asset.getHas720p())
                 .has1080p(asset.getHas1080p())
                 .durationSeconds(asset.getDurationSeconds())
+                .variants(variants)
                 .build();
     }
     private void attachPlaybackUrlToOwner(VideoAsset asset, String playbackUrl) {

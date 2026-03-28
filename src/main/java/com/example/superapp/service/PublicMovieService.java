@@ -3,12 +3,10 @@ package com.example.superapp.service;
 import com.example.superapp.dto.MovieDetailDto;
 import com.example.superapp.dto.MovieItemDto;
 import com.example.superapp.dto.MoviePageResponse;
-import com.example.superapp.entity.Movie;
-import com.example.superapp.entity.MovieRegionBlock;
-import com.example.superapp.entity.TvRegionBlock;
-import com.example.superapp.entity.TvSeries;
+import com.example.superapp.entity.*;
 import com.example.superapp.repository.MovieRepository;
 import com.example.superapp.repository.TvSeriesRepository;
+import com.example.superapp.repository.VideoAssetRepository;
 import com.example.superapp.utils.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +30,10 @@ public class PublicMovieService {
     private final TvSeriesRepository tvSeriesRepository;
     private final TmdbService tmdbService;
     private final JwtUtils jwtUtils;
+    private final VideoAssetService videoAssetService;
+    private final R2StorageService r2StorageService;
+    private final VideoAssetRepository videoAssetRepository;
+
 
     @Value("${tmdb.image-base-url}")
     private String imageBaseUrl;
@@ -303,6 +305,19 @@ public class PublicMovieService {
 
         dto.setSrc(m.getSrc());
         dto.setSrcFilm(m.getSrcFilm());
+        VideoAsset latest = videoAssetRepository
+                .findTopByOwnerTypeAndOwnerIdOrderByCreatedAtDesc("movie", m.getId())
+                .orElse(null);
+
+        if (latest != null) {
+            dto.setVariants(r2StorageService.findVariants("movie", m.getId(), latest.getId()));
+
+            if (latest.getPlaybackUrl() != null && !latest.getPlaybackUrl().isBlank()) {
+                dto.setSrcFilm(latest.getPlaybackUrl());
+            }
+        } else {
+            dto.setVariants(java.util.Collections.emptyList());
+        }
 
         try {
             List<com.example.superapp.dto.CastMemberDto> cast = new ArrayList<>();
@@ -452,6 +467,7 @@ public class PublicMovieService {
         }
 
         dto.setSrc(tv.getSrc());
+        dto.setVariants(java.util.Collections.emptyList());
 
         try {
             List<com.example.superapp.dto.CastMemberDto> cast = new ArrayList<>();
