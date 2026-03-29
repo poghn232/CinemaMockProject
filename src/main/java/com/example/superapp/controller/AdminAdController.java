@@ -1,5 +1,6 @@
 package com.example.superapp.controller;
 
+import com.example.superapp.dto.CreateFromR2Request;
 import com.example.superapp.dto.VideoAssetDto;
 import com.example.superapp.entity.Ad;
 import com.example.superapp.repository.AdRepository;
@@ -32,6 +33,26 @@ public class AdminAdController {
         Ad ad = adRepository.findById(adId)
                 .orElseThrow(() -> new IllegalArgumentException("Ad not found: " + adId));
         return ResponseEntity.ok(ad);
+    }
+    @PostMapping("/create-from-r2")
+    public ResponseEntity<Ad> createAdFromR2(@RequestBody CreateFromR2Request request) {
+        if (request.getSourceAdId() == null) {
+            throw new IllegalArgumentException("sourceAdId is required");
+        }
+
+        String playbackUrl = videoAssetService.findPlaybackUrlFromExistingR2("ad", request.getSourceAdId())
+                .orElseThrow(() -> new IllegalArgumentException("No R2 asset found for sourceAdId: " + request.getSourceAdId()));
+
+        Ad ad = Ad.builder()
+                .title(request.getTitle())
+                .adType(request.getAdType() == null || request.getAdType().isBlank() ? "PRE_ROLL" : request.getAdType())
+                .status(request.getStatus() == null || request.getStatus().isBlank() ? "INACTIVE" : request.getStatus())
+                .srcFilm(playbackUrl)
+                .skippable(request.getSkippable() != null ? request.getSkippable() : false)
+                .skipAfterSeconds(request.getSkipAfterSeconds())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(adRepository.save(ad));
     }
 
     @PostMapping

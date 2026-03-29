@@ -328,6 +328,11 @@ public class VideoAssetService {
         });
     }
 
+    public Optional<String> findPlaybackUrlFromExistingR2(String ownerType, Long ownerId) {
+        return r2StorageService.findLatestMasterPlaylistKey(ownerType, ownerId)
+                .map(r2StorageService::buildPublicUrl);
+    }
+
     public int backfillMovieSrcFilmFromR2() {
         List<Movie> movies = movieRepository.findAll();
         int updated = 0;
