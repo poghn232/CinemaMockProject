@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -158,6 +159,68 @@ public class VideoAssetService {
         }
 
         return toDto(asset);
+    }
+
+    public Map<String, Object> getR2Status(String ownerType, Long ownerId) {
+        Optional<String> latestMasterKey = r2StorageService.findLatestMasterPlaylistKey(ownerType, ownerId);
+
+        if (latestMasterKey.isEmpty()) {
+            return Map.of(
+                    "found", false,
+                    "ownerType", ownerType,
+                    "ownerId", ownerId,
+                    "masterPlaylistKey", "",
+                    "playbackUrl", ""
+            );
+        }
+
+        String masterKey = latestMasterKey.get();
+        String playbackUrl = r2StorageService.buildPublicUrl(masterKey);
+
+        return Map.of(
+                "found", true,
+                "ownerType", ownerType,
+                "ownerId", ownerId,
+                "masterPlaylistKey", masterKey,
+                "playbackUrl", playbackUrl
+        );
+    }
+
+    public boolean syncExistingPlaybackFromR2AndReturn(String ownerType, Long ownerId) {
+        Optional<String> latestMasterKey = r2StorageService.findLatestMasterPlaylistKey(ownerType, ownerId);
+
+        if (latestMasterKey.isEmpty()) {
+            return false;
+        }
+
+        String masterKey = latestMasterKey.get();
+        String playbackUrl = r2StorageService.buildPublicUrl(masterKey);
+
+        if ("ad".equalsIgnoreCase(ownerType)) {
+            Ad ad = adRepository.findById(ownerId)
+                    .orElseThrow(() -> new IllegalArgumentException("Ad not found: " + ownerId));
+            ad.setSrcFilm(playbackUrl);
+            adRepository.save(ad);
+            return true;
+        }
+
+        if ("movie".equalsIgnoreCase(ownerType)) {
+            Movie movie = movieRepository.findById(ownerId)
+                    .orElseThrow(() -> new IllegalArgumentException("Movie not found: " + ownerId));
+            movie.setSrcFilm(playbackUrl);
+            movieRepository.save(movie);
+            return true;
+        }
+
+        if ("tv_episode".equalsIgnoreCase(ownerType)) {
+            Episode episode = episodeRepository.findById(ownerId)
+                    .orElseThrow(() -> new IllegalArgumentException("Episode not found: " + ownerId));
+            episode.setSrcFilm(playbackUrl);
+            episodeRepository.save(episode);
+            return true;
+        }
+
+        throw new IllegalArgumentException("Unsupported ownerType: " + ownerType);
     }
 
     private String buildRootObjectKey(VideoAsset asset) {
@@ -303,40 +366,6 @@ public class VideoAssetService {
         return updated;
     }
 
-    public boolean syncExistingPlaybackFromR2AndReturn(String ownerType, Long ownerId) {
-        Optional<String> masterKeyOpt = r2StorageService.findLatestMasterPlaylistKey(ownerType, ownerId);
-        if (masterKeyOpt.isEmpty()) {
-            return false;
-        }
-
-        String playbackUrl = r2StorageService.buildPublicUrl(masterKeyOpt.get());
-
-        if ("movie".equalsIgnoreCase(ownerType)) {
-            Movie movie = movieRepository.findById(ownerId)
-                    .orElseThrow(() -> new IllegalArgumentException("Movie not found: " + ownerId));
-            movie.setSrcFilm(playbackUrl);
-            movieRepository.save(movie);
-            return true;
-        }
-
-        if ("tv_episode".equalsIgnoreCase(ownerType)) {
-            Episode episode = episodeRepository.findById(ownerId)
-                    .orElseThrow(() -> new IllegalArgumentException("Episode not found: " + ownerId));
-            episode.setSrcFilm(playbackUrl);
-            episodeRepository.save(episode);
-            return true;
-        }
-
-        if ("ad".equalsIgnoreCase(ownerType)) {
-            Ad ad = adRepository.findById(ownerId)
-                    .orElseThrow(() -> new IllegalArgumentException("Ad not found: " + ownerId));
-            ad.setSrcFilm(playbackUrl);
-            adRepository.save(ad);
-            return true;
-        }
-
-        throw new IllegalArgumentException("Unsupported ownerType: " + ownerType);
-    }
 
 
 }

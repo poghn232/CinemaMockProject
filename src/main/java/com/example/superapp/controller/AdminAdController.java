@@ -160,6 +160,15 @@ public class AdminAdController {
 
         return ResponseEntity.ok(refreshed);
     }
+    @GetMapping("/{adId}/r2-status")
+    public ResponseEntity<Map<String, Object>> getAdR2Status(@PathVariable Long adId) {
+        if (!adRepository.existsById(adId)) {
+            throw new IllegalArgumentException("Ad not found: " + adId);
+        }
+
+        Map<String, Object> result = videoAssetService.getR2Status("ad", adId);
+        return ResponseEntity.ok(result);
+    }
 
     @PostMapping("/{adId}/sync-from-r2")
     public ResponseEntity<Map<String, Object>> syncPlaybackFromR2(@PathVariable Long adId) {

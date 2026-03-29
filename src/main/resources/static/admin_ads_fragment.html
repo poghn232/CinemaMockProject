@@ -196,7 +196,6 @@
         font-size: 13px;
     }
 
-    /* modal */
     .ads-backdrop {
         position: fixed;
         inset: 0;
@@ -608,50 +607,58 @@
             return `<span class="status-badge ${klass}">${normalized || 'UNKNOWN'}</span>`;
         }
 
-        function renderAssetBox(asset) {
-            if (!asset) {
-                return `
-        <div class="asset-box">
-          <div class="asset-item">
-            <div class="label">Encode Status</div>
-            <div class="value muted">No asset data</div>
-          </div>
-          <div class="asset-item">
-            <div class="label">Playback URL</div>
-            <div class="value muted">No source uploaded</div>
-          </div>
-        </div>
-      `;
-            }
-
-            const variants = Array.isArray(asset.variants) && asset.variants.length
+        function renderAssetBox(ad, asset) {
+            const playbackUrl = asset?.playbackUrl || ad?.srcFilm || '';
+            const duration = asset?.durationSeconds ?? '—';
+            const progress = asset?.progressPercent ?? 0;
+            const status = asset?.status || 'NOT_UPLOADED';
+            const variants = Array.isArray(asset?.variants) && asset.variants.length
                 ? asset.variants.join(', ')
                 : '—';
 
             return `
-      <div class="asset-box">
-        <div class="asset-item">
-          <div class="label">Encode Status</div>
-          <div class="value">${asset.status || '—'}</div>
-        </div>
-        <div class="asset-item">
-          <div class="label">Progress</div>
-          <div class="value">${asset.progressPercent ?? 0}%</div>
-        </div>
-        <div class="asset-item">
-          <div class="label">Duration</div>
-          <div class="value">${asset.durationSeconds ?? '—'}s</div>
-        </div>
-        <div class="asset-item">
-          <div class="label">Variants</div>
-          <div class="value">${variants}</div>
-        </div>
-        <div class="asset-item" style="grid-column:1 / -1;">
-          <div class="label">Playback URL</div>
-          <div class="value ${asset.playbackUrl ? '' : 'muted'}">${asset.playbackUrl || 'Not ready yet'}</div>
-        </div>
-      </div>
-    `;
+                <div class="asset-box">
+                    <div class="asset-item">
+                        <div class="label">Encode Status</div>
+                        <div class="value">${status}</div>
+                    </div>
+                    <div class="asset-item">
+                        <div class="label">Progress</div>
+                        <div class="value">${progress}%</div>
+                    </div>
+                    <div class="asset-item">
+                        <div class="label">Duration</div>
+                        <div class="value">${duration}s</div>
+                    </div>
+                    <div class="asset-item">
+                        <div class="label">Variants</div>
+                        <div class="value">${variants}</div>
+                    </div>
+                    <div class="asset-item" style="grid-column:1 / -1;">
+                        <div class="label">Playback URL</div>
+                        <div class="value ${playbackUrl ? '' : 'muted'}">
+                            ${playbackUrl ? `<a href="${escapeHtml(playbackUrl)}" target="_blank" style="color:#34d399;">Open playlist</a>` : 'Not ready yet'}
+                        </div>
+                    </div>
+                    <div class="asset-item">
+                        <div class="label">R2 Status</div>
+                        <div class="value muted" id="r2Status-${ad.id}">Not checked</div>
+                    </div>
+                    <div class="asset-item">
+                        <div class="label">R2 Playback</div>
+                        <div class="value muted" id="r2Playback-${ad.id}">—</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#39;');
         }
 
         async function renderAds() {
@@ -669,45 +676,38 @@
                     const asset = await fetchLatestAsset(ad.id);
 
                     return `
-          <div class="ad-card">
-            <div class="ad-card-top">
-              <div class="ad-title-wrap">
-                <div class="ad-title">${escapeHtml(ad.title || '(No title)')}</div>
-                <div class="ad-sub">
-                  <span>ID ${ad.id}</span>
-                  <span>${escapeHtml(ad.adType || 'PRE_ROLL')}</span>
-                  <span>skip: ${ad.skippable ? ('yes' + (ad.skipAfterSeconds != null ? ` (${ad.skipAfterSeconds}s)` : '')) : 'no'}</span>
-                </div>
-              </div>
-              ${renderStatusBadge(ad.status)}
-            </div>
+                        <div class="ad-card">
+                            <div class="ad-card-top">
+                                <div class="ad-title-wrap">
+                                    <div class="ad-title">${escapeHtml(ad.title || '(No title)')}</div>
+                                    <div class="ad-sub">
+                                        <span>ID ${ad.id}</span>
+                                        <span>${escapeHtml(ad.adType || 'PRE_ROLL')}</span>
+                                        <span>skip: ${ad.skippable ? ('yes' + (ad.skipAfterSeconds != null ? ` (${ad.skipAfterSeconds}s)` : '')) : 'no'}</span>
+                                    </div>
+                                </div>
+                                ${renderStatusBadge(ad.status)}
+                            </div>
 
-            ${renderAssetBox(asset)}
+                            ${renderAssetBox(ad, asset)}
 
-            <div class="ad-actions">
-              <button class="ad-btn primary" data-action="upload" data-id="${ad.id}">Upload MP4</button>
-              <button class="ad-btn success" data-action="activate" data-id="${ad.id}">Activate</button>
-              <button class="ad-btn" data-action="activate-exclusive" data-id="${ad.id}">Activate Exclusive</button>
-              <button class="ad-btn warn" data-action="deactivate" data-id="${ad.id}">Deactivate</button>
-              <button class="ad-btn" data-action="refresh" data-id="${ad.id}">Refresh Status</button>
-            </div>
-          </div>
-        `;
+                            <div class="ad-actions">
+                                <button class="ad-btn primary" data-action="upload" data-id="${ad.id}">Upload MP4</button>
+                                <button class="ad-btn success" data-action="activate" data-id="${ad.id}">Activate</button>
+                                <button class="ad-btn" data-action="activate-exclusive" data-id="${ad.id}">Activate Exclusive</button>
+                                <button class="ad-btn warn" data-action="deactivate" data-id="${ad.id}">Deactivate</button>
+                                <button class="ad-btn" data-action="refresh" data-id="${ad.id}">Refresh Status</button>
+                                <button class="ad-btn" data-action="check-r2" data-id="${ad.id}">Check R2</button>
+                                <button class="ad-btn success" data-action="sync-r2" data-id="${ad.id}">Sync from R2</button>
+                            </div>
+                        </div>
+                    `;
                 }));
 
                 adsList.innerHTML = htmlParts.join('');
             } catch (err) {
                 adsList.innerHTML = `<div class="empty-state">Load failed: ${escapeHtml(err.message || 'Unknown error')}</div>`;
             }
-        }
-
-        function escapeHtml(str) {
-            return String(str)
-                .replaceAll('&', '&amp;')
-                .replaceAll('<', '&lt;')
-                .replaceAll('>', '&gt;')
-                .replaceAll('"', '&quot;')
-                .replaceAll("'", '&#39;');
         }
 
         async function createAdOnly(payload) {
@@ -722,6 +722,66 @@
             }
 
             return await res.json();
+        }
+
+        async function checkAdR2(adId) {
+            try {
+                const res = await fetch(`/api/admin/ads/${adId}/r2-status`, {
+                    headers: authHeaders()
+                });
+
+                if (!res.ok) {
+                    throw new Error('Failed to check R2 status');
+                }
+
+                const data = await res.json();
+                const statusEl = document.getElementById(`r2Status-${adId}`);
+                const playbackEl = document.getElementById(`r2Playback-${adId}`);
+
+                if (!statusEl || !playbackEl) return;
+
+                if (data.found) {
+                    statusEl.textContent = 'Found on R2';
+                    statusEl.classList.remove('muted');
+                    playbackEl.classList.remove('muted');
+                    playbackEl.innerHTML = `<a href="${escapeHtml(data.playbackUrl)}" target="_blank" style="color:#34d399;">Open playlist</a>`;
+                    showToast(`Đã tìm thấy quảng cáo ${adId} trên R2`, 'success');
+                } else {
+                    statusEl.textContent = 'Not found on R2';
+                    statusEl.classList.add('muted');
+                    playbackEl.classList.add('muted');
+                    playbackEl.textContent = '—';
+                    showToast(`Không tìm thấy quảng cáo ${adId} trên R2`, 'error');
+                }
+            } catch (e) {
+                console.error(e);
+                showToast('Check R2 failed', 'error');
+            }
+        }
+
+        async function syncAdFromR2(adId) {
+            try {
+                const res = await fetch(`/api/admin/ads/${adId}/sync-from-r2`, {
+                    method: 'POST',
+                    headers: authHeaders()
+                });
+
+                if (!res.ok) {
+                    throw new Error('Failed to sync from R2');
+                }
+
+                const data = await res.json();
+
+                if (data.success) {
+                    showToast(`Đồng bộ quảng cáo ${adId} từ R2 thành công`, 'success');
+                    await renderAds();
+                } else {
+                    showToast(`Không có dữ liệu trên R2 để đồng bộ cho ad ${adId}`, 'error');
+                }
+            } catch (e) {
+                console.error(e);
+                showToast('Sync from R2 failed', 'error');
+            }
         }
 
         async function uploadAdSource(adId, file) {
@@ -833,20 +893,20 @@
                 if (action === 'activate') {
                     await callSimpleAction(`/api/admin/ads/${adId}/activate`, 'PUT');
                     showToast('Activated');
-                }
-
-                if (action === 'activate-exclusive') {
+                } else if (action === 'activate-exclusive') {
                     await callSimpleAction(`/api/admin/ads/${adId}/activate-exclusive`, 'PUT');
                     showToast('Activated exclusively');
-                }
-
-                if (action === 'deactivate') {
+                } else if (action === 'deactivate') {
                     await callSimpleAction(`/api/admin/ads/${adId}/deactivate`, 'PUT');
                     showToast('Deactivated');
-                }
-
-                if (action === 'refresh') {
+                } else if (action === 'refresh') {
                     showToast('Refreshed');
+                } else if (action === 'check-r2') {
+                    await checkAdR2(adId);
+                    return;
+                } else if (action === 'sync-r2') {
+                    await syncAdFromR2(adId);
+                    return;
                 }
 
                 await renderAds();
