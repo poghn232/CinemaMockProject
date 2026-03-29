@@ -512,54 +512,71 @@
       let _currentVariants = [];
       let _currentPlaybackMasterUrl = "";
 
+      function authHeaders() {
+          const token = localStorage.getItem("token");
+          return token
+              ? { Authorization: `Bearer ${token}` }
+              : {};
+      }
+
       async function loadWatchPage() {
-        const params = new URLSearchParams(window.location.search);
-        const id = params.get("id");
-        const type = params.get("type") || "movie";
-        const season = params.get("season");
-        const episode = params.get("episode");
+          const params = new URLSearchParams(window.location.search);
+          const id = params.get("id");
+          const type = params.get("type") || "movie";
+          const season = params.get("season");
+          const episode = params.get("episode");
 
-        _currentMovieId = id ? parseInt(id, 10) : null;
-        _currentType = type;
-        _currentEpisodeId = episode ? parseInt(episode, 10) : null;
+          _currentMovieId = id ? parseInt(id, 10) : null;
+          _currentType = type;
+          _currentEpisodeId = episode ? parseInt(episode, 10) : null;
 
-        if (!id) {
-          alert("Missing movie ID");
-          window.location.href = "homepage.html";
-          return;
-        }
-
-        try {
-          // Load movie details
-          const res = await fetch(
-            `/api/public/movies/detail?type=${encodeURIComponent(type)}&id=${encodeURIComponent(id)}`,
-          );
-          if (!res.ok) {
-            throw new Error("Failed to load movie details");
+          if (!id) {
+              alert("Missing movie ID");
+              window.location.href = "homepage.html";
+              return;
           }
-          const movieData = await res.json();
 
-          // For TV series, load seasons and episodes
-          let seasonsData = [];
-          if (type === "tv") {
-            try {
-              const seasonsRes = await fetch(
-                `/api/movies/tv/${encodeURIComponent(id)}/seasons`,
+          try {
+              const res = await fetch(
+                  `/api/public/movies/detail?type=${encodeURIComponent(type)}&id=${encodeURIComponent(id)}`,
+                  {
+                      headers: {
+                          ...authHeaders()
+                      }
+                  }
               );
-              if (seasonsRes.ok) {
-                seasonsData = await seasonsRes.json();
-              }
-            } catch (e) {
-              console.error("Failed to load seasons:", e);
-            }
-          }
 
-          renderWatchPage(movieData, type, seasonsData, season, episode);
-        } catch (e) {
-          console.error(e);
-          document.getElementById("loading").textContent =
-            "Failed to load movie.";
-        }
+              if (!res.ok) {
+                  throw new Error("Failed to load movie details");
+              }
+
+              const movieData = await res.json();
+
+              let seasonsData = [];
+              if (type === "tv") {
+                  try {
+                      const seasonsRes = await fetch(
+                          `/api/movies/tv/${encodeURIComponent(id)}/seasons`,
+                          {
+                              headers: {
+                                  ...authHeaders()
+                              }
+                          }
+                      );
+
+                      if (seasonsRes.ok) {
+                          seasonsData = await seasonsRes.json();
+                      }
+                  } catch (e) {
+                      console.error("Failed to load seasons:", e);
+                  }
+              }
+
+              renderWatchPage(movieData, type, seasonsData, season, episode);
+          } catch (e) {
+              console.error(e);
+              document.getElementById("loading").textContent = "Failed to load movie.";
+          }
       }
       function buildVariantPlaylistUrl(masterUrl, variantName) {
           if (!masterUrl || !variantName) return masterUrl;

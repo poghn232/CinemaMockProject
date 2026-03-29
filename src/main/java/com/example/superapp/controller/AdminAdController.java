@@ -49,6 +49,19 @@ public class AdminAdController {
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
+    @GetMapping("/api/public/ads/pre-roll")
+    public ResponseEntity<?> getActivePreRollAd() {
+        return adRepository.findFirstByAdTypeIgnoreCaseAndStatusIgnoreCase("PRE_ROLL", "ACTIVE")
+                .map(ad -> ResponseEntity.ok(Map.of(
+                        "id", ad.getId(),
+                        "title", ad.getTitle(),
+                        "srcFilm", ad.getSrcFilm(),
+                        "skippable", Boolean.TRUE.equals(ad.getSkippable()),
+                        "skipAfterSeconds", ad.getSkipAfterSeconds() == null ? 0 : ad.getSkipAfterSeconds()
+                )))
+                .orElse(ResponseEntity.noContent().build());
+    }
+
     @PutMapping("/{adId}")
     public ResponseEntity<Ad> updateAd(
             @PathVariable Long adId,
