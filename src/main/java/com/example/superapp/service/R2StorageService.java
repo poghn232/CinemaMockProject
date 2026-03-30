@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.core.sync.ResponseTransformer;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -61,6 +64,18 @@ public class R2StorageService {
 
             continuationToken = response.nextContinuationToken();
         } while (continuationToken != null);
+    }
+
+    public void createFolder(String folderKey) {
+        String key = folderKey.endsWith("/") ? folderKey : folderKey + "/";
+
+        PutObjectRequest request = PutObjectRequest.builder()
+                .bucket(r2Properties.getBucket())
+                .key(key)
+                .contentLength(0L)
+                .build();
+
+        r2S3Client.putObject(request, RequestBody.fromBytes(new byte[0]));
     }
 
 
@@ -125,6 +140,31 @@ public class R2StorageService {
                     }
                 }))
                 .toList();
+    }
+
+    public java.util.List<String> listObjectsByPrefix(String prefix) {
+        ListObjectsV2Request request = ListObjectsV2Request.builder()
+                .bucket(r2Properties.getBucket())
+                .prefix(prefix)
+                .build();
+
+        ListObjectsV2Response response = r2S3Client.listObjectsV2(request);
+
+        return response.contents().stream().map(S3Object::key).toList();
+    }
+
+    public java.util.Optional<ResponseBytes<GetObjectResponse>> getObjectBytes(String objectKey) {
+        try {
+            GetObjectRequest request = GetObjectRequest.builder()
+                    .bucket(r2Properties.getBucket())
+                    .key(objectKey)
+                    .build();
+
+            ResponseBytes<GetObjectResponse> resp = r2S3Client.getObject(request, ResponseTransformer.toBytes());
+            return java.util.Optional.ofNullable(resp);
+        } catch (Exception e) {
+            return java.util.Optional.empty();
+        }
     }
 
     private long extractAssetIdSafely(String key) {

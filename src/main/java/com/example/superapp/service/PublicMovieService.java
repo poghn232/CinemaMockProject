@@ -367,6 +367,28 @@ public class PublicMovieService {
             }
         }
 
+        // Attach subtitle public URL if a default subtitle exists in R2 (prefer .vtt over .srt)
+        try {
+            String subtitlePrefix = "subtitles/movie/" + m.getId() + "/";
+            String vttKey = subtitlePrefix + "default.vtt";
+            String srtKey = subtitlePrefix + "default.srt";
+
+            if (r2StorageService.objectExists(vttKey)) {
+                dto.setSubtitleUrl("/api/public/movies/subtitle/" + m.getId() + "/default.vtt");
+            } else if (r2StorageService.objectExists(srtKey)) {
+                dto.setSubtitleUrl("/api/public/movies/subtitle/" + m.getId() + "/default.srt");
+            } else {
+                // fallback: check listing for any file under the prefix and use the first
+                java.util.List<String> keys = r2StorageService.listObjectsByPrefix(subtitlePrefix);
+                if (keys != null && !keys.isEmpty()) {
+                    String first = keys.get(0);
+                    String filename = first.substring(subtitlePrefix.length());
+                    dto.setSubtitleUrl("/api/public/movies/subtitle/" + m.getId() + "/" + filename);
+                }
+            }
+        } catch (Exception ignored) {
+        }
+
         try {
             List<com.example.superapp.dto.CastMemberDto> cast = new ArrayList<>();
             if (m.getCredits() != null) {

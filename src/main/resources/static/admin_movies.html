@@ -782,10 +782,16 @@
             ${item.type === "tv" ? `<div id="tvEpisodesPanel" style="margin-top:10px"></div>` : ""}
           </div>
         </div>
-        <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:14px">
-          <button id="tmdbCancel" class="btn ghost">Cancel</button>
-          <button id="tmdbConfirm" class="btn">Add this movie</button>
-        </div>
+                        <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:14px">
+                    <div style="display:flex; gap:8px; align-items:center; margin-right:auto">
+                    <input id="subtitleFileInput" type="file" accept=".vtt,.srt,text/vtt,text/plain" style="display:none" />
+                    <button id="chooseSubtitleBtn" class="btn ghost">Choose default subtitle (.vtt/.srt)</button>
+                        <span id="chosenSubtitleName" class="muted"></span>
+                        <button id="uploadSubtitleBtn" class="btn ghost" style="margin-left:6px">Upload subtitle</button>
+                    </div>
+                    <button id="tmdbCancel" class="btn ghost">Cancel</button>
+                    <button id="tmdbConfirm" class="btn">Add this movie</button>
+                </div>
       `;
 
             overlay.appendChild(modal);
@@ -798,6 +804,51 @@
             document.getElementById("tmdbCancel").addEventListener("click", close);
 
             const confirmBtn = document.getElementById("tmdbConfirm");
+            const chooseSubtitleBtn = document.getElementById("chooseSubtitleBtn");
+            const subtitleInput = document.getElementById("subtitleFileInput");
+            const chosenSubtitleName = document.getElementById("chosenSubtitleName");
+
+            chooseSubtitleBtn.addEventListener("click", () => subtitleInput.click());
+            subtitleInput.addEventListener("change", () => {
+                const f = subtitleInput.files && subtitleInput.files[0];
+                chosenSubtitleName.textContent = f ? f.name : "";
+            });
+
+            const uploadSubtitleBtn = document.getElementById('uploadSubtitleBtn');
+            uploadSubtitleBtn.addEventListener('click', async () => {
+                const f = subtitleInput.files && subtitleInput.files[0];
+                if (!f) return alert('Choose a subtitle file first');
+
+                const token = localStorage.getItem('token');
+                const headers = {};
+                if (token) headers['Authorization'] = 'Bearer ' + token;
+
+                const fd = new FormData(); fd.append('file', f);
+
+                try {
+                    const res = await fetch(`/api/admin/movies/movie/${encodeURIComponent(item.id)}/subtitle`, {
+                        method: 'POST', headers, body: fd
+                    });
+
+                    if (!res.ok) {
+                        const txt = await res.text();
+                        alert('Upload failed: ' + res.status + ' — ' + txt);
+                        return;
+                    }
+
+                    // fetch list of subtitles for this movie
+                    const listRes = await fetch(`/api/admin/movies/movie/${encodeURIComponent(item.id)}/subtitles`, { headers });
+                    const arr = await listRes.json();
+                    if (Array.isArray(arr) && arr.length) {
+                        alert('Uploaded. Files:\n' + arr.map(a => a.key + ' -> ' + a.url).join('\n'));
+                    } else {
+                        alert('Uploaded but no subtitles listed (unexpected)');
+                    }
+                } catch (e) {
+                    console.error('upload subtitle error', e);
+                    alert('Upload error: ' + e);
+                }
+            });
             try {
                 if (isExistingItem(item)) {
                     confirmBtn.textContent = "Added";
@@ -813,6 +864,42 @@
                                 headers: { "Content-Type": "application/json" },
                                 body: JSON.stringify({ tmdbId: item.id, type: item.type }),
                             });
+
+                            // if subtitle chosen, upload it to R2
+                            try {
+                                const f = subtitleInput.files && subtitleInput.files[0];
+                                if (f) {
+                                    const fd = new FormData();
+                                    fd.append('file', f);
+                                    // include Authorization header like fetchJson does
+                                    const token = localStorage.getItem('token');
+                                    const headers = {};
+                                    if (token) headers['Authorization'] = 'Bearer ' + token;
+
+                                    const upRes = await fetch(`/api/admin/movies/movie/${encodeURIComponent(item.id)}/subtitle`, {
+                                        method: 'POST',
+                                        headers,
+                                        body: fd,
+                                    });
+
+                                    if (!upRes.ok) {
+                                        const txt = await upRes.text();
+                                        console.warn('subtitle upload failed', upRes.status, txt);
+                                        alert('Subtitle upload failed: HTTP ' + upRes.status + ' — ' + txt);
+                                    } else {
+                                        try {
+                                            const json = await upRes.json();
+                                            console.info('subtitle uploaded', json);
+                                            showToast && showToast('Subtitle uploaded', 'success');
+                                        } catch (e) {
+                                            showToast && showToast('Subtitle uploaded', 'success');
+                                        }
+                                    }
+                                }
+                            } catch (e) {
+                                console.warn('subtitle upload error', e);
+                                alert('Subtitle upload error: ' + e);
+                            }
 
                             msg.textContent = "Added successfully.";
                             await loadFilms();

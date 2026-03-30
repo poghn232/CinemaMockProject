@@ -594,6 +594,7 @@
     let _currentEpisodeId = null;
     let _currentVariants = [];
     let _currentPlaybackMasterUrl = "";
+    let _currentSubtitleUrl = null;
 
     function authHeaders() {
         const token = localStorage.getItem("token");
@@ -748,6 +749,13 @@
         if (overviewEl) {
             overviewEl.textContent =
                 movieData.overview || "No overview available.";
+        }
+
+        // expose subtitle URL for the player to consume (if provided)
+        try {
+            _currentSubtitleUrl = movieData && movieData.subtitleUrl ? movieData.subtitleUrl : null;
+        } catch (e) {
+            _currentSubtitleUrl = null;
         }
 
         // Handle TV series vs Movie (errors here should not prevent comments from loading)
@@ -1534,7 +1542,20 @@
             vid.className = "video-player";
             vid.controls = true;
             vid.style.background = "#000";
-
+            // attach subtitle track if admin uploaded one
+            if (_currentSubtitleUrl) {
+                try {
+                    const track = document.createElement('track');
+                    track.kind = 'subtitles';
+                    track.label = 'Default';
+                    track.srclang = 'en';
+                    track.src = _currentSubtitleUrl;
+                    track.default = true;
+                    vid.appendChild(track);
+                } catch (e) {
+                    console.warn('Failed to attach subtitle track', e);
+                }
+            }
             container.insertBefore(vid, container.firstChild);
             _nativeVideo = vid;
 
@@ -1544,6 +1565,20 @@
                 } else if (window.Hls && Hls.isSupported()) {
                     const hls = new Hls();
                     hls.loadSource(videoUrl);
+                    // attach subtitle track for hls.js playback
+                    if (_currentSubtitleUrl) {
+                        try {
+                            const track = document.createElement('track');
+                            track.kind = 'subtitles';
+                            track.label = 'Default';
+                            track.srclang = 'en';
+                            track.src = _currentSubtitleUrl;
+                            track.default = true;
+                            vid.appendChild(track);
+                        } catch (e) {
+                            console.warn('Failed to attach subtitle track for hls.js', e);
+                        }
+                    }
                     hls.attachMedia(vid);
                 } else {
                     console.error("HLS is not supported in this browser");

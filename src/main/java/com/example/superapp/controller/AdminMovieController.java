@@ -16,6 +16,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -31,6 +35,7 @@ public class AdminMovieController {
     private final SeasonRepository seasonRepository;
     private final EpisodeRepository episodeRepository;
     private final VideoAssetService videoAssetService;
+    private final com.example.superapp.service.R2StorageService r2StorageService;
 
     @GetMapping
     public List<AdminMovieDto> list(@RequestParam(name = "q", required = false) String query) {
@@ -49,6 +54,10 @@ public class AdminMovieController {
 
         if ("movie".equalsIgnoreCase(request.getType())) {
             videoAssetService.syncExistingPlaybackFromR2("movie", request.getTmdbId());
+            // ensure subtitles folder exists for this movie in R2
+            try {
+                r2StorageService.createFolder("subtitles/movie/" + request.getTmdbId());
+            } catch (Exception ignored) {}
         }
 
         return dto;
@@ -153,6 +162,70 @@ public class AdminMovieController {
         String ownerType = resolveOwnerType(type);
         VideoAssetDto dto = videoAssetService.uploadSource(ownerType, id, file);
         return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping("/{type}/{id}/subtitle")
+    public ResponseEntity<Map<String, Object>> uploadSubtitle(@PathVariable("type") String type,
+                                                              @PathVariable("id") long id,
+                                                              @RequestParam("file") MultipartFile file) {
+        String t = (type == null ? "" : type.trim().toLowerCase());
+        if (!"movie".equals(t)) {
+            throw new IllegalArgumentException("Subtitle upload currently only supported for movies");
+        }
+
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("Empty subtitle file");
+        }
+
+        try {
+            // create folder
+            String folder = "subtitles/movie/" + id;
+            r2StorageService.createFolder(folder);
+
+            // write to temp file and upload
+            Path tmp = Files.createTempFile("subtitle-", ".vtt");
+            try (var in = file.getInputStream()) {
+                Files.copy(in, tmp, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            // preserve extension from original filename if possible
+            String orig = file.getOriginalFilename() == null ? "" : file.getOriginalFilename();
+            String ext = "vtt";
+            int dot = orig.lastIndexOf('.');
+            if (dot >= 0 && dot + 1 < orig.length()) {
+                ext = orig.substring(dot + 1).toLowerCase();
+            }
+
+            String objectKey = folder + "/default." + ext;
+            String contentType = file.getContentType();
+            if (contentType == null) {
+                if ("srt".equals(ext)) contentType = "text/plain";
+                else if ("vtt".equals(ext)) contentType = "text/vtt";
+                else contentType = "application/octet-stream";
+            }
+
+            r2StorageService.uploadFile(tmp, objectKey, contentType);
+
+            Files.deleteIfExists(tmp);
+
+            return ResponseEntity.ok(Map.of("uploaded", true, "objectKey", objectKey));
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload subtitle: " + e.getMessage(), e);
+        }
+    }
+
+    // Debug: list subtitle objects in R2 for a movie
+    @GetMapping("/movie/{id}/subtitles")
+    public ResponseEntity<java.util.List<java.util.Map<String,String>>> listMovieSubtitles(@PathVariable("id") long id) {
+        String prefix = "subtitles/movie/" + id + "/";
+        java.util.List<String> keys = r2StorageService.listObjectsByPrefix(prefix);
+
+        java.util.List<java.util.Map<String,String>> out = keys.stream().map(k -> java.util.Map.of(
+                "key", k,
+                "url", r2StorageService.buildPublicUrl(k)
+        )).toList();
+
+        return ResponseEntity.ok(out);
     }
 
     @GetMapping("/{type}/{id}/source/latest")

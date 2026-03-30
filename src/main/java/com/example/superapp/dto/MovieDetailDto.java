@@ -16,6 +16,7 @@ public class MovieDetailDto {
     private String backdropUrl;
     private String src; // trailer url
     private String srcFilm; //src film
+    private String subtitleUrl;
     private String director;
     private String country;
     private String studio;
@@ -175,5 +176,13 @@ public class MovieDetailDto {
 
     public void setSrcFilm(String srcFilm) {
         this.srcFilm = srcFilm;
+    }
+
+    public String getSubtitleUrl() {
+        return subtitleUrl;
+    }
+
+    public void setSubtitleUrl(String subtitleUrl) {
+        this.subtitleUrl = subtitleUrl;
     }
 }
