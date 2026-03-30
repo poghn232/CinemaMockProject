@@ -9,10 +9,12 @@ import com.example.superapp.repository.SubscriptionRepository;
 import com.example.superapp.repository.TvSeriesRepository;
 import com.example.superapp.repository.UserRepository;
 import com.example.superapp.repository.VideoAssetRepository;
+import com.example.superapp.repository.ReviewRepository;
 import com.example.superapp.utils.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +41,7 @@ public class PublicMovieService {
     private final VideoAssetRepository videoAssetRepository;
     private final UserRepository userRepository;
     private final SubscriptionRepository subscriptionRepository;
+    private final ReviewRepository reviewRepository;
 
     @Value("${tmdb.image-base-url}")
     private String imageBaseUrl;
@@ -324,6 +327,11 @@ public class PublicMovieService {
         dto.setRuntime(m.getRuntime());
         dto.setPremiumUser(premiumUser);
 
+        Double avg = reviewRepository.getAverageRatingForMovie(m.getId());
+        Long count = reviewRepository.getRatingCountForMovie(m.getId());
+        dto.setUserRating(avg != null ? avg : 0.0);
+        dto.setUserRatingCount(count != null ? count : 0L);
+
         LocalDate release = m.getReleaseDate();
         if (release != null) {
             dto.setYear(release.getYear());
@@ -517,6 +525,11 @@ public class PublicMovieService {
         dto.setRating(tv.getVoteAverage());
         dto.setVoteCount(tv.getVoteCount());
         dto.setPremiumUser(premiumUser);
+
+        Double avg = reviewRepository.getAverageRatingForTvSeries(tv.getId());
+        Long count = reviewRepository.getRatingCountForTvSeries(tv.getId());
+        dto.setUserRating(avg != null ? avg : 0.0);
+        dto.setUserRatingCount(count != null ? count : 0L);
 
         LocalDate firstAir = tv.getFirstAirDate();
         if (firstAir != null) {
@@ -756,5 +769,47 @@ public class PublicMovieService {
         result.addAll(map.values());
         result.sort((a, b) -> Integer.compare(b.getItems().size(), a.getItems().size()));
         return result;
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<MovieItemDto> getTopRated(int limit, jakarta.servlet.http.HttpServletRequest request) {
+        String userRegion = extractRegionFromRequest(request);
+        int safeLimit = Math.max(1, limit);
+        org.springframework.data.domain.PageRequest pr = org.springframework.data.domain.PageRequest.of(0, safeLimit);
+
+        List<MovieItemDto> results = new ArrayList<>();
+
+        // Get Top Movies
+        List<Object[]> topMovies = reviewRepository.findTopMoviesByRating(pr);
+        for (Object[] row : topMovies) {
+            com.example.superapp.entity.Movie m = (com.example.superapp.entity.Movie) row[0];
+            Double avg = (Double) row[1];
+            if (m != null && !isMovieBlockedForRegion(m, userRegion)) {
+                MovieItemDto dto = mapMovie(m);
+                dto.setRating(avg != null ? avg : 0.0);
+                results.add(dto);
+            }
+        }
+
+        // Get Top TV Series
+        List<Object[]> topTv = reviewRepository.findTopTvSeriesByRating(pr);
+        for (Object[] row : topTv) {
+            com.example.superapp.entity.TvSeries tv = (com.example.superapp.entity.TvSeries) row[0];
+            Double avg = (Double) row[1];
+            if (tv != null && !isTvBlockedForRegion(tv, userRegion)) {
+                MovieItemDto dto = mapTv(tv);
+                dto.setRating(avg != null ? avg : 0.0);
+                results.add(dto);
+            }
+        }
+
+        // Sort combined list by rating DESC
+        results.sort((a, b) -> Double.compare(b.getRating(), a.getRating()));
+
+        // Return the top N
+        if (results.size() > safeLimit) {
+            return results.subList(0, safeLimit);
+        }
+        return results;
     }
 }

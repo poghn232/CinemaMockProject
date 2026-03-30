@@ -23,6 +23,25 @@ public class MovieDetailDto {
     private List<String> allowedVariants;
     private Boolean premiumUser;
 
+    private Double userRating;
+    private Long userRatingCount;
+
+    public Double getUserRating() {
+        return userRating;
+    }
+
+    public void setUserRating(Double userRating) {
+        this.userRating = userRating;
+    }
+
+    public Long getUserRatingCount() {
+        return userRatingCount;
+    }
+
+    public void setUserRatingCount(Long userRatingCount) {
+        this.userRatingCount = userRatingCount;
+    }
+
     public List<String> getAllowedVariants() {
         return allowedVariants;
     }

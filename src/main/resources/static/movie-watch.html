@@ -545,6 +545,19 @@
             <div class="ad-subtext">Remove ads and enjoy unlimited streaming</div>
         </div>
 
+        <!-- USER RATING SECTION -->
+        <div id="ratingSection" class="comments-section" style="margin-top: 24px; display: block;">
+            <h3 class="comments-title">User Rating</h3>
+            <div id="ratingPrompt" style="margin-bottom: 12px; font-size: 14px; color: var(--text-subtle);">
+                Đang nạp hệ thống đánh giá...
+            </div>
+            <div id="ratingStars" style="margin-bottom: 12px; display: none;"></div>
+            <div id="ratingResult" style="display: none;">
+                <span id="avgRating" style="font-size: 18px; font-weight: 700; color: var(--accent);">0.0</span>
+                <span id="ratingCount" style="font-size: 14px; color: var(--text-subtle); margin-left: 8px;">(0 người đánh giá)</span>
+            </div>
+        </div>
+
         <!-- COMMENTS SECTION -->
         <div class="comments-section">
             <h3 class="comments-title">Comments</h3>
@@ -570,6 +583,7 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script src="js/bannerads.js"></script>
+<script src="js/rating.js?v=2.0"></script>
 <script>
     console.log("movie-watch script loaded");
     window.addEventListener("error", (event) => {
@@ -751,6 +765,7 @@
                 movieData.overview || "No overview available.";
         }
 
+<<<<<<< HEAD
         // expose subtitle URL for the player to consume (if provided)
         try {
             _currentSubtitleUrl = movieData && movieData.subtitleUrl ? movieData.subtitleUrl : null;
@@ -759,6 +774,13 @@
         }
 
         // Handle TV series vs Movie (errors here should not prevent comments from loading)
+=======
+        // Initialize comments and ratings functionality (BEFORE video setup)
+        initializeRating(type, type === 'tv' ? _currentEpisodeId : movieData.id);
+        initializeComments();
+
+        // Handle TV series vs Movie 
+>>>>>>> cdd1531 (Top rated film by user)
         try {
             if (type === "tv") {
                 setupTVSeries(
@@ -771,37 +793,102 @@
                 setupMovie(movieData);
             }
         } catch (e) {
-            console.warn("Video setup failed, continuing to load comments", e);
+            console.warn("Video setup failed", e);
         }
 
-        // Check premium status and show/hide ad banner (if function exists)
+        // Check premium status and show/hide ad banner
         if (typeof checkUserPremiumStatus === "function") {
             checkUserPremiumStatus()
                 .then((isPremium) => {
                     const adBanner = document.getElementById("adBanner");
-                    if (isPremium) {
-                        adBanner.classList.add("hidden");
-                    } else {
-                        adBanner.classList.remove("hidden");
+                    if (adBanner) {
+                        if (isPremium) adBanner.classList.add("hidden");
+                        else adBanner.classList.remove("hidden");
                     }
                 })
-                .catch((e) => {
-                    console.warn("Premium status check failed", e);
-                });
+                .catch((e) => console.warn("Premium status check failed", e));
         }
 
-        // Start the elapsed-time tracker now that we have a video loaded.
-        // Use runtime (minutes → seconds) when available; TV episodes default to 45 min.
-        const runtimeSec = movieData.runtime
-            ? movieData.runtime * 60
-            : type === "tv"
-                ? 45 * 60
-                : 0;
-        if (window._startHistoryTracker)
-            window._startHistoryTracker(runtimeSec);
+        // Start history tracker
+        const runtimeSec = movieData.runtime ? movieData.runtime * 60 : (type === "tv" ? 45 * 60 : 0);
+        if (window._startHistoryTracker) window._startHistoryTracker(runtimeSec);
+    }
 
-        // Initialize comments functionality
-        initializeComments();
+    function initializeRating(initialType, initialId) {
+        console.log("Initializing rating section");
+        const section = document.getElementById("ratingSection");
+        const prompt = document.getElementById("ratingPrompt");
+        const stars = document.getElementById("ratingStars");
+        const result = document.getElementById("ratingResult");
+        const avgEl = document.getElementById("avgRating");
+        const countEl = document.getElementById("ratingCount");
+
+        if (!section) {
+            console.error("ratingSection element not found!");
+            return;
+        }
+
+        async function refreshRating(type, id) {
+            console.log(`refreshRating called: type=${type}, id=${id}`);
+            section.style.display = "block";
+
+            if (!id) {
+                stars.style.display = "none";
+                result.style.display = "none";
+                prompt.style.display = "block";
+                prompt.textContent = "Hãy chọn một tập phim để đánh giá.";
+                return;
+            }
+
+            const apiType = type === 'tv' || type === 'episode' ? 'episode' : 'movie';
+            try {
+                const status = await RatingSystem.getStatus(apiType, id);
+                if (!status) throw new Error("Status is null");
+                updateUI(status, apiType, id);
+            } catch (err) {
+                console.error("Failed to load rating status:", err);
+                prompt.textContent = "Không thể tải thông tin đánh giá.";
+            }
+        }
+
+        function updateUI(s, apiType, id) {
+            stars.innerHTML = "";
+            countEl.innerHTML = "";
+
+            if (s.hasRated) {
+                stars.style.display = "none";
+                result.style.display = "block";
+                avgEl.textContent = (s.average || 0).toFixed(1) + " ⭐";
+                countEl.textContent = `(${s.count || 0} người đánh giá)`;
+                prompt.style.display = "none";
+
+                const editBtn = document.createElement("button");
+                editBtn.textContent = "Sửa";
+                editBtn.className = "btn ghost";
+                editBtn.style.fontSize = "12px";
+                editBtn.style.marginLeft = "12px";
+                editBtn.style.padding = "2px 6px";
+                editBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    s.hasRated = false;
+                    updateUI(s, apiType, id);
+                };
+                countEl.appendChild(editBtn);
+            } else {
+                stars.style.display = "flex";
+                result.style.display = "none";
+                prompt.style.display = "block";
+                prompt.textContent = s.count === 0 ? "Hãy là người đầu tiên đánh giá!" : `Trung bình: ${(s.average || 0).toFixed(1)} ⭐. Bạn đánh giá sao?`;
+
+                RatingSystem.renderStars("ratingStars", 0, async (val) => {
+                    const res = await RatingSystem.saveRating(apiType, id, val);
+                    if (res) refreshRating(apiType, id);
+                });
+            }
+        }
+
+        window._refreshRating = refreshRating;
+        refreshRating(initialType, initialId);
     }
 
     function initializeComments() {
@@ -1278,13 +1365,47 @@
             }
         });
 
+        function selectEpisode(ep, button, isAuto = false) {
+            console.log(`selectEpisode called for ep ${ep.episodeNumber}`, ep);
+            
+            // Remove active class from all buttons
+            document.querySelectorAll(".episode-button").forEach((btn) => {
+                btn.classList.remove("active");
+            });
+
+            // Add active class to this button
+            if (button) {
+                button.classList.add("active");
+            }
+
+            // Update current episode id
+            _currentEpisodeId = ep.id || ep.episodeId || ep.episodeNumber;
+            console.log("Setting _currentEpisodeId to:", _currentEpisodeId);
+
+            // Load video
+            const resumeOnLoad = isAuto ? (window._resumeSec || 0) : 0;
+            if (isAuto) window._resumeSec = 0;
+
+            if (ep && (ep.srcFilm || ep.src)) {
+                renderQualityDropdown(ep.srcFilm || ep.src, ep.allowedVariants || [], ep.premiumUser === true);
+                loadVideo(ep.srcFilm || ep.src, resumeOnLoad);
+            }
+
+            // Refresh comments and ratings 
+            if (typeof window._loadComments === "function") {
+                window._loadComments();
+            }
+            if (typeof window._refreshRating === "function") {
+                window._refreshRating('tv', _currentEpisodeId);
+            }
+        }
+
         // Create buttons for each season's episodes
         Object.keys(episodesBySeason)
             .sort((a, b) => Number(a) - Number(b))
             .forEach((seasonNum) => {
                 const episodes = episodesBySeason[seasonNum];
 
-                // Add season header if there are multiple seasons
                 if (Object.keys(episodesBySeason).length > 1) {
                     const seasonHeader = document.createElement("div");
                     seasonHeader.className = "season-header";
@@ -1297,80 +1418,34 @@
                     buttonsContainer.appendChild(seasonHeader);
                 }
 
-                // Create episode buttons
                 episodes.forEach((ep) => {
                     const button = document.createElement("button");
                     button.className = "episode-button";
                     button.textContent = `Ep ${ep.episodeNumber}`;
                     button.dataset.season = seasonNum;
                     button.dataset.episode = ep.episodeNumber;
-                    // Keep the DB identifier around for comments/history
-                    button.dataset.episodeId =
-                        ep.id || ep.episodeId || ep.episodeNumber;
+                    button.dataset.episodeId = ep.id || ep.episodeId || ep.episodeNumber;
 
-                    // Check if this is the selected episode
-                    const isSelected =
-                        selectedSeason == seasonNum &&
-                        selectedEpisode == ep.episodeNumber;
+                    const isSelected = selectedSeason == seasonNum && selectedEpisode == ep.episodeNumber;
                     if (isSelected) {
                         button.classList.add("active");
-                        _currentEpisodeId = button.dataset.episodeId
-                            ? parseInt(button.dataset.episodeId, 10)
-                            : null;
+                        _currentEpisodeId = ep.id || ep.episodeId || ep.episodeNumber;
                     }
 
-                    button.addEventListener("click", () => {
-                        // Remove active class from all buttons
-                        document.querySelectorAll(".episode-button").forEach((btn) => {
-                            btn.classList.remove("active");
-                        });
-
-                        // Add active class to clicked button
-                        button.classList.add("active");
-
-                        // Update current episode id for comments & history tracking
-                        _currentEpisodeId = button.dataset.episodeId
-                            ? parseInt(button.dataset.episodeId, 10)
-                            : null;
-
-                        // Load the episode video — only resume on the initial auto-click,
-                        // not when the user manually picks a different episode
-                        const resumeOnLoad = window._resumeSec || 0;
-                        window._resumeSec = 0; // clear after first use
-                        if (ep && (ep.srcFilm || ep.src)) {
-                            const videoUrl = ep.srcFilm || ep.src;
-                            const variants = Array.isArray(ep.allowedVariants)
-                                ? ep.allowedVariants
-                                : [];
-                            const isPremiumUser = ep.premiumUser === true;
-
-                            renderQualityDropdown(videoUrl, variants, isPremiumUser);
-                            loadVideo(videoUrl, resumeOnLoad);
-                        } else {
-                            renderQualityDropdown("", []);
-                            loadVideo("", 0);
-                        }
-
-                        // Refresh episode-specific comments when switching
-                        if (typeof window._loadComments === "function") {
-                            window._loadComments();
-                        }
-                    });
-
+                    button.addEventListener("click", () => selectEpisode(ep, button));
                     buttonsContainer.appendChild(button);
                 });
             });
 
-        // Auto-select first episode if no specific episode selected
+        // Handle initial selection
         if (!selectedSeason || !selectedEpisode) {
             const firstSeasonNum = Object.keys(episodesBySeason)[0];
             const firstEpisode = episodesBySeason[firstSeasonNum]?.[0];
-
             if (firstEpisode) {
-                // Find and click the first episode button
                 const firstButton = buttonsContainer.querySelector(
-                    `[data-season="${firstSeasonNum}"][data-episode="${firstEpisode.episodeNumber}"]`,
+                    `[data-season="${firstSeasonNum}"][data-episode="${firstEpisode.episodeNumber}"]`
                 );
+<<<<<<< HEAD
                 if (firstButton) {
                     firstButton.click();
                 } else if (firstEpisode.srcFilm || firstEpisode.src) {
@@ -1384,25 +1459,18 @@
                     loadVideo(videoUrl, window._resumeSec || 0);
                     window._resumeSec = 0;
                 }
+=======
+                selectEpisode(firstEpisode, firstButton, true);
+>>>>>>> cdd1531 (Top rated film by user)
             }
         } else {
-            // Load the specified episode
-            const season = sortedSeasons.find(
-                (s) => s.seasonNumber == selectedSeason,
-            );
-            const ep = season?.episodes?.find(
-                (e) => e.episodeNumber == selectedEpisode && e.published,
-            );
-            if (ep && (ep.srcFilm || ep.src)) {
-                const videoUrl = ep.srcFilm || ep.src;
-                const variants = Array.isArray(ep.allowedVariants)
-                    ? ep.allowedVariants
-                    : [];
-                const isPremiumUser = ep.premiumUser === true;
-
-                renderQualityDropdown(videoUrl, variants, isPremiumUser);
-                loadVideo(videoUrl, window._resumeSec || 0);
-                window._resumeSec = 0;
+            const season = sortedSeasons.find(s => s.seasonNumber == selectedSeason);
+            const ep = season?.episodes?.find(e => e.episodeNumber == selectedEpisode && e.published);
+            if (ep) {
+                const btn = buttonsContainer.querySelector(
+                    `[data-season="${selectedSeason}"][data-episode="${selectedEpisode}"]`
+                );
+                selectEpisode(ep, btn, true);
             }
         }
     }
@@ -2163,177 +2231,6 @@
 
         _playPreRollAd(ad);
     }
-
-    function setupMovie(movieData) {
-        const videoUrl = movieData.srcFilm || movieData.src || "";
-        const variants = Array.isArray(movieData.allowedVariants)
-            ? movieData.allowedVariants
-            : [];
-        const isPremiumUser = movieData.premiumUser === true;
-
-        playMainContentWithOptionalAd({
-            videoUrl,
-            startSec: window._resumeSec || 0,
-            variants,
-            isPremiumUser
-        });
-    }
-
-    function setupTVSeries(
-        movieData,
-        seasonsData,
-        selectedSeason,
-        selectedEpisode,
-    ) {
-        const selector = document.getElementById("episodeSelector");
-        const buttonsContainer = document.getElementById("episodeButtons");
-
-        selector.classList.remove("hidden");
-        buttonsContainer.innerHTML = "";
-
-        const sortedSeasons = [...(seasonsData || [])].sort(
-            (a, b) => (a.seasonNumber || 0) - (b.seasonNumber || 0),
-        );
-
-        const episodesBySeason = {};
-        sortedSeasons.forEach((season) => {
-            const publishedEpisodes = (season.episodes || []).filter((ep) => ep.published);
-            if (publishedEpisodes.length > 0) {
-                episodesBySeason[season.seasonNumber] = publishedEpisodes.sort(
-                    (a, b) => (a.episodeNumber || 0) - (b.episodeNumber || 0),
-                );
-            }
-        });
-
-        const loadEpisodePlayback = (ep, resumeSec = 0) => {
-            if (ep && (ep.srcFilm || ep.src)) {
-                const videoUrl = ep.srcFilm || ep.src;
-                const variants = Array.isArray(ep.allowedVariants) ? ep.allowedVariants : [];
-                const isPremiumUser = ep.premiumUser === true;
-
-                playMainContentWithOptionalAd({
-                    videoUrl,
-                    startSec: resumeSec,
-                    variants,
-                    isPremiumUser
-                });
-            } else {
-                renderQualityDropdown("", [], false);
-                loadVideo("", 0);
-            }
-        };
-
-        Object.keys(episodesBySeason)
-            .sort((a, b) => Number(a) - Number(b))
-            .forEach((seasonNum) => {
-                const episodes = episodesBySeason[seasonNum];
-
-                if (Object.keys(episodesBySeason).length > 1) {
-                    const seasonHeader = document.createElement("div");
-                    seasonHeader.className = "season-header";
-                    seasonHeader.textContent = `Season ${seasonNum}`;
-                    buttonsContainer.appendChild(seasonHeader);
-                }
-
-                episodes.forEach((ep) => {
-                    const button = document.createElement("button");
-                    button.className = "episode-button";
-                    button.textContent = `Ep ${ep.episodeNumber}`;
-                    button.dataset.season = seasonNum;
-                    button.dataset.episode = ep.episodeNumber;
-                    button.dataset.episodeId = ep.id || ep.episodeId || ep.episodeNumber;
-
-                    const isSelected =
-                        selectedSeason == seasonNum && selectedEpisode == ep.episodeNumber;
-                    if (isSelected) {
-                        button.classList.add("active");
-                        _currentEpisodeId = button.dataset.episodeId
-                            ? parseInt(button.dataset.episodeId, 10)
-                            : null;
-                    }
-
-                    button.addEventListener("click", () => {
-                        document.querySelectorAll(".episode-button").forEach((btn) => {
-                            btn.classList.remove("active");
-                        });
-                        button.classList.add("active");
-
-                        _currentEpisodeId = button.dataset.episodeId
-                            ? parseInt(button.dataset.episodeId, 10)
-                            : null;
-
-                        const resumeOnLoad = window._resumeSec || 0;
-                        window._resumeSec = 0;
-
-                        loadEpisodePlayback(ep, resumeOnLoad);
-
-                        if (typeof window._loadComments === "function") {
-                            window._loadComments();
-                        }
-                    });
-
-                    buttonsContainer.appendChild(button);
-                });
-            });
-
-        if (!selectedSeason || !selectedEpisode) {
-            const firstSeasonNum = Object.keys(episodesBySeason)[0];
-            const firstEpisode = episodesBySeason[firstSeasonNum]?.[0];
-
-            if (firstEpisode) {
-                const firstButton = buttonsContainer.querySelector(
-                    `[data-season="${firstSeasonNum}"][data-episode="${firstEpisode.episodeNumber}"]`,
-                );
-                if (firstButton) {
-                    firstButton.click();
-                } else {
-                    loadEpisodePlayback(firstEpisode, window._resumeSec || 0);
-                    window._resumeSec = 0;
-                }
-            }
-        } else {
-            const season = sortedSeasons.find((s) => s.seasonNumber == selectedSeason);
-            const ep = season?.episodes?.find(
-                (e) => e.episodeNumber == selectedEpisode && e.published,
-            );
-            if (ep) {
-                loadEpisodePlayback(ep, window._resumeSec || 0);
-                window._resumeSec = 0;
-            }
-        }
-    }
-
-    function _buildPayload() {
-        if (_isAdPlaying) return null;
-
-        const currentTime = _getCurrentTime();
-        const duration = _getLiveDuration();
-        if (duration > 0) _durationSec = duration;
-        const progress = duration > 0 ? Math.min(currentTime, duration) : currentTime;
-
-        if (_histType === "tv") {
-            const epId = _currentEpisodeId || parseInt(_histId);
-            return { progressSec: progress, durationSec: duration, episodeId: epId };
-        } else {
-            const mvId = _currentMovieId || parseInt(_histId);
-            return { progressSec: progress, durationSec: duration, movieId: mvId };
-        }
-    }
-
-    function _doSave() {
-        if (_isAdPlaying || !_histToken) return;
-        const payload = _buildPayload();
-        if (!payload || (!payload.movieId && !payload.episodeId)) return;
-        fetch("/api/user/history/save", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + _histToken,
-            },
-            body: JSON.stringify(payload),
-        }).catch(() => {});
-    }
-
 
     _initAndStart();
 </script>

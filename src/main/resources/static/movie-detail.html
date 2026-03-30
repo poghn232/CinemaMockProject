@@ -653,6 +653,7 @@
 </div>
 <script src="/js/i18n.js"></script>
 <script src="js/bannerads.js"></script>
+<script src="js/rating.js"></script>
 <script>
     // ── WISHLIST ──────────────────────────────────────────────
     const token = localStorage.getItem("token");
@@ -904,6 +905,21 @@
             heroRating.appendChild(badge);
         }
 
+        // User Rating
+        if (typeof d.userRating === "number" && d.userRating > 0) {
+            const userBadge = document.createElement("div");
+            userBadge.className = "rating-badge";
+            userBadge.style.background = "rgba(236, 72, 153, 0.2)";
+            userBadge.innerHTML = `
+                <div class="rating-number" style="color: var(--accent2)">${d.userRating.toFixed(1)}</div>
+                <div>
+                  <div style="font-size:12px;font-weight:600">User Rating</div>
+                  <div class="rating-label">from ${d.userRatingCount || 0} reviews</div>
+                </div>
+            `;
+            heroRating.appendChild(userBadge);
+        }
+
         // Overview
         const overviewEl = document.getElementById("overviewText");
         if (overviewEl) {
@@ -932,7 +948,10 @@
                 const li = document.createElement("li");
                 li.className = "cast-item";
 
-                const avatarSrc = c.profilePath || 'https://via.placeholder.com/48x48?text=No';
+                let avatarSrc = c.profilePath || 'https://via.placeholder.com/48x48?text=No';
+                if (avatarSrc && avatarSrc.startsWith('/')) {
+                    avatarSrc = 'https://image.tmdb.org/t/p/w200' + avatarSrc;
+                }
 
                 li.innerHTML = `
               <div class="cast-row">

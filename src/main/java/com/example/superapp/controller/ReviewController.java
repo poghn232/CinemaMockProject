@@ -1,7 +1,5 @@
 package com.example.superapp.controller;
 
-import com.example.superapp.dto.CreateReviewRequest;
-import com.example.superapp.dto.ReviewDto;
 import com.example.superapp.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,49 +13,68 @@ import java.util.Map;
 public class ReviewController {
 
     private final ReviewService reviewService;
-    private final com.example.superapp.repository.ReportRepository reportRepository;
-    private final com.example.superapp.repository.UserRepository userRepository;
-    private final com.example.superapp.repository.ReviewRepository reviewRepository;
+
+    @PostMapping("/api/reviews/save")
+    public ResponseEntity<?> saveRating(
+            Authentication auth,
+            @RequestBody Map<String, Object> payload
+    ) {
+        if (auth == null) {
+            return ResponseEntity.status(401).body(Map.of("message", "Login required to rate"));
+        }
+
+        String type = (String) payload.get("type");
+        Long id = Long.valueOf(payload.get("id").toString());
+        Integer rating = Integer.valueOf(payload.get("rating").toString());
+
+        try {
+            reviewService.saveRating(auth.getName(), type, id, rating);
+            return ResponseEntity.ok(Map.of("message", "Rating saved successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/api/reviews/status")
+    public ResponseEntity<?> getRatingStatus(
+            Authentication auth,
+            @RequestParam String type,
+            @RequestParam Long id
+    ) {
+        String username = auth != null ? auth.getName() : null;
+        try {
+            return ResponseEntity.ok(reviewService.getRatingStatus(username, type, id));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
+
 
     @GetMapping("/api/public/reviews")
-    public ResponseEntity<?> listReviews(
+    public ResponseEntity<?> getPublicReviews(
             @RequestParam(required = false) Long movieId,
             @RequestParam(required = false) Long episodeId
     ) {
-        return ResponseEntity.ok(Map.of("reviews", reviewService.listReviews(movieId, episodeId)));
+        try {
+            return ResponseEntity.ok(reviewService.getPublicReviews(movieId, episodeId));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
     }
 
     @PostMapping("/api/user/reviews")
-    public ResponseEntity<ReviewDto> createReview(Authentication authentication,
-                                                  @RequestBody CreateReviewRequest request) {
-        String username = authentication.getName();
-        ReviewDto dto = reviewService.createComment(username, request.getMovieId(), request.getEpisodeId(), request.getComment());
-        return ResponseEntity.ok(dto);
+    public ResponseEntity<?> saveComment(
+            Authentication auth,
+            @RequestBody Map<String, Object> payload
+    ) {
+        if (auth == null) {
+            return ResponseEntity.status(401).body(Map.of("message", "Login required to comment"));
+        }
+        try {
+            return ResponseEntity.ok(reviewService.saveComment(auth.getName(), payload));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
     }
-
-    @PostMapping("/api/user/reviews/{reviewId}/report")
-
-    public ResponseEntity<?> reportReview(@PathVariable Long reviewId, @RequestBody(required = false) ReportRequest req, Authentication auth) {
-        var reviewEntityOpt = reviewRepository.findById(reviewId);
-        if (reviewEntityOpt.isEmpty()) return ResponseEntity.badRequest().body(Map.of("message","Review not found"));
-
-        var reviewEntity = reviewEntityOpt.get();
-        var reporter = userRepository.findByUsername(auth.getName()).orElse(null);
-
-    String reasonText = (req != null && req.reason != null) ? req.reason : "";
-
-    com.example.superapp.entity.Report report = com.example.superapp.entity.Report.builder()
-        .review(reviewEntity)
-        .reporter(reporter)
-        .reason(reasonText)
-        .createdAt(java.time.LocalDateTime.now())
-        .status(com.example.superapp.entity.Report.Status.PENDING)
-        .build();
-
-        reportRepository.save(report);
-
-    return ResponseEntity.status(201).body(Map.of("message", "Report received", "reportId", report.getId()));
-    }
-
-    public static class ReportRequest { public String reason; }
 }

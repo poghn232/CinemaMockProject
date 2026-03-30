@@ -1,6 +1,5 @@
 package com.example.superapp.service;
 
-import com.example.superapp.dto.ReviewDto;
 import com.example.superapp.entity.Episode;
 import com.example.superapp.entity.Movie;
 import com.example.superapp.entity.Review;
@@ -13,15 +12,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,84 +26,158 @@ public class ReviewService {
     private final MovieRepository movieRepository;
     private final EpisodeRepository episodeRepository;
 
-    @Transactional(readOnly = true)
-    public List<ReviewDto> listReviews(Long movieId, Long episodeId) {
-        return loadReviews(movieId, episodeId).stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
-    }
-
     @Transactional
-    public ReviewDto createComment(String username, Long movieId, Long episodeId, String comment) {
-        if ((movieId == null && episodeId == null) || (movieId != null && episodeId != null)) {
-            throw new IllegalArgumentException("Either movieId or episodeId must be provided");
-        }
-
-        if (comment == null || comment.trim().isEmpty()) {
-            throw new IllegalArgumentException("Comment cannot be empty");
-        }
-
-        if (comment.length() > 1000) {
-            throw new IllegalArgumentException("Comment is too long (max 1000 characters)");
+    public void saveRating(String username, String type, Long id, Integer rating) {
+        if (rating < 1 || rating > 10) {
+            throw new IllegalArgumentException("Rating must be between 1 and 10");
         }
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Block commenting for users flagged as commentDisabled
-        if (Boolean.TRUE.equals(user.getCommentDisabled())) {
-            // friendlier, more natural message returned to clients
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't post comments right now.");
+        Review review;
+        if ("movie".equalsIgnoreCase(type)) {
+            review = reviewRepository.findByMovieIdAndUser_Username(id, username)
+                    .orElseGet(() -> {
+                        Movie movie = movieRepository.findById(id)
+                                .orElseThrow(() -> new RuntimeException("Movie not found"));
+                        return Review.builder()
+                                .user(user)
+                                .movie(movie)
+                                .createdDate(LocalDateTime.now())
+                                .build();
+                    });
+        } else if ("episode".equalsIgnoreCase(type)) {
+            review = reviewRepository.findByEpisodeIdAndUser_Username(id, username)
+                    .orElseGet(() -> {
+                        Episode episode = episodeRepository.findById(id)
+                                .orElseThrow(() -> new RuntimeException("Episode not found"));
+                        return Review.builder()
+                                .user(user)
+                                .episode(episode)
+                                .createdDate(LocalDateTime.now())
+                                .build();
+                    });
+        } else {
+            throw new IllegalArgumentException("Invalid type: " + type);
         }
 
-    // Always create a new Review row so a user can post multiple comments
-    Review review = new Review();
-    if (movieId != null) {
-        Movie movie = movieRepository.findById(movieId)
-            .orElseThrow(() -> new IllegalArgumentException("Movie not found"));
-        review.setMovie(movie);
-    } else {
-        Episode episode = episodeRepository.findById(episodeId)
-            .orElseThrow(() -> new IllegalArgumentException("Episode not found"));
-        review.setEpisode(episode);
+        review.setRating(rating);
+        review.setCreatedDate(LocalDateTime.now()); // Update timestamp if re-rating
+        reviewRepository.save(review);
     }
 
-    review.setUser(user);
-        // keep rating field present to satisfy schema; default to 0 for comments
-        review.setRating(0);
-    review.setComment(comment == null ? null : comment.trim());
-    // When a user posts or updates a comment, ensure it's visible (clear hidden flag)
-    review.setHidden(false);
-        if (review.getReviewId() == null) {
-            review.setCreatedDate(LocalDateTime.now());
+    public Map<String, Object> getRatingStatus(String username, String type, Long id) {
+        boolean hasRated = false;
+        Integer userRating = null;
+
+        if (username != null) {
+            Optional<Review> existing;
+            if ("movie".equalsIgnoreCase(type)) {
+                existing = reviewRepository.findByMovieIdAndUser_Username(id, username);
+            } else {
+                existing = reviewRepository.findByEpisodeIdAndUser_Username(id, username);
+            }
+            if (existing.isPresent()) {
+                hasRated = true;
+                userRating = existing.get().getRating();
+            }
         }
 
-        return toDto(reviewRepository.save(review));
+        Double average;
+        Long count;
+
+        if ("movie".equalsIgnoreCase(type)) {
+            average = reviewRepository.getAverageRatingForMovie(id);
+            count = reviewRepository.getRatingCountForMovie(id);
+        } else if ("episode".equalsIgnoreCase(type)) {
+            average = reviewRepository.getAverageRatingForEpisode(id);
+            count = reviewRepository.getRatingCountForEpisode(id);
+        } else if ("tv".equalsIgnoreCase(type)) {
+            average = reviewRepository.getAverageRatingForTvSeries(id);
+            count = reviewRepository.getRatingCountForTvSeries(id);
+        } else {
+            throw new IllegalArgumentException("Invalid type: " + type);
+        }
+
+        return Map.of(
+                "hasRated", hasRated,
+                "userRating", userRating != null ? userRating : 0,
+                "average", average != null ? average : 0.0,
+                "count", count != null ? count : 0
+        );
     }
 
-    @Transactional(readOnly = true)
-    public List<Review> loadReviews(Long movieId, Long episodeId) {
+    public Map<String, Object> getPublicReviews(Long movieId, Long episodeId) {
         List<Review> reviews;
         if (episodeId != null) {
             reviews = reviewRepository.findByEpisodeId(episodeId);
         } else if (movieId != null) {
             reviews = reviewRepository.findByMovieId(movieId);
         } else {
-            return List.of();
+            reviews = List.of();
         }
-    reviews = new java.util.ArrayList<>(reviews); // Make mutable
-    // Remove hidden reviews so they don't appear to viewers
-    reviews.removeIf(r -> Boolean.TRUE.equals(r.getHidden()));
-        reviews.sort(java.util.Comparator.comparing(Review::getCreatedDate, java.util.Comparator.nullsLast(java.util.Comparator.reverseOrder())));
-        return reviews;
+
+        List<Map<String, Object>> reviewDtos = reviews.stream()
+                .filter(r -> !Boolean.TRUE.equals(r.getHidden()) && r.getComment() != null && !r.getComment().trim().isEmpty())
+                .sorted((a, b) -> b.getCreatedDate().compareTo(a.getCreatedDate()))
+                .map(r -> Map.<String, Object>of(
+                        "reviewId", r.getReviewId(),
+                        "username", r.getUser().getUsername(),
+                        "comment", r.getComment(),
+                        "createdDate", r.getCreatedDate(),
+                        "rating", r.getRating() != null ? (Object)r.getRating() : (Object)0
+                ))
+                .toList();
+
+        return Map.of("reviews", reviewDtos);
     }
 
-    private ReviewDto toDto(Review review) {
-        ReviewDto dto = new ReviewDto();
-        dto.setReviewId(review.getReviewId());
-        dto.setUsername(review.getUser() != null ? review.getUser().getUsername() : "Unknown");
-        dto.setComment(review.getComment());
-        dto.setCreatedDate(review.getCreatedDate() != null ? review.getCreatedDate() : LocalDateTime.now());
-        return dto;
+    @Transactional
+    public Map<String, Object> saveComment(String username, Map<String, Object> payload) {
+        String commentText = (String) payload.get("comment");
+        Long movieId = payload.get("movieId") != null ? Long.valueOf(payload.get("movieId").toString()) : null;
+        Long episodeId = payload.get("episodeId") != null ? Long.valueOf(payload.get("episodeId").toString()) : null;
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (Boolean.TRUE.equals(user.getCommentDisabled())) {
+            throw new RuntimeException("You are disabled from commenting.");
+        }
+
+        Review review;
+        if (movieId != null) {
+            review = reviewRepository.findByMovieIdAndUser_Username(movieId, username)
+                    .orElseGet(() -> {
+                        Movie movie = movieRepository.findById(movieId)
+                                .orElseThrow(() -> new RuntimeException("Movie not found"));
+                        return Review.builder().user(user).movie(movie).build();
+                    });
+        } else if (episodeId != null) {
+            review = reviewRepository.findByEpisodeIdAndUser_Username(episodeId, username)
+                    .orElseGet(() -> {
+                        Episode episode = episodeRepository.findById(episodeId)
+                                .orElseThrow(() -> new RuntimeException("Episode not found"));
+                        return Review.builder().user(user).episode(episode).build();
+                    });
+        } else {
+            throw new IllegalArgumentException("Either movieId or episodeId must be provided");
+        }
+
+        review.setComment(commentText);
+        review.setCreatedDate(LocalDateTime.now());
+        if (review.getRating() == null) {
+            review.setRating(0); // Default if not rated
+        }
+        
+        Review saved = reviewRepository.save(review);
+        return Map.<String, Object>of(
+                "reviewId", saved.getReviewId(),
+                "username", saved.getUser().getUsername(),
+                "comment", saved.getComment(),
+                "createdDate", saved.getCreatedDate(),
+                "rating", saved.getRating() != null ? (Object)saved.getRating() : (Object)0
+        );
     }
 }

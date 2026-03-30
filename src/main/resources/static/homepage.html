@@ -1517,9 +1517,7 @@
 
     <!-- HERO -->
     <section class="hero" id="heroSection">
-        <!-- search removed from hero; uses overlay search instead -->
-
-        <!-- ADS: shown for non-premium users (handled in initUserUi) -->
+        <!-- existing hero sliders will be injected here -->
     </section>
 
     <section class="featured" id="featuredMovie">
@@ -1539,6 +1537,7 @@
             ▼
         </button>
     </section>
+
     <div class="ad-wrapper" id="adWrapper">
         <div class="ad-banner">
             <div class="ad-text">
@@ -1868,7 +1867,50 @@
         }, 220);
     }
 
-    // ========== STATE ==========
+    // ========== SEARCH ==========
+    async function loadTopRatedData(limit = 10) {
+        try {
+            const res = await fetch(`/api/public/movies/top-rated?limit=${limit}`);
+            if (!res.ok) return [];
+            return await res.json();
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function renderTopRatedRow(title, list) {
+        const container = document.getElementById("moviesContainer");
+        if (!list || !list.length) return;
+
+        const row = document.createElement("div");
+        row.className = "movie-row";
+
+        const titleEl = document.createElement("div");
+        titleEl.className = "movie-row-title";
+        titleEl.innerHTML = `<span style="width: 4px; height: 18px; background: var(--accent); border-radius: 2px; display:inline-block; margin-right:8px; vertical-align:middle;"></span> ${title}`;
+        row.appendChild(titleEl);
+
+        const scroll = document.createElement("div");
+        scroll.className = "movie-row-scroll";
+        
+        list.forEach((m, idx) => {
+            const card = createMovieCard(m);
+            // Ranking badge
+            const badge = document.createElement("span");
+            badge.className = "movie-badge";
+            badge.style.background = "linear-gradient(135deg, #facc15, #f59e0b)";
+            badge.style.color = "#000";
+            badge.style.fontWeight = "bold";
+            badge.textContent = `#${idx + 1}`;
+            card.querySelector(".movie-thumb").appendChild(badge);
+            
+            scroll.appendChild(card);
+            setTimeout(() => card.classList.add("in"), 100 + (idx * 50));
+        });
+
+        row.appendChild(scroll);
+        container.appendChild(row);
+    }
     let currentFilter = "all"; // all | movie | tv
     let currentSearch = "";
     let movies = [];
@@ -2200,17 +2242,24 @@
             await fadeIn(container);
             return;
         }
-            try {
-                const recommendations = await loadMaybeYouWantToWatch(12);
-                if (recommendations && recommendations.length) {
-                    renderRow(t("home.maybe_watch"), recommendations.slice(0, ROW_DISPLAY_LIMIT), recommendations);
-                }
-        } catch (e) {
-            // recommendations failed
-        }
 
 
         // ✅ NORMAL MODE (ROWS)
+        try {
+            // 1. Maybe You Want to Watch
+            const recommendations = await loadMaybeYouWantToWatch(12);
+            if (recommendations && recommendations.length) {
+                renderRow(t("home.maybe_watch"), recommendations.slice(0, ROW_DISPLAY_LIMIT), recommendations);
+            }
+
+            // 2. Top Rated (User-voted)
+            const topRated = await loadTopRatedData(10);
+            if (topRated && topRated.length) {
+                renderTopRatedRow(t("home.top_rated"), topRated);
+            }
+        } catch (e) {
+            // discovery rows init failed
+        }
     // pass full lists to renderRow; rows will only display first ROW_DISPLAY_LIMIT items
     const trendingList = movies.filter((m) => m.rating >= 8);
     renderRow(t("home.trending"), trendingList.slice(0, ROW_DISPLAY_LIMIT), trendingList);
@@ -3080,7 +3129,7 @@
         }
     });
 
-    // ========== SEARCH ==========
+
     function initSearch() {
         // wire the navbar search button to open the overlay
         const navButton = document.getElementById("navSearchBtn");
@@ -3399,13 +3448,13 @@
 
     // ========== INIT ==========
     (async function init() {
+        initNav();
         const yearEl = document.getElementById("footerYear");
         if (yearEl) {
             yearEl.textContent = new Date().getFullYear().toString();
         }
 
         await initUserUi();
-        initNav();
         initSearch();
         initNavbarSearchToggle();
     initHamburgerMenu();

@@ -56,6 +56,7 @@ public class PublicMovieController {
         return publicMovieService.listGenresWithItems(request);
     }
 
+<<<<<<< HEAD
     @GetMapping("/subtitle/{movieId}/{filename:.+}")
     @ResponseBody
     public ResponseEntity<byte[]> proxySubtitle(
@@ -120,5 +121,13 @@ public class PublicMovieController {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(respBytes.asByteArray());
+=======
+    @GetMapping("/top-rated")
+    public java.util.List<com.example.superapp.dto.MovieItemDto> topRated(
+            @RequestParam(name = "limit", defaultValue = "10") int limit,
+            HttpServletRequest request
+    ) {
+        return publicMovieService.getTopRated(limit, request);
+>>>>>>> cdd1531 (Top rated film by user)
     }
 }
