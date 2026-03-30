@@ -1367,10 +1367,10 @@
                     firstButton.click();
                 } else if (firstEpisode.srcFilm || firstEpisode.src) {
                     const videoUrl = firstEpisode.srcFilm || firstEpisode.src;
-                    const variants = Array.isArray(ep.allowedVariants)
-                        ? ep.allowedVariants
+                    const variants = Array.isArray(firstEpisode.allowedVariants)
+                        ? firstEpisode.allowedVariants
                         : [];
-                    const isPremiumUser = ep.premiumUser === true;
+                    const isPremiumUser = firstEpisode.premiumUser === true;
 
                     renderQualityDropdown(videoUrl, variants, isPremiumUser);
                     loadVideo(videoUrl, window._resumeSec || 0);

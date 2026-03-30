@@ -134,18 +134,14 @@ public class MovieController {
                         em.put("published", e.getPublished());
                         em.put("premiumUser", premiumUser);
 
-                        List<String> variants = Collections.emptyList();
+                        List<String> variants =
+                                r2StorageService.findVariantsWithoutDb("tv_episode", e.getId());
 
-                        VideoAsset latest = videoAssetRepository
-                                .findTopByOwnerTypeAndOwnerIdOrderByCreatedAtDesc("tv_episode", e.getId())
-                                .orElse(null);
+                        java.util.Optional<String> playbackOpt =
+                                r2StorageService.findPlaybackUrlWithoutDb("tv_episode", e.getId());
 
-                        if (latest != null) {
-                            variants = r2StorageService.findVariants("tv_episode", e.getId(), latest.getId());
-
-                            if (latest.getPlaybackUrl() != null && !latest.getPlaybackUrl().isBlank()) {
-                                em.put("srcFilm", latest.getPlaybackUrl());
-                            }
+                        if (playbackOpt.isPresent()) {
+                            em.put("srcFilm", playbackOpt.get());
                         }
 
                         em.put("variants", variants);
