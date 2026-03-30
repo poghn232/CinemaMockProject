@@ -5,6 +5,7 @@ import com.example.superapp.entity.AdminLogs;
 import com.example.superapp.entity.Profile;
 import com.example.superapp.repository.AdminLogsRepository;
 import com.example.superapp.repository.ProfileRepository;
+import com.example.superapp.repository.ReviewRepository;
 import com.example.superapp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -23,7 +24,7 @@ public class AdminUserController {
     private static final Logger log = LoggerFactory.getLogger(AdminUserController.class);
 
     private final UserRepository userRepository;
-    private final com.example.superapp.repository.ReviewRepository reviewRepository;
+    private final ReviewRepository reviewRepository;
     private final AdminLogsRepository adminLogsRepository;
     private final ProfileRepository profileRepository;
 

@@ -2,8 +2,10 @@ package com.example.superapp.service;
 
 import com.example.superapp.dto.NotificationDto;
 import com.example.superapp.entity.Notification;
+import com.example.superapp.entity.Profile;
 import com.example.superapp.entity.User;
 import com.example.superapp.repository.NotificationRepository;
+import com.example.superapp.repository.ProfileRepository;
 import com.example.superapp.repository.UserRepository;
 import com.example.superapp.repository.WishlistRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +24,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final WishlistRepository wishlistRepository;
-    private final UserRepository userRepository;
+    private final ProfileRepository profileRepository;
 
     // ── PUBLIC API ────────────────────────────────────────────────────────
 
@@ -53,25 +55,25 @@ public class NotificationService {
         String message = buildMessage(eventType, contentTitle, episodeId, episodeName);
         String poster = posterPath != null ? TMDB_IMG + posterPath : null;
 
-        List<User> users = wishlistRepository.findUsersByContentIdAndContentType(contentId, contentType);
-        log.info("[Notification] Found {} wishlist users for {} #{}", users.size(), contentType, contentId);
+        List<Profile> profiles = wishlistRepository.findProfilesByContentIdAndContentType(contentId, contentType);
+        log.info("[Notification] Found {} wishlist users for {} #{}", profiles.size(), contentType, contentId);
 
-        if (users.isEmpty()) {
+        if (profiles.isEmpty()) {
             log.info("[Notification] No wishlist users → skip");
             return;
         }
 
-        for (User user : users) {
+        for (Profile profile : profiles) {
             boolean alreadyExists = notificationRepository
-                    .existsByUserAndContentIdAndContentTypeAndEventTypeAndEpisodeId(
-                            user, contentId, contentType, eventType, episodeId);
+                    .existsByProfileAndContentIdAndContentTypeAndEventTypeAndEpisodeId(
+                            profile, contentId, contentType, eventType, episodeId);
             if (alreadyExists) {
-                log.info("[Notification] duplicate, skip user={}", user.getUsername());
+                log.info("[Notification] duplicate, skip profile={}", profile.getProfileName());
                 continue;
             }
 
             Notification notif = Notification.builder()
-                    .user(user)
+                    .profile(profile)
                     .message(message)
                     .contentId(contentId)
                     .contentType(contentType)
@@ -83,43 +85,43 @@ public class NotificationService {
                     .build();
 
             notificationRepository.save(notif);
-            log.info("[Notification] SAVED for user={}", user.getUsername());
+            log.info("[Notification] SAVED for profile={}", profile.getProfileName());
         }
     }
 
     // ── USER-FACING QUERIES ───────────────────────────────────────────────
 
     @Transactional(readOnly = true)
-    public List<NotificationDto> getNotifications(String username) {
-        User user = getUser(username);
+    public List<NotificationDto> getNotifications(long profileId) {
+        System.out.println("called getNotifications() - NotificationService");
+        Profile profile = profileRepository.findByProfileId(profileId).orElseThrow(() -> new IllegalArgumentException("getNotifications() - Profile ID: " + profileId + " is not available"));
         return notificationRepository
-                .findTop20ByUserOrderByCreatedAtDesc(user)
+                .findTop20ByProfileOrderByCreatedAtDesc(profile)
                 .stream()
                 .map(this::toDto)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public long countUnread(String username) {
-        return notificationRepository.countByUserAndIsReadFalse(getUser(username));
+    public long countUnread(long profileId) {
+        Profile profile = profileRepository.findByProfileId(profileId).orElseThrow(() -> new IllegalArgumentException("countUnread() - profileId: " + profileId + "is not available"));
+        return notificationRepository.countByProfileAndIsReadFalse(profile);
     }
 
     @Transactional
-    public void markAllRead(String username) {
-        notificationRepository.markAllAsRead(getUser(username));
+    public void markAllRead(long profileId) {
+        Profile profile = profileRepository.findByProfileId(profileId).orElseThrow(() -> new IllegalArgumentException("markAllRead() - profileId: " + profileId + "is not available"));
+
+        notificationRepository.markAllAsRead(profile);
     }
 
     @Transactional
-    public void markOneRead(String username, Long notifId) {
-        notificationRepository.markOneAsRead(notifId, getUser(username));
+    public void markOneRead(long profileId, Long notifId) {
+        Profile profile = profileRepository.findByProfileId(profileId).orElseThrow(() -> new IllegalArgumentException("markAllRead() - profileId: " + profileId + "is not available"));
+        notificationRepository.markOneAsRead(notifId, profile);
     }
 
     // ── PRIVATE HELPERS ───────────────────────────────────────────────────
-
-    private User getUser(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
-    }
 
     private String buildMessage(String eventType, String title, Long episodeId, String episodeName) {
         String epLabel = (episodeName != null && !episodeName.isBlank())

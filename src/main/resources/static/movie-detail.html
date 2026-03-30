@@ -652,6 +652,7 @@
 <script>
     // ── WISHLIST ──────────────────────────────────────────────
     const token = localStorage.getItem("token");
+    const profileId = localStorage.getItem("profileId");
 
     function showToast(msg, type = "success") {
         const t = document.getElementById("toast");
@@ -667,7 +668,7 @@
         if (!token) return false;
         try {
             const res = await fetch(
-                `/api/user/wishlist/check?contentId=${encodeURIComponent(contentId)}&contentType=${encodeURIComponent(contentType)}`,
+                `/api/user/wishlist/check?contentId=${encodeURIComponent(contentId)}&contentType=${encodeURIComponent(contentType)}&profileId=${encodeURIComponent(profileId)}`,
                 {headers: {Authorization: "Bearer " + token}}
             );
             if (!res.ok) return false;
@@ -701,7 +702,7 @@
                         "Content-Type": "application/json",
                         Authorization: "Bearer " + token
                     },
-                    body: JSON.stringify({contentId, contentType})
+                    body: JSON.stringify({profileId, contentId, contentType})
                 });
                 if (res.status === 401 || res.status === 403) {
                     showToast(t("wishlist.login_required"), "error");

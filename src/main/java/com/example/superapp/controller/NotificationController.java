@@ -28,25 +28,29 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @GetMapping
-    public ResponseEntity<List<NotificationDto>> list(Authentication auth) {
-        return ResponseEntity.ok(notificationService.getNotifications(auth.getName()));
+    public ResponseEntity<List<NotificationDto>> list(@RequestParam long profileId) {
+        System.out.println("called list() - NotificationController");
+        return ResponseEntity.ok(notificationService.getNotifications(profileId));
     }
 
     @GetMapping("/unread")
-    public ResponseEntity<Map<String, Long>> unreadCount(Authentication auth) {
-        long count = notificationService.countUnread(auth.getName());
+    public ResponseEntity<Map<String, Long>> unreadCount(@RequestParam long profileId) {
+        System.out.println("called unread() - NotificationController");
+        long count = notificationService.countUnread(profileId);
         return ResponseEntity.ok(Map.of("count", count));
     }
 
     @PutMapping("/read-all")
-    public ResponseEntity<Void> markAllRead(Authentication auth) {
-        notificationService.markAllRead(auth.getName());
+    public ResponseEntity<Void> markAllRead(@RequestBody WishlistController.ProfileRequest profileRequest) {
+        System.out.println("called readAll() - NotificationController");
+        notificationService.markAllRead(profileRequest.profileId);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}/read")
-    public ResponseEntity<Void> markOneRead(@PathVariable Long id, Authentication auth) {
-        notificationService.markOneRead(auth.getName(), id);
+    public ResponseEntity<Void> markOneRead(@PathVariable Long id, @RequestBody WishlistController.ProfileRequest profileRequest) {
+        System.out.println("called readOne() - NotificationController");
+        notificationService.markOneRead(profileRequest.profileId, id);
         return ResponseEntity.noContent().build();
     }
 }

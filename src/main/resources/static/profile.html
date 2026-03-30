@@ -983,6 +983,7 @@
 </footer>
 <script src="js/bannerads.js"></script>
 <script>
+    const profileId = localStorage.getItem('profileId');
     document.addEventListener('DOMContentLoaded', () => {
 
         // --- CẤU HÌNH API ---
@@ -1464,7 +1465,7 @@
         </div>`;
 
         try {
-            const res = await fetch('/api/user/wishlist', {
+            const res = await fetch('/api/user/wishlist?profileId=' + profileId, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -1540,7 +1541,7 @@
                                 'Content-Type': 'application/json',
                                 'Authorization': `Bearer ${localStorage.getItem('token')}`
                             },
-                            body: JSON.stringify({contentId: item.contentId, contentType: item.contentType})
+                            body: JSON.stringify({profileId: profileId, contentId: item.contentId, contentType: item.contentType})
                         });
                         if (r.ok) {
                             card.remove();

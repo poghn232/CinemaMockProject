@@ -35,7 +35,6 @@ public class AuthController {
     private final GeoIpService geoIpService;
     private final LoginHistoryService loginHistoryService;
     private final GoogleTokenVerifier googleTokenVerifier;
-    private final ProfileRepository profileRepository;
 
     public AuthController(
         AuthenticationManager authenticationManager,
@@ -46,8 +45,7 @@ public class AuthController {
         OtpService otpService,
         GeoIpService geoIpService,
         LoginHistoryService loginHistoryService,
-        GoogleTokenVerifier googleTokenVerifier,
-        ProfileRepository profileRepository) {
+        GoogleTokenVerifier googleTokenVerifier) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.userRepository = userRepository;
@@ -57,7 +55,6 @@ public class AuthController {
         this.geoIpService = geoIpService;
         this.loginHistoryService = loginHistoryService;
         this.googleTokenVerifier = googleTokenVerifier;
-        this.profileRepository = profileRepository;
     }
 
     // ─── Normal login ────────────────────────────────────────────────────────

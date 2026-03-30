@@ -21,21 +21,25 @@ public class WishlistController {
     private final WishlistService wishlistService;
 
     @GetMapping
-    public ResponseEntity<List<WishlistItemDto>> getWishlist(Authentication auth) {
-        return ResponseEntity.ok(wishlistService.getWishlist(auth.getName()));
+    public ResponseEntity<List<WishlistItemDto>> getWishlist(@RequestParam long profileId) {
+        return ResponseEntity.ok(wishlistService.getWishlist(profileId));
     }
 
     @PostMapping("/toggle")
     public ResponseEntity<WishlistToggleResponse> toggle(
-            @RequestBody WishlistToggleRequest req, Authentication auth) {
-        return ResponseEntity.ok(wishlistService.toggle(auth.getName(), req));
+            @RequestBody WishlistToggleRequest req) {
+        return ResponseEntity.ok(wishlistService.toggle(req));
     }
 
     @GetMapping("/check")
     public ResponseEntity<WishlistToggleResponse> check(
             @RequestParam Long contentId,
             @RequestParam String contentType,
-            Authentication auth) {
-        return ResponseEntity.ok(wishlistService.check(auth.getName(), contentId, contentType));
+            @RequestParam long profileId) {
+        return ResponseEntity.ok(wishlistService.check(profileId, contentId, contentType));
+    }
+
+    public static class ProfileRequest {
+        public long profileId;
     }
 }

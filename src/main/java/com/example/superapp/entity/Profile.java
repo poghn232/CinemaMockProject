@@ -38,6 +38,10 @@ public class Profile {
 
     @OneToMany(mappedBy = "profile")
     @Builder.Default
+    private List<Notification> notifications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "profile")
+    @Builder.Default
     private List<WatchHistory> watchHistories = new ArrayList<>();
 
     @Column(name = "enabled")

@@ -19,6 +19,8 @@
         readOne: (id) => `/api/user/notifications/${id}/read`,
     };
 
+    const profileId = localStorage.getItem("profileId");
+
     const POLL_MS = 30_000; // kiểm tra unread mỗi 30 giây
 
     // ── CSS ──────────────────────────────────────────────────────────────────
@@ -202,7 +204,7 @@
         const token = getToken();
         const headers = { ...(opts.headers || {}) };
         if (token) headers['Authorization'] = 'Bearer ' + token;
-        const res = await fetch(url, { ...opts, headers });
+        const res = await fetch(url, {...opts, headers});
         if (!res.ok) throw new Error(res.status);
         const text = await res.text();
         return text ? JSON.parse(text) : null;
@@ -244,7 +246,11 @@
         // Đánh dấu đã đọc khi click
         div.addEventListener('click', () => {
             if (!item.isRead) {
-                apiFetch(API.readOne(item.id), { method: 'PUT' }).catch(() => {});
+                apiFetch(API.readOne(item.id),{headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    method: 'PUT',
+                    body: JSON.stringify({profileId: profileId})}).catch(() => {});
                 div.classList.replace('unread', 'read');
                 div.querySelector('.nb-dot').style.visibility = 'hidden';
             }
@@ -333,7 +339,7 @@
         async _fetchUnread() {
             if (!isLoggedIn()) return;
             try {
-                const data = await apiFetch(API.unread);
+                const data = await apiFetch(API.unread + "?profileId=" + profileId);
                 this._updateBadge(data.count);
             } catch { /* silent */ }
         }
@@ -342,7 +348,7 @@
             const list = this.dropdown.querySelector('.nb-list');
             list.innerHTML = '<div class="nb-loading">Loading…</div>';
             try {
-                this.items = await apiFetch(API.list);
+                this.items = await apiFetch(API.list+"?profileId=" + profileId);
                 this._renderList();
                 this._updateBadge(this.items.filter(i => !i.isRead).length);
             } catch {
@@ -362,7 +368,11 @@
 
         async _readAll() {
             try {
-                await apiFetch(API.readAll, { method: 'PUT' });
+                await apiFetch(API.readAll, {headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    method: 'PUT',
+                    body: JSON.stringify({profileId: profileId})});
                 this._updateBadge(0);
                 this.dropdown.querySelectorAll('.nb-item.unread').forEach(el => {
                     el.classList.replace('unread', 'read');

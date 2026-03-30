@@ -1,14 +1,13 @@
 package com.example.superapp.service;
 
+import com.example.superapp.controller.WishlistController;
 import com.example.superapp.dto.WishlistItemDto;
 import com.example.superapp.dto.WishlistToggleRequest;
 import com.example.superapp.dto.WishlistToggleResponse;
+import com.example.superapp.entity.Profile;
 import com.example.superapp.entity.User;
 import com.example.superapp.entity.Wishlist;
-import com.example.superapp.repository.MovieRepository;
-import com.example.superapp.repository.TvSeriesRepository;
-import com.example.superapp.repository.UserRepository;
-import com.example.superapp.repository.WishlistRepository;
+import com.example.superapp.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,18 +20,13 @@ import java.util.stream.Collectors;
 public class WishlistService {
 
     private final WishlistRepository wishlistRepository;
-    private final UserRepository userRepository;
     private final MovieRepository movieRepository;
     private final TvSeriesRepository tvSeriesRepository;
+    private final ProfileRepository profileRepository;
 
-    private User getUser(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
-    }
-
-    public List<WishlistItemDto> getWishlist(String username) {
-        User user = getUser(username);
-        return wishlistRepository.findByUserOrderByAddedAtDesc(user)
+    public List<WishlistItemDto> getWishlist(long profileId) {
+        Profile profile = profileRepository.findByProfileId(profileId).orElseThrow(() -> new IllegalArgumentException("Profile ID: " + profileId + " is not available"));
+        return wishlistRepository.findByProfileOrderByAddedAtDesc(profile)
                 .stream()
                 .map(w -> {
                     String title = null;
@@ -72,25 +66,24 @@ public class WishlistService {
                 .collect(Collectors.toList());
     }
 
-    public WishlistToggleResponse check(String username, Long contentId, String contentType) {
-        User user = getUser(username);
-        boolean exists = wishlistRepository.existsByUserAndContentIdAndContentType(user, contentId, contentType);
+    public WishlistToggleResponse check(long profileId, Long contentId, String contentType) {
+        Profile profile = profileRepository.findByProfileId(profileId).orElseThrow(() -> new IllegalArgumentException("WishlistToggleResponse - Profile ID: " + profileId + " is not available"));
+        boolean exists = wishlistRepository.existsByProfileAndContentIdAndContentType(profile, contentId, contentType);
         return new WishlistToggleResponse(exists, exists ? "In wishlist" : "Not in wishlist");
     }
 
     @Transactional
-    public WishlistToggleResponse toggle(String username, WishlistToggleRequest req) {
-        User user = getUser(username);
-        boolean exists = wishlistRepository.existsByUserAndContentIdAndContentType(
-                user, req.contentId(), req.contentType());
+    public WishlistToggleResponse toggle(WishlistToggleRequest req) {
+        Profile profile = profileRepository.findByProfileId(req.profileId()).orElseThrow(() -> new IllegalArgumentException("WishlistToggleResponse - Profile ID: " + req.profileId() + " is not available"));
+        boolean exists = wishlistRepository.existsByProfileAndContentIdAndContentType(profile, req.contentId(), req.contentType());
 
         if (exists) {
-            wishlistRepository.deleteByUserAndContentIdAndContentType(
-                    user, req.contentId(), req.contentType());
+            wishlistRepository.deleteByProfileAndContentIdAndContentType(
+                    profile, req.contentId(), req.contentType());
             return new WishlistToggleResponse(false, "Removed from wishlist");
         } else {
             wishlistRepository.save(Wishlist.builder()
-                    .user(user)
+                    .profile(profile)
                     .contentId(req.contentId())
                     .contentType(req.contentType())
                     .build());
