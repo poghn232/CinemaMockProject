@@ -181,4 +181,35 @@ public class R2StorageService {
             return -1L;
         }
     }
+
+    public java.util.List<String> findVariantsWithoutDb(String ownerType, Long ownerId) {
+        String basePrefix = "videos/" + ownerType + "/" + ownerId + "/";
+
+        ListObjectsV2Request request = ListObjectsV2Request.builder()
+                .bucket(r2Properties.getBucket())
+                .prefix(basePrefix)
+                .build();
+
+        ListObjectsV2Response response = r2S3Client.listObjectsV2(request);
+
+        // 👉 tìm assetId lớn nhất (asset mới nhất)
+        Optional<Long> latestAssetId = response.contents().stream()
+                .map(S3Object::key)
+                .map(this::extractAssetIdSafely)
+                .filter(id -> id > 0)
+                .max(Long::compareTo);
+
+        if (latestAssetId.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+
+        Long assetId = latestAssetId.get();
+
+        // 👉 reuse lại logic cũ
+        return findVariants(ownerType, ownerId, assetId);
+    }
+    public Optional<String> findPlaybackUrlWithoutDb(String ownerType, Long ownerId) {
+        return findLatestMasterPlaylistKey(ownerType, ownerId)
+                .map(this::buildPublicUrl);
+    }
 }

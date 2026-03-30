@@ -339,18 +339,14 @@ public class PublicMovieService {
         dto.setSrc(m.getSrc());
         dto.setSrcFilm(m.getSrcFilm());
 
-        List<String> variants = Collections.emptyList();
+        List<String> variants =
+                r2StorageService.findVariantsWithoutDb("movie", m.getId());
 
-        VideoAsset latest = videoAssetRepository
-                .findTopByOwnerTypeAndOwnerIdOrderByCreatedAtDesc("movie", m.getId())
-                .orElse(null);
+        java.util.Optional<String> playbackOpt =
+                r2StorageService.findPlaybackUrlWithoutDb("movie", m.getId());
 
-        if (latest != null) {
-            variants = r2StorageService.findVariants("movie", m.getId(), latest.getId());
-
-            if (latest.getPlaybackUrl() != null && !latest.getPlaybackUrl().isBlank()) {
-                dto.setSrcFilm(latest.getPlaybackUrl());
-            }
+        if (playbackOpt.isPresent()) {
+            dto.setSrcFilm(playbackOpt.get());
         }
 
         dto.setVariants(variants);
