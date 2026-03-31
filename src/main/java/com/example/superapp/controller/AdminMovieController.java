@@ -167,7 +167,8 @@ public class AdminMovieController {
     @PostMapping("/{type}/{id}/subtitle")
     public ResponseEntity<Map<String, Object>> uploadSubtitle(@PathVariable("type") String type,
                                                               @PathVariable("id") long id,
-                                                              @RequestParam("file") MultipartFile file) {
+                                                              @RequestParam("file") MultipartFile file,
+                                                              @RequestParam(name = "lang", required = false) String lang) {
         String t = (type == null ? "" : type.trim().toLowerCase());
         if (!"movie".equals(t)) {
             throw new IllegalArgumentException("Subtitle upload currently only supported for movies");
@@ -196,7 +197,20 @@ public class AdminMovieController {
                 ext = orig.substring(dot + 1).toLowerCase();
             }
 
-            String objectKey = folder + "/default." + ext;
+            // Determine object filename: default for English/unspecified, otherwise use lang.<ext>
+            String filename;
+            String normalizedLang = (lang == null ? "" : lang.trim());
+            if (normalizedLang.isEmpty() || "en".equalsIgnoreCase(normalizedLang) || "default".equalsIgnoreCase(normalizedLang)) {
+                filename = "default." + ext;
+            } else {
+                // keep simple language code as filename, e.g., vi.vtt or ja.vtt
+                // sanitize lang to remove unsafe chars
+                String safeLang = normalizedLang.replaceAll("[^a-zA-Z0-9_-]", "").toLowerCase();
+                if (safeLang.isEmpty()) safeLang = "default";
+                filename = safeLang + "." + ext;
+            }
+
+            String objectKey = folder + "/" + filename;
             String contentType = file.getContentType();
             if (contentType == null) {
                 if ("srt".equals(ext)) contentType = "text/plain";

@@ -511,7 +511,7 @@
                 <label for="qualitySelect" style="font-size:13px; color: var(--text-subtle); margin-right:8px;">
                     Quality:
                 </label>
-                <select id="qualitySelect" class="btn ghost" style="padding:8px 12px;">
+                <select id="qualitySelect" class="btn" style="padding:8px 12px;">
                     <option value="auto">Auto</option>
                 </select>
             </div>
@@ -534,10 +534,13 @@
                 <h1 id="movieTitle" class="movie-title">Loading...</h1>
                 <div id="movieSubtitle" class="movie-subtitle"></div>
                 <div id="movieOverview" class="movie-overview">Loading...</div>
-                <div id="subtitleControls" style="margin-top:12px; display:flex; gap:8px; align-items:center;">
+                <div id="subtitleControls" style="margin-top:12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
                     <label for="subtitleFileInput" class="btn ghost" style="cursor:pointer; padding:8px 12px;">Upload Subtitles</label>
                     <input id="subtitleFileInput" type="file" accept=".vtt,.srt,text/vtt,text/plain" style="display:none;" />
                     <button id="clearCustomSubtitle" type="button" class="btn ghost" style="display:none;">Clear Uploaded Subtitle</button>
+                    <select id="subtitleLangSelect" class="btn" style="padding:8px 12px; display:none;">
+                        <option value="">None</option>
+                    </select>
                     <div id="subtitleStatus" style="font-size:13px; color:var(--text-subtle);"></div>
                 </div>
             </div>
@@ -821,6 +824,145 @@
         if (typeof window._updateSubtitleUi === 'function') {
             window._updateSubtitleUi();
         }
+
+        // Populate subtitle language selector from movieData.subtitles if present
+        try {
+            const select = document.getElementById('subtitleLangSelect');
+            if (select) {
+                select.innerHTML = '<option value="">None</option>';
+                const subs = Array.isArray(movieData.subtitles) ? movieData.subtitles : [];
+                const langNames = {
+                    en: 'English',
+                    vi: 'Vietnamese',
+                    ja: 'Japanese',
+                    de: 'German',
+                    my: 'Burmese',
+                    es: 'Spanish',
+                    fr: 'French'
+                };
+                if (subs.length > 0) {
+                    // dedupe by base filename (strip extension). prefer .vtt over .srt
+                    const byBase = {};
+                    subs.forEach(s => {
+                        const fname = (s.filename || '').toLowerCase();
+                        const dot = fname.lastIndexOf('.');
+                        const base = dot > 0 ? fname.substring(0, dot) : fname || 'unknown';
+                        const ext = dot > 0 ? fname.substring(dot + 1) : '';
+                        const existing = byBase[base];
+                        if (!existing) {
+                            byBase[base] = { src: s.url || s.filename, filename: s.filename || '', lang: s.lang || '', ext };
+                        } else {
+                            // if we already have srt and new is vtt, prefer vtt
+                            if (existing.ext === 'srt' && ext === 'vtt') {
+                                byBase[base] = { src: s.url || s.filename, filename: s.filename || '', lang: s.lang || '', ext };
+                            }
+                        }
+                    });
+
+                    // track default entry to auto-select it
+                    let defaultEntry = null;
+                    // clear initial options; we'll insert Default (if any), None, then others
+                    select.innerHTML = '';
+                    // Insert Default first (if present), then None, then other entries
+                    const bases = Object.keys(byBase);
+                    // append Default option if available
+                    if (byBase['default']) {
+                        const entry = byBase['default'];
+                        const opt = document.createElement('option');
+                        opt.value = entry.src || entry.filename || 'default';
+                        opt.textContent = 'Default';
+                        opt.dataset.filename = entry.filename || '';
+                        opt.dataset.lang = (entry.lang || '').toLowerCase();
+                        select.appendChild(opt);
+                        defaultEntry = entry;
+                    }
+
+                    // None option (user can select to hide subtitles)
+                    const noneOpt = document.createElement('option');
+                    noneOpt.value = '';
+                    noneOpt.textContent = 'None';
+                    select.appendChild(noneOpt);
+
+                    // append the rest (excluding default)
+                    bases.forEach(base => {
+                        if (base === 'default') return;
+                        const entry = byBase[base];
+                        const code = (entry.lang && entry.lang.trim()) ? entry.lang.trim().toLowerCase() : '';
+                        // skip unknown base entries without a language
+                        if (base === 'unknown' && !code) return;
+                        const opt = document.createElement('option');
+                        let label = '';
+                        if (code) label = langNames[code] || code;
+                        else label = base.charAt(0).toUpperCase() + base.slice(1);
+                        opt.value = entry.src || entry.filename || base;
+                        opt.textContent = label;
+                        opt.dataset.filename = entry.filename || '';
+                        opt.dataset.lang = code || '';
+                        select.appendChild(opt);
+                    });
+
+                    // Auto-select and attach the default subtitle if available and no custom uploaded subtitle
+                    try {
+                        const custom = _getStoredCustomSubtitle();
+                        if (!custom && defaultEntry) {
+                            select.value = defaultEntry.src || defaultEntry.filename || 'default';
+                            // attach default subtitle to player
+                            try {
+                                attachRemoteSubtitleToVideo(select.value, defaultEntry.lang || '');
+                                const status = document.getElementById('subtitleStatus');
+                                if (status) status.textContent = 'Using default subtitle.';
+                            } catch (e) {
+                                console.warn('Could not attach default subtitle', e);
+                            }
+                        }
+                    } catch (e) { /* ignore */ }
+                    select.style.display = 'inline-flex';
+                } else {
+                    select.style.display = 'none';
+                }
+
+                select.onchange = () => {
+                    const val = select.value;
+                    // If a user-uploaded custom subtitle exists for this item, it overrides remote selection.
+                    const custom = _getStoredCustomSubtitle();
+                    if (custom) {
+                        const status = document.getElementById('subtitleStatus');
+                        if (status) status.textContent = 'Using uploaded subtitle. Clear it to use server-provided ones.';
+                        return;
+                    }
+
+                    // If user selected None (empty value), remove non-custom subtitle tracks
+                    if (!val) {
+                        try {
+                            if (_nativeVideo) {
+                                Array.from(_nativeVideo.querySelectorAll('track')).forEach(t => {
+                                    if (t.src && !t.src.startsWith('data:')) t.remove();
+                                });
+                            }
+                            // hls.js: try removing text tracks if Hls instance used
+                            if (window._hlsInstance && window._hlsInstance.subtitleTracks) {
+                                try {
+                                    // remove all subtitle tracks from Hls by setting subtitleTrack to -1
+                                    window._hlsInstance.subtitleTrack = -1;
+                                } catch (e) { /* ignore */ }
+                            }
+                            const status = document.getElementById('subtitleStatus');
+                            if (status) status.textContent = 'Subtitles hidden.';
+                        } catch (e) {
+                            console.warn('Failed to clear subtitles', e);
+                        }
+                        return;
+                    }
+
+                    // attach selected remote subtitle URL as a track
+                    try {
+                        attachRemoteSubtitleToVideo(val, select.selectedOptions[0].dataset.lang || '');
+                        const status = document.getElementById('subtitleStatus');
+                        if (status) status.textContent = `Using subtitles: ${select.selectedOptions[0].textContent}`;
+                    } catch (e) { console.warn('Could not attach remote subtitle', e); }
+                };
+            }
+        } catch (e) { console.warn('Subtitle selector populate failed', e); }
 
         // Handle TV series vs Movie (errors here should not prevent comments from loading)
         // Initialize comments and ratings functionality (BEFORE video setup)
@@ -1622,7 +1764,9 @@
             return;
         }
 
-        _nativeVideo = null;
+    _nativeVideo = null;
+    // Clear any previous Hls instance reference when switching videos
+    try { window._hlsInstance = null; } catch (e) {}
 
         if (videoUrl.includes("youtube.com") || videoUrl.includes("youtu.be")) {
             const videoId = extractYouTubeId(videoUrl);
@@ -1695,6 +1839,8 @@
                     vid.src = videoUrl;
                 } else if (window.Hls && Hls.isSupported()) {
                     const hls = new Hls();
+                    // keep a global reference so UI controls (subtitle selector) can disable subtitleTrack
+                    try { window._hlsInstance = hls; } catch (e) {}
                     hls.loadSource(videoUrl);
                     // attach subtitle track for hls.js playback
                     if (_currentSubtitleUrl) {
@@ -1706,6 +1852,14 @@
                             track.src = _currentSubtitleUrl;
                             track.default = true;
                             vid.appendChild(track);
+                            // attempt to make the new text track visible once it's parsed
+                            setTimeout(() => {
+                                try {
+                                    const tracks = Array.from(vid.textTracks || []);
+                                    const tt = tracks.find(t => (t && (t.label === 'Default' || t.language === 'en')));
+                                    if (tt) tt.mode = 'showing';
+                                } catch (e) {}
+                            }, 150);
                         } catch (e) {
                             console.warn('Failed to attach subtitle track for hls.js', e);
                         }
@@ -1911,6 +2065,45 @@
             reader.onerror = (e) => reject(e);
             reader.readAsText(file);
         });
+    }
+
+    function attachRemoteSubtitleToVideo(url, lang) {
+        try {
+            // if url seems like a proxy api (/api/public/movies/subtitle/...), use as-is
+            const finalUrl = url;
+
+            if (_nativeVideo) {
+                // remove existing non-custom tracks
+                Array.from(_nativeVideo.querySelectorAll('track')).forEach(t => {
+                    // do not remove data: URL custom tracks (they contain 'data:'), these are user-uploaded
+                    if (t.src && !t.src.startsWith('data:')) t.remove();
+                });
+                const t = document.createElement('track');
+                t.kind = 'subtitles';
+                t.label = lang || 'subtitle';
+                t.srclang = lang || 'en';
+                t.src = finalUrl;
+                t.default = true;
+                _nativeVideo.appendChild(t);
+            } else {
+                // if no native video, try to replace tracks inside videoPlayer (iframe case unsupported)
+                const vidEl = document.getElementById('videoPlayer');
+                if (vidEl && vidEl.tagName === 'VIDEO') {
+                    Array.from(vidEl.querySelectorAll('track')).forEach(t => { if (t.src && !t.src.startsWith('data:')) t.remove(); });
+                    const t = document.createElement('track');
+                    t.kind = 'subtitles';
+                    t.label = lang || 'subtitle';
+                    t.srclang = lang || 'en';
+                    t.src = finalUrl;
+                    t.default = true;
+                    vidEl.appendChild(t);
+                } else {
+                    console.warn('attachRemoteSubtitleToVideo: no native video element available to attach track');
+                }
+            }
+        } catch (e) {
+            console.warn('attachRemoteSubtitleToVideo error', e);
+        }
     }
 
     // Wire up input handlers

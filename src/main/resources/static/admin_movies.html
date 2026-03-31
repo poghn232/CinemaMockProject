@@ -782,16 +782,26 @@
             ${item.type === "tv" ? `<div id="tvEpisodesPanel" style="margin-top:10px"></div>` : ""}
           </div>
         </div>
-                        <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:14px">
-                    <div style="display:flex; gap:8px; align-items:center; margin-right:auto">
-                    <input id="subtitleFileInput" type="file" accept=".vtt,.srt,text/vtt,text/plain" style="display:none" />
-                    <button id="chooseSubtitleBtn" class="btn ghost">Choose default subtitle (.vtt/.srt)</button>
-                        <span id="chosenSubtitleName" class="muted"></span>
-                        <button id="uploadSubtitleBtn" class="btn ghost" style="margin-left:6px">Upload subtitle</button>
-                    </div>
-                    <button id="tmdbCancel" class="btn ghost">Cancel</button>
-                    <button id="tmdbConfirm" class="btn">Add this movie</button>
-                </div>
+                                    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:14px">
+                                                    <div style="display:flex; gap:8px; align-items:center; margin-right:auto">
+                                                    <input id="subtitleFileInput" type="file" accept=".vtt,.srt,text/vtt,text/plain" style="display:none" />
+                                                    <button id="chooseSubtitleBtn" class="btn ghost">Choose default subtitle (.vtt/.srt)</button>
+                                                            <span id="chosenSubtitleName" class="muted"></span>
+                                                            <select id="subtitleLangSelect" style="margin-left:8px">
+                                                                <option value="default">Default (English)</option>
+                                                                <option value="en">English (en)</option>
+                                                                <option value="de">German (de)</option>
+                                                                <option value="ja">Japanese (ja)</option>
+                                                                <option value="my">Myanmar (my)</option>
+                                                                <option value="vi">Vietnamese (vi)</option>
+                                                                <option value="other">Other (enter code)</option>
+                                                            </select>
+                                                            <input id="subtitleLangCustom" type="text" placeholder="e.g. es" style="width:80px; margin-left:6px; display:none" />
+                                                            <button id="uploadSubtitleBtn" class="btn ghost" style="margin-left:6px">Upload subtitle</button>
+                                                    </div>
+                                                    <button id="tmdbCancel" class="btn ghost">Cancel</button>
+                                                    <button id="tmdbConfirm" class="btn">Add this movie</button>
+                                            </div>
       `;
 
             overlay.appendChild(modal);
@@ -815,6 +825,17 @@
             });
 
             const uploadSubtitleBtn = document.getElementById('uploadSubtitleBtn');
+            const subtitleLangSelect = document.getElementById('subtitleLangSelect');
+            const subtitleLangCustom = document.getElementById('subtitleLangCustom');
+
+            subtitleLangSelect.addEventListener('change', () => {
+                if (subtitleLangSelect.value === 'other') {
+                    subtitleLangCustom.style.display = 'inline-block';
+                } else {
+                    subtitleLangCustom.style.display = 'none';
+                }
+            });
+
             uploadSubtitleBtn.addEventListener('click', async () => {
                 const f = subtitleInput.files && subtitleInput.files[0];
                 if (!f) return alert('Choose a subtitle file first');
@@ -824,6 +845,13 @@
                 if (token) headers['Authorization'] = 'Bearer ' + token;
 
                 const fd = new FormData(); fd.append('file', f);
+                // include language selection if provided
+                let lang = subtitleLangSelect && subtitleLangSelect.value;
+                if (lang === 'other') {
+                    const custom = (subtitleLangCustom && subtitleLangCustom.value || '').trim();
+                    if (custom) lang = custom;
+                }
+                if (lang && lang !== 'default') fd.append('lang', lang);
 
                 try {
                     const res = await fetch(`/api/admin/movies/movie/${encodeURIComponent(item.id)}/subtitle`, {
@@ -871,6 +899,17 @@
                                 if (f) {
                                     const fd = new FormData();
                                     fd.append('file', f);
+                                    // include chosen language when importing
+                                    try {
+                                        const langSel = document.getElementById('subtitleLangSelect');
+                                        const langCustom = document.getElementById('subtitleLangCustom');
+                                        let langVal = langSel && langSel.value;
+                                        if (langVal === 'other') {
+                                            const c = (langCustom && langCustom.value || '').trim();
+                                            if (c) langVal = c;
+                                        }
+                                        if (langVal && langVal !== 'default') fd.append('lang', langVal);
+                                    } catch (e) { /* ignore */ }
                                     // include Authorization header like fetchJson does
                                     const token = localStorage.getItem('token');
                                     const headers = {};

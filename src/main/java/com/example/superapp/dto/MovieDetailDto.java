@@ -17,6 +17,7 @@ public class MovieDetailDto {
     private String src; // trailer url
     private String srcFilm; //src film
     private String subtitleUrl;
+    private java.util.List<SubtitleDto> subtitles;
     private String director;
     private String country;
     private String studio;
@@ -203,5 +204,13 @@ public class MovieDetailDto {
 
     public void setSubtitleUrl(String subtitleUrl) {
         this.subtitleUrl = subtitleUrl;
+    }
+
+    public java.util.List<SubtitleDto> getSubtitles() {
+        return subtitles;
+    }
+
+    public void setSubtitles(java.util.List<SubtitleDto> subtitles) {
+        this.subtitles = subtitles;
     }
 }

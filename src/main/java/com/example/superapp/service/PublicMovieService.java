@@ -317,8 +317,9 @@ public class PublicMovieService {
     }
 
     private MovieDetailDto mapMovieDetail(Movie m, boolean premiumUser) {
-        MovieDetailDto dto = new MovieDetailDto();
-        dto.setId(m.getId());
+    MovieDetailDto dto = new MovieDetailDto();
+    dto.setId(m.getId());
+    long movieId = m.getId();
         dto.setType("movie");
         dto.setTitle(m.getTitle());
         dto.setOverview(m.getOverview());
@@ -373,14 +374,14 @@ public class PublicMovieService {
 
         // Attach subtitle public URL if a default subtitle exists in R2 (prefer .vtt over .srt)
         try {
-            String subtitlePrefix = "subtitles/movie/" + m.getId() + "/";
+            String subtitlePrefix = "subtitles/movie/" + movieId + "/";
             String vttKey = subtitlePrefix + "default.vtt";
             String srtKey = subtitlePrefix + "default.srt";
 
             if (r2StorageService.objectExists(vttKey)) {
-                dto.setSubtitleUrl("/api/public/movies/subtitle/" + m.getId() + "/default.vtt");
+                dto.setSubtitleUrl("/api/public/movies/subtitle/" + movieId + "/default.vtt");
             } else if (r2StorageService.objectExists(srtKey)) {
-                dto.setSubtitleUrl("/api/public/movies/subtitle/" + m.getId() + "/default.srt");
+                dto.setSubtitleUrl("/api/public/movies/subtitle/" + movieId + "/default.srt");
             } else {
                 // fallback: check listing for any file under the prefix and use the first
                 java.util.List<String> keys = r2StorageService.listObjectsByPrefix(subtitlePrefix);
@@ -390,6 +391,37 @@ public class PublicMovieService {
                     dto.setSubtitleUrl("/api/public/movies/subtitle/" + m.getId() + "/" + filename);
                 }
             }
+            // Also expose all available subtitles (multi-language) with public URLs
+            try {
+                java.util.List<String> keys = r2StorageService.listObjectsByPrefix("subtitles/movie/" + m.getId() + "/");
+                    if (keys != null && !keys.isEmpty()) {
+                    java.util.List<com.example.superapp.dto.SubtitleDto> subs = new java.util.ArrayList<>();
+                    for (String k : keys) {
+                        String filename = k.substring(("subtitles/movie/" + movieId + "/").length());
+                        // Use same-origin proxy endpoint to avoid cross-origin browser restrictions
+                        com.example.superapp.dto.SubtitleDto sd = new com.example.superapp.dto.SubtitleDto();
+                        sd.setFilename(filename);
+                        sd.setUrl("/api/public/movies/subtitle/" + movieId + "/" + filename);
+                        // infer language: filename patterns like en.vtt, subtitle.en.vtt, default.en.vtt
+                        String lower = filename.toLowerCase();
+                        String lang = null;
+                        if (lower.endsWith(".vtt") || lower.endsWith(".srt")) {
+                            String base = lower.substring(0, lower.lastIndexOf('.'));
+                            String[] parts = base.split("[\\.\\-_]");
+                            for (int i = parts.length - 1; i >= 0; i--) {
+                                String p = parts[i];
+                                if (p.length() == 2 || p.length() == 3) { // likely language code
+                                    lang = p;
+                                    break;
+                                }
+                            }
+                        }
+                        sd.setLang(lang == null ? "" : lang);
+                        subs.add(sd);
+                    }
+                    dto.setSubtitles(subs);
+                }
+            } catch (Exception ignored) {}
         } catch (Exception ignored) {
         }
 
