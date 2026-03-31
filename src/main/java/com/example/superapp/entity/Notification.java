@@ -27,7 +27,7 @@ public class Notification {
     private User user;
 
     /** Nội dung thông báo */
-    @Column(nullable = false, length = 512)
+    @Column(length = 512)
     private String message;
 
     /** Thời điểm tạo */
@@ -44,7 +44,7 @@ public class Notification {
     private Long contentId;
 
     /** "movie" | "tv" */
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false, length = 32)
     private String contentType;
 
     @Column(length = 256)
@@ -52,6 +52,15 @@ public class Notification {
 
     @Column(length = 512)
     private String posterUrl;
+
+    @Column(nullable = false)
+    private String messageKey;
+
+    @Column(columnDefinition = "TEXT")
+    private String messageParams; // JSON string
+
+    @Column(name = "icon_url")
+    private String iconUrl;
 
     // ── Loại sự kiện ─────────────────────────────────────────────────────
 

@@ -27,12 +27,18 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @GetMapping
-    public ResponseEntity<List<NotificationDto>> list(Authentication auth) {
+    public ResponseEntity<?> list(Authentication auth) {
+        if (auth == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
         return ResponseEntity.ok(notificationService.getNotifications(auth.getName()));
     }
 
     @GetMapping("/unread")
-    public ResponseEntity<Map<String, Long>> unreadCount(Authentication auth) {
+    public ResponseEntity<?> unreadCount(Authentication auth) {
+        if (auth == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
         long count = notificationService.countUnread(auth.getName());
         return ResponseEntity.ok(Map.of("count", count));
     }

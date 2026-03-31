@@ -18,4 +18,6 @@ public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
     List<User> findUsersByContentIdAndContentType(
             @Param("contentId") Long contentId,
             @Param("contentType") String contentType);
+
+    long countByUser(User user);
 }

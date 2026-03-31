@@ -759,6 +759,221 @@
             font-size: 14px;
             padding: 20px 0;
         }
+
+        .achievement-card {
+            background: rgba(255,255,255,0.04);
+            border-radius: 14px;
+            border: 1px solid rgba(148,163,184,0.12);
+            padding: 20px 16px;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .achievement-card:not(.locked):hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(249,115,22,0.2);
+        }
+        .achievement-card.locked {
+            opacity: 0.45;
+            filter: grayscale(0.6);
+        }
+        .achievement-icon {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .achievement-name {
+            font-weight: 700;
+            font-size: 13px;
+            margin-bottom: 4px;
+            color: #f1f5f9;
+        }
+        .achievement-desc {
+            font-size: 11px;
+            color: #9ca3af;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+        .achievement-date {
+            font-size: 10px;
+            color: #6b7280;
+        }
+        .rarity-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 2px 7px;
+            border-radius: 999px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .rarity-COMMON   { background: rgba(107,114,128,0.3);  color: #9ca3af; }
+        .rarity-RARE     { background: rgba(59,130,246,0.3);   color: #93c5fd; }
+        .rarity-EPIC     { background: rgba(139,92,246,0.3);   color: #c4b5fd; }
+        .rarity-LEGENDARY{ background: rgba(249,115,22,0.3);   color: #fdba74; }
+
+        .achievement-card:not(.locked).rarity-LEGENDARY {
+            border-color: rgba(249,115,22,0.4);
+            background: rgba(249,115,22,0.06);
+        }
+        .achievement-card:not(.locked).rarity-EPIC {
+            border-color: rgba(139,92,246,0.3);
+        }
+        .achievement-card:not(.locked).rarity-RARE {
+            border-color: rgba(59,130,246,0.25);
+        }
+
+        .stat-chip {
+            padding: 10px 18px;
+            border-radius: 12px;
+            background: rgba(15,23,42,0.8);
+            border: 1px solid rgba(148,163,184,0.15);
+            text-align: center;
+        }
+        .stat-chip .val {
+            font-size: 24px;
+            font-weight: 700;
+            color: #f97316;
+            display: block;
+        }
+        .stat-chip .lbl {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        /* ── Streak UI ─────────────────────────────────────────── */
+        .streak-hero {
+            background: linear-gradient(135deg,
+            rgba(249,115,22,0.12), rgba(236,72,153,0.08));
+            border: 1px solid rgba(249,115,22,0.25);
+            border-radius: 18px;
+            padding: 28px 24px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+        .streak-fire {
+            font-size: 64px;
+            line-height: 1;
+            filter: drop-shadow(0 0 20px rgba(249,115,22,0.6));
+            animation: pulse-fire 2s ease infinite;
+        }
+        @keyframes pulse-fire {
+            0%,100% { transform: scale(1); }
+            50%      { transform: scale(1.08); }
+        }
+        .streak-main-info { flex: 1; }
+        .streak-number {
+            font-size: 56px;
+            font-weight: 800;
+            line-height: 1;
+            background: linear-gradient(135deg, #f97316, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .streak-label {
+            font-size: 14px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+        .streak-stats-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .streak-stat-pill {
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: rgba(15,23,42,0.7);
+            border: 1px solid rgba(148,163,184,0.15);
+            font-size: 12px;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .streak-stat-pill strong { color: #f97316; }
+
+        /* Calendar heatmap */
+        .streak-calendar-wrap {
+            margin-bottom: 28px;
+        }
+        .streak-calendar-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 12px;
+        }
+        .streak-calendar {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .streak-day {
+            width: 24px;
+            height: 24px;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(148,163,184,0.08);
+            title: '';
+            position: relative;
+            cursor: default;
+        }
+        .streak-day.today {
+            border-color: rgba(249,115,22,0.6);
+        }
+        .streak-day.logged {
+            background: rgba(249,115,22,0.75);
+            border-color: rgba(249,115,22,0.9);
+        }
+        .streak-day-label {
+            font-size: 10px;
+            color: #6b7280;
+            margin-bottom: 4px;
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        /* Milestone timeline */
+        .milestone-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 28px;
+        }
+        .milestone-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(148,163,184,0.08);
+            transition: border-color 0.2s;
+        }
+        .milestone-item.reached {
+            background: rgba(249,115,22,0.07);
+            border-color: rgba(249,115,22,0.25);
+        }
+        .milestone-icon { font-size: 24px; width: 32px; text-align: center; }
+        .milestone-info { flex: 1; }
+        .milestone-name { font-weight: 600; font-size: 13px; }
+        .milestone-sub  { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+        .milestone-progress {
+            font-size: 12px;
+            color: #f97316;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .milestone-check { font-size: 20px; }
     </style>
 </head>
 
@@ -865,6 +1080,14 @@
                 <i class="fas fa-heart"></i>
                 <span data-i18n="profile.wishlist_title">My Wishlist</span>
             </li>
+            <li class="sidebar-item" data-target="section-streak">
+                <i class="fas fa-fire"></i>
+                <span>Login Streak</span>
+            </li>
+            <li class="sidebar-item" data-target="section-achievements">
+                <i class="fas fa-trophy"></i>
+                <span data-i18n="profile.achievements">Achievements</span>
+            </li>
             <li class="sidebar-item" data-target="section-password">
                 <i class="fas fa-lock"></i>
                 <span data-i18n="profile.change_password">Change
@@ -924,6 +1147,52 @@
         <section id="section-wishlist" class="content-section">
             <h3 data-i18n="profile.wishlist_title">My Wishlist</h3>
             <div id="wishlistContainer" class="history-grid"></div>
+        </section>
+        <section id="section-streak" class="content-section">
+            <h3>🔥 Login Streak</h3>
+
+            <!-- Hero card -->
+            <div class="streak-hero" id="streakHero">
+                <div class="streak-fire">🔥</div>
+                <div class="streak-main-info">
+                    <div class="streak-number" id="streakCurrentNum">--</div>
+                    <div class="streak-label">Day streak</div>
+                    <div class="streak-stats-row">
+                        <div class="streak-stat-pill">
+                            🏆 Best: <strong id="streakBest">--</strong> days
+                        </div>
+                        <div class="streak-stat-pill">
+                            📅 Total logins: <strong id="streakTotal">--</strong> days
+                        </div>
+                        <div class="streak-stat-pill" id="streakLastPill">
+                            🕐 Last: <strong id="streakLast">--</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 30-day calendar -->
+            <div class="streak-calendar-wrap">
+                <div class="streak-calendar-title">Last 30 days</div>
+                <div class="streak-calendar" id="streakCalendar"></div>
+            </div>
+
+            <!-- Milestones -->
+            <div class="streak-calendar-title" style="margin-bottom:12px;">
+                🎯 Milestones
+            </div>
+            <div class="milestone-list" id="milestonesContainer"></div>
+        </section>
+
+        <section id="section-achievements" class="content-section">
+            <h3>🏆 Achievements</h3>
+            <div id="achievementStats" style="
+        display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;
+    "></div>
+            <h4 style="margin-bottom: 12px; color: #f97316;">✅ Earned</h4>
+            <div id="earnedGrid" class="history-grid"></div>
+            <h4 style="margin: 24px 0 12px; color: #6b7280;">🔒 Locked</h4>
+            <div id="lockedGrid" class="history-grid"></div>
         </section>
 
         <section id="section-password" class="content-section">
@@ -1305,6 +1574,32 @@
 
         // Chuyển Tab Sidebar
         const sidebarItems = document.querySelectorAll('.sidebar-item');
+        // Nếu URL có hash → mở tab tương ứng
+        const hash = location.hash.replace('#', '');
+        if (hash === 'achievements') {
+            switchTab('section-achievements');
+        } else if (hash) {
+            // Map hash khác nếu muốn
+            switchTab('section-' + hash);
+        } else {
+            switchTab('section-info'); // mặc định
+        }
+
+        // Khi click sidebar
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', function () {
+                const targetId = this.getAttribute('data-target');
+                history.pushState(null, '', `#${targetId.replace('section-', '')}`);
+                switchTab(targetId);
+            });
+        });
+
+        // Nếu user dùng back/forward browser
+        window.addEventListener('hashchange', () => {
+            const newHash = location.hash.replace('#', '');
+            switchTab('section-' + newHash);
+        });
+
         const contentSections = document.querySelectorAll('.content-section');
 
         sidebarItems.forEach(item => {
@@ -1331,6 +1626,13 @@
                     loadWishlist();
                 }
 
+                if (targetId === 'section-achievements') {
+                    loadAchievements();
+                }
+                if (targetId === 'section-streak') {
+                    loadStreak();
+                }
+
             });
         });
 
@@ -1345,6 +1647,33 @@
             }
         });
     });
+    function switchTab(targetId) {
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        const contentSections = document.querySelectorAll('.content-section');
+
+        // Remove active
+        sidebarItems.forEach(i => i.classList.remove('active'));
+        contentSections.forEach(s => s.classList.remove('active'));
+
+        // Active target sidebar
+        const targetSidebar = Array.from(sidebarItems).find(i => i.dataset.target === targetId);
+        if (targetSidebar) targetSidebar.classList.add('active');
+
+        // Active target content
+        const targetSection = document.getElementById(targetId);
+        if (targetSection) targetSection.classList.add('active');
+
+        // Load data if tab cần
+        if (targetId === 'section-history') loadHistory();
+        if (targetId === 'section-wishlist') loadWishlist();
+        if (targetId === 'section-achievements') loadAchievements();
+        if (targetId === 'section-streak') loadStreak();
+
+        // Scroll vào section (optional)
+        if (targetSection) targetSection.scrollIntoView({behavior: 'smooth'});
+    }
+
+
     window.extendSubscription = function (subscriptionId) {
         window.location.href = `packs.html?mode=extend&subscriptionId=${subscriptionId}`;
     };
@@ -1581,6 +1910,188 @@
             container.innerHTML = '<p class="wishlist-empty">Failed to load wishlist.</p>';
             console.error(e);
         }
+    }
+
+    async function loadAchievements() {
+        const earnedGrid  = document.getElementById('earnedGrid');
+        const lockedGrid  = document.getElementById('lockedGrid');
+        const statsEl     = document.getElementById('achievementStats');
+
+        earnedGrid.innerHTML = lockedGrid.innerHTML = statsEl.innerHTML =
+            '<div style="color:#9ca3af;font-size:13px;padding:12px 0">Loading...</div>';
+
+        try {
+            const res = await fetch('/api/user/achievements', {
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+            });
+            if (!res.ok) throw new Error('Failed');
+            const data = await res.json();
+
+            // Stats
+            const pct = data.total ? Math.round((data.count / data.total) * 100) : 0;
+            statsEl.innerHTML = `
+            <div class="stat-chip">
+                <span class="val">${data.count}</span>
+                <span class="lbl">Earned</span>
+            </div>
+            <div class="stat-chip">
+                <span class="val">${data.total}</span>
+                <span class="lbl">Total</span>
+            </div>
+            <div class="stat-chip">
+                <span class="val">${pct}%</span>
+                <span class="lbl">Completion</span>
+            </div>
+        `;
+
+            // Earned
+            earnedGrid.innerHTML = '';
+            if (!data.earned.length) {
+                earnedGrid.innerHTML = '<p style="color:#9ca3af;font-size:13px">No achievements yet. Start watching! 🎬</p>';
+            } else {
+                data.earned.forEach(a => {
+                    earnedGrid.appendChild(buildAchievementCard(a, false));
+                });
+            }
+
+            // Locked
+            lockedGrid.innerHTML = '';
+            data.locked.forEach(a => lockedGrid.appendChild(buildAchievementCard(a, true)));
+
+        } catch(e) {
+            earnedGrid.innerHTML = '<p style="color:#9ca3af">Failed to load achievements.</p>';
+            lockedGrid.innerHTML = '';
+        }
+    }
+
+    const STREAK_MILESTONES = [
+        { days: 3,   name: "Consistent",     icon: "🔥",  desc: "Login 3 days in a row" },
+        { days: 7,   name: "Weekly Warrior", icon: "⚡",  desc: "Login 7 days in a row" },
+        { days: 14,  name: "Dedicated",      icon: "💪",  desc: "Login 14 days in a row" },
+        { days: 30,  name: "Unstoppable",    icon: "🚀",  desc: "Login 30 days in a row" },
+        { days: 100, name: "Legend",         icon: "👑",  desc: "Login 100 days in a row" },
+    ];
+
+    async function loadStreak() {
+        try {
+            const [streakRes, histRes] = await Promise.all([
+                fetch('/api/user/achievements/streak', {
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                }),
+                fetch('/api/user/history', {
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                })
+            ]);
+
+            if (!streakRes.ok) throw new Error('Failed');
+            const s = await streakRes.json();
+
+            // --- Hero numbers ---
+            document.getElementById('streakCurrentNum').textContent = s.currentStreak;
+            document.getElementById('streakBest').textContent = s.longestStreak;
+            document.getElementById('streakTotal').textContent = s.totalLoginDays;
+            document.getElementById('streakLast').textContent =
+                s.lastLoginDate ? formatStreakDate(s.lastLoginDate) : 'Never';
+
+            // Fire emoji intensity theo streak
+            const fireEl = document.querySelector('.streak-fire');
+            if      (s.currentStreak === 0)   fireEl.style.filter = 'grayscale(1)';
+            else if (s.currentStreak >= 30)   fireEl.textContent = '🔥🔥🔥';
+            else if (s.currentStreak >= 7)    fireEl.textContent = '🔥🔥';
+
+            // --- 30-day calendar từ login history ---
+            const loginDates = new Set();
+            if (histRes.ok) {
+                const hist = await histRes.json();
+                // Lấy watchedAt dates
+                hist.forEach(h => {
+                    if (h.watchedAt) {
+                        loginDates.add(h.watchedAt.substring(0, 10));
+                    }
+                });
+            }
+            // Luôn thêm lastLoginDate nếu có
+            if (s.lastLoginDate) loginDates.add(s.lastLoginDate);
+            renderCalendar(loginDates);
+
+            // --- Milestones ---
+            renderMilestones(s.currentStreak, s.longestStreak);
+
+        } catch(e) {
+            console.error('Streak load error:', e);
+        }
+    }
+
+    function renderCalendar(loginDates) {
+        const cal = document.getElementById('streakCalendar');
+        cal.innerHTML = '';
+        const today = new Date();
+
+        for (let i = 29; i >= 0; i--) {
+            const d = new Date(today);
+            d.setDate(today.getDate() - i);
+            const dateStr = d.toISOString().substring(0, 10);
+            const isToday = i === 0;
+            const isLogged = loginDates.has(dateStr);
+
+            const cell = document.createElement('div');
+            cell.className = 'streak-day'
+                + (isLogged ? ' logged' : '')
+                + (isToday  ? ' today'  : '');
+            cell.title = dateStr + (isLogged ? ' ✓' : '');
+            cal.appendChild(cell);
+        }
+    }
+
+    function renderMilestones(current, longest) {
+        const container = document.getElementById('milestonesContainer');
+        container.innerHTML = '';
+        const best = Math.max(current, longest);
+
+        STREAK_MILESTONES.forEach(m => {
+            const reached = best >= m.days;
+            const item = document.createElement('div');
+            item.className = 'milestone-item' + (reached ? ' reached' : '');
+
+            const progress = reached
+                ? `${m.days}/${m.days} days`
+                : `${Math.min(current, m.days)}/${m.days} days`;
+
+            item.innerHTML = `
+            <div class="milestone-icon">${m.icon}</div>
+            <div class="milestone-info">
+                <div class="milestone-name">${m.name}</div>
+                <div class="milestone-sub">${m.desc}</div>
+            </div>
+            <div class="milestone-progress">${progress}</div>
+            <div class="milestone-check">${reached ? '✅' : '🔒'}</div>
+        `;
+            container.appendChild(item);
+        });
+    }
+
+    function formatStreakDate(dateStr) {
+        const d = new Date(dateStr);
+        const today = new Date();
+        const diff = Math.floor((today - d) / 86400000);
+        if (diff === 0) return 'Today';
+        if (diff === 1) return 'Yesterday';
+        return dateStr;
+    }
+
+    function buildAchievementCard(a, locked) {
+        const card = document.createElement('div');
+        card.className = `achievement-card rarity-${a.rarity}${locked ? ' locked' : ''}`;
+        card.innerHTML = `
+        <span class="rarity-badge rarity-${a.rarity}">${a.rarity}</span>
+        <span class="achievement-icon">${a.icon}</span>
+        <div class="achievement-name">${a.name}</div>
+        <div class="achievement-desc">${a.description}</div>
+        ${!locked && a.earnedAt
+            ? `<div class="achievement-date">📅 ${a.earnedAt}</div>`
+            : locked ? '<div class="achievement-date">🔒 Not earned yet</div>' : ''}
+    `;
+        return card;
     }
 </script>
 <script src="js/ai-chat-support.js"></script>

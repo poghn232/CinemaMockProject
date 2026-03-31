@@ -27,6 +27,7 @@ public class WishlistService {
     private final MovieRepository movieRepository;
     private final TvSeriesRepository tvSeriesRepository;
     private final JwtUtils jwtUtils;
+    private final AchievementService achievementService;
 
     private User getUser(String username) {
         return userRepository.findByUsername(username)
@@ -138,6 +139,7 @@ public class WishlistService {
                     .contentId(req.contentId())
                     .contentType(req.contentType())
                     .build());
+            achievementService.checkWishlistAchievements(user);
             return new WishlistToggleResponse(true, "Added to wishlist");
         }
     }

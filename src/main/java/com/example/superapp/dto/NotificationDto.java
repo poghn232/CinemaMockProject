@@ -4,7 +4,8 @@ import java.time.LocalDateTime;
 
 public record NotificationDto(
         Long id,
-        String message,
+        String messageKey,
+        String messageParams,
         LocalDateTime createdAt,
         boolean isRead,
         Long contentId,
@@ -12,5 +13,6 @@ public record NotificationDto(
         String contentTitle,
         String posterUrl,
         String eventType,
-        Long episodeId
+        Long episodeId,
+        String iconUrl
 ) {}

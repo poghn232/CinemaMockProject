@@ -25,6 +25,7 @@ public class ReviewService {
     private final UserRepository userRepository;
     private final MovieRepository movieRepository;
     private final EpisodeRepository episodeRepository;
+    private final AchievementService achievementService;
 
     @Transactional
     public void saveRating(String username, String type, Long id, Integer rating) {
@@ -170,8 +171,13 @@ public class ReviewService {
         if (review.getRating() == null) {
             review.setRating(0); // Default if not rated
         }
-        
+
         Review saved = reviewRepository.save(review);
+        try {
+            achievementService.checkCommentAchievements(user);
+        } catch (Exception e) {
+            // ignore
+        }
         return Map.<String, Object>of(
                 "reviewId", saved.getReviewId(),
                 "username", saved.getUser().getUsername(),

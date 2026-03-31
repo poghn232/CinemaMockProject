@@ -319,5 +319,16 @@
       "cleared": "Lịch sử chat đã được xóa. Tôi có thể giúp gì cho bạn? 😊",
       "busy": "Xin lỗi, tôi không thể trả lời ngay lúc này."
     }
+  },
+  "notif": {
+    "default": "🎬 \"{{title}}\" has an update!",
+    "new_movie": "🎬 \"{{title}}\" vừa được thêm vào MovieZone!",
+    "new_trailer": "🎥 Trailer của \"{{title}}\" đã có!",
+    "new_trailer_episode": "🎥 \"{{episode}}\" của \"{{title}}\" đã có trailer!",
+    "new_source": "▶️ \"{{title}}\" đã sẵn sàng để xem!",
+    "new_source_episode": "▶️ \"{{episode}}\" của \"{{title}}\" đã có thể xem!",
+    "unpublished": "⏸️ \"{{title}}\" đã bị gỡ tạm thời.",
+    "unpublished_episode": "⏸️ \"{{episode}}\" của \"{{title}}\" đã bị gỡ tạm thời.",
+    "achievement_unlock": "🏆 You unlocked achievement: \"{{name}}\""
   }
 }

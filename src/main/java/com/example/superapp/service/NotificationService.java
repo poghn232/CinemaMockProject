@@ -6,12 +6,14 @@ import com.example.superapp.entity.User;
 import com.example.superapp.repository.NotificationRepository;
 import com.example.superapp.repository.UserRepository;
 import com.example.superapp.repository.WishlistRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -23,6 +25,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final WishlistRepository wishlistRepository;
     private final UserRepository userRepository;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     // ── PUBLIC API ────────────────────────────────────────────────────────
 
@@ -47,14 +50,13 @@ public class NotificationService {
     public void notifyWishlistUsers(Long contentId, String contentType,
                                     String contentTitle, String posterPath,
                                     String eventType, Long episodeId, String episodeName) {
+
         log.info("[Notification] called: contentId={}, episodeId={}, eventType={}",
                 contentId, episodeId, eventType);
 
-        String message = buildMessage(eventType, contentTitle, episodeId, episodeName);
         String poster = posterPath != null ? TMDB_IMG + posterPath : null;
 
         List<User> users = wishlistRepository.findUsersByContentIdAndContentType(contentId, contentType);
-        log.info("[Notification] Found {} wishlist users for {} #{}", users.size(), contentType, contentId);
 
         if (users.isEmpty()) {
             log.info("[Notification] No wishlist users → skip");
@@ -65,29 +67,27 @@ public class NotificationService {
             boolean alreadyExists = notificationRepository
                     .existsByUserAndContentIdAndContentTypeAndEventTypeAndEpisodeId(
                             user, contentId, contentType, eventType, episodeId);
-            if (alreadyExists) {
-                log.info("[Notification] duplicate, skip user={}", user.getUsername());
-                continue;
-            }
+
+            if (alreadyExists) continue;
 
             Notification notif = Notification.builder()
                     .user(user)
-                    .message(message)
                     .contentId(contentId)
                     .contentType(contentType)
                     .contentTitle(contentTitle)
                     .posterUrl(poster)
                     .eventType(eventType)
                     .episodeId(episodeId)
+                    .messageKey(buildMessageKey(eventType, episodeId))
+                    .messageParams(buildParams(contentTitle, episodeName))
                     .isRead(false)
                     .build();
 
             notificationRepository.save(notif);
-            log.info("[Notification] SAVED for user={}", user.getUsername());
         }
     }
 
-    // ── USER-FACING QUERIES ───────────────────────────────────────────────
+    // ── USER-FACING ───────────────────────────────────────────────────────
 
     @Transactional(readOnly = true)
     public List<NotificationDto> getNotifications(String username) {
@@ -114,37 +114,54 @@ public class NotificationService {
         notificationRepository.markOneAsRead(notifId, getUser(username));
     }
 
-    // ── PRIVATE HELPERS ───────────────────────────────────────────────────
+    // ── HELPERS ───────────────────────────────────────────────────────────
 
     private User getUser(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
     }
 
-    private String buildMessage(String eventType, String title, Long episodeId, String episodeName) {
-        String epLabel = (episodeName != null && !episodeName.isBlank())
-                ? "\"" + episodeName + "\""
-                : "A new episode";
-
+    private String buildMessageKey(String eventType, Long episodeId) {
         return switch (eventType) {
-            case "NEW_MOVIE"   -> "🎬 \"" + title + "\" has been added to MovieZone!";
-            case "NEW_TRAILER" -> episodeId != null
-                    ? "🎥 " + epLabel + " of \"" + title + "\" now has a trailer!"
-                    : "🎥 Trailer for \"" + title + "\" is now available!";
-            case "NEW_SOURCE"  -> episodeId != null
-                    ? "▶️ " + epLabel + " of \"" + title + "\" is now available to watch!"
-                    : "▶️ \"" + title + "\" is now ready to watch!";
-            case "UNPUBLISHED" -> episodeId != null
-                    ? "⏸️ " + epLabel + " of \"" + title + "\" has been temporarily removed."
-                    : "⏸️ \"" + title + "\" has been temporarily removed.";
-            default            -> "🔔 Update for \"" + title + "\"";
+            case "NEW_MOVIE"   -> "notif.new_movie";
+            case "NEW_TRAILER" -> episodeId != null ? "notif.new_trailer_episode" : "notif.new_trailer";
+            case "NEW_SOURCE"  -> episodeId != null ? "notif.new_source_episode" : "notif.new_source";
+            case "UNPUBLISHED" -> episodeId != null ? "notif.unpublished_episode" : "notif.unpublished";
+            case "ACHIEVEMENT_UNLOCK" -> "notif.achievement_unlock";
+            default            -> "notif.default";
         };
     }
 
+    private String buildParams(String title, String episodeName) {
+        try {
+            return objectMapper.writeValueAsString(Map.of(
+                    "title", title,
+                    "episode", episodeName != null ? episodeName : ""
+            ));
+        } catch (Exception e) {
+            return "{}";
+        }
+    }
+
     private NotificationDto toDto(Notification n) {
+
+        String key = n.getMessageKey();
+
+        // 🔥 FIX thông minh
+        if (key == null || key.isBlank()) {
+            if ("ACHIEVEMENT_UNLOCK".equals(n.getEventType())) {
+                key = "notif.achievement_unlock";
+            } else {
+                key = "notif.default";
+            }
+        }
+
         return new NotificationDto(
                 n.getId(),
-                n.getMessage(),
+
+                key, // ✅ dùng key đã xử lý
+                safe(n.getMessageParams(), "{}"),
+
                 n.getCreatedAt(),
                 n.isRead(),
                 n.getContentId(),
@@ -152,7 +169,11 @@ public class NotificationService {
                 n.getContentTitle(),
                 n.getPosterUrl(),
                 n.getEventType(),
-                n.getEpisodeId()  // ✅ thêm episodeId vào DTO
+                n.getEpisodeId(),
+                n.getEventType().equals("ACHIEVEMENT_UNLOCK") ? n.getIconUrl() : null
         );
+    }
+    private String safe(String s, String fallback) {
+        return (s == null || s.isBlank()) ? fallback : s;
     }
 }

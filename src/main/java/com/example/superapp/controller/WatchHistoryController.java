@@ -7,6 +7,7 @@ import com.example.superapp.repository.WatchHistoryRepository;
 import com.example.superapp.repository.UserRepository;
 import com.example.superapp.repository.MovieRepository; // Cần thêm
 import com.example.superapp.repository.EpisodeRepository; // Cần thêm
+import com.example.superapp.service.AchievementService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -23,11 +24,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/user/history")
 @CrossOrigin(origins = "*")
+
 public class WatchHistoryController {
+
+    private static final Logger log = LoggerFactory.getLogger(WatchHistoryController.class);
 
     @Value("${tmdb.image-base-url}")
     private String imageBaseUrl;
@@ -42,6 +48,8 @@ public class WatchHistoryController {
     private EpisodeRepository episodeRepository; // Đảm bảo tên class này chính xác
     @Autowired
     private JwtUtils jwtUtils;
+    @Autowired
+    private AchievementService achievementService;
 
     // Constructor thủ công để đảm bảo tiêm đủ các Repository
     public WatchHistoryController(WatchHistoryRepository watchHistoryRepository,
@@ -154,6 +162,15 @@ public class WatchHistoryController {
         history.setWatchedAt(LocalDateTime.now());
 
         watchHistoryRepository.save(history);
+        // Check watch achievements async
+        try {
+            User userEntity = userRepository.findByUsername(auth.getName()).orElse(null);
+            if (userEntity != null) {
+                achievementService.checkWatchAchievements(userEntity);
+            }
+        } catch (Exception e) {
+            log.warn("Achievement check failed: {}", e.getMessage());
+        }
         return ResponseEntity.ok(Map.of("message", "History saved"));
     }
 

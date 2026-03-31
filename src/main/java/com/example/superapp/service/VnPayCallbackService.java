@@ -21,6 +21,7 @@ public class VnPayCallbackService {
     private final PaymentRepository paymentRepo;
     private final SubscriptionRepository subRepo;
     private final EmailService emailService;
+    private final AchievementService achievementService;
 
     @Transactional
     public Subscription handleCallback(Map<String, String> allParams) {
@@ -72,6 +73,10 @@ public class VnPayCallbackService {
                 sub.setStartDate(start);
                 sub.setEndDate(end);
                 sub.setStatus(SubscriptionStatus.ACTIVE);
+                try {
+                    User u = sub.getUser();
+                    achievementService.grant(u, "PREMIUM_MEMBER");
+                } catch (Exception e) { /* ignore */ }
             }
 
             // CASE 2: GIA HẠN GÓI CŨ
@@ -84,6 +89,10 @@ public class VnPayCallbackService {
 
                 sub.setEndDate(baseEnd.plusDays(durationDays));
                 sub.setStatus(SubscriptionStatus.ACTIVE);
+                try {
+                    User u = sub.getUser();
+                    achievementService.grant(u, "PREMIUM_MEMBER");
+                } catch (Exception e) { /* ignore */ }
             }
 
             // fallback
@@ -100,6 +109,10 @@ public class VnPayCallbackService {
 
                 sub.setEndDate(baseEnd.plusDays(durationDays));
                 sub.setStatus(SubscriptionStatus.ACTIVE);
+                try {
+                    User u = sub.getUser();
+                    achievementService.grant(u, "PREMIUM_MEMBER");
+                } catch (Exception e) { /* ignore */ }
             }
 
             User user = sub.getUser();

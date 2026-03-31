@@ -333,5 +333,16 @@
       "cleared": "Chat မှတ်တမ်းကို ရှင်းလင်းပြီးပါပြီ။ သင့်ကို ဘယ်လိုကူညီပေးရမလဲ? 😊",
       "busy": "တောင်းပန်ပါတယ်၊ ယခုအချိန်တွင် မဖြေကြားနိုင်သေးပါ။"
     }
+  },
+  "notif": {
+    "default": "🎬 \"{{title}}\" has an update!",
+    "new_movie": "🎬 \"{{title}}\" has been added to MovieZone!",
+    "new_trailer": "🎥 Trailer for \"{{title}}\" is now available!",
+    "new_trailer_episode": "🎥 \"{{episode}}\" of \"{{title}}\" now has a trailer!",
+    "new_source": "▶️ \"{{title}}\" is now ready to watch!",
+    "new_source_episode": "▶️ \"{{episode}}\" of \"{{title}}\" is now available to watch!",
+    "unpublished": "⏸️ \"{{title}}\" has been temporarily removed.",
+    "unpublished_episode": "⏸️ \"{{episode}}\" of \"{{title}}\" has been temporarily removed.",
+    "achievement_unlock": "🏆 You unlocked achievement: \"{{name}}\""
   }
 }

@@ -16,13 +16,15 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
     private final AuthenticationManager authenticationManager;
     private final CustomUserDetailsService userDetailsService;
     private final UserRepository userRepository;
@@ -33,19 +35,10 @@ public class AuthController {
     private final LoginHistoryService loginHistoryService;
     private final GoogleTokenVerifier googleTokenVerifier;
     private final FacebookTokenVerifier facebookTokenVerifier;
+    private final LoginStreakService loginStreakService;
+    private final AchievementService achievementService;
 
-    public AuthController(
-            AuthenticationManager authenticationManager,
-            CustomUserDetailsService userDetailsService,
-            UserRepository userRepository,
-            JwtUtils jwtUtil,
-            AuthService authService,
-            OtpService otpService,
-            GeoIpService geoIpService,
-            LoginHistoryService loginHistoryService,
-            GoogleTokenVerifier googleTokenVerifier,
-            FacebookTokenVerifier facebookTokenVerifier
-    ) {
+    public AuthController(AuthenticationManager authenticationManager, CustomUserDetailsService userDetailsService, UserRepository userRepository, JwtUtils jwtUtil, AuthService authService, OtpService otpService, GeoIpService geoIpService, LoginHistoryService loginHistoryService, GoogleTokenVerifier googleTokenVerifier, FacebookTokenVerifier facebookTokenVerifier, LoginStreakService loginStreakService, AchievementService achievementService) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.userRepository = userRepository;
@@ -56,28 +49,18 @@ public class AuthController {
         this.loginHistoryService = loginHistoryService;
         this.googleTokenVerifier = googleTokenVerifier;
         this.facebookTokenVerifier = facebookTokenVerifier;
+        this.loginStreakService = loginStreakService;
+        this.achievementService = achievementService;
     }
 
     // ─── Normal login ────────────────────────────────────────────────────────
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(
-            @RequestBody LoginRequest request,
-            HttpServletRequest httpRequest
-    ) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
-                )
-        );
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
 
-        String role = userDetails.getAuthorities()
-                .stream()
-                .findFirst()
-                .map(Object::toString)
-                .orElse("ROLE_CUSTOMER");
+        String role = userDetails.getAuthorities().stream().findFirst().map(Object::toString).orElse("ROLE_CUSTOMER");
 
         String clientIp = IpUtil.getClientIp(httpRequest);
         String region = geoIpService.resolveRegion(clientIp);
@@ -87,13 +70,23 @@ public class AuthController {
         resp.setRole(role);
         resp.setRegion(region);
 
-        boolean requirePublicIp = geoIpService.isLocalIp(clientIp)
-                || "LOCAL-LOCAL".equalsIgnoreCase(region)
-                || "LOCAL".equalsIgnoreCase(region);
+        boolean requirePublicIp = geoIpService.isLocalIp(clientIp) || "LOCAL-LOCAL".equalsIgnoreCase(region) || "LOCAL".equalsIgnoreCase(region);
         resp.setRequirePublicIp(requirePublicIp);
 
         if (!requirePublicIp && role.toUpperCase().contains("CUSTOMER")) {
             loginHistoryService.saveLoginHistory(request.getUsername(), clientIp, region);
+        }
+
+        // Record login streak (chỉ với CUSTOMER)
+        if (role.toUpperCase().contains("CUSTOMER")) {
+            try {
+                User streakUser = userRepository.findByUsername(request.getUsername()).orElse(null);
+                if (streakUser != null) {
+                    loginStreakService.recordLogin(streakUser);
+                }
+            } catch (Exception e) {
+                log.warn("Streak record failed: {}", e.getMessage());
+            }
         }
 
         return ResponseEntity.ok(resp);
@@ -101,10 +94,7 @@ public class AuthController {
 
     // ─── Google OAuth2 login ─────────────────────────────────────────────────
     @PostMapping("/google")
-    public ResponseEntity<?> googleLogin(
-            @RequestBody Map<String, String> body,
-            HttpServletRequest httpRequest
-    ) {
+    public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> body, HttpServletRequest httpRequest) {
         String idToken = body.get("idToken");
         if (idToken == null || idToken.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of("message", "idToken không được để trống"));
@@ -122,14 +112,7 @@ public class AuthController {
 
         // Find existing user by googleId or email, or create a new one
         User user = userRepository.findByEmail(email).orElseGet(() -> {
-            User newUser = User.builder()
-                    .email(email)
-                    .username(email)
-                    .googleId(googleId)
-                    .password(null)
-                    .role("CUSTOMER")
-                    .enabled(true)
-                    .build();
+            User newUser = User.builder().email(email).username(email).googleId(googleId).password(null).role("CUSTOMER").enabled(true).build();
             return userRepository.save(newUser);
         });
 
@@ -145,33 +128,29 @@ public class AuthController {
         String region = geoIpService.resolveRegion(clientIp);
         String jwt = jwtUtil.generateToken(userDetails, region, clientIp);
 
-        String role = userDetails.getAuthorities()
-                .stream()
-                .findFirst()
-                .map(Object::toString)
-                .orElse("ROLE_CUSTOMER");
+        String role = userDetails.getAuthorities().stream().findFirst().map(Object::toString).orElse("ROLE_CUSTOMER");
 
         LoginResponse resp = new LoginResponse(jwt);
         resp.setRole(role);
         resp.setRegion(region);
 
-        boolean requirePublicIp = geoIpService.isLocalIp(clientIp)
-                || "LOCAL-LOCAL".equalsIgnoreCase(region)
-                || "LOCAL".equalsIgnoreCase(region);
+        boolean requirePublicIp = geoIpService.isLocalIp(clientIp) || "LOCAL-LOCAL".equalsIgnoreCase(region) || "LOCAL".equalsIgnoreCase(region);
         resp.setRequirePublicIp(requirePublicIp);
 
         if (!requirePublicIp) {
             loginHistoryService.saveLoginHistory(user.getUsername(), clientIp, region);
         }
+        try {
+            loginStreakService.recordLogin(user);
+            achievementService.checkPremiumAchievement(user);
+        } catch (Exception e) { /* non-critical */ }
 
         return ResponseEntity.ok(resp);
     }
 
     // ─── Facebook OAuth2 login ──────────────────────────────────────────────────
     @PostMapping("/facebook")
-    public ResponseEntity<?> facebookLogin(
-            @RequestBody Map<String, String> body,
-            HttpServletRequest httpRequest) {
+    public ResponseEntity<?> facebookLogin(@RequestBody Map<String, String> body, HttpServletRequest httpRequest) {
 
         String accessToken = body.get("accessToken");
         if (accessToken == null || accessToken.isBlank()) {
@@ -200,14 +179,7 @@ public class AuthController {
             if (userRepository.existsByUsername(username)) {
                 username = "fb_" + fbId;
             }
-            user = User.builder()
-                    .email(email != null && !email.isBlank() ? email : "fb_" + fbId + "@facebook.com")
-                    .username(username)
-                    .facebookId(fbId)
-                    .password(null)
-                    .role("CUSTOMER")
-                    .enabled(true)
-                    .build();
+            user = User.builder().email(email != null && !email.isBlank() ? email : "fb_" + fbId + "@facebook.com").username(username).facebookId(fbId).password(null).role("CUSTOMER").enabled(true).build();
             user = userRepository.save(user);
         }
 
@@ -222,20 +194,21 @@ public class AuthController {
         String region = geoIpService.resolveRegion(clientIp);
         String jwt = jwtUtil.generateToken(userDetails, region, clientIp);
 
-        String role = userDetails.getAuthorities().stream()
-                .findFirst().map(Object::toString).orElse("ROLE_CUSTOMER");
+        String role = userDetails.getAuthorities().stream().findFirst().map(Object::toString).orElse("ROLE_CUSTOMER");
 
         LoginResponse resp = new LoginResponse(jwt);
         resp.setRole(role);
         resp.setRegion(region);
-        boolean requirePublicIp = geoIpService.isLocalIp(clientIp)
-                || "LOCAL-LOCAL".equalsIgnoreCase(region)
-                || "LOCAL".equalsIgnoreCase(region);
+        boolean requirePublicIp = geoIpService.isLocalIp(clientIp) || "LOCAL-LOCAL".equalsIgnoreCase(region) || "LOCAL".equalsIgnoreCase(region);
         resp.setRequirePublicIp(requirePublicIp);
 
         if (!requirePublicIp) {
             loginHistoryService.saveLoginHistory(user.getUsername(), clientIp, region);
         }
+        try {
+            loginStreakService.recordLogin(user);
+            achievementService.checkPremiumAchievement(user);
+        } catch (Exception e) { /* non-critical */ }
 
         return ResponseEntity.ok(resp);
     }
@@ -278,10 +251,7 @@ public class AuthController {
 
     // ─── Resolve region from public IP ───────────────────────────────────────
     @PostMapping("/resolve-region")
-    public ResponseEntity<?> resolveRegionFromPublicIp(
-            @RequestBody ResolveRegionRequest request,
-            HttpServletRequest httpRequest
-    ) {
+    public ResponseEntity<?> resolveRegionFromPublicIp(@RequestBody ResolveRegionRequest request, HttpServletRequest httpRequest) {
         String authHeader = httpRequest.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return ResponseEntity.status(401).body(Map.of("message", "Thiếu token"));
@@ -300,11 +270,7 @@ public class AuthController {
         String region = geoIpService.resolveRegion(publicIp);
         String newToken = jwtUtil.generateToken(userDetails, region, publicIp);
 
-        String role = userDetails.getAuthorities()
-                .stream()
-                .findFirst()
-                .map(Object::toString)
-                .orElse("ROLE_CUSTOMER");
+        String role = userDetails.getAuthorities().stream().findFirst().map(Object::toString).orElse("ROLE_CUSTOMER");
 
         LoginResponse resp = new LoginResponse(newToken);
         resp.setRole(role);

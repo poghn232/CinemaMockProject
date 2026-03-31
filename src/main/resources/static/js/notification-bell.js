@@ -192,6 +192,16 @@
     color: #6b7280;
     font-size: 13px;
   }
+  .nb-poster-placeholder {
+  width: 40px;
+  height: 60px;
+  border-radius: 8px;
+  background: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;   /* 👈 to hơn */
+}
   `;
 
     // ── Helpers ───────────────────────────────────────────────────────────────
@@ -202,8 +212,15 @@
         const token = getToken();
         const headers = { ...(opts.headers || {}) };
         if (token) headers['Authorization'] = 'Bearer ' + token;
+        console.log("TOKEN:", localStorage.getItem("token"));
         const res = await fetch(url, { ...opts, headers });
-        if (!res.ok) throw new Error(res.status);
+
+        if (!res.ok) {
+            const text = await res.text();
+            console.error("API ERROR:", res.status, text); // 👈 thêm dòng này
+            throw new Error(res.status);
+        }
+
         const text = await res.text();
         return text ? JSON.parse(text) : null;
     }
@@ -219,6 +236,9 @@
     }
 
     function detailUrl(item) {
+        if (item.eventType === "ACHIEVEMENT_UNLOCK" || item.contentType === "achievement") {
+            return 'profile.html#achievements';
+        }
         return `movie-detail.html?id=${item.contentId}&type=${item.contentType}`;
     }
 
@@ -228,28 +248,67 @@
         div.className = 'nb-item ' + (item.isRead ? 'read' : 'unread');
         div.href = detailUrl(item);
 
-        const poster = item.posterUrl
-            ? `<img class="nb-poster" src="${item.posterUrl}" alt="" loading="lazy">`
-            : `<div class="nb-poster-placeholder">🎬</div>`;
+        // Poster
+        const poster = (item.eventType === 'ACHIEVEMENT_UNLOCK' && item.iconUrl)
+            ? `<div class="nb-poster-placeholder">${item.iconUrl}</div>`
+            : item.posterUrl
+                ? `<img class="nb-poster" src="${item.posterUrl}" alt="" loading="lazy">`
+                : `<div class="nb-poster-placeholder">🎬</div>`;
 
+        // 👉 Parse params an toàn
+        let params = {};
+        try {
+            params = item.messageParams ? JSON.parse(item.messageParams) : {};
+        } catch (e) {
+            params = {};
+        }
+
+        // 👉 Dịch message từ i18n
+        let msg;
+
+        try {
+            if (typeof t === 'function' && item.messageKey) {
+                try {
+                    msg = t(item.messageKey, params);
+                    if (msg === item.messageKey) {
+                        msg = item.contentTitle || "New notification";
+                    }
+                } catch(e) {
+                    msg = item.contentTitle || "New notification";
+                }
+            } else {
+                msg = item.contentTitle || "New notification";
+            }
+        } catch (e) {
+            console.error("i18n error:", e);
+            msg = item.contentTitle || "New notification";
+        }
+
+        // 👉 Render HTML
         div.innerHTML = `
-      ${poster}
-      <div class="nb-body">
-        <div class="nb-msg">${item.message}</div>
-        <div class="nb-time">${timeAgo(item.createdAt)}</div>
-      </div>
-      <div class="nb-dot"></div>
+        ${poster}
+        <div class="nb-body">
+            <div class="nb-msg">${msg}</div>
+            <div class="nb-time">${timeAgo(item.createdAt)}</div>
+        </div>
+        <div class="nb-dot"></div>
     `;
 
-        // Đánh dấu đã đọc khi click
+        // Đánh dấu đã đọc
         div.addEventListener('click', () => {
             if (!item.isRead) {
+                item.isRead = true;
                 apiFetch(API.readOne(item.id), { method: 'PUT' }).catch(() => {});
                 div.classList.replace('unread', 'read');
                 div.querySelector('.nb-dot').style.visibility = 'hidden';
+
+                // ⭐ update badge ngay
+                if (window._notifBell) {
+                    const unread = window._notifBell.items.filter(i => !i.isRead).length;
+                    window._notifBell._updateBadge(unread);
+                }
             }
         });
-
         return div;
     }
 
@@ -403,3 +462,8 @@
         init();
     }
 })();
+window.addEventListener("languageChanged", () => {
+    if (window._notifBell) {
+        window._notifBell._fetchList(); // reload lại để dịch
+    }
+});
