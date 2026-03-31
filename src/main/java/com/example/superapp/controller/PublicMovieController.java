@@ -56,7 +56,6 @@ public class PublicMovieController {
         return publicMovieService.listGenresWithItems(request);
     }
 
-<<<<<<< HEAD
     @GetMapping("/subtitle/{movieId}/{filename:.+}")
     @ResponseBody
     public ResponseEntity<byte[]> proxySubtitle(
@@ -89,12 +88,18 @@ public class PublicMovieController {
                 String[] blocks = normalized.split("\n\n");
                 for (String block : blocks) {
                     String trimmed = block.trim();
-                    if (trimmed.isEmpty()) continue;
+                    if (trimmed.isEmpty()) {
+                        continue;
+                    }
                     // if block starts with a number (index), drop it
                     String[] lines = trimmed.split("\n");
                     int idx = 0;
-                    if (lines.length > 0 && lines[0].matches("^\\d+$")) idx = 1;
-                    if (idx >= lines.length) continue;
+                    if (lines.length > 0 && lines[0].matches("^\\d+$")) {
+                        idx = 1;
+                    }
+                    if (idx >= lines.length) {
+                        continue;
+                    }
                     // time line
                     String timeLine = lines[idx];
                     timeLine = timeLine.replace(',', '.');
@@ -121,13 +126,13 @@ public class PublicMovieController {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(respBytes.asByteArray());
-=======
+    }
     @GetMapping("/top-rated")
+
     public java.util.List<com.example.superapp.dto.MovieItemDto> topRated(
             @RequestParam(name = "limit", defaultValue = "10") int limit,
             HttpServletRequest request
     ) {
         return publicMovieService.getTopRated(limit, request);
->>>>>>> cdd1531 (Top rated film by user)
     }
 }

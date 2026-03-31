@@ -534,6 +534,12 @@
                 <h1 id="movieTitle" class="movie-title">Loading...</h1>
                 <div id="movieSubtitle" class="movie-subtitle"></div>
                 <div id="movieOverview" class="movie-overview">Loading...</div>
+                <div id="subtitleControls" style="margin-top:12px; display:flex; gap:8px; align-items:center;">
+                    <label for="subtitleFileInput" class="btn ghost" style="cursor:pointer; padding:8px 12px;">Upload Subtitles</label>
+                    <input id="subtitleFileInput" type="file" accept=".vtt,.srt,text/vtt,text/plain" style="display:none;" />
+                    <button id="clearCustomSubtitle" type="button" class="btn ghost" style="display:none;">Clear Uploaded Subtitle</button>
+                    <div id="subtitleStatus" style="font-size:13px; color:var(--text-subtle);"></div>
+                </div>
             </div>
         </div>
 
@@ -609,6 +615,46 @@
     let _currentVariants = [];
     let _currentPlaybackMasterUrl = "";
     let _currentSubtitleUrl = null;
+    // Custom uploaded subtitle stored as data URL in localStorage key: customSub:[movie|tv]:<id>[:episodeId]
+    function _customSubtitleKey() {
+        if (_currentType === 'tv') {
+            const ep = _currentEpisodeId || 'unknown-ep';
+            return `customSub:tv:${_currentMovieId || 'unknown'}:${ep}`;
+        }
+        return `customSub:movie:${_currentMovieId || 'unknown'}`;
+    }
+
+    function _getStoredCustomSubtitle() {
+        try {
+            const key = _customSubtitleKey();
+            return localStorage.getItem(key);
+        } catch (e) {
+            console.warn('Could not read custom subtitle from storage', e);
+            return null;
+        }
+    }
+
+    function _storeCustomSubtitle(dataUrl) {
+        try {
+            const key = _customSubtitleKey();
+            localStorage.setItem(key, dataUrl);
+            return true;
+        } catch (e) {
+            console.warn('Could not store custom subtitle', e);
+            return false;
+        }
+    }
+
+    function _clearStoredCustomSubtitle() {
+        try {
+            const key = _customSubtitleKey();
+            localStorage.removeItem(key);
+            return true;
+        } catch (e) {
+            console.warn('Could not clear custom subtitle', e);
+            return false;
+        }
+    }
 
     function authHeaders() {
         const token = localStorage.getItem("token");
@@ -765,22 +811,23 @@
                 movieData.overview || "No overview available.";
         }
 
-<<<<<<< HEAD
         // expose subtitle URL for the player to consume (if provided)
         try {
             _currentSubtitleUrl = movieData && movieData.subtitleUrl ? movieData.subtitleUrl : null;
         } catch (e) {
             _currentSubtitleUrl = null;
         }
+        // Update subtitle UI (clear/uploaded badge) if handler is set
+        if (typeof window._updateSubtitleUi === 'function') {
+            window._updateSubtitleUi();
+        }
 
         // Handle TV series vs Movie (errors here should not prevent comments from loading)
-=======
         // Initialize comments and ratings functionality (BEFORE video setup)
         initializeRating(type, type === 'tv' ? _currentEpisodeId : movieData.id);
         initializeComments();
 
         // Handle TV series vs Movie 
->>>>>>> cdd1531 (Top rated film by user)
         try {
             if (type === "tv") {
                 setupTVSeries(
@@ -1445,7 +1492,6 @@
                 const firstButton = buttonsContainer.querySelector(
                     `[data-season="${firstSeasonNum}"][data-episode="${firstEpisode.episodeNumber}"]`
                 );
-<<<<<<< HEAD
                 if (firstButton) {
                     firstButton.click();
                 } else if (firstEpisode.srcFilm || firstEpisode.src) {
@@ -1459,9 +1505,7 @@
                     loadVideo(videoUrl, window._resumeSec || 0);
                     window._resumeSec = 0;
                 }
-=======
                 selectEpisode(firstEpisode, firstButton, true);
->>>>>>> cdd1531 (Top rated film by user)
             }
         } else {
             const season = sortedSeasons.find(s => s.seasonNumber == selectedSeason);
@@ -1623,6 +1667,25 @@
                 } catch (e) {
                     console.warn('Failed to attach subtitle track', e);
                 }
+            }
+
+            // Attach custom uploaded subtitle if present (overrides default)
+            try {
+                const stored = _getStoredCustomSubtitle();
+                if (stored) {
+                    // stored is a data URL
+                    const customTrack = document.createElement('track');
+                    customTrack.kind = 'subtitles';
+                    customTrack.label = 'Uploaded';
+                    customTrack.srclang = 'en';
+                    customTrack.src = stored;
+                    customTrack.default = true;
+                    // remove other 'default' flags
+                    Array.from(vid.querySelectorAll('track')).forEach(t => t.default = false);
+                    vid.appendChild(customTrack);
+                }
+            } catch (e) {
+                console.warn('Failed to attach custom subtitle', e);
             }
             container.insertBefore(vid, container.firstChild);
             _nativeVideo = vid;
@@ -1815,6 +1878,151 @@
         }
         loadWatchPage();
     }
+
+    // --- Subtitle upload helpers ---
+    function srtToVtt(srtText) {
+        // Simple converter: normalize line endings, add VTT header, and
+        // convert any SRT timecode commas to dots on lines containing -->
+        try {
+            const normalized = srtText.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+            const lines = normalized.split('\n');
+            const out = ['WEBVTT', ''];
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                if (line.indexOf('-->') !== -1) {
+                    // replace comma with dot in timecodes and collapse extra spaces
+                    const fixed = line.replace(/,/g, '.').replace(/\s+/g, ' ').trim();
+                    out.push(fixed);
+                } else {
+                    out.push(line);
+                }
+            }
+            return out.join('\n');
+        } catch (e) {
+            console.warn('srtToVtt failed', e);
+            return null;
+        }
+    }
+
+    function fileToDataUrl(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = (e) => reject(e);
+            reader.readAsText(file);
+        });
+    }
+
+    // Wire up input handlers
+    (function setupSubtitleUploadHandlers() {
+        const input = document.getElementById('subtitleFileInput');
+        const clearBtn = document.getElementById('clearCustomSubtitle');
+        const status = document.getElementById('subtitleStatus');
+
+        function updateUi() {
+            const stored = _getStoredCustomSubtitle();
+            if (stored) {
+                clearBtn.style.display = 'inline-flex';
+                status.textContent = 'Using uploaded subtitle.';
+            } else if (_currentSubtitleUrl) {
+                clearBtn.style.display = 'none';
+                status.textContent = 'Using default subtitle.';
+            } else {
+                clearBtn.style.display = 'none';
+                status.textContent = 'No subtitles available.';
+            }
+        }
+
+        if (input) {
+            input.addEventListener('change', async (e) => {
+                const file = input.files && input.files[0];
+                if (!file) return;
+                status.textContent = 'Processing subtitle...';
+                try {
+                    const text = await fileToDataUrl(file);
+                    // text is the file content (string). Determine type by extension
+                    const name = file.name || '';
+                    let vtt = null;
+                    if (/\.vtt$/i.test(name) || /text\/vtt/.test(file.type)) {
+                        vtt = text;
+                    } else if (/\.srt$/i.test(name) || /subtitle|srt/.test(file.type)) {
+                        vtt = srtToVtt(text);
+                    } else {
+                        // try to guess: if contains "-->" treat as srt
+                        if (text.includes('-->')) vtt = srtToVtt(text);
+                        else vtt = text;
+                    }
+
+                    if (!vtt) throw new Error('Could not convert subtitle to VTT');
+
+                    // Create data URL
+                    const blob = new Blob([vtt], { type: 'text/vtt' });
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const dataUrl = reader.result;
+                        if (_storeCustomSubtitle(dataUrl)) {
+                            status.textContent = 'Uploaded subtitle saved locally for this item.';
+                            // Re-attach to currently playing video
+                            try {
+                                if (_nativeVideo) {
+                                    // remove existing uploaded tracks
+                                    Array.from(_nativeVideo.querySelectorAll('track')).forEach(t => t.remove());
+                                    const t = document.createElement('track');
+                                    t.kind = 'subtitles';
+                                    t.label = 'Uploaded';
+                                    t.srclang = 'en';
+                                    t.src = dataUrl;
+                                    t.default = true;
+                                    _nativeVideo.appendChild(t);
+                                }
+                            } catch (e) { console.warn('Could not attach uploaded track immediately', e); }
+                        } else {
+                            status.textContent = 'Failed to save subtitle locally.';
+                        }
+                        updateUi();
+                    };
+                    reader.onerror = (err) => {
+                        console.warn('Failed to read blob as dataURL', err);
+                        status.textContent = 'Failed to process subtitle.';
+                    };
+                    reader.readAsDataURL(blob);
+                } catch (err) {
+                    console.error('Subtitle upload failed', err);
+                    status.textContent = 'Failed to process subtitle.';
+                } finally {
+                    input.value = '';
+                }
+            });
+        }
+
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                _clearStoredCustomSubtitle();
+                status.textContent = 'Cleared uploaded subtitle.';
+                // reload video tracks: remove custom tracks and re-add default if present
+                try {
+                    if (_nativeVideo) {
+                        Array.from(_nativeVideo.querySelectorAll('track')).forEach(t => t.remove());
+                        if (_currentSubtitleUrl) {
+                            const track = document.createElement('track');
+                            track.kind = 'subtitles';
+                            track.label = 'Default';
+                            track.srclang = 'en';
+                            track.src = _currentSubtitleUrl;
+                            track.default = true;
+                            _nativeVideo.appendChild(track);
+                        }
+                    }
+                } catch (e) { console.warn('Could not reattach default subtitle', e); }
+                updateUi();
+            });
+        }
+
+        // Expose a function to update UI when movie/episode changes
+        window._updateSubtitleUi = updateUi;
+        // Initial UI update (may be before movie loaded)
+        setTimeout(updateUi, 300);
+    })();
 
     // ── PRE-ROLL ADS FOR NON-PREMIUM USERS ────────────────────────────
     let _isAdPlaying = false;
