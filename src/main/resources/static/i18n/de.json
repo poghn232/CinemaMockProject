@@ -383,5 +383,12 @@
       "desc_30": "30 Tage in Folge einloggen",
       "desc_100": "100 Tage in Folge einloggen"
     }
+  },
+  "notification": {
+    "title": "Benachrichtigungen",
+    "mark_all": "Alle als gelesen markieren",
+    "loading": "Wird geladen…",
+    "empty": "Noch keine Benachrichtigungen 🎉",
+    "failed": "Benachrichtigungen konnten nicht geladen werden."
   }
 }

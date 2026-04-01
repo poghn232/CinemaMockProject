@@ -384,5 +384,12 @@
       "desc_30": "Login 30 days in a row",
       "desc_100": "Login 100 days in a row"
     }
+  },
+  "notification": {
+    "title": "Notifications",
+    "mark_all": "Mark all read",
+    "loading": "Loading…",
+    "empty": "No notifications yet 🎉",
+    "failed": "Failed to load notifications."
   }
 }

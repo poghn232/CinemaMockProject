@@ -369,5 +369,12 @@
       "desc_30": "Đăng nhập 30 ngày liên tiếp",
       "desc_100": "Đăng nhập 100 ngày liên tiếp"
     }
+  },
+  "notification": {
+    "title": "Thông báo",
+    "mark_all": "Đánh dấu đã đọc tất cả",
+    "loading": "Đang tải…",
+    "empty": "Chưa có thông báo 🎉",
+    "failed": "Tải thông báo thất bại."
   }
 }

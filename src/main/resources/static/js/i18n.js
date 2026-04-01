@@ -69,6 +69,12 @@ window.addEventListener("languageChanged", () => {
     }
 });
 
+window.addEventListener("languageChanged", () => {
+    if (window._notifBell) {
+        window._notifBell._fetchList(); // reload + dịch lại
+    }
+});
+
 // đổi language
 function changeLanguage(lang) {
     // lưu ngôn ngữ

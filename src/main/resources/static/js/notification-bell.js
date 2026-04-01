@@ -353,11 +353,11 @@
             this.dropdown.className = 'nb-dropdown';
             this.dropdown.innerHTML = `
         <div class="nb-header">
-          <span class="nb-header-title">Notifications</span>
-          <button class="nb-read-all">Mark all read</button>
+          <span class="nb-header-title" data-i18n="notification.title">Notifications</span>
+          <button class="nb-read-all" data-i18n="notification.mark_all">Mark all read</button>
         </div>
         <div class="nb-list">
-          <div class="nb-loading">Loading…</div>
+          <div class="nb-loading" data-i18n="notification.loading">Loading…</div>
         </div>
       `;
 
@@ -365,6 +365,10 @@
             this.wrap.appendChild(this.badge);
             this.wrap.appendChild(this.dropdown);
             this.mount.appendChild(this.wrap);
+
+            if (typeof applyTranslations === "function") {
+                applyTranslations();
+            }
 
             // Events
             this.btn.addEventListener('click', (e) => { e.stopPropagation(); this._toggle(); });
@@ -399,23 +403,27 @@
 
         async _fetchList() {
             const list = this.dropdown.querySelector('.nb-list');
-            list.innerHTML = '<div class="nb-loading">Loading…</div>';
+
+            list.innerHTML = `<div class="nb-loading">${t('notification.loading')}</div>`;
+
             try {
                 this.items = await apiFetch(API.list);
                 this._renderList();
                 this._updateBadge(this.items.filter(i => !i.isRead).length);
             } catch {
-                list.innerHTML = '<div class="nb-empty">Failed to load notifications.</div>';
+                list.innerHTML = `<div class="nb-empty">${t('notification.failed')}</div>`;
             }
         }
 
         _renderList() {
             const list = this.dropdown.querySelector('.nb-list');
             list.innerHTML = '';
+
             if (!this.items || this.items.length === 0) {
-                list.innerHTML = '<div class="nb-empty">No notifications yet 🎉</div>';
+                list.innerHTML = `<div class="nb-empty">${t('notification.empty')}</div>`;
                 return;
             }
+
             this.items.forEach(item => list.appendChild(renderItem(item)));
         }
 
