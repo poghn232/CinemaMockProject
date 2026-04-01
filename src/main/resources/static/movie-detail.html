@@ -231,6 +231,49 @@
             color: var(--accent);
         }
 
+        /* TRAILER MODAL */
+        .trailer-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .trailer-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(2px);
+        }
+
+        .trailer-content {
+            position: relative;
+            width: min(1100px, 95%);
+            max-width: 1100px;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(2,6,23,0.9);
+            z-index: 2010;
+        }
+
+        .trailer-close {
+            position: absolute;
+            right: 8px;
+            top: 8px;
+            z-index: 2020;
+            background: rgba(255,255,255,0.06);
+            border: none;
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
         /* DETAIL SECTION */
         .detail-section {
             padding: 40px 24px;
@@ -989,6 +1032,10 @@
                 d.id,
             )}&type=${encodeURIComponent(type)}`;
         });
+
+    // Trailer: show watch trailer button and wire modal
+    const trailerSrc = d.src || d.trailer || (d.tmdb && d.tmdb.trailer) || null;
+    ensureTrailerUI(trailerSrc, d);
         // Wishlist button
         initWishlistButton(d.id, type);
         // TV series: load and render seasons section
@@ -1009,7 +1056,97 @@
 </script>
 <!-- Toast -->
 <div id="toast" class="toast"></div>
+<!-- Trailer Modal -->
+<div id="trailerModal" class="trailer-modal" aria-hidden="true">
+    <div class="trailer-overlay" id="trailerOverlay"></div>
+    <div class="trailer-content" id="trailerContent">
+        <button id="trailerClose" class="trailer-close">✕</button>
+        <!-- iframe inserted dynamically -->
+    </div>
+</div>
 <script src="js/ai-chat-support.js"></script>
+
+<script>
+    // Utility: extract YouTube video id from various URL formats
+    function extractYouTubeId(url) {
+        if (!url) return null;
+        try {
+            const u = url.trim();
+            const youtubeRegex = /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?v=|embed\/|v\/|.+?\bv=))([\w-]{11})/i;
+            const m = u.match(youtubeRegex);
+            if (m && m[1]) return m[1];
+            // fallback: if param v exists
+            const qp = new URL(u, window.location.origin).searchParams;
+            return qp.get('v');
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function ensureTrailerUI(trailerSrc, detail) {
+        // add Watch Trailer button next to existing action buttons
+        const actions = document.querySelector('.action-buttons');
+        if (!actions) return;
+
+        // remove existing if present
+        const existing = document.getElementById('watchTrailerBtn');
+        if (existing) existing.remove();
+
+        if (!trailerSrc) return; // no trailer available
+
+        const btn = document.createElement('button');
+        btn.id = 'watchTrailerBtn';
+        btn.className = 'btn-secondary';
+        btn.textContent = '▶ Watch Trailer';
+        btn.addEventListener('click', () => openTrailerModal(trailerSrc, detail));
+        actions.insertBefore(btn, actions.firstChild);
+    }
+
+    function openTrailerModal(src, detail) {
+        const modal = document.getElementById('trailerModal');
+        const content = document.getElementById('trailerContent');
+        const close = document.getElementById('trailerClose');
+        const overlay = document.getElementById('trailerOverlay');
+
+        // clear previous iframe
+        const old = content.querySelector('iframe');
+        if (old) old.remove();
+
+        const vid = extractYouTubeId(src);
+        let iframeSrc;
+        if (vid) {
+            iframeSrc = `https://www.youtube-nocookie.com/embed/${vid}?autoplay=1&rel=0&modestbranding=1`;
+        } else {
+            // fallback to using original src in a frame-friendly mode (may be external)
+            iframeSrc = src;
+        }
+
+        const iframe = document.createElement('iframe');
+        iframe.width = '100%';
+        iframe.height = '100%';
+        iframe.src = iframeSrc;
+        iframe.frameBorder = '0';
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+        iframe.allowFullscreen = true;
+        content.appendChild(iframe);
+
+        // show modal
+        modal.style.display = 'flex';
+        modal.setAttribute('aria-hidden', 'false');
+
+        function closeModal() {
+            modal.style.display = 'none';
+            modal.setAttribute('aria-hidden', 'true');
+            // stop playback by removing iframe src
+            try { iframe.src = ''; } catch (e) {}
+            overlay.removeEventListener('click', closeModal);
+            close.removeEventListener('click', closeModal);
+        }
+
+        overlay.addEventListener('click', closeModal);
+        close.addEventListener('click', closeModal);
+    }
+</script>
 </body>
 </html>
 

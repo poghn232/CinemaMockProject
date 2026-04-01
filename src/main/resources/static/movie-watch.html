@@ -1,672 +1,745 @@
 <!doctype html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <title>MovieZone | Watch Movie</title>
     <style>
-        :root {
-            --bg: #020617;
-            --bg-soft: #0f172a;
-            --accent: #f97316;
-            --accent2: #ec4899;
-            --text-main: #e5e7eb;
-            --text-subtle: #9ca3af;
-        }
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            font-family:
-                    "Poppins",
-                    system-ui,
-                    -apple-system,
-                    BlinkMacSystemFont,
-                    "Segoe UI",
-                    sans-serif;
-            background: var(--bg);
-            color: var(--text-main);
-            min-height: 100vh;
-        }
+      :root {
+        --bg: #020617;
+        --bg-soft: #0f172a;
+        --accent: #f97316;
+        --accent2: #ec4899;
+        --text-main: #e5e7eb;
+        --text-subtle: #9ca3af;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family:
+          "Poppins",
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        background: var(--bg);
+        color: var(--text-main);
+        min-height: 100vh;
+      }
 
-        .page-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 24px;
-        }
+      .page-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px;
+      }
 
-        .navbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-        }
-        .nav-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .nav-logo {
-            width: 30px;
-            height: 30px;
-            border-radius: 999px;
-            background: radial-gradient(
-                    circle at 30% 20%,
-                    #f97316,
-                    #e11d48 55%,
-                    #4f46e5
-            );
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 25px rgba(248, 113, 113, 0.55);
-            font-size: 14px;
-            font-weight: 700;
-        }
-        .nav-title-main {
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            font-size: 12px;
-        }
-        .nav-title-sub {
-            font-size: 11px;
-            color: var(--text-subtle);
-        }
-        .back-link {
-            font-size: 13px;
-            color: var(--text-subtle);
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .back-link:hover {
-            color: var(--text-main);
-        }
+      .navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+      }
+      .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .nav-logo {
+        width: 30px;
+        height: 30px;
+        border-radius: 999px;
+        background: radial-gradient(
+          circle at 30% 20%,
+          #f97316,
+          #e11d48 55%,
+          #4f46e5
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 25px rgba(248, 113, 113, 0.55);
+        font-size: 14px;
+        font-weight: 700;
+      }
+      .nav-title-main {
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-size: 12px;
+      }
+      .nav-title-sub {
+        font-size: 11px;
+        color: var(--text-subtle);
+      }
+      .back-link {
+        font-size: 13px;
+        color: var(--text-subtle);
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .back-link:hover {
+        color: var(--text-main);
+      }
 
-        /* site button styles (shared across pages) */
-        .btn {
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: none;
-            background: var(--accent);
-            color: white;
-            cursor: pointer;
-        }
+      /* site button styles (shared across pages) */
+      .btn {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: none;
+        background: var(--accent);
+        color: white;
+        cursor: pointer;
+      }
 
-        .btn.ghost {
-            background: transparent;
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            color: var(--text-main);
-        }
+      .btn.ghost {
+        background: transparent;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        color: var(--text-main);
+      }
 
-        /* VIDEO PLAYER */
-        .video-section {
-            margin-bottom: 24px;
-        }
-        .video-container {
-            position: relative;
-            width: 100%;
-            background: #000;
-            border-radius: 12px;
-            overflow: hidden;
-            aspect-ratio: 16 / 9;
-        }
-        /* All player types: div, iframe, video — fill the container */
-        .video-container > *,
-        .video-player {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100% !important;
-            height: 100% !important;
-            border: none;
-            display: block;
-        }
+      /* VIDEO PLAYER */
+      .video-section {
+        margin-bottom: 24px;
+      }
+      .video-container {
+        position: relative;
+        width: 100%;
+        background: #000;
+        border-radius: 12px;
+        overflow: hidden;
+        aspect-ratio: 16 / 9;
+      }
+      /* All player types: div, iframe, video — fill the container */
+      .video-container > *,
+      .video-player {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100% !important;
+        height: 100% !important;
+        border: none;
+        display: block;
+      }
 
-        /* EPISODE SELECTOR */
-        .episode-selector {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            margin-top: 24px;
-            padding: 20px;
-            background: rgba(15, 23, 42, 0.5);
-            border-radius: 12px;
-            border: 1px solid rgba(148, 163, 184, 0.15);
-        }
-        .episode-selector.hidden {
-            display: none;
-        }
-        .episode-label {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-main);
-            margin-bottom: 8px;
-        }
-        .episode-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .episode-button {
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(0, 0, 0, 0.3);
-            color: var(--text-main);
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            min-width: 60px;
-            text-align: center;
-        }
-        .episode-button:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--accent);
-        }
-        .episode-button.active {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: white;
-        }
-        .episode-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .season-header {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-subtle);
-            margin-bottom: 8px;
-            margin-top: 12px;
-            width: 100%;
-        }
+      /* EPISODE SELECTOR */
+      .episode-selector {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin-top: 24px;
+        padding: 20px;
+        background: rgba(15, 23, 42, 0.5);
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+      }
+      .episode-selector.hidden {
+        display: none;
+      }
+      .episode-label {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 8px;
+      }
+      .episode-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .episode-button {
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(0, 0, 0, 0.3);
+        color: var(--text-main);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        min-width: 60px;
+        text-align: center;
+      }
+      .episode-button:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--accent);
+      }
+      .episode-button.active {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: white;
+      }
+      .episode-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .season-header {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-subtle);
+        margin-bottom: 8px;
+        margin-top: 12px;
+        width: 100%;
+      }
 
-        /* MOVIE INFO */
+      /* MOVIE INFO */
+      .movie-info {
+        display: flex;
+        gap: 24px;
+        align-items: flex-start;
+      }
+      .poster-wrapper {
+        flex-shrink: 0;
+      }
+      .poster {
+        width: 140px;
+        height: 210px;
+        border-radius: 8px;
+        background-size: cover;
+        background-position: center;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      }
+      .info-content {
+        flex: 1;
+      }
+      .movie-title {
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 8px;
+        line-height: 1.2;
+      }
+      .movie-subtitle {
+        font-size: 16px;
+        color: var(--text-subtle);
+        margin-bottom: 16px;
+      }
+      .movie-overview {
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--text-main);
+        margin-bottom: 16px;
+      }
+
+      /* LOADING */
+      .loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 400px;
+        font-size: 16px;
+        color: var(--text-subtle);
+      }
+
+      @media (max-width: 768px) {
         .movie-info {
-            display: flex;
-            gap: 24px;
-            align-items: flex-start;
-        }
-        .poster-wrapper {
-            flex-shrink: 0;
+          flex-direction: column;
+          text-align: center;
         }
         .poster {
-            width: 140px;
-            height: 210px;
-            border-radius: 8px;
-            background-size: cover;
-            background-position: center;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+          width: 120px;
+          height: 180px;
+          margin: 0 auto;
         }
-        .info-content {
-            flex: 1;
+        .episode-selector {
+          flex-direction: column;
+          gap: 12px;
+          align-items: stretch;
         }
-        .movie-title {
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 8px;
-            line-height: 1.2;
-        }
-        .movie-subtitle {
-            font-size: 16px;
-            color: var(--text-subtle);
-            margin-bottom: 16px;
-        }
-        .movie-overview {
-            font-size: 15px;
-            line-height: 1.6;
-            color: var(--text-main);
-            margin-bottom: 16px;
-        }
+      }
 
-        /* LOADING */
-        .loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 400px;
-            font-size: 16px;
-            color: var(--text-subtle);
-        }
+      /* AD BANNER */
+      .ad-banner {
+        margin: 24px 0;
+        padding: 16px;
+        background: linear-gradient(135deg, #f97316, #ec4899);
+        border-radius: 12px;
+        text-align: center;
+        color: white;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+      }
+      .ad-banner.hidden {
+        display: none;
+      }
+      .ad-text {
+        font-size: 18px;
+        margin-bottom: 8px;
+      }
+      .ad-subtext {
+        font-size: 14px;
+        opacity: 0.9;
+      }
 
-        @media (max-width: 768px) {
-            .movie-info {
-                flex-direction: column;
-                text-align: center;
-            }
-            .poster {
-                width: 120px;
-                height: 180px;
-                margin: 0 auto;
-            }
-            .episode-selector {
-                flex-direction: column;
-                gap: 12px;
-                align-items: stretch;
-            }
-        }
+      /* COMMENTS SECTION */
+      .comments-section {
+        margin-top: 32px;
+        padding: 24px;
+        background: rgba(15, 23, 42, 0.5);
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+      }
+      .comments-title {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: var(--text-main);
+      }
+      .comment-input-container {
+        margin-bottom: 20px;
+      }
+      .comment-input {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(0, 0, 0, 0.3);
+        color: var(--text-main);
+        font-size: 14px;
+        resize: vertical;
+        min-height: 80px;
+      }
+      .comment-input:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+      .comment-input::placeholder {
+        color: var(--text-subtle);
+      }
+      .comment-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .comment-submit {
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: none;
+        background: var(--accent);
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .comment-submit:hover {
+        background: #ea580c;
+      }
+      .comment-submit:disabled {
+        background: var(--text-subtle);
+        cursor: not-allowed;
+      }
+      .comment-char-count {
+        font-size: 12px;
+        color: var(--text-subtle);
+      }
 
-        /* AD BANNER */
-        .ad-banner {
-            margin: 24px 0;
-            padding: 16px;
-            background: linear-gradient(135deg, #f97316, #ec4899);
-            border-radius: 12px;
-            text-align: center;
-            color: white;
-            font-weight: 600;
-            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
-        }
-        .ad-banner.hidden {
-            display: none;
-        }
-        .ad-text {
-            font-size: 18px;
-            margin-bottom: 8px;
-        }
-        .ad-subtext {
-            font-size: 14px;
-            opacity: 0.9;
-        }
+      .comments-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 16px;
+      }
 
-        /* COMMENTS SECTION */
-        .comments-section {
-            margin-top: 32px;
-            padding: 24px;
-            background: rgba(15, 23, 42, 0.5);
-            border-radius: 12px;
-            border: 1px solid rgba(148, 163, 184, 0.15);
-        }
-        .comments-title {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: var(--text-main);
-        }
-        .comment-input-container {
-            margin-bottom: 20px;
-        }
-        .comment-input {
-            width: 100%;
-            padding: 12px 16px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(0, 0, 0, 0.3);
-            color: var(--text-main);
-            font-size: 14px;
-            resize: vertical;
-            min-height: 80px;
-        }
-        .comment-input:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-        .comment-input::placeholder {
-            color: var(--text-subtle);
-        }
-        .comment-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .comment-submit {
-            padding: 8px 16px;
-            border-radius: 6px;
-            border: none;
-            background: var(--accent);
-            color: white;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .comment-submit:hover {
-            background: #ea580c;
-        }
-        .comment-submit:disabled {
-            background: var(--text-subtle);
-            cursor: not-allowed;
-        }
-        .comment-char-count {
-            font-size: 12px;
-            color: var(--text-subtle);
-        }
+      .comment-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.04);
+      }
 
-        .comments-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 16px;
-        }
+      .comment-meta {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
 
-        .comment-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 14px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(255, 255, 255, 0.04);
-        }
+      .comment-author {
+        font-weight: 600;
+        font-size: 14px;
+      }
 
-        .comment-meta {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
-        }
+      .comment-time {
+        font-size: 12px;
+        color: var(--text-subtle);
+        margin-left: 8px;
+      }
 
-        .comment-author {
-            font-weight: 600;
-            font-size: 14px;
-        }
+      .comment-text {
+        font-size: 14px;
+        line-height: 1.5;
+        color: var(--text-main);
+        white-space: pre-wrap;
+      }
 
-        .comment-time {
-            font-size: 12px;
-            color: var(--text-subtle);
-            margin-left: 8px;
-        }
+      .comment-report {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        padding: 6px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        color: var(--text-subtle);
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
 
-        .comment-text {
-            font-size: 14px;
-            line-height: 1.5;
-            color: var(--text-main);
-            white-space: pre-wrap;
-        }
+      .comment-report:hover {
+        border-color: rgba(249, 115, 22, 0.6);
+        color: var(--accent);
+      }
 
-        .comment-report {
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            padding: 6px 10px;
-            font-size: 12px;
-            cursor: pointer;
-            color: var(--text-subtle);
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
+      .comment-error {
+        color: #f87171;
+        font-size: 13px;
+        margin-top: 8px;
+      }
 
-        .comment-report:hover {
-            border-color: rgba(249, 115, 22, 0.6);
-            color: var(--accent);
-        }
+      .comment-error.hidden {
+        display: none;
+      }
 
-        .comment-error {
-            color: #f87171;
-            font-size: 13px;
-            margin-top: 8px;
-        }
-
-        .comment-error.hidden {
-            display: none;
-        }
-
-        /* PRE-ROLL ADS */
-        .ad-overlay {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            display: none;
-            z-index: 20;
-        }
-        .ad-overlay.active {
-            display: block;
-        }
-        .ad-chip {
-            position: absolute;
-            top: 14px;
-            left: 14px;
-            padding: 8px 12px;
-            border-radius: 999px;
-            background: rgba(15, 23, 42, 0.88);
-            color: #fff;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.03em;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-        }
-        .ad-controls {
-            position: absolute;
-            right: 14px;
-            top: 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            pointer-events: auto;
-        }
-        .ad-counter {
-            padding: 8px 12px;
-            border-radius: 999px;
-            background: rgba(15, 23, 42, 0.88);
-            color: #fff;
-            font-size: 12px;
-            font-weight: 600;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-        }
-        .skip-ad-btn {
-            padding: 8px 12px;
-            border-radius: 999px;
-            border: none;
-            background: #fff;
-            color: #111827;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            display: none;
-        }
-        .skip-ad-btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        .ad-center-hint {
-            position: absolute;
-            left: 50%;
-            bottom: 16px;
-            transform: translateX(-50%);
-            padding: 10px 14px;
-            border-radius: 10px;
-            background: rgba(15, 23, 42, 0.88);
-            color: #fff;
-            font-size: 13px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-        }
-
+      /* PRE-ROLL ADS */
+      .ad-overlay {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        display: none;
+        z-index: 20;
+      }
+      .ad-overlay.active {
+        display: block;
+      }
+      .ad-chip {
+        position: absolute;
+        top: 14px;
+        left: 14px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.88);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
+      .ad-controls {
+        position: absolute;
+        right: 14px;
+        top: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        pointer-events: auto;
+      }
+      .ad-counter {
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.88);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
+      .skip-ad-btn {
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: none;
+        background: #fff;
+        color: #111827;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        display: none;
+      }
+      .skip-ad-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+      .ad-center-hint {
+        position: absolute;
+        left: 50%;
+        bottom: 16px;
+        transform: translateX(-50%);
+        padding: 10px 14px;
+        border-radius: 10px;
+        background: rgba(15, 23, 42, 0.88);
+        color: #fff;
+        font-size: 13px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
     </style>
-</head>
-<body>
-<div class="page-container">
-    <header class="navbar">
+  </head>
+  <body>
+    <div class="page-container">
+      <header class="navbar">
         <div class="nav-left">
-            <div class="nav-logo">MZ</div>
-            <div>
-                <div class="nav-title-main">MovieZone</div>
-                <div class="nav-title-sub">Watch Movie</div>
-            </div>
+          <div class="nav-logo">MZ</div>
+          <div>
+            <div class="nav-title-main">MovieZone</div>
+            <div class="nav-title-sub">Watch Movie</div>
+          </div>
         </div>
         <a href="javascript:history.back()" class="back-link">← Back</a>
-    </header>
+      </header>
 
-    <div id="loading" class="loading">Loading...</div>
+      <div id="loading" class="loading">Loading...</div>
 
-    <div id="content" style="display: none">
+      <div id="content" style="display: none">
         <!-- VIDEO PLAYER -->
         <div class="video-section">
-            <div class="video-container">
-                <div id="videoPlayer" class="video-player"></div>
-                <div id="adOverlay" class="ad-overlay">
-                    <div class="ad-chip">Advertisement</div>
-                    <div class="ad-controls">
-                        <div id="adCounter" class="ad-counter">Ad</div>
-                        <button id="skipAdBtn" class="skip-ad-btn" type="button">Skip Ad</button>
-                        <button id="unmuteAdBtn" class="unmute-ad-btn" type="button">🔊 Unmute</button>
-                    </div>
-                    <div id="adCenterHint" class="ad-center-hint" style="display:none;">
-                        Playing advertisement...
-                    </div>
-                </div>
+          <div class="video-container">
+            <div id="videoPlayer" class="video-player"></div>
+            <div id="adOverlay" class="ad-overlay">
+              <div class="ad-chip">Advertisement</div>
+              <div class="ad-controls">
+                <div id="adCounter" class="ad-counter">Ad</div>
+                <button id="skipAdBtn" class="skip-ad-btn" type="button">
+                  Skip Ad
+                </button>
+                <button id="unmuteAdBtn" class="unmute-ad-btn" type="button">
+                  🔊 Unmute
+                </button>
+              </div>
+              <div
+                id="adCenterHint"
+                class="ad-center-hint"
+                style="display: none"
+              >
+                Playing advertisement...
+              </div>
             </div>
-            <div id="qualityWrap" style="margin-top:12px; display:none;">
-                <label for="qualitySelect" style="font-size:13px; color: var(--text-subtle); margin-right:8px;">
-                    Quality:
-                </label>
-                <select id="qualitySelect" class="btn" style="padding:8px 12px;">
-                    <option value="auto">Auto</option>
-                </select>
-            </div>
+          </div>
+          <div id="qualityWrap" style="margin-top: 12px; display: none">
+            <label
+              for="qualitySelect"
+              style="
+                font-size: 13px;
+                color: var(--text-subtle);
+                margin-right: 8px;
+              "
+            >
+              Quality:
+            </label>
+            <select id="qualitySelect" class="btn" style="padding: 8px 12px">
+              <option value="auto">Auto</option>
+            </select>
+          </div>
         </div>
 
         <!-- EPISODE SELECTOR (hidden for movies) -->
         <div id="episodeSelector" class="episode-selector hidden">
-            <div class="episode-label">Select Episode:</div>
-            <div id="episodeButtons" class="episode-buttons">
-                <!-- Episode buttons will be generated here -->
-            </div>
+          <div class="episode-label">Select Episode:</div>
+          <div id="episodeButtons" class="episode-buttons">
+            <!-- Episode buttons will be generated here -->
+          </div>
         </div>
 
         <!-- MOVIE INFO -->
         <div class="movie-info">
-            <div class="poster-wrapper">
-                <div id="poster" class="poster"></div>
+          <div class="poster-wrapper">
+            <div id="poster" class="poster"></div>
+          </div>
+          <div class="info-content">
+            <h1 id="movieTitle" class="movie-title">Loading...</h1>
+            <div id="movieSubtitle" class="movie-subtitle"></div>
+            <div id="movieOverview" class="movie-overview">Loading...</div>
+            <div
+              id="subtitleControls"
+              style="
+                margin-top: 12px;
+                display: flex;
+                gap: 8px;
+                align-items: center;
+                flex-wrap: wrap;
+              "
+            >
+              <label
+                for="subtitleFileInput"
+                class="btn ghost"
+                style="cursor: pointer; padding: 8px 12px"
+                >Upload Subtitles</label
+              >
+              <input
+                id="subtitleFileInput"
+                type="file"
+                accept=".vtt,.srt,text/vtt,text/plain"
+                style="display: none"
+              />
+              <button
+                id="clearCustomSubtitle"
+                type="button"
+                class="btn ghost"
+                style="display: none"
+              >
+                Clear Uploaded Subtitle
+              </button>
+              <select
+                id="subtitleLangSelect"
+                class="btn"
+                style="padding: 8px 12px; display: none"
+              >
+                <option value="">None</option>
+              </select>
+              <div
+                id="subtitleStatus"
+                style="font-size: 13px; color: var(--text-subtle)"
+              ></div>
             </div>
-            <div class="info-content">
-                <h1 id="movieTitle" class="movie-title">Loading...</h1>
-                <div id="movieSubtitle" class="movie-subtitle"></div>
-                <div id="movieOverview" class="movie-overview">Loading...</div>
-                <div id="subtitleControls" style="margin-top:12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                    <label for="subtitleFileInput" class="btn ghost" style="cursor:pointer; padding:8px 12px;">Upload Subtitles</label>
-                    <input id="subtitleFileInput" type="file" accept=".vtt,.srt,text/vtt,text/plain" style="display:none;" />
-                    <button id="clearCustomSubtitle" type="button" class="btn ghost" style="display:none;">Clear Uploaded Subtitle</button>
-                    <select id="subtitleLangSelect" class="btn" style="padding:8px 12px; display:none;">
-                        <option value="">None</option>
-                    </select>
-                    <div id="subtitleStatus" style="font-size:13px; color:var(--text-subtle);"></div>
-                </div>
-            </div>
+          </div>
         </div>
 
         <!-- AD BANNER (shown for non-premium users) -->
         <div id="adBanner" class="ad-banner hidden">
-            <div class="ad-text">
-                🎬 Upgrade to Premium for Ad-Free Experience!
-            </div>
-            <div class="ad-subtext">Remove ads and enjoy unlimited streaming</div>
+          <div class="ad-text">
+            🎬 Upgrade to Premium for Ad-Free Experience!
+          </div>
+          <div class="ad-subtext">Remove ads and enjoy unlimited streaming</div>
         </div>
 
         <!-- USER RATING SECTION -->
-        <div id="ratingSection" class="comments-section" style="margin-top: 24px; display: block;">
-            <h3 class="comments-title">User Rating</h3>
-            <div id="ratingPrompt" style="margin-bottom: 12px; font-size: 14px; color: var(--text-subtle);">
-                Đang nạp hệ thống đánh giá...
-            </div>
-            <div id="ratingStars" style="margin-bottom: 12px; display: none;"></div>
-            <div id="ratingResult" style="display: none;">
-                <span id="avgRating" style="font-size: 18px; font-weight: 700; color: var(--accent);">0.0</span>
-                <span id="ratingCount" style="font-size: 14px; color: var(--text-subtle); margin-left: 8px;">(0 người đánh giá)</span>
-            </div>
+        <div
+          id="ratingSection"
+          class="comments-section"
+          style="margin-top: 24px; display: block"
+        >
+          <h3 class="comments-title">User Rating</h3>
+          <div
+            id="ratingPrompt"
+            style="
+              margin-bottom: 12px;
+              font-size: 14px;
+              color: var(--text-subtle);
+            "
+          >
+            Đang nạp hệ thống đánh giá...
+          </div>
+          <div
+            id="ratingStars"
+            style="margin-bottom: 12px; display: none"
+          ></div>
+          <div id="ratingResult" style="display: none">
+            <span
+              id="avgRating"
+              style="font-size: 18px; font-weight: 700; color: var(--accent)"
+              >0.0</span
+            >
+            <span
+              id="ratingCount"
+              style="
+                font-size: 14px;
+                color: var(--text-subtle);
+                margin-left: 8px;
+              "
+              >(0 người đánh giá)</span
+            >
+          </div>
         </div>
 
         <!-- COMMENTS SECTION -->
         <div class="comments-section">
-            <h3 class="comments-title">Comments</h3>
-            <div class="comment-input-container">
+          <h3 class="comments-title">Comments</h3>
+          <div class="comment-input-container">
             <textarea
-                    id="commentInput"
-                    class="comment-input"
-                    placeholder="Share your thoughts about this movie..."
-                    maxlength="1000"></textarea>
-                <div class="comment-actions">
-                    <div id="charCount" class="comment-char-count">0/1000</div>
-                    <button id="submitComment" class="comment-submit">
-                        Post Comment
-                    </button>
-                </div>
+              id="commentInput"
+              class="comment-input"
+              placeholder="Share your thoughts about this movie..."
+              maxlength="1000"
+            ></textarea>
+            <div class="comment-actions">
+              <div id="charCount" class="comment-char-count">0/1000</div>
+              <button id="submitComment" class="comment-submit">
+                Post Comment
+              </button>
             </div>
-            <div id="commentError" class="comment-error hidden"></div>
-            <div id="commentsList" class="comments-list">
-                <div class="comment-text">Loading comments...</div>
-            </div>
+          </div>
+          <div id="commentError" class="comment-error hidden"></div>
+          <div id="commentsList" class="comments-list">
+            <div class="comment-text">Loading comments...</div>
+          </div>
         </div>
+      </div>
     </div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<script src="js/bannerads.js"></script>
-<script src="js/rating.js?v=2.0"></script>
-<script>
-    console.log("movie-watch script loaded");
-    window.addEventListener("error", (event) => {
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="js/bannerads.js"></script>
+    <script src="js/rating.js?v=2.0"></script>
+    <script>
+      console.log("movie-watch script loaded");
+      window.addEventListener("error", (event) => {
         console.error("Global JS error:", event.error || event.message, event);
         const commentError = document.getElementById("commentError");
         if (commentError) {
-            commentError.textContent = `Error: ${event.error || event.message}`;
-            commentError.classList.remove("hidden");
+          commentError.textContent = `Error: ${event.error || event.message}`;
+          commentError.classList.remove("hidden");
         }
-    });
-    window.addEventListener("unhandledrejection", (event) => {
+      });
+      window.addEventListener("unhandledrejection", (event) => {
         console.error("Unhandled rejection:", event.reason);
         const commentError = document.getElementById("commentError");
         if (commentError) {
-            commentError.textContent = `Error: ${event.reason}`;
-            commentError.classList.remove("hidden");
+          commentError.textContent = `Error: ${event.reason}`;
+          commentError.classList.remove("hidden");
         }
-    });
+      });
 
-    let _currentMovieId = null;
-    let _currentType = null;
-    let _currentEpisodeId = null;
-    let _currentVariants = [];
-    let _currentPlaybackMasterUrl = "";
-    let _currentSubtitleUrl = null;
-    // Custom uploaded subtitle stored as data URL in localStorage key: customSub:[movie|tv]:<id>[:episodeId]
-    function _customSubtitleKey() {
-        if (_currentType === 'tv') {
-            const ep = _currentEpisodeId || 'unknown-ep';
-            return `customSub:tv:${_currentMovieId || 'unknown'}:${ep}`;
+      let _currentMovieId = null;
+      let _currentType = null;
+      let _currentEpisodeId = null;
+      let _currentVariants = [];
+      let _currentPlaybackMasterUrl = "";
+      let _currentSubtitleUrl = null;
+      // Custom uploaded subtitle stored as data URL in localStorage key: customSub:[movie|tv]:<id>[:episodeId]
+      function _customSubtitleKey() {
+        if (_currentType === "tv") {
+          const ep = _currentEpisodeId || "unknown-ep";
+          return `customSub:tv:${_currentMovieId || "unknown"}:${ep}`;
         }
-        return `customSub:movie:${_currentMovieId || 'unknown'}`;
-    }
+        return `customSub:movie:${_currentMovieId || "unknown"}`;
+      }
 
-    function _getStoredCustomSubtitle() {
+      function _getStoredCustomSubtitle() {
         try {
-            const key = _customSubtitleKey();
-            return localStorage.getItem(key);
+          const key = _customSubtitleKey();
+          return localStorage.getItem(key);
         } catch (e) {
-            console.warn('Could not read custom subtitle from storage', e);
-            return null;
+          console.warn("Could not read custom subtitle from storage", e);
+          return null;
         }
-    }
+      }
 
-    function _storeCustomSubtitle(dataUrl) {
+      function _storeCustomSubtitle(dataUrl) {
         try {
-            const key = _customSubtitleKey();
-            localStorage.setItem(key, dataUrl);
-            return true;
+          const key = _customSubtitleKey();
+          localStorage.setItem(key, dataUrl);
+          return true;
         } catch (e) {
-            console.warn('Could not store custom subtitle', e);
-            return false;
+          console.warn("Could not store custom subtitle", e);
+          return false;
         }
-    }
+      }
 
-    function _clearStoredCustomSubtitle() {
+      function _clearStoredCustomSubtitle() {
         try {
-            const key = _customSubtitleKey();
-            localStorage.removeItem(key);
-            return true;
+          const key = _customSubtitleKey();
+          localStorage.removeItem(key);
+          return true;
         } catch (e) {
-            console.warn('Could not clear custom subtitle', e);
-            return false;
+          console.warn("Could not clear custom subtitle", e);
+          return false;
         }
-    }
+      }
 
-    function authHeaders() {
+      function authHeaders() {
         const token = localStorage.getItem("token");
-        return token
-            ? { Authorization: `Bearer ${token}` }
-            : {};
-    }
+        return token ? { Authorization: `Bearer ${token}` } : {};
+      }
 
-    async function loadWatchPage() {
+      async function loadWatchPage() {
         const params = new URLSearchParams(window.location.search);
         const id = params.get("id");
         const type = params.get("type") || "movie";
@@ -678,61 +751,66 @@
         _currentEpisodeId = episode ? parseInt(episode, 10) : null;
 
         if (!id) {
-            alert("Missing movie ID");
-            window.location.href = "homepage.html";
-            return;
+          alert("Missing movie ID");
+          window.location.href = "homepage.html";
+          return;
         }
 
         try {
-            const res = await fetch(
-                `/api/public/movies/detail?type=${encodeURIComponent(type)}&id=${encodeURIComponent(id)}`,
+          const res = await fetch(
+            `/api/public/movies/detail?type=${encodeURIComponent(type)}&id=${encodeURIComponent(id)}`,
+            {
+              headers: {
+                ...authHeaders(),
+              },
+            },
+          );
+
+          if (!res.ok) {
+            throw new Error("Failed to load movie details");
+          }
+
+          const movieData = await res.json();
+
+          let seasonsData = [];
+          if (type === "tv") {
+            try {
+              const seasonsRes = await fetch(
+                `/api/movies/tv/${encodeURIComponent(id)}/seasons`,
                 {
-                    headers: {
-                        ...authHeaders()
-                    }
-                }
-            );
+                  headers: {
+                    ...authHeaders(),
+                  },
+                },
+              );
 
-            if (!res.ok) {
-                throw new Error("Failed to load movie details");
+              if (seasonsRes.ok) {
+                seasonsData = await seasonsRes.json();
+              }
+            } catch (e) {
+              console.error("Failed to load seasons:", e);
             }
+          }
 
-            const movieData = await res.json();
-
-            let seasonsData = [];
-            if (type === "tv") {
-                try {
-                    const seasonsRes = await fetch(
-                        `/api/movies/tv/${encodeURIComponent(id)}/seasons`,
-                        {
-                            headers: {
-                                ...authHeaders()
-                            }
-                        }
-                    );
-
-                    if (seasonsRes.ok) {
-                        seasonsData = await seasonsRes.json();
-                    }
-                } catch (e) {
-                    console.error("Failed to load seasons:", e);
-                }
-            }
-
-            renderWatchPage(movieData, type, seasonsData, season, episode);
+          renderWatchPage(movieData, type, seasonsData, season, episode);
         } catch (e) {
-            console.error(e);
-            document.getElementById("loading").textContent = "Failed to load movie.";
+          console.error(e);
+          document.getElementById("loading").textContent =
+            "Failed to load movie.";
         }
-    }
-    function buildVariantPlaylistUrl(masterUrl, variantName) {
+      }
+      function buildVariantPlaylistUrl(masterUrl, variantName) {
         if (!masterUrl || !variantName) return masterUrl;
         const idx = masterUrl.lastIndexOf("/master.m3u8");
         if (idx === -1) return masterUrl;
         const base = masterUrl.substring(0, idx);
         return `${base}/${variantName}/playlist.m3u8`;
-    }
-    function renderQualityDropdown(masterUrl, variants, isPremiumUser = false) {
+      }
+      function renderQualityDropdown(
+        masterUrl,
+        variants,
+        isPremiumUser = false,
+      ) {
         const wrap = document.getElementById("qualityWrap");
         const select = document.getElementById("qualitySelect");
 
@@ -742,42 +820,52 @@
         _currentVariants = Array.isArray(variants) ? variants : [];
 
         select.innerHTML = isPremiumUser
-            ? `<option value="auto">Auto</option>`
-            : "";
+          ? `<option value="auto">Auto</option>`
+          : "";
 
         if (!_currentPlaybackMasterUrl || _currentVariants.length === 0) {
-            wrap.style.display = "none";
-            return;
+          wrap.style.display = "none";
+          return;
         }
 
         _currentVariants.forEach((v) => {
-            const option = document.createElement("option");
-            option.value = v;
-            option.textContent = v;
-            select.appendChild(option);
+          const option = document.createElement("option");
+          option.value = v;
+          option.textContent = v;
+          select.appendChild(option);
         });
 
         wrap.style.display = "block";
 
         select.onchange = () => {
-            const selected = select.value;
-            const resume = _getCurrentTime() || 0;
+          const selected = select.value;
+          const resume = _getCurrentTime() || 0;
 
-            if (selected === "auto") {
-                loadVideo(_currentPlaybackMasterUrl, resume);
-            } else {
-                loadVideo(buildVariantPlaylistUrl(_currentPlaybackMasterUrl, selected), resume);
-            }
+          if (selected === "auto") {
+            playMainContentWithOptionalAd({
+              videoUrl: _currentPlaybackMasterUrl,
+              startSec: resume,
+              variants: _currentVariants || [],
+              isPremiumUser: isPremiumUser || false,
+            });
+          } else {
+            playMainContentWithOptionalAd({
+              videoUrl: buildVariantPlaylistUrl(_currentPlaybackMasterUrl, selected),
+              startSec: resume,
+              variants: _currentVariants || [],
+              isPremiumUser: isPremiumUser || false,
+            });
+          }
         };
-    }
+      }
 
-    function renderWatchPage(
+      function renderWatchPage(
         movieData,
         type,
         seasonsData,
         selectedSeason,
         selectedEpisode,
-    ) {
+      ) {
         document.title = `MovieZone | Watch ${movieData.title || "Movie"}`;
 
         // Hide loading, show content
@@ -787,9 +875,9 @@
         // Set poster
         const poster = document.getElementById("poster");
         if (poster) {
-            poster.style.backgroundImage = movieData.posterUrl
-                ? `url('${movieData.posterUrl}')`
-                : "url('https://via.placeholder.com/400x600?text=No+Image')";
+          poster.style.backgroundImage = movieData.posterUrl
+            ? `url('${movieData.posterUrl}')`
+            : "url('https://via.placeholder.com/400x600?text=No+Image')";
         }
 
         // Set title and subtitle
@@ -798,7 +886,7 @@
         const overviewEl = document.getElementById("movieOverview");
 
         if (titleEl) {
-            titleEl.textContent = movieData.title || "Unknown Title";
+          titleEl.textContent = movieData.title || "Unknown Title";
         }
 
         const bits = [];
@@ -806,204 +894,252 @@
         if (movieData.year) bits.push(`${movieData.year}`);
         if (movieData.runtime) bits.push(`${movieData.runtime} min`);
         if (subtitleEl) {
-            subtitleEl.textContent = bits.join(" · ");
+          subtitleEl.textContent = bits.join(" · ");
         }
 
         if (overviewEl) {
-            overviewEl.textContent =
-                movieData.overview || "No overview available.";
+          overviewEl.textContent =
+            movieData.overview || "No overview available.";
         }
 
         // expose subtitle URL for the player to consume (if provided)
         try {
-            _currentSubtitleUrl = movieData && movieData.subtitleUrl ? movieData.subtitleUrl : null;
+          _currentSubtitleUrl =
+            movieData && movieData.subtitleUrl ? movieData.subtitleUrl : null;
         } catch (e) {
-            _currentSubtitleUrl = null;
+          _currentSubtitleUrl = null;
         }
         // Update subtitle UI (clear/uploaded badge) if handler is set
-        if (typeof window._updateSubtitleUi === 'function') {
-            window._updateSubtitleUi();
+        if (typeof window._updateSubtitleUi === "function") {
+          window._updateSubtitleUi();
         }
 
         // Populate subtitle language selector from movieData.subtitles if present
         try {
-            const select = document.getElementById('subtitleLangSelect');
-            if (select) {
-                select.innerHTML = '<option value="">None</option>';
-                const subs = Array.isArray(movieData.subtitles) ? movieData.subtitles : [];
-                const langNames = {
-                    en: 'English',
-                    vi: 'Vietnamese',
-                    ja: 'Japanese',
-                    de: 'German',
-                    my: 'Burmese',
-                    es: 'Spanish',
-                    fr: 'French'
-                };
-                if (subs.length > 0) {
-                    // dedupe by base filename (strip extension). prefer .vtt over .srt
-                    const byBase = {};
-                    subs.forEach(s => {
-                        const fname = (s.filename || '').toLowerCase();
-                        const dot = fname.lastIndexOf('.');
-                        const base = dot > 0 ? fname.substring(0, dot) : fname || 'unknown';
-                        const ext = dot > 0 ? fname.substring(dot + 1) : '';
-                        const existing = byBase[base];
-                        if (!existing) {
-                            byBase[base] = { src: s.url || s.filename, filename: s.filename || '', lang: s.lang || '', ext };
-                        } else {
-                            // if we already have srt and new is vtt, prefer vtt
-                            if (existing.ext === 'srt' && ext === 'vtt') {
-                                byBase[base] = { src: s.url || s.filename, filename: s.filename || '', lang: s.lang || '', ext };
-                            }
-                        }
-                    });
-
-                    // track default entry to auto-select it
-                    let defaultEntry = null;
-                    // clear initial options; we'll insert Default (if any), None, then others
-                    select.innerHTML = '';
-                    // Insert Default first (if present), then None, then other entries
-                    const bases = Object.keys(byBase);
-                    // append Default option if available
-                    if (byBase['default']) {
-                        const entry = byBase['default'];
-                        const opt = document.createElement('option');
-                        opt.value = entry.src || entry.filename || 'default';
-                        opt.textContent = 'Default';
-                        opt.dataset.filename = entry.filename || '';
-                        opt.dataset.lang = (entry.lang || '').toLowerCase();
-                        select.appendChild(opt);
-                        defaultEntry = entry;
-                    }
-
-                    // None option (user can select to hide subtitles)
-                    const noneOpt = document.createElement('option');
-                    noneOpt.value = '';
-                    noneOpt.textContent = 'None';
-                    select.appendChild(noneOpt);
-
-                    // append the rest (excluding default)
-                    bases.forEach(base => {
-                        if (base === 'default') return;
-                        const entry = byBase[base];
-                        const code = (entry.lang && entry.lang.trim()) ? entry.lang.trim().toLowerCase() : '';
-                        // skip unknown base entries without a language
-                        if (base === 'unknown' && !code) return;
-                        const opt = document.createElement('option');
-                        let label = '';
-                        if (code) label = langNames[code] || code;
-                        else label = base.charAt(0).toUpperCase() + base.slice(1);
-                        opt.value = entry.src || entry.filename || base;
-                        opt.textContent = label;
-                        opt.dataset.filename = entry.filename || '';
-                        opt.dataset.lang = code || '';
-                        select.appendChild(opt);
-                    });
-
-                    // Auto-select and attach the default subtitle if available and no custom uploaded subtitle
-                    try {
-                        const custom = _getStoredCustomSubtitle();
-                        if (!custom && defaultEntry) {
-                            select.value = defaultEntry.src || defaultEntry.filename || 'default';
-                            // attach default subtitle to player
-                            try {
-                                attachRemoteSubtitleToVideo(select.value, defaultEntry.lang || '');
-                                const status = document.getElementById('subtitleStatus');
-                                if (status) status.textContent = 'Using default subtitle.';
-                            } catch (e) {
-                                console.warn('Could not attach default subtitle', e);
-                            }
-                        }
-                    } catch (e) { /* ignore */ }
-                    select.style.display = 'inline-flex';
+          const select = document.getElementById("subtitleLangSelect");
+          if (select) {
+            select.innerHTML = '<option value="">None</option>';
+            const subs = Array.isArray(movieData.subtitles)
+              ? movieData.subtitles
+              : [];
+            const langNames = {
+              en: "English",
+              vi: "Vietnamese",
+              ja: "Japanese",
+              de: "German",
+              my: "Burmese",
+              es: "Spanish",
+              fr: "French",
+            };
+            if (subs.length > 0) {
+              // dedupe by base filename (strip extension). prefer .vtt over .srt
+              const byBase = {};
+              subs.forEach((s) => {
+                const fname = (s.filename || "").toLowerCase();
+                const dot = fname.lastIndexOf(".");
+                const base =
+                  dot > 0 ? fname.substring(0, dot) : fname || "unknown";
+                const ext = dot > 0 ? fname.substring(dot + 1) : "";
+                const existing = byBase[base];
+                if (!existing) {
+                  byBase[base] = {
+                    src: s.url || s.filename,
+                    filename: s.filename || "",
+                    lang: s.lang || "",
+                    ext,
+                  };
                 } else {
-                    select.style.display = 'none';
+                  // if we already have srt and new is vtt, prefer vtt
+                  if (existing.ext === "srt" && ext === "vtt") {
+                    byBase[base] = {
+                      src: s.url || s.filename,
+                      filename: s.filename || "",
+                      lang: s.lang || "",
+                      ext,
+                    };
+                  }
                 }
+              });
 
-                select.onchange = () => {
-                    const val = select.value;
-                    // If a user-uploaded custom subtitle exists for this item, it overrides remote selection.
-                    const custom = _getStoredCustomSubtitle();
-                    if (custom) {
-                        const status = document.getElementById('subtitleStatus');
-                        if (status) status.textContent = 'Using uploaded subtitle. Clear it to use server-provided ones.';
-                        return;
-                    }
+              // track default entry to auto-select it
+              let defaultEntry = null;
+              // clear initial options; we'll insert Default (if any), None, then others
+              select.innerHTML = "";
+              // Insert Default first (if present), then None, then other entries
+              const bases = Object.keys(byBase);
+              // append Default option if available
+              if (byBase["default"]) {
+                const entry = byBase["default"];
+                const opt = document.createElement("option");
+                opt.value = entry.src || entry.filename || "default";
+                opt.textContent = "Default";
+                opt.dataset.filename = entry.filename || "";
+                opt.dataset.lang = (entry.lang || "").toLowerCase();
+                select.appendChild(opt);
+                defaultEntry = entry;
+              }
 
-                    // If user selected None (empty value), remove non-custom subtitle tracks
-                    if (!val) {
-                        try {
-                            if (_nativeVideo) {
-                                Array.from(_nativeVideo.querySelectorAll('track')).forEach(t => {
-                                    if (t.src && !t.src.startsWith('data:')) t.remove();
-                                });
-                            }
-                            // hls.js: try removing text tracks if Hls instance used
-                            if (window._hlsInstance && window._hlsInstance.subtitleTracks) {
-                                try {
-                                    // remove all subtitle tracks from Hls by setting subtitleTrack to -1
-                                    window._hlsInstance.subtitleTrack = -1;
-                                } catch (e) { /* ignore */ }
-                            }
-                            const status = document.getElementById('subtitleStatus');
-                            if (status) status.textContent = 'Subtitles hidden.';
-                        } catch (e) {
-                            console.warn('Failed to clear subtitles', e);
-                        }
-                        return;
-                    }
+              // None option (user can select to hide subtitles)
+              const noneOpt = document.createElement("option");
+              noneOpt.value = "";
+              noneOpt.textContent = "None";
+              select.appendChild(noneOpt);
 
-                    // attach selected remote subtitle URL as a track
-                    try {
-                        attachRemoteSubtitleToVideo(val, select.selectedOptions[0].dataset.lang || '');
-                        const status = document.getElementById('subtitleStatus');
-                        if (status) status.textContent = `Using subtitles: ${select.selectedOptions[0].textContent}`;
-                    } catch (e) { console.warn('Could not attach remote subtitle', e); }
-                };
+              // append the rest (excluding default)
+              bases.forEach((base) => {
+                if (base === "default") return;
+                const entry = byBase[base];
+                const code =
+                  entry.lang && entry.lang.trim()
+                    ? entry.lang.trim().toLowerCase()
+                    : "";
+                // skip unknown base entries without a language
+                if (base === "unknown" && !code) return;
+                const opt = document.createElement("option");
+                let label = "";
+                if (code) label = langNames[code] || code;
+                else label = base.charAt(0).toUpperCase() + base.slice(1);
+                opt.value = entry.src || entry.filename || base;
+                opt.textContent = label;
+                opt.dataset.filename = entry.filename || "";
+                opt.dataset.lang = code || "";
+                select.appendChild(opt);
+              });
+
+              // Auto-select and attach the default subtitle if available and no custom uploaded subtitle
+              try {
+                const custom = _getStoredCustomSubtitle();
+                if (!custom && defaultEntry) {
+                  select.value =
+                    defaultEntry.src || defaultEntry.filename || "default";
+                  // attach default subtitle to player
+                  try {
+                    attachRemoteSubtitleToVideo(
+                      select.value,
+                      defaultEntry.lang || "",
+                    );
+                    const status = document.getElementById("subtitleStatus");
+                    if (status) status.textContent = "Using default subtitle.";
+                  } catch (e) {
+                    console.warn("Could not attach default subtitle", e);
+                  }
+                }
+              } catch (e) {
+                /* ignore */
+              }
+              select.style.display = "inline-flex";
+            } else {
+              select.style.display = "none";
             }
-        } catch (e) { console.warn('Subtitle selector populate failed', e); }
+
+            select.onchange = () => {
+              const val = select.value;
+              // If a user-uploaded custom subtitle exists for this item, it overrides remote selection.
+              const custom = _getStoredCustomSubtitle();
+              if (custom) {
+                const status = document.getElementById("subtitleStatus");
+                if (status)
+                  status.textContent =
+                    "Using uploaded subtitle. Clear it to use server-provided ones.";
+                return;
+              }
+
+              // If user selected None (empty value), remove non-custom subtitle tracks
+              if (!val) {
+                try {
+                  if (_nativeVideo) {
+                    Array.from(_nativeVideo.querySelectorAll("track")).forEach(
+                      (t) => {
+                        if (t.src && !t.src.startsWith("data:")) t.remove();
+                      },
+                    );
+                  }
+                  // hls.js: try removing text tracks if Hls instance used
+                  if (
+                    window._hlsInstance &&
+                    window._hlsInstance.subtitleTracks
+                  ) {
+                    try {
+                      // remove all subtitle tracks from Hls by setting subtitleTrack to -1
+                      window._hlsInstance.subtitleTrack = -1;
+                    } catch (e) {
+                      /* ignore */
+                    }
+                  }
+                  const status = document.getElementById("subtitleStatus");
+                  if (status) status.textContent = "Subtitles hidden.";
+                } catch (e) {
+                  console.warn("Failed to clear subtitles", e);
+                }
+                return;
+              }
+
+              // attach selected remote subtitle URL as a track
+              try {
+                attachRemoteSubtitleToVideo(
+                  val,
+                  select.selectedOptions[0].dataset.lang || "",
+                );
+                const status = document.getElementById("subtitleStatus");
+                if (status)
+                  status.textContent = `Using subtitles: ${select.selectedOptions[0].textContent}`;
+              } catch (e) {
+                console.warn("Could not attach remote subtitle", e);
+              }
+            };
+          }
+        } catch (e) {
+          console.warn("Subtitle selector populate failed", e);
+        }
 
         // Handle TV series vs Movie (errors here should not prevent comments from loading)
         // Initialize comments and ratings functionality (BEFORE video setup)
-        initializeRating(type, type === 'tv' ? _currentEpisodeId : movieData.id);
+        initializeRating(
+          type,
+          type === "tv" ? _currentEpisodeId : movieData.id,
+        );
         initializeComments();
 
-        // Handle TV series vs Movie 
+        // Handle TV series vs Movie
         try {
-            if (type === "tv") {
-                setupTVSeries(
-                    movieData,
-                    seasonsData,
-                    selectedSeason,
-                    selectedEpisode,
-                );
-            } else {
-                setupMovie(movieData);
-            }
+          if (type === "tv") {
+            setupTVSeries(
+              movieData,
+              seasonsData,
+              selectedSeason,
+              selectedEpisode,
+            );
+          } else {
+            setupMovie(movieData);
+          }
         } catch (e) {
-            console.warn("Video setup failed", e);
+          console.warn("Video setup failed", e);
         }
 
         // Check premium status and show/hide ad banner
         if (typeof checkUserPremiumStatus === "function") {
-            checkUserPremiumStatus()
-                .then((isPremium) => {
-                    const adBanner = document.getElementById("adBanner");
-                    if (adBanner) {
-                        if (isPremium) adBanner.classList.add("hidden");
-                        else adBanner.classList.remove("hidden");
-                    }
-                })
-                .catch((e) => console.warn("Premium status check failed", e));
+          checkUserPremiumStatus()
+            .then((isPremium) => {
+              const adBanner = document.getElementById("adBanner");
+              if (adBanner) {
+                if (isPremium) adBanner.classList.add("hidden");
+                else adBanner.classList.remove("hidden");
+              }
+            })
+            .catch((e) => console.warn("Premium status check failed", e));
         }
 
         // Start history tracker
-        const runtimeSec = movieData.runtime ? movieData.runtime * 60 : (type === "tv" ? 45 * 60 : 0);
-        if (window._startHistoryTracker) window._startHistoryTracker(runtimeSec);
-    }
+        const runtimeSec = movieData.runtime
+          ? movieData.runtime * 60
+          : type === "tv"
+            ? 45 * 60
+            : 0;
+        if (window._startHistoryTracker)
+          window._startHistoryTracker(runtimeSec);
+      }
 
-    function initializeRating(initialType, initialId) {
+      function initializeRating(initialType, initialId) {
         console.log("Initializing rating section");
         const section = document.getElementById("ratingSection");
         const prompt = document.getElementById("ratingPrompt");
@@ -1013,74 +1149,78 @@
         const countEl = document.getElementById("ratingCount");
 
         if (!section) {
-            console.error("ratingSection element not found!");
-            return;
+          console.error("ratingSection element not found!");
+          return;
         }
 
         async function refreshRating(type, id) {
-            console.log(`refreshRating called: type=${type}, id=${id}`);
-            section.style.display = "block";
+          console.log(`refreshRating called: type=${type}, id=${id}`);
+          section.style.display = "block";
 
-            if (!id) {
-                stars.style.display = "none";
-                result.style.display = "none";
-                prompt.style.display = "block";
-                prompt.textContent = "Hãy chọn một tập phim để đánh giá.";
-                return;
-            }
+          if (!id) {
+            stars.style.display = "none";
+            result.style.display = "none";
+            prompt.style.display = "block";
+            prompt.textContent = "Hãy chọn một tập phim để đánh giá.";
+            return;
+          }
 
-            const apiType = type === 'tv' || type === 'episode' ? 'episode' : 'movie';
-            try {
-                const status = await RatingSystem.getStatus(apiType, id);
-                if (!status) throw new Error("Status is null");
-                updateUI(status, apiType, id);
-            } catch (err) {
-                console.error("Failed to load rating status:", err);
-                prompt.textContent = "Không thể tải thông tin đánh giá.";
-            }
+          const apiType =
+            type === "tv" || type === "episode" ? "episode" : "movie";
+          try {
+            const status = await RatingSystem.getStatus(apiType, id);
+            if (!status) throw new Error("Status is null");
+            updateUI(status, apiType, id);
+          } catch (err) {
+            console.error("Failed to load rating status:", err);
+            prompt.textContent = "Không thể tải thông tin đánh giá.";
+          }
         }
 
         function updateUI(s, apiType, id) {
-            stars.innerHTML = "";
-            countEl.innerHTML = "";
+          stars.innerHTML = "";
+          countEl.innerHTML = "";
 
-            if (s.hasRated) {
-                stars.style.display = "none";
-                result.style.display = "block";
-                avgEl.textContent = (s.average || 0).toFixed(1) + " ⭐";
-                countEl.textContent = `(${s.count || 0} người đánh giá)`;
-                prompt.style.display = "none";
+          if (s.hasRated) {
+            stars.style.display = "none";
+            result.style.display = "block";
+            avgEl.textContent = (s.average || 0).toFixed(1) + " ⭐";
+            countEl.textContent = `(${s.count || 0} người đánh giá)`;
+            prompt.style.display = "none";
 
-                const editBtn = document.createElement("button");
-                editBtn.textContent = "Sửa";
-                editBtn.className = "btn ghost";
-                editBtn.style.fontSize = "12px";
-                editBtn.style.marginLeft = "12px";
-                editBtn.style.padding = "2px 6px";
-                editBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    s.hasRated = false;
-                    updateUI(s, apiType, id);
-                };
-                countEl.appendChild(editBtn);
-            } else {
-                stars.style.display = "flex";
-                result.style.display = "none";
-                prompt.style.display = "block";
-                prompt.textContent = s.count === 0 ? "Hãy là người đầu tiên đánh giá!" : `Trung bình: ${(s.average || 0).toFixed(1)} ⭐. Bạn đánh giá sao?`;
+            const editBtn = document.createElement("button");
+            editBtn.textContent = "Sửa";
+            editBtn.className = "btn ghost";
+            editBtn.style.fontSize = "12px";
+            editBtn.style.marginLeft = "12px";
+            editBtn.style.padding = "2px 6px";
+            editBtn.onclick = (e) => {
+              e.stopPropagation();
+              s.hasRated = false;
+              updateUI(s, apiType, id);
+            };
+            countEl.appendChild(editBtn);
+          } else {
+            stars.style.display = "flex";
+            result.style.display = "none";
+            prompt.style.display = "block";
+            prompt.textContent =
+              s.count === 0
+                ? "Hãy là người đầu tiên đánh giá!"
+                : `Trung bình: ${(s.average || 0).toFixed(1)} ⭐. Bạn đánh giá sao?`;
 
-                RatingSystem.renderStars("ratingStars", 0, async (val) => {
-                    const res = await RatingSystem.saveRating(apiType, id, val);
-                    if (res) refreshRating(apiType, id);
-                });
-            }
+            RatingSystem.renderStars("ratingStars", 0, async (val) => {
+              const res = await RatingSystem.saveRating(apiType, id, val);
+              if (res) refreshRating(apiType, id);
+            });
+          }
         }
 
         window._refreshRating = refreshRating;
         refreshRating(initialType, initialId);
-    }
+      }
 
-    function initializeComments() {
+      function initializeComments() {
         console.log("Initializing comments section");
 
         let commentInput = null;
@@ -1090,443 +1230,448 @@
         let commentsList = null;
 
         try {
-            commentInput = document.getElementById("commentInput");
-            submitBtn = document.getElementById("submitComment");
-            charCount = document.getElementById("charCount");
-            commentError = document.getElementById("commentError");
-            commentsList = document.getElementById("commentsList");
+          commentInput = document.getElementById("commentInput");
+          submitBtn = document.getElementById("submitComment");
+          charCount = document.getElementById("charCount");
+          commentError = document.getElementById("commentError");
+          commentsList = document.getElementById("commentsList");
 
-            function setError(message) {
-                if (!commentError) return;
-                commentError.textContent = message || "";
-                commentError.classList.toggle("hidden", !message);
+          function setError(message) {
+            if (!commentError) return;
+            commentError.textContent = message || "";
+            commentError.classList.toggle("hidden", !message);
+          }
+
+          function updateSubmitState() {
+            // Keep the button enabled so the user can always attempt to post.
+            // The click handler will validate the comment text and show an error if needed.
+            if (submitBtn) {
+              submitBtn.disabled = false;
+            }
+          }
+
+          function renderCommentRow(review) {
+            const row = document.createElement("div");
+            row.className = "comment-row";
+
+            const content = document.createElement("div");
+            content.style.flex = "1";
+
+            const meta = document.createElement("div");
+            meta.className = "comment-meta";
+
+            const author = document.createElement("div");
+            author.className = "comment-author";
+            author.textContent = review.username || "Anonymous";
+
+            const time = document.createElement("div");
+            time.className = "comment-time";
+            if (review.createdDate) {
+              const date = new Date(review.createdDate);
+              time.textContent = date.toLocaleString();
             }
 
-            function updateSubmitState() {
-                // Keep the button enabled so the user can always attempt to post.
-                // The click handler will validate the comment text and show an error if needed.
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                }
-            }
+            meta.appendChild(author);
+            meta.appendChild(time);
 
-            function renderCommentRow(review) {
-                const row = document.createElement("div");
-                row.className = "comment-row";
+            const text = document.createElement("div");
+            text.className = "comment-text";
+            text.textContent = review.comment || "";
 
-                const content = document.createElement("div");
-                content.style.flex = "1";
+            content.appendChild(meta);
+            content.appendChild(text);
 
-                const meta = document.createElement("div");
-                meta.className = "comment-meta";
+            const actions = document.createElement("div");
+            actions.style.display = "flex";
+            actions.style.alignItems = "center";
 
-                const author = document.createElement("div");
-                author.className = "comment-author";
-                author.textContent = review.username || "Anonymous";
+            const reportBtn = document.createElement("button");
+            reportBtn.className = "comment-report";
+            reportBtn.type = "button";
+            reportBtn.textContent = "🚩 Report";
+            reportBtn.addEventListener("click", async () => {
+              if (!localStorage.getItem("token")) {
+                alert("Please log in to report comments.");
+                return;
+              }
 
-                const time = document.createElement("div");
-                time.className = "comment-time";
-                if (review.createdDate) {
-                    const date = new Date(review.createdDate);
-                    time.textContent = date.toLocaleString();
-                }
+              // show modal form to collect reason
+              const modal = getOrCreateReportModal();
+              modal.show(
+                review.reviewId,
+                async (reason, setError, setSubmitting) => {
+                  if (!reason || reason.trim().length === 0) {
+                    setError("Please provide a reason for the report.");
+                    return { success: false };
+                  }
 
-                meta.appendChild(author);
-                meta.appendChild(time);
+                  reportBtn.disabled = true;
+                  setSubmitting(true);
+                  try {
+                    const token = localStorage.getItem("token");
+                    console.debug("Sending report, token present?", !!token);
 
-                const text = document.createElement("div");
-                text.className = "comment-text";
-                text.textContent = review.comment || "";
-
-                content.appendChild(meta);
-                content.appendChild(text);
-
-                const actions = document.createElement("div");
-                actions.style.display = "flex";
-                actions.style.alignItems = "center";
-
-                const reportBtn = document.createElement("button");
-                reportBtn.className = "comment-report";
-                reportBtn.type = "button";
-                reportBtn.textContent = "🚩 Report";
-                reportBtn.addEventListener("click", async () => {
-                    if (!localStorage.getItem("token")) {
-                        alert("Please log in to report comments.");
-                        return;
-                    }
-
-                    // show modal form to collect reason
-                    const modal = getOrCreateReportModal();
-                    modal.show(
-                        review.reviewId,
-                        async (reason, setError, setSubmitting) => {
-                            if (!reason || reason.trim().length === 0) {
-                                setError("Please provide a reason for the report.");
-                                return { success: false };
-                            }
-
-                            reportBtn.disabled = true;
-                            setSubmitting(true);
-                            try {
-                                const token = localStorage.getItem("token");
-                                console.debug("Sending report, token present?", !!token);
-
-                                const res = await fetch(
-                                    `/api/user/reviews/${encodeURIComponent(review.reviewId)}/report`,
-                                    {
-                                        method: "POST",
-                                        headers: {
-                                            "Content-Type": "application/json",
-                                            Authorization: `Bearer ${token}`,
-                                        },
-                                        body: JSON.stringify({ reason }),
-                                    },
-                                );
-
-                                if (!res.ok) {
-                                    let msg =
-                                        "Could not send report. Please try again later.";
-                                    try {
-                                        const json = await res.json();
-                                        if (json && json.message) msg = json.message;
-                                    } catch (err) {
-                                        const text = await res.text();
-                                        if (text) msg = text;
-                                    }
-                                    setError(msg);
-                                    setSubmitting(false);
-                                    reportBtn.disabled = false;
-                                    return { success: false };
-                                }
-
-                                reportBtn.textContent = "Reported";
-                                setSubmitting(false);
-                                return { success: true };
-                            } catch (e) {
-                                console.warn("Report failed", e);
-                                setError("Could not send report. Please try again later.");
-                                setSubmitting(false);
-                                reportBtn.disabled = false;
-                                return { success: false };
-                            }
-                        },
-                    );
-                });
-
-                actions.appendChild(reportBtn);
-
-                row.appendChild(content);
-                row.appendChild(actions);
-                return row;
-            }
-
-            function setCommentListPlaceholder(message) {
-                if (!commentsList) return;
-                commentsList.innerHTML = `<div class="comment-text">${message}</div>`;
-            }
-
-            async function loadComments() {
-                console.log("Loading comments...");
-                if (!commentsList) return;
-                setCommentListPlaceholder("Loading comments...");
-
-                const params = new URLSearchParams();
-                if (_currentType === "tv" && _currentEpisodeId) {
-                    params.set("episodeId", _currentEpisodeId);
-                } else if (_currentMovieId) {
-                    params.set("movieId", _currentMovieId);
-                }
-
-                try {
                     const res = await fetch(
-                        `/api/public/reviews?${params.toString()}`,
-                    );
-                    if (!res.ok) throw new Error("Failed to load comments");
-                    const data = await res.json();
-
-                    const reviews = Array.isArray(data.reviews) ? data.reviews : [];
-                    if (reviews.length === 0) {
-                        setCommentListPlaceholder(
-                            "No comments yet. Be the first to post one!",
-                        );
-                        return;
-                    }
-
-                    commentsList.innerHTML = "";
-                    reviews.forEach((review) => {
-                        commentsList.appendChild(renderCommentRow(review));
-                    });
-                } catch (err) {
-                    console.error(err);
-                    setCommentListPlaceholder("Failed to load comments.");
-                }
-            }
-
-            // Report modal helper: creates a singleton modal to collect reason
-            function getOrCreateReportModal() {
-                let existing = document.getElementById("report-modal-root");
-                if (existing) {
-                    return existing._api;
-                }
-
-                const root = document.createElement("div");
-                root.id = "report-modal-root";
-                root.style.position = "fixed";
-                root.style.left = 0;
-                root.style.top = 0;
-                root.style.right = 0;
-                root.style.bottom = 0;
-                root.style.display = "flex";
-                root.style.alignItems = "center";
-                root.style.justifyContent = "center";
-                root.style.background = "rgba(0,0,0,0.6)";
-                root.style.zIndex = 9999;
-                root.style.visibility = "hidden";
-
-                const box = document.createElement("div");
-                box.className = "card";
-                box.style.width = "420px";
-                box.style.maxWidth = "92%";
-
-                const title = document.createElement("div");
-                title.textContent = "Report comment";
-                title.className = "card-title";
-                title.style.marginBottom = "8px";
-
-                const textarea = document.createElement("textarea");
-                textarea.style.width = "100%";
-                textarea.style.height = "120px";
-                textarea.style.marginBottom = "12px";
-                textarea.className = "comment-input";
-
-                const error = document.createElement("div");
-                error.style.color = "crimson";
-                error.style.marginBottom = "8px";
-                error.className = "muted";
-
-                const btnRow = document.createElement("div");
-                btnRow.style.display = "flex";
-                btnRow.style.justifyContent = "flex-end";
-                btnRow.style.gap = "8px";
-
-                const cancelBtn = document.createElement("button");
-                cancelBtn.textContent = "Cancel";
-                cancelBtn.className = "btn ghost";
-                cancelBtn.onclick = () => {
-                    root.style.visibility = "hidden";
-                };
-
-                const submitBtn = document.createElement("button");
-                submitBtn.textContent = "Submit";
-                submitBtn.className = "btn";
-                submitBtn.onclick = async () => {
-                    error.textContent = "";
-                    const cb = root._api._onSubmit;
-                    if (typeof cb === "function") {
-                        const setError = (msg) => {
-                            error.textContent = msg || "";
-                        };
-                        const setSubmitting = (v) => {
-                            submitBtn.disabled = !!v;
-                        };
-                        try {
-                            const result = await cb(
-                                textarea.value,
-                                setError,
-                                setSubmitting,
-                            );
-                            if (result && result.success)
-                                root.style.visibility = "hidden";
-                        } catch (e) {
-                            console.error("Report modal onSubmit error", e);
-                            setError("Could not send report. Please try again later.");
-                        }
-                    }
-                };
-
-                btnRow.appendChild(cancelBtn);
-                btnRow.appendChild(submitBtn);
-
-                box.appendChild(title);
-                box.appendChild(textarea);
-                box.appendChild(error);
-                box.appendChild(btnRow);
-                root.appendChild(box);
-                document.body.appendChild(root);
-
-                const api = {
-                    show: (reviewId, onSubmit) => {
-                        textarea.value = "";
-                        error.textContent = "";
-                        root._api._onSubmit = onSubmit;
-                        root.style.visibility = "visible";
-                        textarea.focus();
-                    },
-                };
-                root._api = api;
-                return api;
-            }
-
-            // Expose comment loader so other UI bits (episode switch) can refresh comments
-            window._loadComments = loadComments;
-
-            function prependComment(review) {
-                if (!commentsList) return;
-                const placeholder = commentsList.querySelector(".comment-text");
-                if (placeholder && placeholder.textContent) {
-                    const txt = placeholder.textContent.toLowerCase();
-                    if (
-                        txt.includes("no comments") ||
-                        txt.includes("loading comments") ||
-                        txt.includes("failed to load")
-                    ) {
-                        commentsList.innerHTML = "";
-                    }
-                }
-                commentsList.prepend(renderCommentRow(review));
-            }
-
-            async function postComment() {
-                setError(null);
-                const token = localStorage.getItem("token");
-                if (!token) {
-                    setError("You must be logged in to post a comment.");
-                    return;
-                }
-
-                const MAX_COMMENT_LENGTH = 1000;
-                const comment = commentInput ? commentInput.value.trim() : "";
-                if (!comment) {
-                    setError("Comment cannot be empty.");
-                    return;
-                }
-                if (comment.length > MAX_COMMENT_LENGTH) {
-                    setError(
-                        `Comment cannot exceed ${MAX_COMMENT_LENGTH} characters.`,
-                    );
-                    return;
-                }
-
-                submitBtn.disabled = true;
-
-                try {
-                    const body = { comment };
-                    if (_currentType === "tv") {
-                        if (!_currentEpisodeId) {
-                            setError(
-                                "Unable to post comment: missing episode identifier.",
-                            );
-                            submitBtn.disabled = false;
-                            return;
-                        }
-                        body.episodeId = _currentEpisodeId;
-                    } else {
-                        if (!_currentMovieId) {
-                            setError("Unable to post comment: missing movie identifier.");
-                            submitBtn.disabled = false;
-                            return;
-                        }
-                        body.movieId = _currentMovieId;
-                    }
-
-                    const res = await fetch("/api/user/reviews", {
+                      `/api/user/reviews/${encodeURIComponent(review.reviewId)}/report`,
+                      {
                         method: "POST",
                         headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`,
+                          "Content-Type": "application/json",
+                          Authorization: `Bearer ${token}`,
                         },
-                        body: JSON.stringify(body),
-                    });
+                        body: JSON.stringify({ reason }),
+                      },
+                    );
 
                     if (!res.ok) {
-                        let message = "Unable to post comment.";
-
-                        try {
-                            const err = await res.json();
-                            message = err.message || message;
-                        } catch {
-                            message = "You can't comment at this time.";
-                        }
-
-                        setError(message);
-                        submitBtn.disabled = false;
-                        return;
+                      let msg =
+                        "Could not send report. Please try again later.";
+                      try {
+                        const json = await res.json();
+                        if (json && json.message) msg = json.message;
+                      } catch (err) {
+                        const text = await res.text();
+                        if (text) msg = text;
+                      }
+                      setError(msg);
+                      setSubmitting(false);
+                      reportBtn.disabled = false;
+                      return { success: false };
                     }
 
-                    const created = await res.json();
-                    if (created) {
-                        prependComment(created);
-                    }
-                    commentInput.value = "";
-                    if (charCount) charCount.textContent = "0/500";
-                    updateSubmitState();
+                    reportBtn.textContent = "Reported";
+                    setSubmitting(false);
+                    return { success: true };
+                  } catch (e) {
+                    console.warn("Report failed", e);
+                    setError("Could not send report. Please try again later.");
+                    setSubmitting(false);
+                    reportBtn.disabled = false;
+                    return { success: false };
+                  }
+                },
+              );
+            });
+
+            actions.appendChild(reportBtn);
+
+            row.appendChild(content);
+            row.appendChild(actions);
+            return row;
+          }
+
+          function setCommentListPlaceholder(message) {
+            if (!commentsList) return;
+            commentsList.innerHTML = `<div class="comment-text">${message}</div>`;
+          }
+
+          async function loadComments() {
+            console.log("Loading comments...");
+            if (!commentsList) return;
+            setCommentListPlaceholder("Loading comments...");
+
+            const params = new URLSearchParams();
+            if (_currentType === "tv" && _currentEpisodeId) {
+              params.set("episodeId", _currentEpisodeId);
+            } else if (_currentMovieId) {
+              params.set("movieId", _currentMovieId);
+            }
+
+            try {
+              const res = await fetch(
+                `/api/public/reviews?${params.toString()}`,
+              );
+              if (!res.ok) throw new Error("Failed to load comments");
+              const data = await res.json();
+
+              const reviews = Array.isArray(data.reviews) ? data.reviews : [];
+              if (reviews.length === 0) {
+                setCommentListPlaceholder(
+                  "No comments yet. Be the first to post one!",
+                );
+                return;
+              }
+
+              commentsList.innerHTML = "";
+              reviews.forEach((review) => {
+                commentsList.appendChild(renderCommentRow(review));
+              });
+            } catch (err) {
+              console.error(err);
+              setCommentListPlaceholder("Failed to load comments.");
+            }
+          }
+
+          // Report modal helper: creates a singleton modal to collect reason
+          function getOrCreateReportModal() {
+            let existing = document.getElementById("report-modal-root");
+            if (existing) {
+              return existing._api;
+            }
+
+            const root = document.createElement("div");
+            root.id = "report-modal-root";
+            root.style.position = "fixed";
+            root.style.left = 0;
+            root.style.top = 0;
+            root.style.right = 0;
+            root.style.bottom = 0;
+            root.style.display = "flex";
+            root.style.alignItems = "center";
+            root.style.justifyContent = "center";
+            root.style.background = "rgba(0,0,0,0.6)";
+            root.style.zIndex = 9999;
+            root.style.visibility = "hidden";
+
+            const box = document.createElement("div");
+            box.className = "card";
+            box.style.width = "420px";
+            box.style.maxWidth = "92%";
+
+            const title = document.createElement("div");
+            title.textContent = "Report comment";
+            title.className = "card-title";
+            title.style.marginBottom = "8px";
+
+            const textarea = document.createElement("textarea");
+            textarea.style.width = "100%";
+            textarea.style.height = "120px";
+            textarea.style.marginBottom = "12px";
+            textarea.className = "comment-input";
+
+            const error = document.createElement("div");
+            error.style.color = "crimson";
+            error.style.marginBottom = "8px";
+            error.className = "muted";
+
+            const btnRow = document.createElement("div");
+            btnRow.style.display = "flex";
+            btnRow.style.justifyContent = "flex-end";
+            btnRow.style.gap = "8px";
+
+            const cancelBtn = document.createElement("button");
+            cancelBtn.textContent = "Cancel";
+            cancelBtn.className = "btn ghost";
+            cancelBtn.onclick = () => {
+              root.style.visibility = "hidden";
+            };
+
+            const submitBtn = document.createElement("button");
+            submitBtn.textContent = "Submit";
+            submitBtn.className = "btn";
+            submitBtn.onclick = async () => {
+              error.textContent = "";
+              const cb = root._api._onSubmit;
+              if (typeof cb === "function") {
+                const setError = (msg) => {
+                  error.textContent = msg || "";
+                };
+                const setSubmitting = (v) => {
+                  submitBtn.disabled = !!v;
+                };
+                try {
+                  const result = await cb(
+                    textarea.value,
+                    setError,
+                    setSubmitting,
+                  );
+                  if (result && result.success)
+                    root.style.visibility = "hidden";
                 } catch (e) {
-                    console.error(e);
-                    setError(`Unable to post comment. ${e.message || ""}`);
-                    submitBtn.disabled = false;
+                  console.error("Report modal onSubmit error", e);
+                  setError("Could not send report. Please try again later.");
                 }
+              }
+            };
+
+            btnRow.appendChild(cancelBtn);
+            btnRow.appendChild(submitBtn);
+
+            box.appendChild(title);
+            box.appendChild(textarea);
+            box.appendChild(error);
+            box.appendChild(btnRow);
+            root.appendChild(box);
+            document.body.appendChild(root);
+
+            const api = {
+              show: (reviewId, onSubmit) => {
+                textarea.value = "";
+                error.textContent = "";
+                root._api._onSubmit = onSubmit;
+                root.style.visibility = "visible";
+                textarea.focus();
+              },
+            };
+            root._api = api;
+            return api;
+          }
+
+          // Expose comment loader so other UI bits (episode switch) can refresh comments
+          window._loadComments = loadComments;
+
+          function prependComment(review) {
+            if (!commentsList) return;
+            const placeholder = commentsList.querySelector(".comment-text");
+            if (placeholder && placeholder.textContent) {
+              const txt = placeholder.textContent.toLowerCase();
+              if (
+                txt.includes("no comments") ||
+                txt.includes("loading comments") ||
+                txt.includes("failed to load")
+              ) {
+                commentsList.innerHTML = "";
+              }
+            }
+            commentsList.prepend(renderCommentRow(review));
+          }
+
+          async function postComment() {
+            setError(null);
+            const token = localStorage.getItem("token");
+            if (!token) {
+              setError("You must be logged in to post a comment.");
+              return;
             }
 
-            if (commentInput) {
-                console.log("Comment input element found");
-                commentInput.addEventListener("input", () => {
-                    const len = commentInput.value.length;
-                    if (charCount) charCount.textContent = `${len}/1000`;
-                    updateSubmitState();
-                });
-            } else {
-                console.warn("Comment input element not found");
+            const MAX_COMMENT_LENGTH = 1000;
+            const comment = commentInput ? commentInput.value.trim() : "";
+            if (!comment) {
+              setError("Comment cannot be empty.");
+              return;
+            }
+            if (comment.length > MAX_COMMENT_LENGTH) {
+              setError(
+                `Comment cannot exceed ${MAX_COMMENT_LENGTH} characters.`,
+              );
+              return;
             }
 
-            if (submitBtn) {
-                console.log("Submit button element found");
-                submitBtn.addEventListener("click", () => {
-                    console.log("Post Comment clicked");
-                    const comment = commentInput ? commentInput.value.trim() : "";
-                    if (!comment) {
-                        setError("Comment cannot be empty.");
-                        if (commentInput) {
-                            commentInput.focus();
-                        }
-                        return;
-                    }
-                    postComment();
-                });
-            } else {
-                console.warn("Submit button element not found");
-            }
+            submitBtn.disabled = true;
 
-            updateSubmitState();
-            loadComments();
+            try {
+              const body = { comment };
+              if (_currentType === "tv") {
+                if (!_currentEpisodeId) {
+                  setError(
+                    "Unable to post comment: missing episode identifier.",
+                  );
+                  submitBtn.disabled = false;
+                  return;
+                }
+                body.episodeId = _currentEpisodeId;
+              } else {
+                if (!_currentMovieId) {
+                  setError("Unable to post comment: missing movie identifier.");
+                  submitBtn.disabled = false;
+                  return;
+                }
+                body.movieId = _currentMovieId;
+              }
+
+              const res = await fetch("/api/user/reviews", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(body),
+              });
+
+              if (!res.ok) {
+                let message = "Unable to post comment.";
+
+                try {
+                  const err = await res.json();
+                  message = err.message || message;
+                } catch {
+                  message = "You can't comment at this time.";
+                }
+
+                setError(message);
+                submitBtn.disabled = false;
+                return;
+              }
+
+              const created = await res.json();
+              if (created) {
+                prependComment(created);
+              }
+              commentInput.value = "";
+              if (charCount) charCount.textContent = "0/500";
+              updateSubmitState();
+            } catch (e) {
+              console.error(e);
+              setError(`Unable to post comment. ${e.message || ""}`);
+              submitBtn.disabled = false;
+            }
+          }
+
+          if (commentInput) {
+            console.log("Comment input element found");
+            commentInput.addEventListener("input", () => {
+              const len = commentInput.value.length;
+              if (charCount) charCount.textContent = `${len}/1000`;
+              updateSubmitState();
+            });
+          } else {
+            console.warn("Comment input element not found");
+          }
+
+          if (submitBtn) {
+            console.log("Submit button element found");
+            submitBtn.addEventListener("click", () => {
+              console.log("Post Comment clicked");
+              const comment = commentInput ? commentInput.value.trim() : "";
+              if (!comment) {
+                setError("Comment cannot be empty.");
+                if (commentInput) {
+                  commentInput.focus();
+                }
+                return;
+              }
+              postComment();
+            });
+          } else {
+            console.warn("Submit button element not found");
+          }
+
+          updateSubmitState();
+          loadComments();
         } catch (e) {
-            console.error("Failed to initialize comments section", e);
-            if (commentError) {
-                commentError.textContent =
-                    "Could not initialize comments. See console for details.";
-                commentError.classList.remove("hidden");
-            }
-            if (commentsList) {
-                commentsList.innerHTML = `<div class="comment-text">Failed to load comments.</div>`;
-            }
+          console.error("Failed to initialize comments section", e);
+          if (commentError) {
+            commentError.textContent =
+              "Could not initialize comments. See console for details.";
+            commentError.classList.remove("hidden");
+          }
+          if (commentsList) {
+            commentsList.innerHTML = `<div class="comment-text">Failed to load comments.</div>`;
+          }
         }
-    }
+      }
 
-    function setupMovie(movieData) {
+      function setupMovie(movieData) {
         const videoUrl = movieData.srcFilm || movieData.src || "";
         const variants = Array.isArray(movieData.allowedVariants)
-            ? movieData.allowedVariants
-            : [];
+          ? movieData.allowedVariants
+          : [];
         const isPremiumUser = movieData.premiumUser === true;
 
         renderQualityDropdown(videoUrl, variants, isPremiumUser);
-        loadVideo(videoUrl, window._resumeSec || 0);
-    }
-    function setupTVSeries(
+        playMainContentWithOptionalAd({
+          videoUrl: videoUrl,
+          startSec: window._resumeSec || 0,
+          variants: variants || [],
+          isPremiumUser: isPremiumUser,
+        });
+      }
+      function setupTVSeries(
         movieData,
         seasonsData,
         selectedSeason,
         selectedEpisode,
-    ) {
+      ) {
         const selector = document.getElementById("episodeSelector");
         const buttonsContainer = document.getElementById("episodeButtons");
 
@@ -1538,458 +1683,520 @@
 
         // Sort seasons
         const sortedSeasons = [...seasonsData].sort(
-            (a, b) => (a.seasonNumber || 0) - (b.seasonNumber || 0),
+          (a, b) => (a.seasonNumber || 0) - (b.seasonNumber || 0),
         );
 
         // Group episodes by season for better organization
         const episodesBySeason = {};
         sortedSeasons.forEach((season) => {
-            const publishedEpisodes = (season.episodes || []).filter(
-                (ep) => ep.published,
+          const publishedEpisodes = (season.episodes || []).filter(
+            (ep) => ep.published,
+          );
+          if (publishedEpisodes.length > 0) {
+            episodesBySeason[season.seasonNumber] = publishedEpisodes.sort(
+              (a, b) => (a.episodeNumber || 0) - (b.episodeNumber || 0),
             );
-            if (publishedEpisodes.length > 0) {
-                episodesBySeason[season.seasonNumber] = publishedEpisodes.sort(
-                    (a, b) => (a.episodeNumber || 0) - (b.episodeNumber || 0),
-                );
-            }
+          }
         });
 
         function selectEpisode(ep, button, isAuto = false) {
-            console.log(`selectEpisode called for ep ${ep.episodeNumber}`, ep);
-            
-            // Remove active class from all buttons
-            document.querySelectorAll(".episode-button").forEach((btn) => {
-                btn.classList.remove("active");
-            });
+          console.log(`selectEpisode called for ep ${ep.episodeNumber}`, ep);
 
-            // Add active class to this button
-            if (button) {
-                button.classList.add("active");
-            }
+          // Remove active class from all buttons
+          document.querySelectorAll(".episode-button").forEach((btn) => {
+            btn.classList.remove("active");
+          });
 
-            // Update current episode id
-            _currentEpisodeId = ep.id || ep.episodeId || ep.episodeNumber;
-            console.log("Setting _currentEpisodeId to:", _currentEpisodeId);
+          // Add active class to this button
+          if (button) {
+            button.classList.add("active");
+          }
 
-            // Load video
-            const resumeOnLoad = isAuto ? (window._resumeSec || 0) : 0;
-            if (isAuto) window._resumeSec = 0;
+          // Update current episode id
+          _currentEpisodeId = ep.id || ep.episodeId || ep.episodeNumber;
+          console.log("Setting _currentEpisodeId to:", _currentEpisodeId);
+
+          // Load video
+          const resumeOnLoad = isAuto ? window._resumeSec || 0 : 0;
+          if (isAuto) window._resumeSec = 0;
 
             if (ep && (ep.srcFilm || ep.src)) {
-                renderQualityDropdown(ep.srcFilm || ep.src, ep.allowedVariants || [], ep.premiumUser === true);
-                loadVideo(ep.srcFilm || ep.src, resumeOnLoad);
-            }
+            renderQualityDropdown(
+              ep.srcFilm || ep.src,
+              ep.allowedVariants || [],
+              ep.premiumUser === true,
+            );
+            playMainContentWithOptionalAd({
+              videoUrl: ep.srcFilm || ep.src,
+              startSec: resumeOnLoad,
+              variants: ep.allowedVariants || [],
+              isPremiumUser: ep.premiumUser === true,
+            });
+          }
 
-            // Refresh comments and ratings 
-            if (typeof window._loadComments === "function") {
-                window._loadComments();
-            }
-            if (typeof window._refreshRating === "function") {
-                window._refreshRating('tv', _currentEpisodeId);
-            }
+          // Refresh comments and ratings
+          if (typeof window._loadComments === "function") {
+            window._loadComments();
+          }
+          if (typeof window._refreshRating === "function") {
+            window._refreshRating("tv", _currentEpisodeId);
+          }
         }
 
         // Create buttons for each season's episodes
         Object.keys(episodesBySeason)
-            .sort((a, b) => Number(a) - Number(b))
-            .forEach((seasonNum) => {
-                const episodes = episodesBySeason[seasonNum];
+          .sort((a, b) => Number(a) - Number(b))
+          .forEach((seasonNum) => {
+            const episodes = episodesBySeason[seasonNum];
 
-                if (Object.keys(episodesBySeason).length > 1) {
-                    const seasonHeader = document.createElement("div");
-                    seasonHeader.className = "season-header";
-                    seasonHeader.textContent = `Season ${seasonNum}`;
-                    seasonHeader.style.fontSize = "14px";
-                    seasonHeader.style.fontWeight = "600";
-                    seasonHeader.style.color = "var(--text-subtle)";
-                    seasonHeader.style.marginBottom = "8px";
-                    seasonHeader.style.marginTop = "12px";
-                    buttonsContainer.appendChild(seasonHeader);
-                }
+            if (Object.keys(episodesBySeason).length > 1) {
+              const seasonHeader = document.createElement("div");
+              seasonHeader.className = "season-header";
+              seasonHeader.textContent = `Season ${seasonNum}`;
+              seasonHeader.style.fontSize = "14px";
+              seasonHeader.style.fontWeight = "600";
+              seasonHeader.style.color = "var(--text-subtle)";
+              seasonHeader.style.marginBottom = "8px";
+              seasonHeader.style.marginTop = "12px";
+              buttonsContainer.appendChild(seasonHeader);
+            }
 
-                episodes.forEach((ep) => {
-                    const button = document.createElement("button");
-                    button.className = "episode-button";
-                    button.textContent = `Ep ${ep.episodeNumber}`;
-                    button.dataset.season = seasonNum;
-                    button.dataset.episode = ep.episodeNumber;
-                    button.dataset.episodeId = ep.id || ep.episodeId || ep.episodeNumber;
+            episodes.forEach((ep) => {
+              const button = document.createElement("button");
+              button.className = "episode-button";
+              button.textContent = `Ep ${ep.episodeNumber}`;
+              button.dataset.season = seasonNum;
+              button.dataset.episode = ep.episodeNumber;
+              button.dataset.episodeId =
+                ep.id || ep.episodeId || ep.episodeNumber;
 
-                    const isSelected = selectedSeason == seasonNum && selectedEpisode == ep.episodeNumber;
-                    if (isSelected) {
-                        button.classList.add("active");
-                        _currentEpisodeId = ep.id || ep.episodeId || ep.episodeNumber;
-                    }
+              const isSelected =
+                selectedSeason == seasonNum &&
+                selectedEpisode == ep.episodeNumber;
+              if (isSelected) {
+                button.classList.add("active");
+                _currentEpisodeId = ep.id || ep.episodeId || ep.episodeNumber;
+              }
 
-                    button.addEventListener("click", () => selectEpisode(ep, button));
-                    buttonsContainer.appendChild(button);
-                });
+              button.addEventListener("click", () => selectEpisode(ep, button));
+              buttonsContainer.appendChild(button);
             });
+          });
 
         // Handle initial selection
         if (!selectedSeason || !selectedEpisode) {
-            const firstSeasonNum = Object.keys(episodesBySeason)[0];
-            const firstEpisode = episodesBySeason[firstSeasonNum]?.[0];
-            if (firstEpisode) {
-                const firstButton = buttonsContainer.querySelector(
-                    `[data-season="${firstSeasonNum}"][data-episode="${firstEpisode.episodeNumber}"]`
-                );
-                if (firstButton) {
-                    firstButton.click();
-                } else if (firstEpisode.srcFilm || firstEpisode.src) {
-                    const videoUrl = firstEpisode.srcFilm || firstEpisode.src;
-                    const variants = Array.isArray(firstEpisode.allowedVariants)
-                        ? firstEpisode.allowedVariants
-                        : [];
-                    const isPremiumUser = firstEpisode.premiumUser === true;
+          const firstSeasonNum = Object.keys(episodesBySeason)[0];
+          const firstEpisode = episodesBySeason[firstSeasonNum]?.[0];
+          if (firstEpisode) {
+            const firstButton = buttonsContainer.querySelector(
+              `[data-season="${firstSeasonNum}"][data-episode="${firstEpisode.episodeNumber}"]`,
+            );
+            if (firstButton) {
+              firstButton.click();
+            } else if (firstEpisode.srcFilm || firstEpisode.src) {
+              const videoUrl = firstEpisode.srcFilm || firstEpisode.src;
+              const variants = Array.isArray(firstEpisode.allowedVariants)
+                ? firstEpisode.allowedVariants
+                : [];
+              const isPremiumUser = firstEpisode.premiumUser === true;
 
-                    renderQualityDropdown(videoUrl, variants, isPremiumUser);
-                    loadVideo(videoUrl, window._resumeSec || 0);
-                    window._resumeSec = 0;
-                }
-                selectEpisode(firstEpisode, firstButton, true);
+              renderQualityDropdown(videoUrl, variants, isPremiumUser);
+              playMainContentWithOptionalAd({
+                videoUrl: videoUrl,
+                startSec: window._resumeSec || 0,
+                variants: variants || [],
+                isPremiumUser: isPremiumUser,
+              });
+              window._resumeSec = 0;
             }
+            selectEpisode(firstEpisode, firstButton, true);
+          }
         } else {
-            const season = sortedSeasons.find(s => s.seasonNumber == selectedSeason);
-            const ep = season?.episodes?.find(e => e.episodeNumber == selectedEpisode && e.published);
-            if (ep) {
-                const btn = buttonsContainer.querySelector(
-                    `[data-season="${selectedSeason}"][data-episode="${selectedEpisode}"]`
-                );
-                selectEpisode(ep, btn, true);
-            }
+          const season = sortedSeasons.find(
+            (s) => s.seasonNumber == selectedSeason,
+          );
+          const ep = season?.episodes?.find(
+            (e) => e.episodeNumber == selectedEpisode && e.published,
+          );
+          if (ep) {
+            const btn = buttonsContainer.querySelector(
+              `[data-season="${selectedSeason}"][data-episode="${selectedEpisode}"]`,
+            );
+            selectEpisode(ep, btn, true);
+          }
         }
-    }
+      }
 
-    // ── YouTube IFrame Player API ──────────────────────────────────────
-    // We use the official YT.Player API (not a plain iframe) because it is
-    // the ONLY way to receive play/pause/end state change events reliably.
-    // A plain iframe with enablejsapi=1 does NOT fire postMessage events
-    // unless the player was created through new YT.Player() and has had
-    // addEventListener() called on it. Without the API the tracker never
-    // fires and nothing is ever saved to the database.
+      // ── YouTube IFrame Player API ──────────────────────────────────────
+      // We use the official YT.Player API (not a plain iframe) because it is
+      // the ONLY way to receive play/pause/end state change events reliably.
+      // A plain iframe with enablejsapi=1 does NOT fire postMessage events
+      // unless the player was created through new YT.Player() and has had
+      // addEventListener() called on it. Without the API the tracker never
+      // fires and nothing is ever saved to the database.
 
-    let _ytPlayer = null; // YT.Player instance
-    let _ytReady = false; // true once onReady fires
-    let _pendingLoad = null; // { videoId, startSec } queued before API ready
-    let _ytStartSec = 0; // start position for the current video
+      let _ytPlayer = null; // YT.Player instance
+      let _ytReady = false; // true once onReady fires
+      let _pendingLoad = null; // { videoId, startSec } queued before API ready
+      let _ytStartSec = 0; // start position for the current video
 
-    // Called by the YT API script once it has loaded
-    window.onYouTubeIframeAPIReady = function () {
+      // Called by the YT API script once it has loaded
+      window.onYouTubeIframeAPIReady = function () {
         _ytReady = true;
         if (_pendingLoad) {
-            _createPlayer(_pendingLoad.videoId, _pendingLoad.startSec);
-            _pendingLoad = null;
+          _createPlayer(_pendingLoad.videoId, _pendingLoad.startSec);
+          _pendingLoad = null;
         }
-    };
+      };
 
-    function _createPlayer(videoId, startSec) {
+      function _createPlayer(videoId, startSec) {
         _ytStartSec = Math.floor(startSec || 0); // saved for onReady seekTo()
 
         // Destroy previous player if one exists (e.g. episode switch)
         if (_ytPlayer) {
-            try {
-                _ytPlayer.destroy();
-            } catch (e) {}
-            _ytPlayer = null;
-            const container = document.querySelector(".video-container");
-            container.innerHTML = "";
-            const div = document.createElement("div");
-            div.id = "videoPlayer";
-            div.className = "video-player";
-            container.appendChild(div);
+          try {
+            _ytPlayer.destroy();
+          } catch (e) {}
+          _ytPlayer = null;
+          const container = document.querySelector(".video-container");
+          container.innerHTML = "";
+          const div = document.createElement("div");
+          div.id = "videoPlayer";
+          div.className = "video-player";
+          container.appendChild(div);
         }
         _ytPlayer = new YT.Player("videoPlayer", {
-            width: "100%",
-            height: "100%",
-            videoId: videoId,
-            playerVars: {
-                rel: 0,
-                modestbranding: 1,
-            },
-            events: {
-                onReady: _onPlayerReady,
-                onStateChange: _onStateChange,
-            },
+          width: "100%",
+          height: "100%",
+          videoId: videoId,
+          playerVars: {
+            rel: 0,
+            modestbranding: 1,
+          },
+          events: {
+            onReady: _onPlayerReady,
+            onStateChange: _onStateChange,
+          },
         });
-    }
+      }
 
-    function _onPlayerReady(event) {
+      function _onPlayerReady(event) {
         // Get exact duration straight from the YouTube player API
         const ytDuration = event.target.getDuration();
         if (ytDuration && ytDuration > 0) {
-            _durationSec = Math.floor(ytDuration);
+          _durationSec = Math.floor(ytDuration);
         }
 
         // Seek to saved position — seekTo() is reliable without autoplay,
         // unlike playerVars.start which YouTube ignores when paused on load
         if (_ytStartSec > 0) {
-            event.target.seekTo(_ytStartSec, true);
+          event.target.seekTo(_ytStartSec, true);
         }
-    }
+      }
 
-    function _onStateChange(event) {
+      function _onStateChange(event) {
         const state = event.data;
         // YT.PlayerState: PLAYING=1, PAUSED=2, ENDED=0, BUFFERING=3
         if (state === YT.PlayerState.PLAYING) {
-            if (_firstPlay) {
-                _firstPlay = false;
-                _doSave(); // immediate save creates the DB record right away
-            }
+          if (_firstPlay) {
+            _firstPlay = false;
+            _doSave(); // immediate save creates the DB record right away
+          }
         } else if (
-            state === YT.PlayerState.PAUSED ||
-            state === YT.PlayerState.ENDED
+          state === YT.PlayerState.PAUSED ||
+          state === YT.PlayerState.ENDED
         ) {
-            _doSave(); // save the exact position whenever user pauses or video ends
+          _doSave(); // save the exact position whenever user pauses or video ends
         }
-    }
+      }
 
-    let _nativeVideo = null; // <video> element for direct MP4/HLS
+      let _nativeVideo = null; // <video> element for direct MP4/HLS
 
-    function _prepareVideoContainer() {
+      function _prepareVideoContainer() {
         const container = document.querySelector(".video-container");
         const existingOverlay = document.getElementById("adOverlay");
         container.innerHTML = "";
         if (existingOverlay) {
-            container.appendChild(existingOverlay);
+          container.appendChild(existingOverlay);
         }
         return container;
-    }
+      }
 
-    function loadVideo(videoUrl, startSec) {
+      function loadVideo(videoUrl, startSec) {
         const start = Math.floor(startSec || 0);
 
         if (!videoUrl || videoUrl.trim() === "") {
-            if (_ytPlayer) { try { _ytPlayer.stopVideo(); } catch (e) {} }
-            return;
+          if (_ytPlayer) {
+            try {
+              _ytPlayer.stopVideo();
+            } catch (e) {}
+          }
+          return;
         }
 
-    _nativeVideo = null;
-    // Clear any previous Hls instance reference when switching videos
-    try { window._hlsInstance = null; } catch (e) {}
+        _nativeVideo = null;
+        // Clear any previous Hls instance reference when switching videos
+        try {
+          window._hlsInstance = null;
+        } catch (e) {}
 
         if (videoUrl.includes("youtube.com") || videoUrl.includes("youtu.be")) {
-            const videoId = extractYouTubeId(videoUrl);
-            if (!videoId) return;
-            if (_ytReady) {
-                _createPlayer(videoId, start);
-            } else {
-                _pendingLoad = { videoId, startSec: start };
-                if (!document.getElementById("yt-api-script")) {
-                    const tag = document.createElement("script");
-                    tag.id = "yt-api-script";
-                    tag.src = "https://www.youtube.com/iframe_api";
-                    document.head.appendChild(tag);
-                }
+          const videoId = extractYouTubeId(videoUrl);
+          if (!videoId) return;
+          if (_ytReady) {
+            _createPlayer(videoId, start);
+          } else {
+            _pendingLoad = { videoId, startSec: start };
+            if (!document.getElementById("yt-api-script")) {
+              const tag = document.createElement("script");
+              tag.id = "yt-api-script";
+              tag.src = "https://www.youtube.com/iframe_api";
+              document.head.appendChild(tag);
             }
+          }
         } else if (videoUrl.includes("vimeo.com")) {
-            const videoId = extractVimeoId(videoUrl);
-            if (videoId) {
-                const container = _prepareVideoContainer();
-                container.insertAdjacentHTML("afterbegin", `<iframe id="videoPlayer" class="video-player" allowfullscreen
-                          src="https://player.vimeo.com/video/${videoId}?api=1#t=${start}">
-                       </iframe>`);
-                if (_firstPlay) { _firstPlay = false; _doSave(); }
-            }
-        } else if (/\.(mp4|webm|ogg|mov)([\?#]|$)/i.test(videoUrl) || videoUrl.includes(".m3u8")) {
+          const videoId = extractVimeoId(videoUrl);
+          if (videoId) {
             const container = _prepareVideoContainer();
-            const vid = document.createElement("video");
-            vid.id = "videoPlayer";
-            vid.className = "video-player";
-            vid.controls = true;
-            vid.style.background = "#000";
-            // attach subtitle track if admin uploaded one
-            if (_currentSubtitleUrl) {
-                try {
-                    const track = document.createElement('track');
-                    track.kind = 'subtitles';
-                    track.label = 'Default';
-                    track.srclang = 'en';
-                    track.src = _currentSubtitleUrl;
-                    track.default = true;
-                    vid.appendChild(track);
-                } catch (e) {
-                    console.warn('Failed to attach subtitle track', e);
-                }
+            container.insertAdjacentHTML(
+              "afterbegin",
+              `<iframe id="videoPlayer" class="video-player" allowfullscreen
+                          src="https://player.vimeo.com/video/${videoId}?api=1#t=${start}">
+                       </iframe>`,
+            );
+            if (_firstPlay) {
+              _firstPlay = false;
+              _doSave();
             }
-
-            // Attach custom uploaded subtitle if present (overrides default)
+          }
+        } else if (
+          /\.(mp4|webm|ogg|mov)([\?#]|$)/i.test(videoUrl) ||
+          videoUrl.includes(".m3u8")
+        ) {
+          const container = _prepareVideoContainer();
+          const vid = document.createElement("video");
+          vid.id = "videoPlayer";
+          vid.className = "video-player";
+          vid.controls = true;
+          vid.style.background = "#000";
+          // attach subtitle track if admin uploaded one
+          if (_currentSubtitleUrl) {
             try {
-                const stored = _getStoredCustomSubtitle();
-                if (stored) {
-                    // stored is a data URL
-                    const customTrack = document.createElement('track');
-                    customTrack.kind = 'subtitles';
-                    customTrack.label = 'Uploaded';
-                    customTrack.srclang = 'en';
-                    customTrack.src = stored;
-                    customTrack.default = true;
-                    // remove other 'default' flags
-                    Array.from(vid.querySelectorAll('track')).forEach(t => t.default = false);
-                    vid.appendChild(customTrack);
-                }
+              const track = document.createElement("track");
+              track.kind = "subtitles";
+              track.label = "Default";
+              track.srclang = "en";
+              track.src = _currentSubtitleUrl;
+              track.default = true;
+              vid.appendChild(track);
             } catch (e) {
-                console.warn('Failed to attach custom subtitle', e);
+              console.warn("Failed to attach subtitle track", e);
             }
-            container.insertBefore(vid, container.firstChild);
-            _nativeVideo = vid;
+          }
 
-            if (videoUrl.includes(".m3u8")) {
-                if (vid.canPlayType("application/vnd.apple.mpegurl")) {
-                    vid.src = videoUrl;
-                } else if (window.Hls && Hls.isSupported()) {
-                    const hls = new Hls();
-                    // keep a global reference so UI controls (subtitle selector) can disable subtitleTrack
-                    try { window._hlsInstance = hls; } catch (e) {}
-                    hls.loadSource(videoUrl);
-                    // attach subtitle track for hls.js playback
-                    if (_currentSubtitleUrl) {
-                        try {
-                            const track = document.createElement('track');
-                            track.kind = 'subtitles';
-                            track.label = 'Default';
-                            track.srclang = 'en';
-                            track.src = _currentSubtitleUrl;
-                            track.default = true;
-                            vid.appendChild(track);
-                            // attempt to make the new text track visible once it's parsed
-                            setTimeout(() => {
-                                try {
-                                    const tracks = Array.from(vid.textTracks || []);
-                                    const tt = tracks.find(t => (t && (t.label === 'Default' || t.language === 'en')));
-                                    if (tt) tt.mode = 'showing';
-                                } catch (e) {}
-                            }, 150);
-                        } catch (e) {
-                            console.warn('Failed to attach subtitle track for hls.js', e);
-                        }
-                    }
-                    hls.attachMedia(vid);
-                } else {
-                    console.error("HLS is not supported in this browser");
+          // Attach custom uploaded subtitle if present (overrides default)
+          try {
+            const stored = _getStoredCustomSubtitle();
+            if (stored) {
+              // stored is a data URL
+              const customTrack = document.createElement("track");
+              customTrack.kind = "subtitles";
+              customTrack.label = "Uploaded";
+              customTrack.srclang = "en";
+              customTrack.src = stored;
+              customTrack.default = true;
+              // remove other 'default' flags
+              Array.from(vid.querySelectorAll("track")).forEach(
+                (t) => (t.default = false),
+              );
+              vid.appendChild(customTrack);
+            }
+          } catch (e) {
+            console.warn("Failed to attach custom subtitle", e);
+          }
+          container.insertBefore(vid, container.firstChild);
+          _nativeVideo = vid;
+
+          if (videoUrl.includes(".m3u8")) {
+            if (vid.canPlayType("application/vnd.apple.mpegurl")) {
+              vid.src = videoUrl;
+            } else if (window.Hls && Hls.isSupported()) {
+              const hls = new Hls();
+              // keep a global reference so UI controls (subtitle selector) can disable subtitleTrack
+              try {
+                window._hlsInstance = hls;
+              } catch (e) {}
+              hls.loadSource(videoUrl);
+              // attach subtitle track for hls.js playback
+              if (_currentSubtitleUrl) {
+                try {
+                  const track = document.createElement("track");
+                  track.kind = "subtitles";
+                  track.label = "Default";
+                  track.srclang = "en";
+                  track.src = _currentSubtitleUrl;
+                  track.default = true;
+                  vid.appendChild(track);
+                  // attempt to make the new text track visible once it's parsed
+                  setTimeout(() => {
+                    try {
+                      const tracks = Array.from(vid.textTracks || []);
+                      const tt = tracks.find(
+                        (t) =>
+                          t && (t.label === "Default" || t.language === "en"),
+                      );
+                      if (tt) tt.mode = "showing";
+                    } catch (e) {}
+                  }, 150);
+                } catch (e) {
+                  console.warn("Failed to attach subtitle track for hls.js", e);
                 }
+              }
+              hls.attachMedia(vid);
             } else {
-                vid.src = videoUrl;
+              console.error("HLS is not supported in this browser");
             }
+          } else {
+            vid.src = videoUrl;
+          }
 
-            vid.addEventListener("loadedmetadata", () => {
-                if (vid.duration > 0) _durationSec = Math.floor(vid.duration);
-                if (start > 0) vid.currentTime = start;
-            }, { once: true });
+          vid.addEventListener(
+            "loadedmetadata",
+            () => {
+              if (vid.duration > 0) _durationSec = Math.floor(vid.duration);
+              if (start > 0) vid.currentTime = start;
+            },
+            { once: true },
+          );
 
-            if (_firstPlay) { _firstPlay = false; _doSave(); }
+          if (_firstPlay) {
+            _firstPlay = false;
+            _doSave();
+          }
         } else {
-            // Generic embedded iframe
-            const container = document.querySelector(".video-container");
-            container.innerHTML = `<iframe id="videoPlayer" class="video-player" allowfullscreen
-                      src="${start > 0 ? videoUrl + '#t=' + start : videoUrl}">
+          // Generic embedded iframe
+          const container = document.querySelector(".video-container");
+          container.innerHTML = `<iframe id="videoPlayer" class="video-player" allowfullscreen
+                      src="${start > 0 ? videoUrl + "#t=" + start : videoUrl}">
                    </iframe>`;
-            if (_firstPlay) { _firstPlay = false; _doSave(); }
+          if (_firstPlay) {
+            _firstPlay = false;
+            _doSave();
+          }
         }
-    }
+      }
 
-    function extractYouTubeId(url) {
+      function extractYouTubeId(url) {
         const patterns = [
-            /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/,
-            /youtube\.com\/embed\/([^&\n?#]+)/,
+          /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/,
+          /youtube\.com\/embed\/([^&\n?#]+)/,
         ];
         for (const pattern of patterns) {
-            const match = url.match(pattern);
-            if (match) return match[1];
+          const match = url.match(pattern);
+          if (match) return match[1];
         }
         return null;
-    }
+      }
 
-    function extractVimeoId(url) {
+      function extractVimeoId(url) {
         const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
         return match ? match[1] : null;
-    }
+      }
 
-    // ── Watch History Tracker ──────────────────────────────────────────
+      // ── Watch History Tracker ──────────────────────────────────────────
 
-    const _histParams = new URLSearchParams(window.location.search);
-    const _histId     = _histParams.get("id");
-    const _histType   = _histParams.get("type") || "movie";
-    const _histToken  = localStorage.getItem("token");
-    const _tParam     = _histParams.get("t");
+      const _histParams = new URLSearchParams(window.location.search);
+      const _histId = _histParams.get("id");
+      const _histType = _histParams.get("type") || "movie";
+      const _histToken = localStorage.getItem("token");
+      const _tParam = _histParams.get("t");
 
-    let _durationSec = 0;
-    let _firstPlay   = true;
+      let _durationSec = 0;
+      let _firstPlay = true;
 
-    window._resumeSec = 0;
+      window._resumeSec = 0;
 
-    window._startHistoryTracker = function (durationSeconds) {
+      window._startHistoryTracker = function (durationSeconds) {
         _durationSec = durationSeconds || 0;
-    };
+      };
 
-    // ── Current time — works for YouTube, native <video>, and iframes ──
-    function _getCurrentTime() {
+      // ── Current time — works for YouTube, native <video>, and iframes ──
+      function _getCurrentTime() {
         try {
-            if (_ytPlayer && typeof _ytPlayer.getCurrentTime === "function") {
-                return Math.floor(_ytPlayer.getCurrentTime()) || 0;
-            }
-            if (_nativeVideo) {
-                return Math.floor(_nativeVideo.currentTime) || 0;
-            }
+          if (_ytPlayer && typeof _ytPlayer.getCurrentTime === "function") {
+            return Math.floor(_ytPlayer.getCurrentTime()) || 0;
+          }
+          if (_nativeVideo) {
+            return Math.floor(_nativeVideo.currentTime) || 0;
+          }
         } catch (e) {}
         return 0;
-    }
+      }
 
-    // ── Duration — prefers live player value over stored estimate ──────
-    function _getLiveDuration() {
+      // ── Duration — prefers live player value over stored estimate ──────
+      function _getLiveDuration() {
         try {
-            if (_ytPlayer && typeof _ytPlayer.getDuration === "function") {
-                const d = _ytPlayer.getDuration();
-                if (d > 0) return Math.floor(d);
-            }
-            if (_nativeVideo && _nativeVideo.duration > 0) {
-                return Math.floor(_nativeVideo.duration);
-            }
+          if (_ytPlayer && typeof _ytPlayer.getDuration === "function") {
+            const d = _ytPlayer.getDuration();
+            if (d > 0) return Math.floor(d);
+          }
+          if (_nativeVideo && _nativeVideo.duration > 0) {
+            return Math.floor(_nativeVideo.duration);
+          }
         } catch (e) {}
         return _durationSec || 0;
-    }
+      }
 
-    // ── Resolve which content is currently playing ─────────────────────
-    // When a TV episode is switched, _currentMovieId / _currentEpisodeId
-    // are updated by setupTVSeries — use those instead of the URL ?id=.
-    function _buildPayload() {
+      // ── Resolve which content is currently playing ─────────────────────
+      // When a TV episode is switched, _currentMovieId / _currentEpisodeId
+      // are updated by setupTVSeries — use those instead of the URL ?id=.
+      function _buildPayload() {
         const currentTime = _getCurrentTime();
-        const duration    = _getLiveDuration();
+        const duration = _getLiveDuration();
         if (duration > 0) _durationSec = duration; // keep in sync
-        const progress    = duration > 0 ? Math.min(currentTime, duration) : currentTime;
+        const progress =
+          duration > 0 ? Math.min(currentTime, duration) : currentTime;
 
         // Determine which entity to attach the record to
         if (_histType === "tv") {
-            const epId = _currentEpisodeId || parseInt(_histId);
-            return { progressSec: progress, durationSec: duration, episodeId: epId };
+          const epId = _currentEpisodeId || parseInt(_histId);
+          return {
+            progressSec: progress,
+            durationSec: duration,
+            episodeId: epId,
+          };
         } else {
-            const mvId = _currentMovieId || parseInt(_histId);
-            return { progressSec: progress, durationSec: duration, movieId: mvId };
+          const mvId = _currentMovieId || parseInt(_histId);
+          return {
+            progressSec: progress,
+            durationSec: duration,
+            movieId: mvId,
+          };
         }
-    }
+      }
 
-    function _doSave() {
+      function _doSave() {
         if (!_histToken) return;
         const payload = _buildPayload();
         // Need at least one content id
         if (!payload.movieId && !payload.episodeId) return;
         fetch("/api/user/history/save", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + _histToken,
-            },
-            body: JSON.stringify(payload),
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + _histToken,
+          },
+          body: JSON.stringify(payload),
         }).catch(() => {});
-    }
+      }
 
-    // Periodic save every 15 s — fires for all player types once playing has started
-    setInterval(() => {
+      // Periodic save every 15 s — fires for all player types once playing has started
+      setInterval(() => {
         if (!_firstPlay) _doSave();
-    }, 15_000);
+      }, 15_000);
 
-    // Save on tab/browser close (synchronous XHR — sendBeacon can't set Auth header)
-    window.addEventListener("beforeunload", () => {
+      // Save on tab/browser close (synchronous XHR — sendBeacon can't set Auth header)
+      window.addEventListener("beforeunload", () => {
         if (_firstPlay || !_histToken) return;
         const payload = _buildPayload();
         if (!payload.movieId && !payload.episodeId) return;
@@ -1997,384 +2204,417 @@
         xhr.open("POST", "/api/user/history/save", false);
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.setRequestHeader("Authorization", "Bearer " + _histToken);
-        try { xhr.send(JSON.stringify(payload)); } catch (e) {}
-    });
+        try {
+          xhr.send(JSON.stringify(payload));
+        } catch (e) {}
+      });
 
-    async function _initAndStart() {
+      async function _initAndStart() {
         if (_tParam !== null && _tParam !== "") {
-            window._resumeSec = parseFloat(_tParam) || 0;
+          window._resumeSec = parseFloat(_tParam) || 0;
         }
 
         // Load saved progress from DB to resume from where the user left off
         if (_histId && _histToken) {
-            try {
-                const res = await fetch("/api/user/history", {
-                    headers: { Authorization: "Bearer " + _histToken },
-                });
-                if (res.ok) {
-                    const list = await res.json();
-                    // For TV, _histId is the series ID. Match history by the ?episode= param (episode DB id).
-                    const _episodeParam = _histParams.get("episode");
-                    const rec = list.find(
-                        (h) =>
-                            (_histType === "movie" && String(h.movieId) === String(_histId)) ||
-                            (_histType === "tv" && _episodeParam && String(h.episodeId) === String(_episodeParam)),
-                    );
-                    if (rec) {
-                        const savedPos = rec.progressSec || 0;
-                        if (rec.durationSec > 0) _durationSec = rec.durationSec;
-                        if (!window._resumeSec) window._resumeSec = savedPos;
-                    }
-                }
-            } catch (e) {
-                console.warn("Could not load saved progress:", e);
+          try {
+            const res = await fetch("/api/user/history", {
+              headers: { Authorization: "Bearer " + _histToken },
+            });
+            if (res.ok) {
+              const list = await res.json();
+              // For TV, _histId is the series ID. Match history by the ?episode= param (episode DB id).
+              const _episodeParam = _histParams.get("episode");
+              const rec = list.find(
+                (h) =>
+                  (_histType === "movie" &&
+                    String(h.movieId) === String(_histId)) ||
+                  (_histType === "tv" &&
+                    _episodeParam &&
+                    String(h.episodeId) === String(_episodeParam)),
+              );
+              if (rec) {
+                const savedPos = rec.progressSec || 0;
+                if (rec.durationSec > 0) _durationSec = rec.durationSec;
+                if (!window._resumeSec) window._resumeSec = savedPos;
+              }
             }
+          } catch (e) {
+            console.warn("Could not load saved progress:", e);
+          }
         }
         loadWatchPage();
-    }
+      }
 
-    // --- Subtitle upload helpers ---
-    function srtToVtt(srtText) {
+      // --- Subtitle upload helpers ---
+      function srtToVtt(srtText) {
         // Simple converter: normalize line endings, add VTT header, and
         // convert any SRT timecode commas to dots on lines containing -->
         try {
-            const normalized = srtText.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-            const lines = normalized.split('\n');
-            const out = ['WEBVTT', ''];
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i];
-                if (line.indexOf('-->') !== -1) {
-                    // replace comma with dot in timecodes and collapse extra spaces
-                    const fixed = line.replace(/,/g, '.').replace(/\s+/g, ' ').trim();
-                    out.push(fixed);
-                } else {
-                    out.push(line);
-                }
-            }
-            return out.join('\n');
-        } catch (e) {
-            console.warn('srtToVtt failed', e);
-            return null;
-        }
-    }
-
-    function fileToDataUrl(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = (e) => reject(e);
-            reader.readAsText(file);
-        });
-    }
-
-    function attachRemoteSubtitleToVideo(url, lang) {
-        try {
-            // if url seems like a proxy api (/api/public/movies/subtitle/...), use as-is
-            const finalUrl = url;
-
-            if (_nativeVideo) {
-                // remove existing non-custom tracks
-                Array.from(_nativeVideo.querySelectorAll('track')).forEach(t => {
-                    // do not remove data: URL custom tracks (they contain 'data:'), these are user-uploaded
-                    if (t.src && !t.src.startsWith('data:')) t.remove();
-                });
-                const t = document.createElement('track');
-                t.kind = 'subtitles';
-                t.label = lang || 'subtitle';
-                t.srclang = lang || 'en';
-                t.src = finalUrl;
-                t.default = true;
-                _nativeVideo.appendChild(t);
+          const normalized = srtText
+            .replace(/\r\n/g, "\n")
+            .replace(/\r/g, "\n");
+          const lines = normalized.split("\n");
+          const out = ["WEBVTT", ""];
+          for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            if (line.indexOf("-->") !== -1) {
+              // replace comma with dot in timecodes and collapse extra spaces
+              const fixed = line.replace(/,/g, ".").replace(/\s+/g, " ").trim();
+              out.push(fixed);
             } else {
-                // if no native video, try to replace tracks inside videoPlayer (iframe case unsupported)
-                const vidEl = document.getElementById('videoPlayer');
-                if (vidEl && vidEl.tagName === 'VIDEO') {
-                    Array.from(vidEl.querySelectorAll('track')).forEach(t => { if (t.src && !t.src.startsWith('data:')) t.remove(); });
-                    const t = document.createElement('track');
-                    t.kind = 'subtitles';
-                    t.label = lang || 'subtitle';
-                    t.srclang = lang || 'en';
-                    t.src = finalUrl;
-                    t.default = true;
-                    vidEl.appendChild(t);
-                } else {
-                    console.warn('attachRemoteSubtitleToVideo: no native video element available to attach track');
-                }
+              out.push(line);
             }
+          }
+          return out.join("\n");
         } catch (e) {
-            console.warn('attachRemoteSubtitleToVideo error', e);
+          console.warn("srtToVtt failed", e);
+          return null;
         }
-    }
+      }
 
-    // Wire up input handlers
-    (function setupSubtitleUploadHandlers() {
-        const input = document.getElementById('subtitleFileInput');
-        const clearBtn = document.getElementById('clearCustomSubtitle');
-        const status = document.getElementById('subtitleStatus');
+      function fileToDataUrl(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = (e) => reject(e);
+          reader.readAsText(file);
+        });
+      }
+
+      function attachRemoteSubtitleToVideo(url, lang) {
+        try {
+          // if url seems like a proxy api (/api/public/movies/subtitle/...), use as-is
+          const finalUrl = url;
+
+          if (_nativeVideo) {
+            // remove existing non-custom tracks
+            Array.from(_nativeVideo.querySelectorAll("track")).forEach((t) => {
+              // do not remove data: URL custom tracks (they contain 'data:'), these are user-uploaded
+              if (t.src && !t.src.startsWith("data:")) t.remove();
+            });
+            const t = document.createElement("track");
+            t.kind = "subtitles";
+            t.label = lang || "subtitle";
+            t.srclang = lang || "en";
+            t.src = finalUrl;
+            t.default = true;
+            _nativeVideo.appendChild(t);
+          } else {
+            // if no native video, try to replace tracks inside videoPlayer (iframe case unsupported)
+            const vidEl = document.getElementById("videoPlayer");
+            if (vidEl && vidEl.tagName === "VIDEO") {
+              Array.from(vidEl.querySelectorAll("track")).forEach((t) => {
+                if (t.src && !t.src.startsWith("data:")) t.remove();
+              });
+              const t = document.createElement("track");
+              t.kind = "subtitles";
+              t.label = lang || "subtitle";
+              t.srclang = lang || "en";
+              t.src = finalUrl;
+              t.default = true;
+              vidEl.appendChild(t);
+            } else {
+              console.warn(
+                "attachRemoteSubtitleToVideo: no native video element available to attach track",
+              );
+            }
+          }
+        } catch (e) {
+          console.warn("attachRemoteSubtitleToVideo error", e);
+        }
+      }
+
+      // Wire up input handlers
+      (function setupSubtitleUploadHandlers() {
+        const input = document.getElementById("subtitleFileInput");
+        const clearBtn = document.getElementById("clearCustomSubtitle");
+        const status = document.getElementById("subtitleStatus");
 
         function updateUi() {
-            const stored = _getStoredCustomSubtitle();
-            if (stored) {
-                clearBtn.style.display = 'inline-flex';
-                status.textContent = 'Using uploaded subtitle.';
-            } else if (_currentSubtitleUrl) {
-                clearBtn.style.display = 'none';
-                status.textContent = 'Using default subtitle.';
-            } else {
-                clearBtn.style.display = 'none';
-                status.textContent = 'No subtitles available.';
-            }
+          const stored = _getStoredCustomSubtitle();
+          if (stored) {
+            clearBtn.style.display = "inline-flex";
+            status.textContent = "Using uploaded subtitle.";
+          } else if (_currentSubtitleUrl) {
+            clearBtn.style.display = "none";
+            status.textContent = "Using default subtitle.";
+          } else {
+            clearBtn.style.display = "none";
+            status.textContent = "No subtitles available.";
+          }
         }
 
         if (input) {
-            input.addEventListener('change', async (e) => {
-                const file = input.files && input.files[0];
-                if (!file) return;
-                status.textContent = 'Processing subtitle...';
-                try {
-                    const text = await fileToDataUrl(file);
-                    // text is the file content (string). Determine type by extension
-                    const name = file.name || '';
-                    let vtt = null;
-                    if (/\.vtt$/i.test(name) || /text\/vtt/.test(file.type)) {
-                        vtt = text;
-                    } else if (/\.srt$/i.test(name) || /subtitle|srt/.test(file.type)) {
-                        vtt = srtToVtt(text);
-                    } else {
-                        // try to guess: if contains "-->" treat as srt
-                        if (text.includes('-->')) vtt = srtToVtt(text);
-                        else vtt = text;
+          input.addEventListener("change", async (e) => {
+            const file = input.files && input.files[0];
+            if (!file) return;
+            status.textContent = "Processing subtitle...";
+            try {
+              const text = await fileToDataUrl(file);
+              // text is the file content (string). Determine type by extension
+              const name = file.name || "";
+              let vtt = null;
+              if (/\.vtt$/i.test(name) || /text\/vtt/.test(file.type)) {
+                vtt = text;
+              } else if (
+                /\.srt$/i.test(name) ||
+                /subtitle|srt/.test(file.type)
+              ) {
+                vtt = srtToVtt(text);
+              } else {
+                // try to guess: if contains "-->" treat as srt
+                if (text.includes("-->")) vtt = srtToVtt(text);
+                else vtt = text;
+              }
+
+              if (!vtt) throw new Error("Could not convert subtitle to VTT");
+
+              // Create data URL
+              const blob = new Blob([vtt], { type: "text/vtt" });
+              const reader = new FileReader();
+              reader.onload = () => {
+                const dataUrl = reader.result;
+                if (_storeCustomSubtitle(dataUrl)) {
+                  status.textContent =
+                    "Uploaded subtitle saved locally for this item.";
+                  // Re-attach to currently playing video
+                  try {
+                    if (_nativeVideo) {
+                      // remove existing uploaded tracks
+                      Array.from(
+                        _nativeVideo.querySelectorAll("track"),
+                      ).forEach((t) => t.remove());
+                      const t = document.createElement("track");
+                      t.kind = "subtitles";
+                      t.label = "Uploaded";
+                      t.srclang = "en";
+                      t.src = dataUrl;
+                      t.default = true;
+                      _nativeVideo.appendChild(t);
                     }
-
-                    if (!vtt) throw new Error('Could not convert subtitle to VTT');
-
-                    // Create data URL
-                    const blob = new Blob([vtt], { type: 'text/vtt' });
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                        const dataUrl = reader.result;
-                        if (_storeCustomSubtitle(dataUrl)) {
-                            status.textContent = 'Uploaded subtitle saved locally for this item.';
-                            // Re-attach to currently playing video
-                            try {
-                                if (_nativeVideo) {
-                                    // remove existing uploaded tracks
-                                    Array.from(_nativeVideo.querySelectorAll('track')).forEach(t => t.remove());
-                                    const t = document.createElement('track');
-                                    t.kind = 'subtitles';
-                                    t.label = 'Uploaded';
-                                    t.srclang = 'en';
-                                    t.src = dataUrl;
-                                    t.default = true;
-                                    _nativeVideo.appendChild(t);
-                                }
-                            } catch (e) { console.warn('Could not attach uploaded track immediately', e); }
-                        } else {
-                            status.textContent = 'Failed to save subtitle locally.';
-                        }
-                        updateUi();
-                    };
-                    reader.onerror = (err) => {
-                        console.warn('Failed to read blob as dataURL', err);
-                        status.textContent = 'Failed to process subtitle.';
-                    };
-                    reader.readAsDataURL(blob);
-                } catch (err) {
-                    console.error('Subtitle upload failed', err);
-                    status.textContent = 'Failed to process subtitle.';
-                } finally {
-                    input.value = '';
+                  } catch (e) {
+                    console.warn(
+                      "Could not attach uploaded track immediately",
+                      e,
+                    );
+                  }
+                } else {
+                  status.textContent = "Failed to save subtitle locally.";
                 }
-            });
+                updateUi();
+              };
+              reader.onerror = (err) => {
+                console.warn("Failed to read blob as dataURL", err);
+                status.textContent = "Failed to process subtitle.";
+              };
+              reader.readAsDataURL(blob);
+            } catch (err) {
+              console.error("Subtitle upload failed", err);
+              status.textContent = "Failed to process subtitle.";
+            } finally {
+              input.value = "";
+            }
+          });
         }
 
         if (clearBtn) {
-            clearBtn.addEventListener('click', () => {
-                _clearStoredCustomSubtitle();
-                status.textContent = 'Cleared uploaded subtitle.';
-                // reload video tracks: remove custom tracks and re-add default if present
-                try {
-                    if (_nativeVideo) {
-                        Array.from(_nativeVideo.querySelectorAll('track')).forEach(t => t.remove());
-                        if (_currentSubtitleUrl) {
-                            const track = document.createElement('track');
-                            track.kind = 'subtitles';
-                            track.label = 'Default';
-                            track.srclang = 'en';
-                            track.src = _currentSubtitleUrl;
-                            track.default = true;
-                            _nativeVideo.appendChild(track);
-                        }
-                    }
-                } catch (e) { console.warn('Could not reattach default subtitle', e); }
-                updateUi();
-            });
+          clearBtn.addEventListener("click", () => {
+            _clearStoredCustomSubtitle();
+            status.textContent = "Cleared uploaded subtitle.";
+            // reload video tracks: remove custom tracks and re-add default if present
+            try {
+              if (_nativeVideo) {
+                Array.from(_nativeVideo.querySelectorAll("track")).forEach(
+                  (t) => t.remove(),
+                );
+                if (_currentSubtitleUrl) {
+                  const track = document.createElement("track");
+                  track.kind = "subtitles";
+                  track.label = "Default";
+                  track.srclang = "en";
+                  track.src = _currentSubtitleUrl;
+                  track.default = true;
+                  _nativeVideo.appendChild(track);
+                }
+              }
+            } catch (e) {
+              console.warn("Could not reattach default subtitle", e);
+            }
+            updateUi();
+          });
         }
 
         // Expose a function to update UI when movie/episode changes
         window._updateSubtitleUi = updateUi;
         // Initial UI update (may be before movie loaded)
         setTimeout(updateUi, 300);
-    })();
+      })();
 
-    // ── PRE-ROLL ADS FOR NON-PREMIUM USERS ────────────────────────────
-    let _isAdPlaying = false;
-    let _adCountdownInterval = null;
-    let _adFinishHandled = false;
-    let _mainContentContext = null;
-    let _adSkipUnlocked = false;
-    let _adMaxAllowedTime = 0;
-    let _adStartedOnce = false;
-    let _adAutoplayRecoveryBound = false;
-    let _adUserUnmuted = false;
+      // ── PRE-ROLL ADS FOR NON-PREMIUM USERS ────────────────────────────
+      let _isAdPlaying = false;
+      let _adCountdownInterval = null;
+      let _adFinishHandled = false;
+      let _mainContentContext = null;
+      let _adSkipUnlocked = false;
+      let _adMaxAllowedTime = 0;
+      let _adStartedOnce = false;
+      let _adAutoplayRecoveryBound = false;
+      let _adUserUnmuted = false;
 
-    function _clearAdCountdown() {
+      function _clearAdCountdown() {
         if (_adCountdownInterval) {
-            clearInterval(_adCountdownInterval);
-            _adCountdownInterval = null;
+          clearInterval(_adCountdownInterval);
+          _adCountdownInterval = null;
         }
-    }
+      }
 
-    function _getAdEls() {
+      function _getAdEls() {
         return {
-            overlay: document.getElementById("adOverlay"),
-            counter: document.getElementById("adCounter"),
-            skipBtn: document.getElementById("skipAdBtn"),
-            unmuteBtn: document.getElementById("unmuteAdBtn"),
-            hint: document.getElementById("adCenterHint"),
-            qualityWrap: document.getElementById("qualityWrap"),
+          overlay: document.getElementById("adOverlay"),
+          counter: document.getElementById("adCounter"),
+          skipBtn: document.getElementById("skipAdBtn"),
+          unmuteBtn: document.getElementById("unmuteAdBtn"),
+          hint: document.getElementById("adCenterHint"),
+          qualityWrap: document.getElementById("qualityWrap"),
         };
-    }
+      }
 
-    function _syncAdMuteButton() {
+      function _syncAdMuteButton() {
         const { unmuteBtn } = _getAdEls();
         if (!unmuteBtn) return;
         if (!_isAdPlaying) {
-            unmuteBtn.style.display = "none";
-            unmuteBtn.textContent = "🔊 Unmute";
-            return;
+          unmuteBtn.style.display = "none";
+          unmuteBtn.textContent = "🔊 Unmute";
+          return;
         }
 
         unmuteBtn.style.display = "inline-flex";
         const muted = !_nativeVideo || _nativeVideo.muted;
         unmuteBtn.textContent = muted ? "🔊 Unmute" : "🔇 Mute";
-    }
+      }
 
-    function _setAdMutedState(shouldMute) {
+      function _setAdMutedState(shouldMute) {
         if (_nativeVideo) {
-            _nativeVideo.muted = shouldMute;
-            _nativeVideo.defaultMuted = shouldMute;
-            if (!shouldMute && (_nativeVideo.volume === 0 || Number.isNaN(_nativeVideo.volume))) {
-                _nativeVideo.volume = 1;
-            }
+          _nativeVideo.muted = shouldMute;
+          _nativeVideo.defaultMuted = shouldMute;
+          if (
+            !shouldMute &&
+            (_nativeVideo.volume === 0 || Number.isNaN(_nativeVideo.volume))
+          ) {
+            _nativeVideo.volume = 1;
+          }
         }
         _adUserUnmuted = !shouldMute;
         _syncAdMuteButton();
-    }
+      }
 
-    function _showAdUi(ad) {
-        const { overlay, counter, skipBtn, unmuteBtn, hint, qualityWrap } = _getAdEls();
+      function _showAdUi(ad) {
+        const { overlay, counter, skipBtn, unmuteBtn, hint, qualityWrap } =
+          _getAdEls();
         _adUserUnmuted = false;
         if (overlay) overlay.classList.add("active");
         if (hint) {
-            hint.style.display = "block";
-            hint.textContent = ad?.title
-                ? `Playing ad: ${ad.title}`
-                : "Playing advertisement...";
+          hint.style.display = "block";
+          hint.textContent = ad?.title
+            ? `Playing ad: ${ad.title}`
+            : "Playing advertisement...";
         }
         if (counter) {
-            counter.textContent = "Advertisement";
+          counter.textContent = "Advertisement";
         }
         if (skipBtn) {
-            skipBtn.style.display = "none";
-            skipBtn.disabled = true;
-            skipBtn.textContent = "Skip Ad";
+          skipBtn.style.display = "none";
+          skipBtn.disabled = true;
+          skipBtn.textContent = "Skip Ad";
         }
         if (unmuteBtn) {
-            unmuteBtn.style.display = "inline-flex";
-            unmuteBtn.textContent = "🔊 Unmute";
-            unmuteBtn.onclick = () => {
-                if (!_isAdPlaying) return;
-                _setAdMutedState(_nativeVideo ? !_nativeVideo.muted : false);
-            };
+          unmuteBtn.style.display = "inline-flex";
+          unmuteBtn.textContent = "🔊 Unmute";
+          unmuteBtn.onclick = () => {
+            if (!_isAdPlaying) return;
+            _setAdMutedState(_nativeVideo ? !_nativeVideo.muted : false);
+          };
         }
         if (qualityWrap) {
-            qualityWrap.style.display = "none";
+          qualityWrap.style.display = "none";
         }
-    }
+      }
 
-    function _hideAdUi() {
+      function _hideAdUi() {
         const { overlay, hint, skipBtn, unmuteBtn } = _getAdEls();
         if (overlay) overlay.classList.remove("active");
         if (hint) {
-            hint.style.display = "none";
-            hint.onclick = null;
+          hint.style.display = "none";
+          hint.onclick = null;
         }
         if (skipBtn) {
-            skipBtn.style.display = "none";
-            skipBtn.disabled = true;
-            skipBtn.textContent = "Skip Ad";
-            skipBtn.onclick = null;
+          skipBtn.style.display = "none";
+          skipBtn.disabled = true;
+          skipBtn.textContent = "Skip Ad";
+          skipBtn.onclick = null;
         }
         if (unmuteBtn) {
-            unmuteBtn.style.display = "none";
-            unmuteBtn.textContent = "🔊 Unmute";
-            unmuteBtn.onclick = null;
+          unmuteBtn.style.display = "none";
+          unmuteBtn.textContent = "🔊 Unmute";
+          unmuteBtn.onclick = null;
         }
-    }
+      }
 
-    function _bindAdAutoplayRecovery() {
+      function _bindAdAutoplayRecovery() {
         if (_adAutoplayRecoveryBound) return;
         _adAutoplayRecoveryBound = true;
 
         const tryResumeAd = async () => {
-            if (!_isAdPlaying || !_nativeVideo) return;
-            try {
-                if (!_adUserUnmuted) {
-                    _nativeVideo.muted = true;
-                    _nativeVideo.defaultMuted = true;
-                }
-                await _nativeVideo.play();
-                _syncAdMuteButton();
-            } catch (_) {}
+          if (!_isAdPlaying || !_nativeVideo) return;
+          try {
+            if (!_adUserUnmuted) {
+              _nativeVideo.muted = true;
+              _nativeVideo.defaultMuted = true;
+            }
+            await _nativeVideo.play();
+            _syncAdMuteButton();
+          } catch (_) {}
         };
 
         ["pointerdown", "click", "keydown", "touchstart"].forEach((evt) => {
-            window.addEventListener(evt, tryResumeAd, { passive: true, capture: true });
+          window.addEventListener(evt, tryResumeAd, {
+            passive: true,
+            capture: true,
+          });
         });
 
         document.addEventListener("visibilitychange", () => {
-            if (document.visibilityState === "visible") {
-                tryResumeAd();
-            }
+          if (document.visibilityState === "visible") {
+            tryResumeAd();
+          }
         });
 
         window.addEventListener("pageshow", () => {
-            tryResumeAd();
+          tryResumeAd();
         });
-    }
+      }
 
-    async function fetchActivePreRollAd() {
+      async function fetchActivePreRollAd() {
         const candidates = [
-            "/api/public/ads/pre-roll",
-            "/api/admin/ads/api/public/ads/pre-roll"
+          "/api/public/ads/pre-roll",
+          "/api/admin/ads/api/public/ads/pre-roll",
         ];
 
         for (const url of candidates) {
-            try {
-                const res = await fetch(url, { headers: { ...authHeaders() } });
-                if (res.status === 204) return null;
-                if (!res.ok) continue;
-                const data = await res.json();
-                if (data && data.srcFilm) return data;
-            } catch (e) {
-                console.warn("Failed to fetch pre-roll ad from", url, e);
-            }
+          try {
+            const res = await fetch(url, { headers: { ...authHeaders() } });
+            if (res.status === 204) return null;
+            if (!res.ok) continue;
+            const data = await res.json();
+            if (data && data.srcFilm) return data;
+          } catch (e) {
+            console.warn("Failed to fetch pre-roll ad from", url, e);
+          }
         }
         return null;
-    }
+      }
 
-    function _finishAdAndPlayMain() {
+      function _finishAdAndPlayMain() {
         if (_adFinishHandled) return;
         _adFinishHandled = true;
         _isAdPlaying = false;
@@ -2392,16 +2632,17 @@
         renderQualityDropdown(ctx.videoUrl, ctx.variants, ctx.isPremiumUser);
         loadVideo(ctx.videoUrl, ctx.startSec || 0);
         setTimeout(() => {
-            if (_nativeVideo) {
-                _nativeVideo.muted = false;
-                _nativeVideo.defaultMuted = false;
-                _nativeVideo.controls = true;
-                _nativeVideo.controlsList = "nodownload noplaybackrate noremoteplayback";
-            }
+          if (_nativeVideo) {
+            _nativeVideo.muted = false;
+            _nativeVideo.defaultMuted = false;
+            _nativeVideo.controls = true;
+            _nativeVideo.controlsList =
+              "nodownload noplaybackrate noremoteplayback";
+          }
         }, 0);
-    }
+      }
 
-    function _armSkippableCountdown(ad) {
+      function _armSkippableCountdown(ad) {
         const { counter, skipBtn } = _getAdEls();
         const allowSkip = Boolean(ad && ad.skippable);
         const skipAfter = Math.max(0, Number(ad?.skipAfterSeconds || 0));
@@ -2410,79 +2651,79 @@
         _clearAdCountdown();
 
         if (skipBtn) {
-            skipBtn.onclick = () => {
-                if (!_adSkipUnlocked) return;
-                _finishAdAndPlayMain();
-            };
+          skipBtn.onclick = () => {
+            if (!_adSkipUnlocked) return;
+            _finishAdAndPlayMain();
+          };
         }
 
         if (!allowSkip) {
-            if (counter) counter.textContent = "Advertisement";
-            if (skipBtn) {
-                skipBtn.style.display = "none";
-                skipBtn.disabled = true;
-                skipBtn.textContent = "Skip Ad";
-            }
-            return;
+          if (counter) counter.textContent = "Advertisement";
+          if (skipBtn) {
+            skipBtn.style.display = "none";
+            skipBtn.disabled = true;
+            skipBtn.textContent = "Skip Ad";
+          }
+          return;
         }
 
         if (skipAfter <= 0) {
-            _adSkipUnlocked = true;
-            if (counter) counter.textContent = "You can skip this ad";
-            if (skipBtn) {
-                skipBtn.style.display = "inline-flex";
-                skipBtn.disabled = false;
-                skipBtn.textContent = "Skip Ad";
-            }
-            return;
+          _adSkipUnlocked = true;
+          if (counter) counter.textContent = "You can skip this ad";
+          if (skipBtn) {
+            skipBtn.style.display = "inline-flex";
+            skipBtn.disabled = false;
+            skipBtn.textContent = "Skip Ad";
+          }
+          return;
         }
 
         const startedAt = Date.now();
         if (counter) counter.textContent = `Skip in ${skipAfter}s`;
         if (skipBtn) {
-            skipBtn.style.display = "inline-flex";
-            skipBtn.disabled = true;
-            skipBtn.textContent = `Skip in ${skipAfter}s`;
+          skipBtn.style.display = "inline-flex";
+          skipBtn.disabled = true;
+          skipBtn.textContent = `Skip in ${skipAfter}s`;
         }
 
         _adCountdownInterval = setInterval(() => {
-            const elapsed = Math.floor((Date.now() - startedAt) / 1000);
-            const remain = Math.max(0, skipAfter - elapsed);
+          const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+          const remain = Math.max(0, skipAfter - elapsed);
 
-            if (remain > 0) {
-                if (counter) counter.textContent = `Skip in ${remain}s`;
-                if (skipBtn) skipBtn.textContent = `Skip in ${remain}s`;
-                return;
-            }
+          if (remain > 0) {
+            if (counter) counter.textContent = `Skip in ${remain}s`;
+            if (skipBtn) skipBtn.textContent = `Skip in ${remain}s`;
+            return;
+          }
 
-            _clearAdCountdown();
-            _adSkipUnlocked = true;
-            if (counter) counter.textContent = "You can skip this ad";
-            if (skipBtn) {
-                skipBtn.style.display = "inline-flex";
-                skipBtn.disabled = false;
-                skipBtn.textContent = "Skip Ad";
-            }
+          _clearAdCountdown();
+          _adSkipUnlocked = true;
+          if (counter) counter.textContent = "You can skip this ad";
+          if (skipBtn) {
+            skipBtn.style.display = "inline-flex";
+            skipBtn.disabled = false;
+            skipBtn.textContent = "Skip Ad";
+          }
         }, 250);
-    }
+      }
 
-    function _lockAdSeeking(video) {
+      function _lockAdSeeking(video) {
         if (!video) return;
 
         const syncAllowedTime = () => {
-            if (!_isAdPlaying) return;
-            const now = Number(video.currentTime || 0);
-            if (Number.isFinite(now) && now > _adMaxAllowedTime) {
-                _adMaxAllowedTime = now;
-            }
+          if (!_isAdPlaying) return;
+          const now = Number(video.currentTime || 0);
+          if (Number.isFinite(now) && now > _adMaxAllowedTime) {
+            _adMaxAllowedTime = now;
+          }
         };
 
         const forceBack = () => {
-            if (!_isAdPlaying) return;
-            const now = Number(video.currentTime || 0);
-            if (Number.isFinite(now) && now > _adMaxAllowedTime + 0.2) {
-                video.currentTime = Math.max(0, _adMaxAllowedTime);
-            }
+          if (!_isAdPlaying) return;
+          const now = Number(video.currentTime || 0);
+          if (Number.isFinite(now) && now > _adMaxAllowedTime + 0.2) {
+            video.currentTime = Math.max(0, _adMaxAllowedTime);
+          }
         };
 
         video.addEventListener("timeupdate", syncAllowedTime);
@@ -2491,11 +2732,11 @@
         video.addEventListener("mousedown", forceBack);
         video.addEventListener("touchstart", forceBack, { passive: true });
         video.addEventListener("contextmenu", (e) => {
-            if (_isAdPlaying) e.preventDefault();
+          if (_isAdPlaying) e.preventDefault();
         });
-    }
+      }
 
-    function _playPreRollAd(ad) {
+      function _playPreRollAd(ad) {
         _adFinishHandled = false;
         _isAdPlaying = true;
         _adSkipUnlocked = false;
@@ -2508,132 +2749,153 @@
         loadVideo(ad.srcFilm, 0);
 
         const waitForVideo = () => {
-            if (!_nativeVideo) {
-                setTimeout(waitForVideo, 100);
-                return;
-            }
+          if (!_nativeVideo) {
+            setTimeout(waitForVideo, 100);
+            return;
+          }
 
-            _nativeVideo.controls = false;
-            _nativeVideo.autoplay = true;
-            _nativeVideo.preload = "auto";
-            _nativeVideo.playsInline = true;
-            _nativeVideo.defaultMuted = true;
-            _nativeVideo.muted = true;
-            _nativeVideo.volume = 1;
-            _nativeVideo.setAttribute("autoplay", "autoplay");
-            _nativeVideo.setAttribute("muted", "muted");
-            _nativeVideo.setAttribute("playsinline", "playsinline");
-            _nativeVideo.controlsList = "nodownload noplaybackrate nofullscreen noremoteplayback";
-            _nativeVideo.disablePictureInPicture = true;
-            _syncAdMuteButton();
-            _nativeVideo.addEventListener("loadedmetadata", () => {
-                _adMaxAllowedTime = 0;
-            }, { once: true });
-            _nativeVideo.addEventListener("playing", () => {
-                _adStartedOnce = true;
-                const { hint } = _getAdEls();
-                if (hint) {
-                    hint.style.display = "none";
-                    hint.onclick = null;
-                }
-            }, { once: true });
-            _lockAdSeeking(_nativeVideo);
+          _nativeVideo.controls = false;
+          _nativeVideo.autoplay = true;
+          _nativeVideo.preload = "auto";
+          _nativeVideo.playsInline = true;
+          _nativeVideo.defaultMuted = true;
+          _nativeVideo.muted = true;
+          _nativeVideo.volume = 1;
+          _nativeVideo.setAttribute("autoplay", "autoplay");
+          _nativeVideo.setAttribute("muted", "muted");
+          _nativeVideo.setAttribute("playsinline", "playsinline");
+          _nativeVideo.controlsList =
+            "nodownload noplaybackrate nofullscreen noremoteplayback";
+          _nativeVideo.disablePictureInPicture = true;
+          _syncAdMuteButton();
+          _nativeVideo.addEventListener(
+            "loadedmetadata",
+            () => {
+              _adMaxAllowedTime = 0;
+            },
+            { once: true },
+          );
+          _nativeVideo.addEventListener(
+            "playing",
+            () => {
+              _adStartedOnce = true;
+              const { hint } = _getAdEls();
+              if (hint) {
+                hint.style.display = "none";
+                hint.onclick = null;
+              }
+            },
+            { once: true },
+          );
+          _lockAdSeeking(_nativeVideo);
 
-            _nativeVideo.addEventListener("ended", _finishAdAndPlayMain, { once: true });
-            _nativeVideo.addEventListener("error", () => {
-                console.warn("Ad playback failed, falling back to main content");
-                _finishAdAndPlayMain();
-            }, { once: true });
+          _nativeVideo.addEventListener("ended", _finishAdAndPlayMain, {
+            once: true,
+          });
+          _nativeVideo.addEventListener(
+            "error",
+            () => {
+              console.warn("Ad playback failed, falling back to main content");
+              _finishAdAndPlayMain();
+            },
+            { once: true },
+          );
 
-            const tryPlayMuted = async () => {
-                try {
+          const tryPlayMuted = async () => {
+            try {
+              if (!_adUserUnmuted) {
+                _nativeVideo.defaultMuted = true;
+                _nativeVideo.muted = true;
+              }
+              await _nativeVideo.play();
+              _syncAdMuteButton();
+            } catch (e) {
+              console.warn("Autoplay for ad was blocked:", e);
+              const { hint } = _getAdEls();
+              if (hint) {
+                hint.style.display = "block";
+                hint.textContent =
+                  "Advertisement is ready. Click anywhere to continue.";
+                hint.onclick = async () => {
+                  try {
                     if (!_adUserUnmuted) {
-                        _nativeVideo.defaultMuted = true;
-                        _nativeVideo.muted = true;
+                      _nativeVideo.defaultMuted = true;
+                      _nativeVideo.muted = true;
                     }
                     await _nativeVideo.play();
                     _syncAdMuteButton();
-                } catch (e) {
-                    console.warn("Autoplay for ad was blocked:", e);
-                    const { hint } = _getAdEls();
-                    if (hint) {
-                        hint.style.display = "block";
-                        hint.textContent = "Advertisement is ready. Click anywhere to continue.";
-                        hint.onclick = async () => {
-                            try {
-                                if (!_adUserUnmuted) {
-                                    _nativeVideo.defaultMuted = true;
-                                    _nativeVideo.muted = true;
-                                }
-                                await _nativeVideo.play();
-                                _syncAdMuteButton();
-                                hint.style.display = "none";
-                                hint.onclick = null;
-                            } catch (_) {}
-                        };
-                    }
-                }
-            };
+                    hint.style.display = "none";
+                    hint.onclick = null;
+                  } catch (_) {}
+                };
+              }
+            }
+          };
 
-            tryPlayMuted();
+          tryPlayMuted();
         };
 
         waitForVideo();
-    }
+      }
 
-    async function playMainContentWithOptionalAd({ videoUrl, startSec = 0, variants = [], isPremiumUser = false }) {
+      async function playMainContentWithOptionalAd({
+        videoUrl,
+        startSec = 0,
+        variants = [],
+        isPremiumUser = false,
+      }) {
         const normalizedUrl = (videoUrl || "").trim();
 
         if (!normalizedUrl) {
-            renderQualityDropdown("", [], isPremiumUser);
-            loadVideo("", 0);
-            return;
+          renderQualityDropdown("", [], isPremiumUser);
+          loadVideo("", 0);
+          return;
         }
 
         _mainContentContext = {
-            videoUrl: normalizedUrl,
-            startSec,
-            variants,
-            isPremiumUser,
+          videoUrl: normalizedUrl,
+          startSec,
+          variants,
+          isPremiumUser,
         };
 
         if (isPremiumUser) {
-            _isAdPlaying = false;
-            _hideAdUi();
-            renderQualityDropdown(normalizedUrl, variants, isPremiumUser);
-            loadVideo(normalizedUrl, startSec || 0);
-            setTimeout(() => {
-                if (_nativeVideo) {
-                    _nativeVideo.muted = false;
-                    _nativeVideo.defaultMuted = false;
-                    _nativeVideo.controls = true;
-                }
-            }, 0);
-            _mainContentContext = null;
-            return;
+          _isAdPlaying = false;
+          _hideAdUi();
+          renderQualityDropdown(normalizedUrl, variants, isPremiumUser);
+          loadVideo(normalizedUrl, startSec || 0);
+          setTimeout(() => {
+            if (_nativeVideo) {
+              _nativeVideo.muted = false;
+              _nativeVideo.defaultMuted = false;
+              _nativeVideo.controls = true;
+            }
+          }, 0);
+          _mainContentContext = null;
+          return;
         }
 
         const ad = await fetchActivePreRollAd();
         if (!ad || !ad.srcFilm) {
-            _isAdPlaying = false;
-            _hideAdUi();
-            renderQualityDropdown(normalizedUrl, variants, isPremiumUser);
-            loadVideo(normalizedUrl, startSec || 0);
-            setTimeout(() => {
-                if (_nativeVideo) {
-                    _nativeVideo.muted = false;
-                    _nativeVideo.defaultMuted = false;
-                    _nativeVideo.controls = true;
-                }
-            }, 0);
-            _mainContentContext = null;
-            return;
+          _isAdPlaying = false;
+          _hideAdUi();
+          renderQualityDropdown(normalizedUrl, variants, isPremiumUser);
+          loadVideo(normalizedUrl, startSec || 0);
+          setTimeout(() => {
+            if (_nativeVideo) {
+              _nativeVideo.muted = false;
+              _nativeVideo.defaultMuted = false;
+              _nativeVideo.controls = true;
+            }
+          }, 0);
+          _mainContentContext = null;
+          return;
         }
 
         _playPreRollAd(ad);
-    }
+      }
 
-    _initAndStart();
-</script>
-</body>
+      _initAndStart();
+    </script>
+  </body>
 </html>
