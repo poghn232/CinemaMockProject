@@ -828,10 +828,23 @@
           return;
         }
 
+        // Small helper: map storage variant ids (v0, v1, v2) to readable quality labels
+        function getVariantLabel(name) {
+          if (!name) return name;
+          // If it's already a quality label like "360p", return as-is
+          if (/^\d+p$/i.test(name)) return name;
+          // Map common encoded folders to expected qualities
+          if (name === "v0") return "360p";
+          if (name === "v1") return "720p";
+          if (name === "v2") return "1080p";
+          // fallback: return original identifier
+          return name;
+        }
+
         _currentVariants.forEach((v) => {
           const option = document.createElement("option");
-          option.value = v;
-          option.textContent = v;
+          option.value = v; // keep value as v0/v1/.. so playlist URL builder still works
+          option.textContent = getVariantLabel(v);
           select.appendChild(option);
         });
 
