@@ -1082,11 +1082,11 @@
             </li>
             <li class="sidebar-item" data-target="section-streak">
                 <i class="fas fa-fire"></i>
-                <span>Login Streak</span>
+                <span data-i18n="profile_extra.sidebar.streak">Login Streak</span>
             </li>
             <li class="sidebar-item" data-target="section-achievements">
                 <i class="fas fa-trophy"></i>
-                <span data-i18n="profile.achievements">Achievements</span>
+                <span data-i18n="profile_extra.sidebar.achievements">Achievements</span>
             </li>
             <li class="sidebar-item" data-target="section-password">
                 <i class="fas fa-lock"></i>
@@ -1149,23 +1149,24 @@
             <div id="wishlistContainer" class="history-grid"></div>
         </section>
         <section id="section-streak" class="content-section">
-            <h3>🔥 Login Streak</h3>
+            <h3>🔥 <span data-i18n="profile_extra.sidebar.streak"></span></h3>
 
             <!-- Hero card -->
             <div class="streak-hero" id="streakHero">
                 <div class="streak-fire">🔥</div>
                 <div class="streak-main-info">
                     <div class="streak-number" id="streakCurrentNum">--</div>
-                    <div class="streak-label">Day streak</div>
+                    <div class="streak-label" data-i18n="profile_extra.streak.day_streak">Day streak</div>
                     <div class="streak-stats-row">
                         <div class="streak-stat-pill">
-                            🏆 Best: <strong id="streakBest">--</strong> days
+                            🏆 <span data-i18n="profile_extra.streak.best"></span>:
+                            <strong id="streakBest">--</strong> days
                         </div>
                         <div class="streak-stat-pill">
-                            📅 Total logins: <strong id="streakTotal">--</strong> days
+                            📅 <span data-i18n="profile_extra.streak.total_logins"></span>: <strong id="streakTotal">--</strong> days
                         </div>
                         <div class="streak-stat-pill" id="streakLastPill">
-                            🕐 Last: <strong id="streakLast">--</strong>
+                            🕐 <span data-i18n="profile_extra.streak.last"></span>: <strong id="streakLast">--</strong>
                         </div>
                     </div>
                 </div>
@@ -1173,25 +1174,25 @@
 
             <!-- 30-day calendar -->
             <div class="streak-calendar-wrap">
-                <div class="streak-calendar-title">Last 30 days</div>
+                <div class="streak-calendar-title" data-i18n="profile_extra.streak.last_30_days">Last 30 days</div>
                 <div class="streak-calendar" id="streakCalendar"></div>
             </div>
 
             <!-- Milestones -->
             <div class="streak-calendar-title" style="margin-bottom:12px;">
-                🎯 Milestones
+                🎯 <span data-i18n="profile_extra.streak.milestones"></span>
             </div>
             <div class="milestone-list" id="milestonesContainer"></div>
         </section>
 
         <section id="section-achievements" class="content-section">
-            <h3>🏆 Achievements</h3>
+            <h3>🏆 <span data-i18n="profile_extra.achievement.title">🏆 Achievements</span></h3>
             <div id="achievementStats" style="
         display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;
     "></div>
-            <h4 style="margin-bottom: 12px; color: #f97316;">✅ Earned</h4>
+            <h4 >✅ <span style="margin-bottom: 12px; color: #f97316;" data-i18n="profile_extra.achievement.earned"></span></h4>
             <div id="earnedGrid" class="history-grid"></div>
-            <h4 style="margin: 24px 0 12px; color: #6b7280;">🔒 Locked</h4>
+            <h4>🔒 <span style="margin: 24px 0 12px; color: #6b7280;" data-i18n="profile_extra.achievement.locked"></span></h4>
             <div id="lockedGrid" class="history-grid"></div>
         </section>
 
@@ -1917,60 +1918,82 @@
         const lockedGrid  = document.getElementById('lockedGrid');
         const statsEl     = document.getElementById('achievementStats');
 
-        earnedGrid.innerHTML = lockedGrid.innerHTML = statsEl.innerHTML =
-            '<div style="color:#9ca3af;font-size:13px;padding:12px 0">Loading...</div>';
+        const loadingHtml = `
+        <div style="color:#9ca3af;font-size:13px;padding:12px 0">
+            ${t('profile_extra.achievement.loading')}
+        </div>
+    `;
+
+        earnedGrid.innerHTML = loadingHtml;
+        lockedGrid.innerHTML = loadingHtml;
+        statsEl.innerHTML = loadingHtml;
 
         try {
             const res = await fetch('/api/user/achievements', {
                 headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
             });
+
             if (!res.ok) throw new Error('Failed');
+
             const data = await res.json();
 
-            // Stats
             const pct = data.total ? Math.round((data.count / data.total) * 100) : 0;
+
+            // ✅ Stats
             statsEl.innerHTML = `
             <div class="stat-chip">
                 <span class="val">${data.count}</span>
-                <span class="lbl">Earned</span>
+                <span class="lbl">${t('profile_extra.achievement.stats.earned')}</span>
             </div>
             <div class="stat-chip">
                 <span class="val">${data.total}</span>
-                <span class="lbl">Total</span>
+                <span class="lbl">${t('profile_extra.achievement.stats.total')}</span>
             </div>
             <div class="stat-chip">
                 <span class="val">${pct}%</span>
-                <span class="lbl">Completion</span>
+                <span class="lbl">${t('profile_extra.achievement.stats.completion')}</span>
             </div>
         `;
 
-            // Earned
+            // ✅ Earned
             earnedGrid.innerHTML = '';
             if (!data.earned.length) {
-                earnedGrid.innerHTML = '<p style="color:#9ca3af;font-size:13px">No achievements yet. Start watching! 🎬</p>';
+                earnedGrid.innerHTML = `
+                <p style="color:#9ca3af;font-size:13px">
+                    ${t('profile_extra.achievement.no_achievement')}
+                </p>
+            `;
             } else {
                 data.earned.forEach(a => {
                     earnedGrid.appendChild(buildAchievementCard(a, false));
                 });
             }
 
-            // Locked
+            // ✅ Locked
             lockedGrid.innerHTML = '';
-            data.locked.forEach(a => lockedGrid.appendChild(buildAchievementCard(a, true)));
+            data.locked.forEach(a => {
+                lockedGrid.appendChild(buildAchievementCard(a, true));
+            });
 
-        } catch(e) {
-            earnedGrid.innerHTML = '<p style="color:#9ca3af">Failed to load achievements.</p>';
+        } catch (e) {
+            earnedGrid.innerHTML = `
+            <p style="color:#9ca3af">
+                ${t('profile_extra.achievement.failed')}
+            </p>
+        `;
             lockedGrid.innerHTML = '';
         }
     }
 
-    const STREAK_MILESTONES = [
-        { days: 3,   name: "Consistent",     icon: "🔥",  desc: "Login 3 days in a row" },
-        { days: 7,   name: "Weekly Warrior", icon: "⚡",  desc: "Login 7 days in a row" },
-        { days: 14,  name: "Dedicated",      icon: "💪",  desc: "Login 14 days in a row" },
-        { days: 30,  name: "Unstoppable",    icon: "🚀",  desc: "Login 30 days in a row" },
-        { days: 100, name: "Legend",         icon: "👑",  desc: "Login 100 days in a row" },
-    ];
+    function getStreakMilestones() {
+        return [
+            { days: 3, name: t('profile_extra.milestone.consistent'), desc: t('profile_extra.milestone.desc_3'), icon: "🔥" },
+            { days: 7, name: t('profile_extra.milestone.weekly_warrior'), desc: t('profile_extra.milestone.desc_7'), icon: "⚡" },
+            { days: 14, name: t('profile_extra.milestone.dedicated'), desc: t('profile_extra.milestone.desc_14'), icon: "💪" },
+            { days: 30, name: t('profile_extra.milestone.unstoppable'), desc: t('profile_extra.milestone.desc_30'), icon: "🚀" },
+            { days: 100, name: t('profile_extra.milestone.legend'), desc: t('profile_extra.milestone.desc_100'), icon: "👑" }
+        ];
+    }
 
     async function loadStreak() {
         try {
@@ -2045,11 +2068,13 @@
 
     function renderMilestones(current, longest) {
         const container = document.getElementById('milestonesContainer');
+        const milestones = getStreakMilestones(); // ✅ dùng cái này
         container.innerHTML = '';
         const best = Math.max(current, longest);
 
-        STREAK_MILESTONES.forEach(m => {
+        milestones.forEach(m => {   // ❌ đổi từ STREAK_MILESTONES → milestones
             const reached = best >= m.days;
+
             const item = document.createElement('div');
             item.className = 'milestone-item' + (reached ? ' reached' : '');
 
@@ -2066,6 +2091,7 @@
             <div class="milestone-progress">${progress}</div>
             <div class="milestone-check">${reached ? '✅' : '🔒'}</div>
         `;
+
             container.appendChild(item);
         });
     }

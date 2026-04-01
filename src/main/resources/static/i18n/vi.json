@@ -321,14 +321,53 @@
     }
   },
   "notif": {
-    "default": "🎬 \"{{title}}\" has an update!",
-    "new_movie": "🎬 \"{{title}}\" vừa được thêm vào MovieZone!",
-    "new_trailer": "🎥 Trailer của \"{{title}}\" đã có!",
-    "new_trailer_episode": "🎥 \"{{episode}}\" của \"{{title}}\" đã có trailer!",
-    "new_source": "▶️ \"{{title}}\" đã sẵn sàng để xem!",
-    "new_source_episode": "▶️ \"{{episode}}\" của \"{{title}}\" đã có thể xem!",
-    "unpublished": "⏸️ \"{{title}}\" đã bị gỡ tạm thời.",
-    "unpublished_episode": "⏸️ \"{{episode}}\" của \"{{title}}\" đã bị gỡ tạm thời.",
-    "achievement_unlock": "🏆 You unlocked achievement: \"{{name}}\""
+    "default": "🎬 \"{{title}}\" có cập nhật mới!",
+    "new_movie": "🎬 \"{{title}}\" đã được thêm vào MovieZone!",
+    "new_trailer": "🎥 Trailer của \"{{title}}\" hiện đã có!",
+    "new_trailer_episode": "🎥 \"{{episode}}\" của \"{{title}}\" hiện đã có trailer!",
+    "new_source": "▶️ \"{{title}}\" hiện đã sẵn sàng để xem!",
+    "new_source_episode": "▶️ \"{{episode}}\" của \"{{title}}\" hiện đã có thể xem!",
+    "unpublished": "⏸️ \"{{title}}\" đã tạm thời bị gỡ xuống.",
+    "unpublished_episode": "⏸️ \"{{episode}}\" của \"{{title}}\" đã tạm thời bị gỡ xuống.",
+    "achievement_unlock": "🏆 Bạn đã mở khóa thành tựu: \"{{name}}\""
+  },
+  "profile_extra": {
+    "sidebar": {
+      "streak": "Chuỗi đăng nhập",
+      "achievements": "Thành tựu"
+    },
+    "streak": {
+      "day_streak": "Chuỗi ngày",
+      "best": "Tốt nhất",
+      "total_logins": "Tổng số ngày đăng nhập",
+      "last": "Lần cuối",
+      "last_30_days": "30 ngày gần nhất",
+      "milestones": "Cột mốc"
+    },
+    "achievement": {
+      "title": "Thành tựu",
+      "earned": "Đã đạt",
+      "locked": "Chưa mở",
+      "no_achievement": "Chưa có thành tựu nào. Hãy bắt đầu xem phim! 🎬",
+      "loading": "Đang tải...",
+      "failed": "Không thể tải thành tựu.",
+      "stats": {
+        "earned": "Đã đạt",
+        "total": "Tổng",
+        "completion": "Hoàn thành"
+      }
+    },
+    "milestone": {
+      "consistent": "Ổn định",
+      "weekly_warrior": "Chiến binh tuần",
+      "dedicated": "Chăm chỉ",
+      "unstoppable": "Không thể dừng",
+      "legend": "Huyền thoại",
+      "desc_3": "Đăng nhập 3 ngày liên tiếp",
+      "desc_7": "Đăng nhập 7 ngày liên tiếp",
+      "desc_14": "Đăng nhập 14 ngày liên tiếp",
+      "desc_30": "Đăng nhập 30 ngày liên tiếp",
+      "desc_100": "Đăng nhập 100 ngày liên tiếp"
+    }
   }
 }

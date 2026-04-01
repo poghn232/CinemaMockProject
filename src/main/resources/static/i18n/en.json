@@ -345,5 +345,44 @@
     "unpublished": "⏸️ \"{{title}}\" has been temporarily removed.",
     "unpublished_episode": "⏸️ \"{{episode}}\" of \"{{title}}\" has been temporarily removed.",
     "achievement_unlock": "🏆 You unlocked achievement: \"{{name}}\""
+  },
+  "profile_extra": {
+    "sidebar": {
+      "streak": "Login Streak",
+      "achievements": "Achievements"
+    },
+    "streak": {
+      "day_streak": "Day streak",
+      "best": "Best",
+      "total_logins": "Total logins",
+      "last": "Last",
+      "last_30_days": "Last 30 days",
+      "milestones": "Milestones"
+    },
+    "achievement": {
+      "title": "Achievements",
+      "earned": "Earned",
+      "locked": "Locked",
+      "no_achievement": "No achievements yet. Start watching! 🎬",
+      "loading": "Loading...",
+      "failed": "Failed to load achievements.",
+      "stats": {
+        "earned": "Earned",
+        "total": "Total",
+        "completion": "Completion"
+      }
+    },
+    "milestone": {
+      "consistent": "Consistent",
+      "weekly_warrior": "Weekly Warrior",
+      "dedicated": "Dedicated",
+      "unstoppable": "Unstoppable",
+      "legend": "Legend",
+      "desc_3": "Login 3 days in a row",
+      "desc_7": "Login 7 days in a row",
+      "desc_14": "Login 14 days in a row",
+      "desc_30": "Login 30 days in a row",
+      "desc_100": "Login 100 days in a row"
+    }
   }
 }

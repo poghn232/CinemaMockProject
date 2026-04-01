@@ -63,6 +63,11 @@ async function loadLanguage(lang) {
         console.error("Failed to load language:", err);
     }
 }
+window.addEventListener("languageChanged", () => {
+    if (typeof loadStreak === "function") {
+        loadStreak(); // reload full UI
+    }
+});
 
 // đổi language
 function changeLanguage(lang) {

@@ -335,14 +335,53 @@
     }
   },
   "notif": {
-    "default": "🎬 \"{{title}}\" has an update!",
-    "new_movie": "🎬 \"{{title}}\" has been added to MovieZone!",
-    "new_trailer": "🎥 Trailer for \"{{title}}\" is now available!",
-    "new_trailer_episode": "🎥 \"{{episode}}\" of \"{{title}}\" now has a trailer!",
-    "new_source": "▶️ \"{{title}}\" is now ready to watch!",
-    "new_source_episode": "▶️ \"{{episode}}\" of \"{{title}}\" is now available to watch!",
-    "unpublished": "⏸️ \"{{title}}\" has been temporarily removed.",
-    "unpublished_episode": "⏸️ \"{{episode}}\" of \"{{title}}\" has been temporarily removed.",
-    "achievement_unlock": "🏆 You unlocked achievement: \"{{name}}\""
+    "default": "🎬 \"{{title}}\" hat ein Update!",
+    "new_movie": "🎬 \"{{title}}\" wurde zu MovieZone hinzugefügt!",
+    "new_trailer": "🎥 Der Trailer zu \"{{title}}\" ist jetzt verfügbar!",
+    "new_trailer_episode": "🎥 \"{{episode}}\" von \"{{title}}\" hat jetzt einen Trailer!",
+    "new_source": "▶️ \"{{title}}\" ist jetzt zum Anschauen verfügbar!",
+    "new_source_episode": "▶️ \"{{episode}}\" von \"{{title}}\" ist jetzt verfügbar!",
+    "unpublished": "⏸️ \"{{title}}\" wurde vorübergehend entfernt.",
+    "unpublished_episode": "⏸️ \"{{episode}}\" von \"{{title}}\" wurde vorübergehend entfernt.",
+    "achievement_unlock": "🏆 Du hast die Errungenschaft \"{{name}}\" freigeschaltet"
+  },
+  "profile_extra": {
+    "sidebar": {
+      "streak": "Login-Serie",
+      "achievements": "Erfolge"
+    },
+    "streak": {
+      "day_streak": "Tages-Serie",
+      "best": "Beste",
+      "total_logins": "Gesamte Logins",
+      "last": "Zuletzt",
+      "last_30_days": "Letzte 30 Tage",
+      "milestones": "Meilensteine"
+    },
+    "achievement": {
+      "title": "Erfolge",
+      "earned": "Erreicht",
+      "locked": "Gesperrt",
+      "no_achievement": "Noch keine Erfolge. Fang an zu schauen! 🎬",
+      "loading": "Wird geladen...",
+      "failed": "Erfolge konnten nicht geladen werden.",
+      "stats": {
+        "earned": "Erreicht",
+        "total": "Gesamt",
+        "completion": "Fortschritt"
+      }
+    },
+    "milestone": {
+      "consistent": "Konsequent",
+      "weekly_warrior": "Wochenkrieger",
+      "dedicated": "Engagiert",
+      "unstoppable": "Unaufhaltsam",
+      "legend": "Legende",
+      "desc_3": "3 Tage in Folge einloggen",
+      "desc_7": "7 Tage in Folge einloggen",
+      "desc_14": "14 Tage in Folge einloggen",
+      "desc_30": "30 Tage in Folge einloggen",
+      "desc_100": "100 Tage in Folge einloggen"
+    }
   }
 }

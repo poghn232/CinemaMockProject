@@ -335,14 +335,53 @@
     }
   },
   "notif": {
-    "default": "🎬 \"{{title}}\" has an update!",
-    "new_movie": "🎬 \"{{title}}\" has been added to MovieZone!",
-    "new_trailer": "🎥 Trailer for \"{{title}}\" is now available!",
-    "new_trailer_episode": "🎥 \"{{episode}}\" of \"{{title}}\" now has a trailer!",
-    "new_source": "▶️ \"{{title}}\" is now ready to watch!",
-    "new_source_episode": "▶️ \"{{episode}}\" of \"{{title}}\" is now available to watch!",
-    "unpublished": "⏸️ \"{{title}}\" has been temporarily removed.",
-    "unpublished_episode": "⏸️ \"{{episode}}\" of \"{{title}}\" has been temporarily removed.",
-    "achievement_unlock": "🏆 You unlocked achievement: \"{{name}}\""
+    "default": "🎬 \"{{title}}\" အတွက် အပ်ဒိတ်အသစ်ရှိပါသည်!",
+    "new_movie": "🎬 \"{{title}}\" ကို MovieZone တွင် ထည့်သွင်းပြီးပါပြီ!",
+    "new_trailer": "🎥 \"{{title}}\" အတွက် Trailer ကို ယခုကြည့်ရှုနိုင်ပါသည်!",
+    "new_trailer_episode": "🎥 \"{{title}}\" ၏ \"{{episode}}\" အတွက် Trailer ရရှိနိုင်ပါပြီ!",
+    "new_source": "▶️ \"{{title}}\" ကို ယခုကြည့်ရှုနိုင်ပါပြီ!",
+    "new_source_episode": "▶️ \"{{title}}\" ၏ \"{{episode}}\" ကို ယခုကြည့်ရှုနိုင်ပါပြီ!",
+    "unpublished": "⏸️ \"{{title}}\" ကို ယာယီ ဖယ်ရှားထားပါသည်။",
+    "unpublished_episode": "⏸️ \"{{title}}\" ၏ \"{{episode}}\" ကို ယာယီ ဖယ်ရှားထားပါသည်။",
+    "achievement_unlock": "🏆 သင်သည် \"{{name}}\" အောင်မြင်မှုကို ဖွင့်လှစ်ခဲ့ပါသည်"
+  },
+  "profile_extra": {
+    "sidebar": {
+      "streak": "ဝင်ရောက်မှုအစဉ်",
+      "achievements": "အောင်မြင်မှုများ"
+    },
+    "streak": {
+      "day_streak": "ရက်ဆက်တိုက်ဝင်ရောက်မှု",
+      "best": "အကောင်းဆုံး",
+      "total_logins": "စုစုပေါင်းဝင်ရောက်မှုနေ့များ",
+      "last": "နောက်ဆုံး",
+      "last_30_days": "နောက်ဆုံး 30 ရက်",
+      "milestones": "မှတ်တိုင်များ"
+    },
+    "achievement": {
+      "title": "အောင်မြင်မှုများ",
+      "earned": "ရရှိပြီး",
+      "locked": "မဖွင့်ရသေး",
+      "no_achievement": "အောင်မြင်မှုမရှိသေးပါ။ ရုပ်ရှင်ကြည့်ရန် စတင်ပါ! 🎬",
+      "loading": "ဒေတာတင်နေသည်...",
+      "failed": "အောင်မြင်မှုများကို မတင်နိုင်ပါ။",
+      "stats": {
+        "earned": "ရရှိပြီး",
+        "total": "စုစုပေါင်း",
+        "completion": "ပြီးစီးမှု"
+      }
+    },
+    "milestone": {
+      "consistent": "တည်ငြိမ်မှုရှိသော",
+      "weekly_warrior": "အပတ်စဉ် တိုက်ခိုက်သူ",
+      "dedicated": "အာရုံစိုက်သော",
+      "unstoppable": "မရပ်နိုင်သော",
+      "legend": "ဒဏ္ဍာရီ",
+      "desc_3": "3 ရက်ဆက်တိုက် ဝင်ရောက်ပါ",
+      "desc_7": "7 ရက်ဆက်တိုက် ဝင်ရောက်ပါ",
+      "desc_14": "14 ရက်ဆက်တိုက် ဝင်ရောက်ပါ",
+      "desc_30": "30 ရက်ဆက်တိုက် ဝင်ရောက်ပါ",
+      "desc_100": "100 ရက်ဆက်တိုက် ဝင်ရောက်ပါ"
+    }
   }
 }

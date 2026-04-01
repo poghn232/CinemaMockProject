@@ -335,14 +335,53 @@
     }
   },
   "notif": {
-    "default": "🎬 \"{{title}}\" has an update!",
-    "new_movie": "🎬 \"{{title}}\" has been added to MovieZone!",
-    "new_trailer": "🎥 Trailer for \"{{title}}\" is now available!",
-    "new_trailer_episode": "🎥 \"{{episode}}\" of \"{{title}}\" now has a trailer!",
-    "new_source": "▶️ \"{{title}}\" is now ready to watch!",
-    "new_source_episode": "▶️ \"{{episode}}\" of \"{{title}}\" is now available to watch!",
-    "unpublished": "⏸️ \"{{title}}\" has been temporarily removed.",
-    "unpublished_episode": "⏸️ \"{{episode}}\" of \"{{title}}\" has been temporarily removed.",
-    "achievement_unlock": "🏆 You unlocked achievement: \"{{name}}\""
+    "default": "🎬「{{title}}」にアップデートがあります！",
+    "new_movie": "🎬「{{title}}」がMovieZoneに追加されました！",
+    "new_trailer": "🎥「{{title}}」の予告編が公開されました！",
+    "new_trailer_episode": "🎥「{{title}}」の「{{episode}}」の予告編が公開されました！",
+    "new_source": "▶️「{{title}}」が視聴可能になりました！",
+    "new_source_episode": "▶️「{{title}}」の「{{episode}}」が視聴可能になりました！",
+    "unpublished": "⏸️「{{title}}」は一時的に削除されました。",
+    "unpublished_episode": "⏸️「{{title}}」の「{{episode}}」は一時的に削除されました。",
+    "achievement_unlock": "🏆 実績「{{name}}」を解除しました"
+  },
+  "profile_extra": {
+    "sidebar": {
+      "streak": "ログイン連続記録",
+      "achievements": "実績"
+    },
+    "streak": {
+      "day_streak": "連続ログイン日数",
+      "best": "最高記録",
+      "total_logins": "合計ログイン日数",
+      "last": "最終ログイン",
+      "last_30_days": "直近30日",
+      "milestones": "マイルストーン"
+    },
+    "achievement": {
+      "title": "実績",
+      "earned": "獲得済み",
+      "locked": "未解除",
+      "no_achievement": "まだ実績がありません。映画を見始めましょう！🎬",
+      "loading": "読み込み中...",
+      "failed": "実績の読み込みに失敗しました。",
+      "stats": {
+        "earned": "獲得",
+        "total": "合計",
+        "completion": "達成率"
+      }
+    },
+    "milestone": {
+      "consistent": "継続者",
+      "weekly_warrior": "週間チャレンジャー",
+      "dedicated": "努力家",
+      "unstoppable": "止まらない",
+      "legend": "レジェンド",
+      "desc_3": "3日連続でログイン",
+      "desc_7": "7日連続でログイン",
+      "desc_14": "14日連続でログイン",
+      "desc_30": "30日連続でログイン",
+      "desc_100": "100日連続でログイン"
+    }
   }
 }
