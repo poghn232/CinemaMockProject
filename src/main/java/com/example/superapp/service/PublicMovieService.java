@@ -844,4 +844,85 @@ public class PublicMovieService {
         }
         return results;
     }
+
+    //Autocomplete suggestions for the search box.
+    @Transactional(readOnly = true)
+    public List<MovieItemDto> suggest(String query, int limit, HttpServletRequest request) {
+        String q = query == null ? "" : query.trim();
+        if (q.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        String userRegion = extractRegionFromRequest(request);
+        int safeLimit = Math.max(1, Math.min(limit, 20));
+
+        java.util.Set<Long> seenIds = new java.util.HashSet<>();
+        List<MovieItemDto> results = new ArrayList<>();
+        for (Movie m : movieRepository.findByActiveTrueAndPublishedTrueAndTitleContainingIgnoreCase(q)) {
+            if (results.size() >= safeLimit) {
+                break;
+            }
+            if (!isMovieBlockedForRegion(m, userRegion)) {
+                results.add(mapMovie(m));
+                seenIds.add(m.getId());
+            }
+        }
+        for (TvSeries tv : tvSeriesRepository.findByActiveTrueAndPublishedTrueAndNameContainingIgnoreCase(q)) {
+            if (results.size() >= safeLimit) {
+                break;
+            }
+            if (!isTvBlockedForRegion(tv, userRegion)) {
+                results.add(mapTv(tv));
+                seenIds.add(tv.getId());
+            }
+        }
+        if (results.size() < safeLimit) {
+            String[] words = q.split("\\s+");
+            if (words.length > 1) {
+                String lastWord = words[words.length - 1];
+                if (lastWord.length() >= 2) {
+                    for (Movie m : movieRepository.findByActiveTrueAndPublishedTrueAndTitleContainingIgnoreCase(lastWord)) {
+                        if (results.size() >= safeLimit) {
+                            break;
+                        }
+                        if (!seenIds.contains(m.getId()) && !isMovieBlockedForRegion(m, userRegion)) {
+                            String titleLower = m.getTitle() == null ? "" : m.getTitle().toLowerCase();
+                            boolean allMatch = true;
+                            for (int i = 0; i < words.length - 1; i++) {
+                                if (!titleLower.contains(words[i].toLowerCase())) {
+                                    allMatch = false;
+                                    break;
+                                }
+                            }
+                            if (allMatch) {
+                                results.add(mapMovie(m));
+                                seenIds.add(m.getId());
+                            }
+                        }
+                    }
+                    for (TvSeries tv : tvSeriesRepository.findByActiveTrueAndPublishedTrueAndNameContainingIgnoreCase(lastWord)) {
+                        if (results.size() >= safeLimit) {
+                            break;
+                        }
+                        if (!seenIds.contains(tv.getId()) && !isTvBlockedForRegion(tv, userRegion)) {
+                            String nameLower = tv.getName() == null ? "" : tv.getName().toLowerCase();
+                            boolean allMatch = true;
+                            for (int i = 0; i < words.length - 1; i++) {
+                                if (!nameLower.contains(words[i].toLowerCase())) {
+                                    allMatch = false;
+                                    break;
+                                }
+                            }
+                            if (allMatch) {
+                                results.add(mapTv(tv));
+                                seenIds.add(tv.getId());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return results.size() > safeLimit ? results.subList(0, safeLimit) : results;
+    }
 }

@@ -135,4 +135,13 @@ public class PublicMovieController {
     ) {
         return publicMovieService.getTopRated(limit, request);
     }
+
+    @GetMapping("/suggest")
+    public java.util.List<com.example.superapp.dto.MovieItemDto> suggest(
+            @RequestParam(name = "q") String q,
+            @RequestParam(name = "limit", defaultValue = "10") int limit,
+            HttpServletRequest request
+    ) {
+        return publicMovieService.suggest(q, limit, request);
+    }
 }
