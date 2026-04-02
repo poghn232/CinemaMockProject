@@ -14,7 +14,7 @@
             --text-main: #e5e7eb;
             --text-subtle: #9ca3af;
             --border-soft: rgba(148, 163, 184, 0.45);
-        }
+        }   
 
         * {
             box-sizing: border-box;
@@ -1268,7 +1268,7 @@
             outline-offset: 3px;
         }
 
-        .btn-info {
+    .btn-info {
             padding: 12px 20px;
             border-radius: 999px;
             border: 1px solid rgba(255, 255, 255, 0.18);
@@ -1283,6 +1283,53 @@
             transition: transform 0.12s ease,
             background 0.12s ease,
             border-color 0.12s ease;
+        }
+
+        /* Ghost button variant used by small controls */
+        .btn.ghost {
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            background: rgba(15, 23, 42, 0.6);
+            color: var(--text-main);
+            font-size: 13px;
+            cursor: pointer;
+            transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+        }
+
+        .btn.ghost:hover {
+            background: rgba(15, 23, 42, 0.8);
+            transform: translateY(-2px);
+            border-color: rgba(148, 163, 184, 0.22);
+        }
+
+        .btn.ghost:active {
+            transform: translateY(0);
+        }
+
+        .btn.ghost:focus-visible {
+            outline: 3px solid rgba(148, 163, 184, 0.12);
+            outline-offset: 3px;
+        }
+
+        /* Style the sort field select to visually match the ghost buttons */
+        .sort-field-select {
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            background: rgba(15, 23, 42, 0.6);
+            color: var(--text-main);
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .sort-field-select:focus {
+            outline: 3px solid rgba(148, 163, 184, 0.12);
+            outline-offset: 3px;
         }
 
         .btn-info:hover {
@@ -1571,6 +1618,19 @@
                     All Content
                 </h2>
                 <p class="section-subtitle" id="resultCount"></p>
+            </div>
+            <div id="sortWrap" style="display:flex;gap:8px;align-items:center">
+                <label for="sortFieldSelect" style="color:var(--text-subtle);font-size:13px">Sort:</label>
+                <select id="sortFieldSelect" class="sort-field-select">
+                    <option value="default">Default</option>
+                    <option value="title">Title</option>
+                    <option value="rating">Rating</option>
+                    <option value="year">Year</option>
+                </select>
+                <div id="sortOrderWrap" style="display:inline-flex;gap:6px">
+                    <button id="sortAscBtn" class="btn ghost" title="Ascending">↑</button>
+                    <button id="sortDescBtn" class="btn ghost" title="Descending">↓</button>
+                </div>
             </div>
         </div>
 
@@ -1878,6 +1938,27 @@
         }
     }
 
+    function sortMovies(list, field, order) {
+        if (!Array.isArray(list)) return list || [];
+        if (!field || field === 'default') return list.slice();
+        const cloned = list.slice();
+        const dir = order === 'asc' ? 1 : -1;
+        switch (field) {
+            case 'title':
+                cloned.sort((a,b) => dir * String((a.title||'')).localeCompare(String(b.title||''), undefined, {sensitivity:'base'}));
+                break;
+            case 'rating':
+                cloned.sort((a,b) => dir * ((Number(a.rating)||0) - (Number(b.rating)||0)));
+                break;
+            case 'year':
+                cloned.sort((a,b) => dir * ((Number(a.year)||0) - (Number(b.year)||0)));
+                break;
+            default:
+                break;
+        }
+        return cloned;
+    }
+
     function renderTopRatedRow(title, list) {
         const container = document.getElementById("moviesContainer");
         if (!list || !list.length) return;
@@ -1913,6 +1994,8 @@
     }
     let currentFilter = "all"; // all | movie | tv
     let currentSearch = "";
+    let currentSortField = "default"; // default | title | rating | year
+    let currentSortOrder = "desc"; // asc | desc
     let movies = [];
     let currentPage = 1;
     let totalPages = 1;
@@ -1940,7 +2023,7 @@
             // server-side pagination: fetch only the requested page and
             // render pagination controls. This keeps Movies/TV lists
             // paginated instead of aggregating all pages into one large array.
-            if (!useSearch && currentView === "grid") {
+            if (!useSearch && currentView === "grid" && currentSortField === "default") {
                 const p = page || 1;
                 let res;
                 try {
@@ -2073,6 +2156,10 @@
                 }
 
                 movies = allMovies;
+                // apply global sort if requested (sort across all results)
+                if (currentSortField && currentSortField !== "default") {
+                    movies = sortMovies(movies, currentSortField, currentSortOrder);
+                }
                 // try fetching server-side genres (combined movie+tv)
                 try {
                     await loadGenres();
@@ -2660,8 +2747,10 @@
             const header = document.createElement("div");
             header.className = "grid-header";
 
+            // if a global sort is active, create a sorted copy for this grid
+            const gridList = (currentSortField && currentSortField !== 'default') ? sortMovies(list, currentSortField, currentSortOrder) : (Array.isArray(list) ? list.slice() : []);
             const left = document.createElement("div");
-            left.innerHTML = `<div style="font-size:18px;font-weight:700">${title}</div><div class="section-subtitle">${list.length} items</div>`;
+            left.innerHTML = `<div style="font-size:18px;font-weight:700">${title}</div><div class="section-subtitle">${gridList.length} items</div>`;
 
             const right = document.createElement("div");
             const back = document.createElement("button");
@@ -2689,7 +2778,7 @@
             let page = 1;
             const totalPages = Math.max(
                 1,
-                Math.ceil(list && list.length ? list.length / PAGE_SIZE : 0),
+                Math.ceil(gridList && gridList.length ? gridList.length / PAGE_SIZE : 0),
             );
 
             const gridWrap = document.createElement("div");
@@ -2705,7 +2794,7 @@
             function renderGridPage(p) {
                 grid.innerHTML = "";
                 const start = (p - 1) * PAGE_SIZE;
-                const pageItems = (list || []).slice(start, start + PAGE_SIZE);
+                const pageItems = (gridList || []).slice(start, start + PAGE_SIZE);
                 pageItems.forEach((m) => grid.appendChild(createMovieCard(m)));
 
                 // build compact Prev / Page X / Next pagination
@@ -3210,7 +3299,7 @@
                 {headers},
             );
             const peoplePromise = fetch(
-                `/api/public/people/page?page=1&q=${encodeURIComponent(query)}`,
+                `/api/public/people/all-fast?q=${encodeURIComponent(query)}`,
                 {headers},
             );
 
@@ -3252,17 +3341,14 @@
                 peopleData = await peopleRes.json();
             } catch (e) {
                 console.error('Failed to parse people JSON', e);
-                // fallback: treat as empty
                 peopleData = [];
             }
-            const items = moviesData.items || [];
-            const peopleItems = Array.isArray(peopleData)
-                ? peopleData
-                : peopleData.items || [];
-            const peopleTotal = Array.isArray(peopleData)
-                ? peopleData.length
-                : peopleData.totalElements ||
-                (peopleItems ? peopleItems.length : 0);
+            let items = moviesData.items || [];
+            if (currentSortField && currentSortField !== 'default') {
+                items = sortMovies(items, currentSortField, currentSortOrder);
+            }
+            const peopleItems = Array.isArray(peopleData) ? peopleData : (peopleData.items || []);
+            const peopleTotal = Array.isArray(peopleData) ? peopleData.length : (peopleData.totalElements || (peopleItems ? peopleItems.length : 0));
 
             // limit displayed actor count to 20; show 20+ when there are more
             const displayedActorCount =
@@ -3446,6 +3532,59 @@
         });
     }
 
+    // Initialize sorting UI and behavior
+    function initSortUI() {
+        const fieldSel = document.getElementById('sortFieldSelect');
+        const ascBtn = document.getElementById('sortAscBtn');
+        const descBtn = document.getElementById('sortDescBtn');
+        const wrap = document.getElementById('sortWrap');
+        if (!fieldSel || !ascBtn || !descBtn || !wrap) return;
+
+        // reflect current state
+        fieldSel.value = currentSortField || 'default';
+        // update visibility depending on view
+        function updateSortVisibility() {
+            wrap.style.display = currentView === 'rows' ? 'none' : 'flex';
+        }
+        updateSortVisibility();
+
+        fieldSel.addEventListener('change', async () => {
+            currentSortField = fieldSel.value || 'default';
+            // re-render appropriately
+            if (currentView === 'grid' || currentView === 'search') {
+                if (currentSortField && currentSortField !== 'default') {
+                    movies = sortMovies(movies, currentSortField, currentSortOrder);
+                }
+                await renderMovies(currentView === 'search');
+            } else {
+                await loadMovies(currentFilter, 1);
+            }
+        });
+
+        ascBtn.addEventListener('click', async () => {
+            currentSortOrder = 'asc';
+            if (currentSortField && currentSortField !== 'default') {
+                movies = sortMovies(movies, currentSortField, currentSortOrder);
+            }
+            await renderMovies(currentView === 'search');
+        });
+
+        descBtn.addEventListener('click', async () => {
+            currentSortOrder = 'desc';
+            if (currentSortField && currentSortField !== 'default') {
+                movies = sortMovies(movies, currentSortField, currentSortOrder);
+            }
+            await renderMovies(currentView === 'search');
+        });
+
+        // ensure visibility updates when view changes
+        const origRenderMovies = renderMovies;
+        renderMovies = async function(isSearch) {
+            updateSortVisibility();
+            return origRenderMovies.call(this, isSearch);
+        };
+    }
+
     // ========== INIT ==========
     (async function init() {
         initNav();
@@ -3468,7 +3607,8 @@
         });
         handlePaymentReturnMessage();
         initPremiumAndLogout();
-        await loadMovies(currentFilter);
+    initSortUI();
+    await loadMovies(currentFilter);
     })();
 
     // wire featured down button

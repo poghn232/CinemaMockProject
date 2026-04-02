@@ -46,9 +46,10 @@ public class PublicMovieController {
     public MovieDetailDto detail(
             @RequestParam(name = "type") String type,
             @RequestParam(name = "id") long id,
+            @RequestParam(name = "includeResources", defaultValue = "false") boolean includeResources,
             HttpServletRequest request
     ) {
-        return publicMovieService.getDetail(type, id, request);
+        return publicMovieService.getDetail(type, id, request, includeResources);
     }
 
     @GetMapping("/genres")

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,7 @@ public class PublicPersonController {
     private final PersonRepository personRepository;
     private final MovieRepository movieRepository;
     private final TvSeriesRepository tvSeriesRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     @Value("${tmdb.image-base-url}")
     private String imageBaseUrl;
@@ -92,6 +94,97 @@ public class PublicPersonController {
         resp.setPage(currentPage);
         resp.setTotalPages(totalPages);
         resp.setTotalElements(totalElements);
+        return resp;
+    }
+
+    // Fast endpoint returning all people (or filtered by q) with precomputed credits count.
+    // Uses a single SQL query to avoid N+1 lazy-load queries and is suitable for returning
+    // the full actor list to the frontend when pagination is not desired.
+    @GetMapping("/all-fast")
+    public List<PersonDto> listPeopleAllFast(@RequestParam(value = "q", required = false) String q) {
+        String sql = "SELECT p.id, p.name, p.profile_path, " +
+                "COALESCE(mc.cnt,0) + COALESCE(tc.cnt,0) AS credits_count " +
+                "FROM persons p " +
+                "LEFT JOIN (SELECT person_id, COUNT(*) AS cnt FROM movie_credits GROUP BY person_id) mc ON mc.person_id = p.id " +
+                "LEFT JOIN (SELECT person_id, COUNT(*) AS cnt FROM tv_credits GROUP BY person_id) tc ON tc.person_id = p.id ";
+
+        List<Object> params = new ArrayList<>();
+        if (q != null && !q.isBlank()) {
+            sql += " WHERE LOWER(p.name) LIKE ? ";
+            params.add("%" + q.trim().toLowerCase() + "%");
+        }
+        sql += " ORDER BY credits_count DESC";
+
+        List<PersonDto> list = jdbcTemplate.query(sql, params.toArray(), (rs, rowNum) -> {
+            PersonDto dto = new PersonDto();
+            dto.setId(rs.getLong("id"));
+            dto.setName(rs.getString("name"));
+            String pp = rs.getString("profile_path");
+            if (pp != null && !pp.isBlank()) dto.setProfilePath(imageBaseUrl + pp);
+            dto.setCreditsCount(rs.getInt("credits_count"));
+            return dto;
+        });
+        return list;
+    }
+
+    // Fast paginated endpoint. Supports page (1-based), size, q (name filter), sort (credits|name) and order (asc|desc)
+    @GetMapping("/fast-page")
+    public PersonListResponseDto listPeopleFastPage(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "20") int size,
+            @RequestParam(value = "q", required = false) String q,
+            @RequestParam(value = "sort", defaultValue = "credits") String sort,
+            @RequestParam(value = "order", defaultValue = "desc") String order
+    ) {
+        // sanitize params
+        int pageNum = Math.max(1, page);
+        int pageSize = Math.max(1, Math.min(200, size));
+        String sortCol = "credits_count";
+        if ("name".equalsIgnoreCase(sort)) sortCol = "p.name";
+        String orderDir = "desc".equalsIgnoreCase(order) ? "DESC" : "ASC";
+
+        // build count query
+        String countSql = "SELECT COUNT(*) FROM persons p";
+        List<Object> params = new ArrayList<>();
+        if (q != null && !q.isBlank()) {
+            countSql += " WHERE LOWER(p.name) LIKE ?";
+            params.add("%" + q.trim().toLowerCase() + "%");
+        }
+        long total = jdbcTemplate.queryForObject(countSql, params.toArray(), Long.class);
+
+        // main page query with credits_count
+        String sql = "SELECT p.id, p.name, p.profile_path, " +
+                "COALESCE(mc.cnt,0) + COALESCE(tc.cnt,0) AS credits_count " +
+                "FROM persons p " +
+                "LEFT JOIN (SELECT person_id, COUNT(*) AS cnt FROM movie_credits GROUP BY person_id) mc ON mc.person_id = p.id " +
+                "LEFT JOIN (SELECT person_id, COUNT(*) AS cnt FROM tv_credits GROUP BY person_id) tc ON tc.person_id = p.id ";
+        if (q != null && !q.isBlank()) {
+            sql += " WHERE LOWER(p.name) LIKE ?";
+        }
+        sql += " ORDER BY " + sortCol + " " + orderDir + " LIMIT ? OFFSET ?";
+
+        // params: q?, limit, offset
+        List<Object> qparams = new ArrayList<>();
+        if (q != null && !q.isBlank()) qparams.add("%" + q.trim().toLowerCase() + "%");
+        qparams.add(pageSize);
+        qparams.add((pageNum - 1) * pageSize);
+
+        List<PersonDto> items = jdbcTemplate.query(sql, qparams.toArray(), (rs, rowNum) -> {
+            PersonDto dto = new PersonDto();
+            dto.setId(rs.getLong("id"));
+            dto.setName(rs.getString("name"));
+            String pp = rs.getString("profile_path");
+            if (pp != null && !pp.isBlank()) dto.setProfilePath(imageBaseUrl + pp);
+            dto.setCreditsCount(rs.getInt("credits_count"));
+            return dto;
+        });
+
+        PersonListResponseDto resp = new PersonListResponseDto();
+        resp.setItems(items);
+        resp.setPage(pageNum);
+        int totalPages = (int) Math.max(1, Math.ceil((double) total / pageSize));
+        resp.setTotalPages(totalPages);
+        resp.setTotalElements(total);
         return resp;
     }
 

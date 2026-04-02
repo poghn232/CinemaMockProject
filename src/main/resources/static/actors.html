@@ -115,6 +115,28 @@
         display: flex;
         justify-content: center;
       }
+      .sort-controls {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        margin-left: 12px;
+      }
+      .sort-field-select {
+        padding: 6px 10px;
+        border-radius: 8px;
+        border: 1px solid rgba(148, 163, 184, 0.12);
+        background: rgba(15, 23, 42, 0.6);
+        color: var(--text-main);
+        font-size: 13px;
+      }
+      .btn.ghost {
+        padding: 6px 10px;
+        border-radius: 8px;
+        border: 1px solid rgba(148, 163, 184, 0.12);
+        background: rgba(15, 23, 42, 0.6);
+        color: var(--text-main);
+        cursor: pointer;
+      }
       .nav-right {
         display: flex;
         align-items: center;
@@ -317,6 +339,15 @@
               placeholder="Search actors by name or title..."
             />
           </div>
+          <div class="sort-controls" id="actorsSortControls" style="margin-left:12px">
+            <label for="actorsSortField" style="color:var(--text-subtle);font-size:13px;margin-right:6px">Sort:</label>
+            <select id="actorsSortField" class="sort-field-select">
+              <option value="credits">Credits</option>
+              <option value="name">Name</option>
+            </select>
+            <button id="actorsSortAsc" class="btn ghost" title="Ascending">↑</button>
+            <button id="actorsSortDesc" class="btn ghost" title="Descending">↓</button>
+          </div>
         </div>
         <div class="nav-right">
           <a href="homepage.html" class="nav-button">Home</a>
@@ -381,8 +412,7 @@
     </div>
 
     <script>
-  // Loads paged actors from server API (20 per page) and supports server-side search
-  // guard values to prevent out-of-order fetch responses from clobbering UI
+  // Loads actors using a fast paginated endpoint. Supports server-side sort and page navigation.
   window.__actorsRequestId = window.__actorsRequestId || 0;
   window.__actorsLoading = window.__actorsLoading || false;
 
@@ -399,95 +429,86 @@
         }
       }
 
+      // client state
+      window.__actorsPage = window.__actorsPage || 1;
+      window.__actorsSize = window.__actorsSize || 20;
+      window.__actorsSort = window.__actorsSort || 'credits';
+      window.__actorsOrder = window.__actorsOrder || 'desc';
+
       async function loadActorsPage(page = 1, q = "") {
         const el = document.getElementById("actorsList");
-        // try to show cached data immediately for perceived speed
-        const cacheKey = `actors_page_${page}_q_${q}`;
+        const cacheKey = `actors_page_${page}_q_${q}_s_${window.__actorsSize}_sort_${window.__actorsSort}_o_${window.__actorsOrder}`;
         try {
           const cached = sessionStorage.getItem(cacheKey);
           if (cached) {
             const data = JSON.parse(cached);
-            window.__actorsCurrentQuery = q;
-            window.__actorsCurrentPage = data.page || page;
-            window.__actorsTotalPages = data.totalPages || 1;
-            window.__actorsArray = data.items || [];
+            window.__actorsArray = data || [];
             window.__actorsMap = {};
-            (data.items || []).forEach((a) => (window.__actorsMap[String(a.id)] = a));
-            renderActorsList(data.items || []);
-            renderPagination(window.__actorsCurrentPage, window.__actorsTotalPages);
-            // still fetch fresh data in background; tag with request id so
-            // background results don't override a newer user navigation
+            (data || []).forEach((a) => (window.__actorsMap[String(a.id)] = a));
+            renderActorsList(data || []);
+            // no pagination when using full list
+            document.getElementById('paginationWrap').innerHTML = '';
+            // background refresh
             const bgId = ++window.__actorsRequestId;
-            fetchActorsAndUpdateCache(page, q, cacheKey, bgId);
+            fetchActorsPageAndUpdateCache(page, q, cacheKey, bgId);
             return;
           }
-        } catch (e) {
-          console.debug("cache read failed", e);
-        }
-        // no cache: show skeletons quickly then fetch
-        renderSkeletons();
-        // start a fresh request id and mark loading
+        } catch (e) { console.debug('cache read failed', e); }
+
+        renderSkeletons(12);
         const currentId = ++window.__actorsRequestId;
         window.__actorsLoading = true;
-        renderPagination(window.__actorsCurrentPage || 1, window.__actorsTotalPages || 1);
         try {
           const params = new URLSearchParams();
-          params.set("page", String(page));
-          if (q) params.set("q", q);
-          const res = await fetch("/api/public/people/page?" + params.toString());
-          if (!res.ok) throw new Error("Failed to fetch");
+          params.set('page', String(page));
+          params.set('size', String(window.__actorsSize));
+          params.set('sort', window.__actorsSort);
+          params.set('order', window.__actorsOrder);
+          if (q) params.set('q', q);
+          const res = await fetch('/api/public/people/fast-page?' + params.toString());
+          if (!res.ok) throw new Error('Failed to fetch');
           const data = await res.json();
-          // drop response if a newer request was started
           if (currentId !== window.__actorsRequestId) return;
-          // cache fresh response for quick subsequent loads
-          try {
-            sessionStorage.setItem(cacheKey, JSON.stringify(data));
-          } catch (e) {
-            /* ignore storage errors */
-          }
+          try { sessionStorage.setItem(cacheKey, JSON.stringify(data)); } catch (e) {}
           window.__actorsCurrentQuery = q;
-          window.__actorsCurrentPage = data.page || page;
-          window.__actorsTotalPages = data.totalPages || 1;
-          window.__actorsArray = data.items || [];
-          window.__actorsMap = {};
-          (data.items || []).forEach(
-            (a) => (window.__actorsMap[String(a.id)] = a),
-          );
-          renderActorsList(data.items || []);
-          renderPagination(window.__actorsCurrentPage, window.__actorsTotalPages);
-          window.__actorsLoading = false;
-        } catch (e) {
-            el.textContent = "Failed to load actors";
-          console.error(e);
-          window.__actorsLoading = false;
-        }
-      }
-
-      // helper that fetches fresh data without blocking initial render
-      async function fetchActorsAndUpdateCache(page = 1, q = "", cacheKey, requestId) {
-        try {
-          const params = new URLSearchParams();
-          params.set("page", String(page));
-          if (q) params.set("q", q);
-          const res = await fetch("/api/public/people/page?" + params.toString());
-          if (!res.ok) return;
-          const data = await res.json();
-          // only update UI if this background fetch wasn't superseded
-          if (typeof requestId !== "undefined" && requestId !== window.__actorsRequestId) return;
-          window.__actorsCurrentQuery = q;
-          window.__actorsCurrentPage = data.page || page;
+          window.__actorsPage = data.page || page;
           window.__actorsTotalPages = data.totalPages || 1;
           window.__actorsArray = data.items || [];
           window.__actorsMap = {};
           (data.items || []).forEach((a) => (window.__actorsMap[String(a.id)] = a));
           renderActorsList(data.items || []);
-          renderPagination(window.__actorsCurrentPage, window.__actorsTotalPages);
-          try {
-            if (cacheKey) sessionStorage.setItem(cacheKey, JSON.stringify(data));
-          } catch (e) {}
+          renderPagination(window.__actorsPage, window.__actorsTotalPages);
+          window.__actorsLoading = false;
         } catch (e) {
-          /* ignore background fetch errors */
+          el.textContent = 'Failed to load actors';
+          console.error(e);
+          window.__actorsLoading = false;
         }
+      }
+
+      // helper that fetches fresh full actor list in background and updates cache/UI
+      async function fetchActorsPageAndUpdateCache(page = 1, q = '', cacheKey, requestId) {
+        try {
+          const params = new URLSearchParams();
+          params.set('page', String(page));
+          params.set('size', String(window.__actorsSize));
+          params.set('sort', window.__actorsSort);
+          params.set('order', window.__actorsOrder);
+          if (q) params.set('q', q);
+          const res = await fetch('/api/public/people/fast-page?' + params.toString());
+          if (!res.ok) return;
+          const data = await res.json();
+          if (typeof requestId !== 'undefined' && requestId !== window.__actorsRequestId) return;
+          window.__actorsCurrentQuery = q;
+          window.__actorsPage = data.page || page;
+          window.__actorsTotalPages = data.totalPages || 1;
+          window.__actorsArray = data.items || [];
+          window.__actorsMap = {};
+          (data.items || []).forEach((a) => (window.__actorsMap[String(a.id)] = a));
+          renderActorsList(data.items || []);
+          renderPagination(window.__actorsPage, window.__actorsTotalPages);
+          try { if (cacheKey) sessionStorage.setItem(cacheKey, JSON.stringify(data)); } catch (e) {}
+        } catch (e) { /* ignore background fetch errors */ }
       }
 
       function applyActorFadeIn() {
@@ -613,8 +634,17 @@
           debounce((e) => {
             const q = (e.target.value || "").trim();
             loadActorsPage(1, q);
-          }, 300),
+          }, 250),
         );
+        // wire sort controls
+        const sortField = document.getElementById('actorsSortField');
+        const sortAsc = document.getElementById('actorsSortAsc');
+        const sortDesc = document.getElementById('actorsSortDesc');
+        if (sortField) sortField.value = window.__actorsSort || 'credits';
+        if (sortAsc) sortAsc.addEventListener('click', () => { window.__actorsOrder = 'asc'; loadActorsPage(1, (input.value||'').trim()); });
+        if (sortDesc) sortDesc.addEventListener('click', () => { window.__actorsOrder = 'desc'; loadActorsPage(1, (input.value||'').trim()); });
+        if (sortField) sortField.addEventListener('change', () => { window.__actorsSort = sortField.value || 'credits'; loadActorsPage(1, (input.value||'').trim()); });
+
         // initial load and auto-open actor if ?id= present
         (async () => {
           await loadActorsPage(1, "");

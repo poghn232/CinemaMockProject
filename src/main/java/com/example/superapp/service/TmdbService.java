@@ -16,6 +16,20 @@ import java.util.List;
 import java.util.Map;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * Simple in-memory TTL cache for TMDB responses keyed by URL.
+ */
+class CacheEntry {
+    final Map<String, Object> value;
+    final long ts;
+
+    CacheEntry(Map<String, Object> value, long ts) {
+        this.value = value;
+        this.ts = ts;
+    }
+}
 
 @Service
 public class TmdbService {
@@ -25,6 +39,10 @@ public class TmdbService {
     private final String imageBaseUrl;
     private final RestTemplate restTemplate = new RestTemplate();
     private static final Logger log = LoggerFactory.getLogger(TmdbService.class);
+    private final ConcurrentHashMap<String, CacheEntry> cache = new ConcurrentHashMap<>();
+
+    @Value("${tmdb.cache-ttl-seconds:1800}")
+    private long cacheTtlSeconds;
 
     public TmdbService(
             @Value("${tmdb.api-key}") String apiKey,
@@ -242,11 +260,21 @@ public class TmdbService {
     @SuppressWarnings("unchecked")
     private Map<String, Object> safeGetMap(String url) {
         try {
+            // simple cache by URL
+            CacheEntry entry = cache.get(url);
+            long now = System.currentTimeMillis();
+            if (entry != null && (now - entry.ts) <= cacheTtlSeconds * 1000L) {
+                return entry.value == null ? Map.of() : entry.value;
+            }
+
             Map<String, Object> response = restTemplate.getForObject(url, Map.class);
-            return response == null ? Map.of() : response;
+            Map<String, Object> safe = response == null ? Map.of() : response;
+            cache.put(url, new CacheEntry(safe, now));
+            return safe;
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                 log.warn("TMDB resource not found (404) for URL: {}", url);
+                cache.put(url, new CacheEntry(Map.of(), System.currentTimeMillis()));
                 return Map.of();
             }
             // rethrow other client errors

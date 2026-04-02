@@ -758,7 +758,7 @@
 
         try {
           const res = await fetch(
-            `/api/public/movies/detail?type=${encodeURIComponent(type)}&id=${encodeURIComponent(id)}`,
+                `/api/public/movies/detail?type=${encodeURIComponent(type)}&id=${encodeURIComponent(id)}&includeResources=true`,
             {
               headers: {
                 ...authHeaders(),
