@@ -745,6 +745,37 @@
             border: 1px solid rgba(250, 204, 21, 0.8);
         }
 
+        /* rank badge placed on the poster in the bottom-left corner so it
+           doesn't overlap the 'Trending' (top-left) or movie-type (top-right) badges */
+        .rank-badge {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            background: linear-gradient(135deg, #facc15, #f59e0b);
+            color: #000;
+            font-weight: 700;
+            border: 1px solid rgba(34,34,34,0.08);
+            z-index: 30; /* above poster but below hover glow */
+        }
+
+    /* Continue Watching row specifics */
+    .continue-row .movie-card { width: 180px; }
+    .continue-thumb { position: relative; }
+    .continue-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 8px; background: rgba(0,0,0,0.4); }
+    .continue-progress > .bar { height: 100%; background: linear-gradient(90deg,#f97316,#ec4899); width: 0%; }
+    .resume-pill { position: absolute; right: 8px; bottom: 12px; padding: 6px 8px; border-radius: 999px; font-size: 12px; cursor: pointer;
+        background: linear-gradient(135deg, #f97316, #ec4899);
+        color: #fff;
+        font-weight: 600;
+        border: none;
+        box-shadow: 0 12px 25px rgba(248, 113, 113, 0.6), 0 0 0 1px rgba(248, 113, 113, 0.7);
+        transition: filter 0.12s ease, transform 0.12s ease;
+    }
+    .resume-pill:hover { filter: brightness(1.05); transform: translateY(-1px); }
+
         .movie-type {
             position: absolute;
             top: 8px;
@@ -1923,7 +1954,7 @@
             if (content) {
                 content.classList.remove('fade-out');
                 content.classList.add('fade-in');
-                setTimeout(() => content.classList.remove('fade-in'), 600);
+                setTimeout(() => content.classList.remove('fade-in'), 100);
             }
         }, 220);
     }
@@ -1964,8 +1995,9 @@
         const container = document.getElementById("moviesContainer");
         if (!list || !list.length) return;
 
-        const row = document.createElement("div");
-        row.className = "movie-row";
+    const row = document.createElement("div");
+    // mark as actor-row so other code can find and reorder it
+    row.className = "movie-row actor-row";
 
         const titleEl = document.createElement("div");
         titleEl.className = "movie-row-title";
@@ -1977,14 +2009,12 @@
         
         list.forEach((m, idx) => {
             const card = createMovieCard(m);
-            // Ranking badge
-            const badge = document.createElement("span");
-            badge.className = "movie-badge";
-            badge.style.background = "linear-gradient(135deg, #facc15, #f59e0b)";
-            badge.style.color = "#000";
-            badge.style.fontWeight = "bold";
-            badge.textContent = `#${idx + 1}`;
-            card.querySelector(".movie-thumb").appendChild(badge);
+            // Ranking badge: place under the poster in the body to avoid covering the trending badge
+            const rank = document.createElement("span");
+            rank.className = "rank-badge";
+            rank.textContent = `#${idx + 1}`;
+            const thumb = card.querySelector('.movie-thumb');
+            if (thumb) thumb.appendChild(rank);
             
             scroll.appendChild(card);
             setTimeout(() => card.classList.add("in"), 100 + (idx * 50));
@@ -1992,6 +2022,17 @@
 
         row.appendChild(scroll);
         container.appendChild(row);
+        // ensure actor row appears after any continue-watching row if present
+        // (this keeps actor row visually after history even if actor fetch resolved early)
+        try {
+            const continueRow = container.querySelector('.movie-row.continue-row');
+            const actorRow = container.querySelector('.movie-row.actor-row');
+            if (continueRow && actorRow && continueRow !== actorRow) {
+                // move actorRow to immediately after continueRow
+                if (continueRow.nextSibling) container.insertBefore(actorRow, continueRow.nextSibling);
+                else container.appendChild(actorRow);
+            }
+        } catch (e) { /* silent */ }
     }
     let currentFilter = "all"; // all | movie | tv
     let currentSearch = "";
@@ -2334,11 +2375,28 @@
 
         // ✅ NORMAL MODE (ROWS)
         try {
-            // 1. Maybe You Want to Watch
+            // 1. Maybe You Want to Watch - render this first
             const recommendations = await loadMaybeYouWantToWatch(12);
             if (recommendations && recommendations.length) {
                 renderRow(t("home.maybe_watch"), recommendations.slice(0, ROW_DISPLAY_LIMIT), recommendations);
             }
+
+            // Continue Watching (user history)
+            // (actor row will be rendered after this so it appears below continue watching)
+            try {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    const res = await fetch('/api/user/history', { headers: { Authorization: 'Bearer ' + token } });
+                    if (res && res.ok) {
+                        const hist = await res.json();
+                        if (Array.isArray(hist) && hist.length) {
+                            renderContinueWatchingRow('Continue Watching', hist.slice(0, ROW_DISPLAY_LIMIT));
+                        }
+                    }
+                }
+                } catch (err) { /* ignore history fetch errors */ }
+
+            // actor row will be rendered later after movies/tv rows to ensure stable ordering
 
             // 2. Top Rated (User-voted)
             const topRated = await loadTopRatedData(10);
@@ -2352,15 +2410,7 @@
     const trendingList = movies.filter((m) => m.rating >= 8);
     renderRow(t("home.trending"), trendingList.slice(0, ROW_DISPLAY_LIMIT), trendingList);
 
-        // build and render actor row (non-blocking but try to collect quickly)
-        (async () => {
-            try {
-                const topActors = await collectTopActors(20);
-                renderActorRow(t("home.top_actors"), topActors);
-            } catch (e) {
-                // actor row build failed
-            }
-        })();
+    // actor row handled earlier to control ordering
     const moviesOnly = movies.filter((m) => m.type === "movie");
     // movies row count logged in dev
     renderRow(t("home.movies"), moviesOnly, moviesOnly);
@@ -2368,6 +2418,150 @@
     const tvOnly = movies.filter((m) => m.type === "tv");
     // tv row count logged in dev
     renderRow(t("home.tv_series"), tvOnly, tvOnly);
+
+    // Now render Top Actors so it appears after Movies and TV rows (stable DOM order)
+    try {
+        const topActors = await collectTopActors(20);
+        if (topActors && topActors.length) {
+            renderActorRow(t("home.top_actors"), topActors);
+        }
+    } catch (e) { /* ignore actor fetch errors */ }
+
+    // helper: render continue watching row
+    function renderContinueWatchingRow(title, list) {
+        const container = document.getElementById('moviesContainer');
+        if (!list || !list.length) return;
+        const row = document.createElement('div');
+        row.className = 'movie-row continue-row';
+        const titleEl = document.createElement('div');
+        titleEl.className = 'movie-row-title';
+        titleEl.innerHTML = `<span style="width: 4px; height: 18px; background: var(--accent); border-radius: 2px; display:inline-block; margin-right:8px; vertical-align:middle;"></span> ${title}`;
+        row.appendChild(titleEl);
+        const scroll = document.createElement('div');
+        scroll.className = 'movie-row-scroll';
+        // Deduplicate TV series so we only show the latest watched episode per series.
+        // Strategy: group by tvSeriesId when present; keep the item with the latest
+        // timestamp (watchedAt/createdAt/timestamp) if available, else compare season/episode,
+        // else prefer the most recent item in the list.
+        const grouped = new Map();
+        list.forEach((item, idx) => {
+            const isTv = !!item.tvSeriesId || item.type === 'tv';
+            const id = isTv ? (item.tvSeriesId || item.id) : (item.movieId || item.id);
+            const key = (isTv ? 'tv:' : 'm:') + String(id || '');
+            const existing = grouped.get(key);
+            if (!existing) {
+                grouped.set(key, Object.assign({}, item, { __idx: idx }));
+                return;
+            }
+
+            // try to compare by well-known time fields
+            const timeKeys = ['watchedAt','watched_at','timestamp','createdAt','created_at','time','lastWatched'];
+            const getTime = (o) => {
+                for (const k of timeKeys) if (o && o[k]) return Date.parse(o[k]);
+                return null;
+            };
+            const aT = getTime(existing);
+            const bT = getTime(item);
+            if (aT && bT) {
+                if (bT >= aT) grouped.set(key, Object.assign({}, item, { __idx: idx }));
+                return;
+            }
+
+            // fallback: compare season/episode numbers for TV
+            const aSeason = existing.seasonNumber || existing.season || 0;
+            const aEp = existing.episodeNumber || existing.episode || existing.episodeIndex || 0;
+            const bSeason = item.seasonNumber || item.season || 0;
+            const bEp = item.episodeNumber || item.episode || item.episodeIndex || 0;
+            if (bSeason > aSeason || (bSeason === aSeason && bEp >= aEp)) {
+                grouped.set(key, Object.assign({}, item, { __idx: idx }));
+                return;
+            }
+
+            // last-resort: prefer later item in the original list
+            if (idx > (existing.__idx || 0)) grouped.set(key, Object.assign({}, item, { __idx: idx }));
+        });
+
+        // convert grouped map to array and show most-recent-first
+        const deduped = Array.from(grouped.values()).sort((a, b) => (b.__idx || 0) - (a.__idx || 0));
+
+        deduped.forEach((item, idx) => {
+            // map fields similar to profile.renderHistory
+            const mainTitle = item.movieTitle || item.tvSeriesName || item.title || 'Unknown';
+            const progressSec = item.progressSec || item.positionSeconds || 0;
+            const durationSec = item.durationSec || item.duration || 1;
+            const percent = Math.min(100, Math.round((progressSec / durationSec) * 100));
+            const poster = item.posterPath || item.imageUrl || item.image || 'https://placehold.co/200x300/1f2937/9ca3af?text=No+Poster';
+
+            // Build a lightweight movie-like object for createMovieCard
+            const movieObj = {
+                id: item.movieId || item.tvSeriesId || item.id,
+                title: mainTitle,
+                imageUrl: poster,
+                type: item.tvSeriesId ? 'tv' : (item.type || 'movie'),
+                rating: item.rating || item.score
+            };
+
+            const card = createMovieCard(movieObj);
+            const thumb = card.querySelector('.movie-thumb');
+            if (thumb) {
+                thumb.classList.add('continue-thumb');
+                const progressWrap = document.createElement('div');
+                progressWrap.className = 'continue-progress';
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.width = percent + '%';
+                progressWrap.appendChild(bar);
+                thumb.appendChild(progressWrap);
+
+                const resume = document.createElement('div');
+                resume.className = 'resume-pill';
+                resume.textContent = 'Resume';
+                resume.addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    let link;
+                    if (item.movieId) {
+                        link = `movie-watch.html?id=${item.movieId}&type=movie&t=${progressSec}`;
+                    } else if (item.tvSeriesId) {
+                        link = `movie-watch.html?id=${item.tvSeriesId}&type=tv&season=${item.seasonNumber || item.season || 1}&episode=${item.episodeNumber || item.episode || 1}&t=${progressSec}`;
+                    } else {
+                        link = `movie-watch.html?id=${encodeURIComponent(movieObj.id)}&type=${encodeURIComponent(movieObj.type)}&t=${progressSec}`;
+                    }
+                    window.location.href = link;
+                });
+                thumb.appendChild(resume);
+            }
+
+            // update title and meta rows to show correct title and progress info
+            const body = card.querySelector('.movie-body');
+            if (body) {
+                const titleEl = body.querySelector('.movie-title');
+                if (titleEl) titleEl.textContent = mainTitle;
+
+                // Hide rating in Continue Watching since it's N/A for history items
+                const ratingNode = body.querySelector('.movie-rating');
+                if (ratingNode) ratingNode.style.display = 'none';
+
+                // show episode label for TV series (SxEx or Episode #)
+                if (item.tvSeriesId || item.type === 'tv') {
+                    const season = item.seasonNumber || item.season || 1;
+                    const episode = item.episodeNumber || item.episode || item.episodeIndex || null;
+                    const epText = episode ? `S${season}E${String(episode).padStart(2,'0')}` : (item.episodeName ? item.episodeName : 'Episode');
+                    const epEl = document.createElement('div');
+                    epEl.className = 'movie-episode';
+                    epEl.textContent = epText;
+                    epEl.style.fontSize = '12px';
+                    epEl.style.color = 'var(--text-subtle)';
+                    epEl.style.marginTop = '4px';
+                    body.appendChild(epEl);
+                }
+            }
+
+            scroll.appendChild(card);
+            setTimeout(()=>card.classList.add('in'), 100 + (idx*30));
+        });
+        row.appendChild(scroll);
+        container.appendChild(row);
+    }
 
         // Render top genre rows (prefer server-provided list when available)
         const MAX_GENRE_ROWS = 12; // render more rows based on genre
@@ -2506,16 +2700,49 @@
         };
         pagination.appendChild(prev);
 
-        // Page info
-        const info = document.createElement("div");
-        info.style.minWidth = "120px";
-        info.style.textAlign = "center";
-        info.style.color = "var(--text-subtle)";
-        info.textContent = `Page ${currentPage} / ${totalPages}`;
-        pagination.appendChild(info);
+        // page info + input
+        const infoWrap = document.createElement('div');
+        infoWrap.style.display = 'flex';
+        infoWrap.style.alignItems = 'center';
+        infoWrap.style.gap = '8px';
+        infoWrap.style.color = 'var(--text-subtle)';
+        infoWrap.style.padding = '6px 10px';
+
+    const info = document.createElement('div');
+    info.textContent = `Page ${currentPage} / ${totalPages}`;
+    infoWrap.appendChild(info);
+
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.min = 1;
+    input.max = totalPages;
+    input.value = currentPage;
+    // style input to match page buttons
+    input.style.width = '64px';
+    input.style.padding = '8px 10px';
+    input.style.borderRadius = '8px';
+    input.style.border = '1px solid rgba(148,163,184,0.12)';
+    input.style.background = 'rgba(15, 23, 42, 0.9)';
+    input.style.color = 'var(--text-main)';
+    infoWrap.appendChild(input);
+
+    const go = document.createElement('button');
+    go.className = 'page-button';
+    go.textContent = 'Go';
+        go.onclick = async () => {
+            let v = parseInt(input.value, 10) || 1;
+            v = Math.max(1, Math.min(totalPages, v));
+            await loadMovies(currentFilter, v);
+        };
+        // allow Enter key in input
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') go.click();
+        });
+
+        pagination.appendChild(infoWrap);
 
         // Next button
-        const next = document.createElement("button");
+        const next = document.createElement('button');
         next.className =
             "page-button" + (currentPage >= totalPages ? " disabled" : "");
         next.textContent = "Next";
@@ -2531,7 +2758,7 @@
         return new Promise((res) => {
             if (!el) return res();
             el.classList.add("fade-out");
-            setTimeout(() => res(), 300);
+            setTimeout(() => res(), 100);
         });
     }
 
@@ -2817,13 +3044,52 @@
                     }
                 };
 
-                const info = document.createElement("div");
-                info.style.minWidth = "120px";
-                info.style.textAlign = "center";
-                info.style.color = "var(--text-subtle)";
-                info.textContent = `Page ${p} / ${totalPages}`;
+                // page info + input for direct navigation
+                const infoWrap = document.createElement('div');
+                infoWrap.style.display = 'flex';
+                infoWrap.style.alignItems = 'center';
+                infoWrap.style.gap = '8px';
+                infoWrap.style.color = 'var(--text-subtle)';
+                infoWrap.style.padding = '6px 10px';
 
-                const nextBtn = document.createElement("button");
+                const info = document.createElement('div');
+                info.textContent = `Page ${p} / ${totalPages}`;
+                infoWrap.appendChild(info);
+
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.min = 1;
+                input.max = totalPages;
+                input.value = p;
+                input.style.width = '64px';
+                input.style.padding = '8px 10px';
+                input.style.borderRadius = '8px';
+                input.style.border = '1px solid rgba(148,163,184,0.12)';
+                input.style.background = 'rgba(15, 23, 42, 0.9)';
+                input.style.color = 'var(--text-main)';
+                infoWrap.appendChild(input);
+
+                const goBtn = document.createElement('button');
+                goBtn.className = 'page-button';
+                goBtn.textContent = 'Go';
+                goBtn.onclick = () => {
+                    let v = parseInt(input.value, 10) || 1;
+                    v = Math.max(1, Math.min(totalPages, v));
+                    if (v === p) return; // nothing to do
+                    page = v;
+                    (async () => {
+                        await fadeOut(grid);
+                        renderGridPage(page);
+                        await fadeIn(grid);
+                        applyFadeInAnimation(grid);
+                    })();
+                };
+                input.addEventListener('keydown', (e) => { if (e.key === 'Enter') goBtn.click(); });
+
+                paginationWrap.appendChild(prevBtn);
+                paginationWrap.appendChild(infoWrap);
+
+                const nextBtn = document.createElement('button');
                 nextBtn.className =
                     "page-button" + (p >= totalPages ? " disabled" : "");
                 nextBtn.textContent = "Next";
@@ -2839,8 +3105,6 @@
                     }
                 };
 
-                paginationWrap.appendChild(prevBtn);
-                paginationWrap.appendChild(info);
                 paginationWrap.appendChild(nextBtn);
             }
 
@@ -3257,7 +3521,7 @@
         overlay.classList.remove("hidden");
         overlay.setAttribute("aria-hidden", "false");
         // focus input
-        setTimeout(() => overlayInput && overlayInput.focus(), 80);
+    setTimeout(() => overlayInput && overlayInput.focus(), 80);
         // stop featured from auto-rotating while searching
         if (featuredInterval) clearInterval(featuredInterval);
         currentView = "search";
@@ -3466,7 +3730,7 @@
             };
         }
 
-        setTimeout(() => {
+    setTimeout(() => {
             popup.style.display = "none";
         }, 6000);
     }

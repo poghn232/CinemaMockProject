@@ -69,8 +69,10 @@
         font-size: 14px;
       }
       /* AD BANNER styles (minimal, match homepage) */
+      /* start hidden (no layout gap) to avoid a flash-of-ad for premium users; JS will reveal for non-premium */
       .ad-wrapper {
         margin-top: 18px;
+        display: none; /* collapsed by default so premium users don't see a gap */
       }
       .ad-banner {
         display: flex;
@@ -213,6 +215,24 @@
         box-shadow: 0 20px 44px rgba(249,115,22,0.14), 0 0 30px rgba(249,115,22,0.10);
         /* lift above sibling cards but stay under the navbar (z-index:1000) */
         z-index: 500;
+      }
+      /* when the grid has .no-hover (set while detail is open) disable hover pops */
+      .actors-grid.no-hover .actor-card:hover,
+      .actors-grid.no-hover .movie-card:hover {
+        transform: none !important;
+        box-shadow: none !important;
+        z-index: 1 !important;
+      }
+      /* global override when any overlay/detail is open: ensure cards can't pop above the panel */
+      .overlay-open .actor-card,
+      .overlay-open .movie-card,
+      .overlay-open .actor-card:hover,
+      .overlay-open .movie-card:hover,
+      .overlay-open .actor-card.active,
+      .overlay-open .movie-card.active {
+        transform: none !important;
+        box-shadow: none !important;
+        z-index: 1 !important;
       }
       .actor-card.active, .movie-card.active {
         transform: translateY(-8px) scale(1.06);
@@ -655,17 +675,25 @@
           }
         })();
 
-        // hide premium ad if user is premium (mirror homepage behavior)
+        // hide premium ad for premium users without flashing it first.
+        // We keep the ad wrapper hidden by default (CSS) and only reveal it when the
+        // user is confirmed to be non-premium. For premium users we leave it hidden.
         try {
           const info = await fetchPremiumInfo();
           const isPremium = info && info.isPremium;
           const adWrapper = document.getElementById("adWrapper");
           const premiumButton = document.getElementById("premiumButton");
-          if (isPremium) {
-            if (adWrapper) adWrapper.style.display = "none";
-            if (premiumButton) premiumButton.style.display = "none";
-          } else {
-            if (adWrapper) adWrapper.style.display = "block";
+          if (adWrapper) {
+            if (isPremium) {
+              // keep collapsed
+              adWrapper.style.display = "none";
+            } else {
+              // reveal ad for non-premium users
+              adWrapper.style.display = "block";
+            }
+          }
+          if (premiumButton) {
+            premiumButton.style.display = isPremium ? "none" : "";
           }
         } catch (e) {
           /* ignore */
@@ -692,11 +720,46 @@
         };
         wrap.appendChild(makeBtn("First", 1, page === 1));
         wrap.appendChild(makeBtn("Prev", Math.max(1, page - 1), page === 1));
-        const info = document.createElement("div");
-        info.style.color = "var(--text-subtle)";
-        info.style.padding = "6px 10px";
-        info.textContent = loading ? "Loading..." : `Page ${page} of ${total}`;
-        wrap.appendChild(info);
+
+        // page info + input
+        const infoWrap = document.createElement('div');
+        infoWrap.style.display = 'flex';
+        infoWrap.style.alignItems = 'center';
+        infoWrap.style.gap = '8px';
+        infoWrap.style.color = 'var(--text-subtle)';
+        infoWrap.style.padding = '6px 10px';
+
+  const info = document.createElement("div");
+  info.textContent = `Page ${page} of ${total}`;
+  infoWrap.appendChild(info);
+
+  // allow user to type page number and go (styled like nav buttons)
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.min = 1;
+  input.max = total;
+  input.value = page;
+  // match nav-button visual style
+  input.style.background = 'rgba(15, 23, 42, 0.9)';
+  input.style.color = 'var(--text-main)';
+  input.style.border = '1px solid rgba(148, 163, 184, 0.08)';
+  input.style.padding = '8px 10px';
+  input.style.borderRadius = '8px';
+  input.style.width = '64px';
+  infoWrap.appendChild(input);
+
+  const go = document.createElement('button');
+  go.className = 'nav-button';
+  go.textContent = 'Go';
+        go.addEventListener('click', () => {
+          let v = parseInt(input.value, 10) || 1;
+          v = Math.max(1, Math.min(total, v));
+          loadActorsPage(v, window.__actorsCurrentQuery || '');
+        });
+        infoWrap.appendChild(go);
+
+        wrap.appendChild(infoWrap);
+
         wrap.appendChild(
           makeBtn("Next", Math.min(total, page + 1), page === total),
         );
@@ -777,8 +840,16 @@
         applyDetailPanelOffset();
         // small timeout to allow CSS transition to run
         setTimeout(() => (backdrop.style.opacity = "1"), 10);
-        wrap.classList.add("open");
-        wrap.setAttribute("aria-hidden", "false");
+  wrap.classList.add("open");
+  wrap.setAttribute("aria-hidden", "false");
+  // remove the temporary active/pop state from actor cards so the pop
+  // effect doesn't linger while the detail panel is visible
+  document.querySelectorAll('.actor-card.active').forEach(c => c.classList.remove('active'));
+  // disable hover pop effects while detail overlay is open
+  const grid = document.getElementById('actorsList');
+  if (grid) grid.classList.add('no-hover');
+  // global flag: prevent any card pops from overlapping the open overlay
+  document.body.classList.add('overlay-open');
         // lock body scroll
         document.body.style.overflow = "hidden";
       }
@@ -808,6 +879,13 @@
           const wrap = document.getElementById("personDetailWrap");
           wrap.classList.remove("open");
           wrap.setAttribute("aria-hidden", "true");
+          // clear any active/pop states on cards when closing
+          document.querySelectorAll('.actor-card.active').forEach(c => c.classList.remove('active'));
+          // re-enable hover pop effects when overlay closed
+          const grid = document.getElementById('actorsList');
+          if (grid) grid.classList.remove('no-hover');
+          // remove global overlay-open flag
+          document.body.classList.remove('overlay-open');
           const backdrop = document.getElementById("backdrop");
           backdrop.style.opacity = "0";
           setTimeout(() => (backdrop.style.display = "none"), 240);
@@ -817,13 +895,20 @@
       });
       // clicking backdrop also closes
       document.getElementById("backdrop").addEventListener("click", () => {
-        const wrap = document.getElementById("personDetailWrap");
-        wrap.classList.remove("open");
-        wrap.setAttribute("aria-hidden", "true");
-        const backdrop = document.getElementById("backdrop");
-        backdrop.style.opacity = "0";
-        setTimeout(() => (backdrop.style.display = "none"), 240);
-        document.body.style.overflow = "";
+  const wrap = document.getElementById("personDetailWrap");
+  wrap.classList.remove("open");
+  wrap.setAttribute("aria-hidden", "true");
+  // clear any active/pop states on cards when closing via backdrop click
+  document.querySelectorAll('.actor-card.active').forEach(c => c.classList.remove('active'));
+  // re-enable hover pop effects when overlay closed
+  const grid = document.getElementById('actorsList');
+  if (grid) grid.classList.remove('no-hover');
+  // remove global overlay-open flag
+  document.body.classList.remove('overlay-open');
+  const backdrop = document.getElementById("backdrop");
+  backdrop.style.opacity = "0";
+  setTimeout(() => (backdrop.style.display = "none"), 240);
+  document.body.style.overflow = "";
       });
     </script>
     <script>
