@@ -2965,19 +2965,38 @@
 
       function _disableSubtitlesForAd() {
         try {
-          // store current remote subtitle URL so we can restore it later
-          _prevSubtitleDuringAd = _currentSubtitleUrl || null;
-          // remove all non-data: tracks (remote tracks)
-          const removeTracks = (el) => {
+          // Capture current subtitle tracks (both remote and uploaded) so we can restore them.
+          const captured = [];
+          const captureFromEl = (el) => {
             if (!el) return;
-            Array.from(el.querySelectorAll('track')).forEach(t => {
-              if (t.src && !t.src.startsWith('data:')) t.remove();
+            Array.from(el.querySelectorAll('track')).forEach((t) => {
+              try {
+                const src = t.src || '';
+                const isData = src.startsWith('data:');
+                captured.push({ src, label: t.label || '', srclang: t.srclang || '', isDefault: !!t.default, isData });
+                // Prefer disabling the textTrack rather than removing the element so user-uploaded tracks can be restored.
+                try {
+                  if (t.track) t.track.mode = 'disabled';
+                } catch (_) {}
+                try { t.default = false; } catch (_) {}
+              } catch (e) {}
             });
           };
 
-          if (_nativeVideo) removeTracks(_nativeVideo);
+          if (_nativeVideo) captureFromEl(_nativeVideo);
           const vidEl = document.getElementById('videoPlayer');
-          if (vidEl && vidEl.tagName === 'VIDEO') removeTracks(vidEl);
+          if (vidEl && vidEl.tagName === 'VIDEO') captureFromEl(vidEl);
+
+          // For Hls.js, ask it to hide subtitle tracks
+          try {
+            if (window._hlsInstance && typeof window._hlsInstance.subtitleTrack !== 'undefined') {
+              // -1 disables subtitle rendering in hls.js
+              window._hlsInstance.subtitleTrack = -1;
+            }
+          } catch (e) {}
+
+          _prevSubtitleDuringAd = captured.length > 0 ? captured : null;
+          // We keep _currentSubtitleUrl untouched here so restore logic can decide what to re-enable.
         } catch (e) {
           console.warn('disableSubtitlesForAd failed', e);
         }
@@ -3003,19 +3022,84 @@
 
       function _restoreSubtitlesAfterAd() {
         try {
-          // if a user-uploaded custom subtitle exists, do nothing (it overrides remote)
+          // If a user-uploaded custom subtitle exists, it should override remote ones — restore it first.
           const custom = _getStoredCustomSubtitle();
           if (custom) {
+            try {
+              // enable any existing data: tracks
+              const enableFromEl = (el) => {
+                if (!el) return;
+                Array.from(el.querySelectorAll('track')).forEach((t) => {
+                  try {
+                    if (t.src && t.src.startsWith('data:')) {
+                      if (t.track) t.track.mode = 'showing';
+                      t.default = true;
+                    }
+                  } catch (e) {}
+                });
+              };
+              if (_nativeVideo) enableFromEl(_nativeVideo);
+              const vidEl = document.getElementById('videoPlayer');
+              if (vidEl && vidEl.tagName === 'VIDEO') enableFromEl(vidEl);
+            } catch (e) {}
+            _prevSubtitleDuringAd = null;
+            _pendingSubtitleAttach = null;
+            return;
+          }
+
+          // If a pending attach was queued while ad played, prefer it
+          if (_pendingSubtitleAttach) {
+            try {
+              attachRemoteSubtitleToVideo(_pendingSubtitleAttach.url, _pendingSubtitleAttach.lang || '');
+              _currentSubtitleUrl = _pendingSubtitleAttach.url;
+            } catch (e) {
+              console.warn('failed to attach pending subtitle', e);
+            }
+            _pendingSubtitleAttach = null;
             _prevSubtitleDuringAd = null;
             return;
           }
-          // if a pending attach was queued while ad played, prefer it
-          if (_pendingSubtitleAttach) {
-            try { attachRemoteSubtitleToVideo(_pendingSubtitleAttach.url, _pendingSubtitleAttach.lang || ''); } catch (e) {}
-            _pendingSubtitleAttach = null;
-          } else if (_prevSubtitleDuringAd) {
-            try { attachRemoteSubtitleToVideo(_prevSubtitleDuringAd, ''); } catch (e) {}
+
+          // Otherwise, try to re-enable previously-captured tracks
+          if (_prevSubtitleDuringAd && Array.isArray(_prevSubtitleDuringAd) && _prevSubtitleDuringAd.length > 0) {
+            let restored = false;
+            try {
+              // Try to re-enable in-DOM tracks first
+              const enableFromEl = (el) => {
+                if (!el) return;
+                Array.from(el.querySelectorAll('track')).forEach((t) => {
+                  try {
+                    const src = t.src || '';
+                    const match = _prevSubtitleDuringAd.find((p) => p.src === src);
+                    if (match) {
+                      if (t.track) t.track.mode = 'showing';
+                      if (match.isDefault) t.default = true;
+                      restored = true;
+                    }
+                  } catch (e) {}
+                });
+              };
+              if (_nativeVideo) enableFromEl(_nativeVideo);
+              const vidEl = document.getElementById('videoPlayer');
+              if (vidEl && vidEl.tagName === 'VIDEO') enableFromEl(vidEl);
+            } catch (e) {}
+
+            // If nothing in DOM was restored, attach the first remote non-data track again
+            if (!restored) {
+              const firstRemote = _prevSubtitleDuringAd.find((p) => !p.isData && p.src);
+              if (firstRemote) {
+                try { attachRemoteSubtitleToVideo(firstRemote.src, firstRemote.srclang || ''); _currentSubtitleUrl = firstRemote.src; restored = true; } catch (e) {}
+              }
+            }
+
+            // For Hls.js, try to restore subtitleTrack automatically if we have a recorded url
+            try {
+              if (!restored && window._hlsInstance && typeof window._hlsInstance.subtitleTrack !== 'undefined') {
+                // no-op: letting hls.js manage textTracks if it can; we already reattached above if needed
+              }
+            } catch (e) {}
           }
+
           _prevSubtitleDuringAd = null;
         } catch (e) {
           console.warn('restoreSubtitlesAfterAd failed', e);
