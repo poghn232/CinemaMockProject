@@ -1845,6 +1845,10 @@
               noneOnly.textContent = 'None';
               select.appendChild(noneOnly);
               select.style.display = 'none';
+              // Clear any pending or active remote subtitle because this episode has none
+              _pendingSubtitleAttach = null;
+              // Do not forcefully re-attach previous episode subtitle; clear recorded active remote subtitle
+              _currentSubtitleUrl = null;
               return;
             }
             // Rebuild selector from episode-only subtitles (clear previous options)
@@ -1923,7 +1927,11 @@
               if (defaultEntry) {
                 const val = defaultEntry.url || defaultEntry.filename || '';
                 select.value = val;
-                try { attachSubtitleRespectingAd(val, (defaultEntry.lang || '').toString().toLowerCase() || ''); } catch (e) {}
+                try {
+                  attachSubtitleRespectingAd(val, (defaultEntry.lang || '').toString().toLowerCase() || '');
+                  // only record active remote subtitle if attach was immediate (not queued)
+                  if (!_isAdPlaying) _currentSubtitleUrl = val;
+                } catch (e) {}
               }
             } catch (e) {}
           } catch (e) {
@@ -1966,7 +1974,27 @@
                 _currentEpisodeId = ep.id || ep.episodeId || ep.episodeNumber;
               }
 
-              button.addEventListener("click", () => selectEpisode(ep, button));
+              button.addEventListener("click", (ev) => {
+                try {
+                  // Distinguish user-initiated clicks from programmatic ones.
+                  // programmatic calls (firstButton.click()) have ev.isTrusted === false
+                  if (!ev || ev.isTrusted === false) {
+                    // programmatic: do an in-page selection
+                    selectEpisode(ep, button);
+                    return;
+                  }
+
+                  // real user click: perform a full page reload with season & episode in query
+                  const url = new URL(window.location.href);
+                  url.searchParams.set('season', seasonNum);
+                  url.searchParams.set('episode', ep.episodeNumber);
+                  // keep type and id as-is
+                  window.location.href = url.toString();
+                } catch (e) {
+                  // fallback: try in-page selection
+                  try { selectEpisode(ep, button); } catch (_) {}
+                }
+              });
               buttonsContainer.appendChild(button);
             });
           });
@@ -2959,10 +2987,14 @@
         try {
           if (!_isAdPlaying) {
             attachRemoteSubtitleToVideo(url, lang);
-          } else {
-            _pendingSubtitleAttach = { url, lang };
-            // record desired subtitle even while queued so restore has a reference
+            // record the active remote subtitle only when actually attached
             _currentSubtitleUrl = url;
+          } else {
+            // queue a pending attach while ad is playing, but do NOT overwrite
+            // the recorded _currentSubtitleUrl (which represents what was active
+            // before the ad) so restore logic can correctly choose which to
+            // re-apply after the ad ends.
+            _pendingSubtitleAttach = { url, lang };
           }
         } catch (e) {
           console.warn('attachSubtitleRespectingAd failed', e);
