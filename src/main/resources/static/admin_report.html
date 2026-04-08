@@ -1,5 +1,15 @@
 <div class="card">
   <h2>Reports (Pending)</h2>
+  <style>
+    .btn-approve{ background:#16a34a; color:#fff; border-color:rgba(0,0,0,0.05); }
+    .btn-approve.ghost{ background:transparent; color:#16a34a; border-color:rgba(22,163,74,0.15); }
+    .btn-reject{ background:#dc2626; color:#fff; border-color:rgba(0,0,0,0.05); }
+    .btn-reject.ghost{ background:transparent; color:#dc2626; border-color:rgba(220,38,38,0.12); }
+    .status-badge{ padding:4px 8px; border-radius:999px; font-size:12px; font-weight:700; }
+    .status-pending{ background:rgba(249,115,22,0.12); color:var(--accent); }
+    .status-approved{ background:rgba(16,185,129,0.12); color:#10b981; }
+    .status-rejected{ background:rgba(239,68,68,0.12); color:#ef4444; }
+  </style>
   <div class="muted">Review and moderate reported comments. Approve to remove the comment and disable commenting for the reported user; Reject to notify the reporter.</div>
 
   <div id="reportsMessage" style="margin-top:12px"></div>
@@ -14,6 +24,8 @@
           <th style="padding:10px; text-align:left;">Reporter</th>
           <th style="padding:10px; text-align:left;">Reason</th>
           <th style="padding:10px; text-align:left;">Created At</th>
+          <th style="padding:10px; text-align:left;">Status</th>
+          <th style="padding:10px; text-align:left;">Admin</th>
           <th style="padding:10px; text-align:left;">Actions</th>
         </tr>
       </thead>
@@ -23,15 +35,19 @@
     </table>
   </div>
 
-  <!-- Admin reason modal -->
+  <!-- Report detail modal -->
   <div id="adminReportModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; z-index:60;">
-    <div class="card" style="width:520px; margin:auto;">
-      <h3 id="modalTitle">Admin action</h3>
-      <div class="muted" style="margin-bottom:8px">Provide a short reason to include in email notifications.</div>
-      <textarea id="modalReason" style="width:100%; height:120px; padding:10px; border-radius:8px; background:transparent; color:var(--text-main); border:1px solid rgba(148,163,184,0.12);"></textarea>
+    <div class="card" style="width:640px; max-width:95%; margin:auto;">
+      <h3 id="modalTitle">Report details</h3>
+      <div id="modalBody" style="margin-top:8px; color:var(--text-subtle); max-height:320px; overflow:auto;">
+        <!-- populated dynamically -->
+      </div>
+      <div class="muted" style="margin-top:8px">Provide a short reason to include in email notifications (optional).</div>
+      <textarea id="modalReason" style="width:100%; height:100px; padding:10px; border-radius:8px; background:transparent; color:var(--text-main); border:1px solid rgba(148,163,184,0.12); margin-top:8px"></textarea>
       <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px">
-        <button id="modalCancel" class="btn ghost">Cancel</button>
-        <button id="modalSubmit" class="btn">Send</button>
+        <button id="modalCancel" class="btn ghost">Close</button>
+        <button id="modalReject" class="btn btn-reject">Reject</button>
+        <button id="modalApprove" class="btn btn-approve">Approve</button>
       </div>
     </div>
   </div>
@@ -40,6 +56,7 @@
     (async function(){
       const { fetchJson, api, refreshCounts } = window.adminApi;
       const msgEl = document.getElementById('reportsMessage');
+      let reportsCache = [];
 
       function showMessage(text, isError){
         msgEl.textContent = text;
@@ -50,7 +67,22 @@
       async function loadReports(){
         try{
           const reports = await fetchJson(api.reports);
-          render(reports || []);
+          reportsCache = reports || [];
+          // Ensure pending reports show at the top, then order by createdAt desc
+          reportsCache.sort((a, b) => {
+            const sa = a && a.status ? a.status : '';
+            const sb = b && b.status ? b.status : '';
+            if (sa === sb) {
+              const da = a && a.createdAt ? new Date(a.createdAt) : new Date(0);
+              const db = b && b.createdAt ? new Date(b.createdAt) : new Date(0);
+              return db - da; // newest first
+            }
+            if (sa === 'PENDING') return -1;
+            if (sb === 'PENDING') return 1;
+            // otherwise keep original order between handled statuses
+            return sa < sb ? -1 : sa > sb ? 1 : 0;
+          });
+          render(reportsCache);
         }catch(e){
           console.error(e);
           showMessage('Failed to load reports', true);
@@ -59,8 +91,12 @@
       }
 
       function escapeHtml(s){
-        return s ? s.replace(/[&<>\"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c])) : '';
+        return s ? String(s).replace(/[&<>\"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c])) : '';
       }
+
+      // pagination state
+      let currentPage = 1;
+      const pageSize = 10;
 
       function render(list){
         const tbody = document.getElementById('reportsTableBody');
@@ -68,8 +104,15 @@
           tbody.innerHTML = '<tr><td colspan="7" style="padding:12px">No pending reports</td></tr>';
           return;
         }
+        // compute pagination
+        const total = list.length;
+        const totalPages = Math.max(1, Math.ceil(total / pageSize));
+        if (currentPage > totalPages) currentPage = totalPages;
+        const start = (currentPage - 1) * pageSize;
+        const pageItems = list.slice(start, start + pageSize);
+
         tbody.innerHTML = '';
-        list.forEach(r => {
+        pageItems.forEach(r => {
           const tr = document.createElement('tr');
           tr.style.borderTop = '1px solid rgba(255,255,255,0.04)';
           tr.innerHTML = `
@@ -79,67 +122,184 @@
             <td style="padding:10px">${r.reporterUsername || ''}</td>
             <td style="padding:10px; max-width:420px">${escapeHtml(r.reason || '')}</td>
             <td style="padding:10px">${r.createdAt ? new Date(r.createdAt).toLocaleString() : ''}</td>
+            <td style="padding:10px">${r.status ? `<span class="status-badge ${r.status === 'PENDING' ? 'status-pending' : r.status === 'APPROVED' ? 'status-approved' : 'status-rejected'}">${r.status}</span>` : ''}</td>
+            <td style="padding:10px">${r.adminUsername || ''}</td>
             <td style="padding:10px">
-              <button class="btn" onclick="window.adminApi.handleReport(${r.id}, 'approve')">Approve</button>
-              <button class="btn ghost" onclick="window.adminApi.handleReport(${r.id}, 'reject')">Reject</button>
+              <button class="btn" onclick="window.adminApi.openReportDetail(${r.id})">Detail</button>
             </td>
           `;
           tbody.appendChild(tr);
         });
+
+        renderPager(total, totalPages, currentPage);
       }
 
-      // Expose a handler for approve/reject that shows a modal prompt consistent with site
-      // Modal-based handler
+      function renderPager(total, totalPages, page){
+        let pager = document.getElementById('reportsPager');
+        if (!pager){
+          pager = document.createElement('div');
+          pager.id = 'reportsPager';
+          pager.style.display = 'flex';
+          pager.style.justifyContent = 'space-between';
+          pager.style.alignItems = 'center';
+          pager.style.marginTop = '12px';
+          const container = document.querySelector('.card');
+          container.appendChild(pager);
+        }
+        pager.innerHTML = '';
+        const left = document.createElement('div');
+        left.style.color = 'var(--text-subtle)';
+        left.textContent = `Showing ${Math.min((page-1)*pageSize+1, total)} - ${Math.min(page*pageSize, total)} of ${total}`;
+
+        const right = document.createElement('div');
+        right.style.display = 'flex';
+        right.style.alignItems = 'center';
+        right.style.gap = '8px';
+
+        const prev = document.createElement('button');
+        prev.className = 'btn ghost';
+        prev.textContent = 'Prev';
+        prev.disabled = page <= 1;
+        prev.addEventListener('click', ()=>{ currentPage = Math.max(1, page-1); render(reportsCache); });
+
+        const next = document.createElement('button');
+        next.className = 'btn ghost';
+        next.textContent = 'Next';
+        next.disabled = page >= totalPages;
+        next.addEventListener('click', ()=>{ currentPage = Math.min(totalPages, page+1); render(reportsCache); });
+
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.min = 1;
+        input.max = totalPages;
+        input.value = page;
+        input.style.width = '64px';
+        input.style.padding = '6px';
+        input.style.borderRadius = '6px';
+        input.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') { const v = Number(input.value)||1; currentPage = Math.min(Math.max(1, v), totalPages); render(reportsCache); } });
+
+        const go = document.createElement('button');
+        go.className = 'btn';
+        go.textContent = 'Go';
+        go.addEventListener('click', ()=>{ const v = Number(input.value)||1; currentPage = Math.min(Math.max(1, v), totalPages); render(reportsCache); });
+
+        right.appendChild(prev);
+        right.appendChild(input);
+        right.appendChild(go);
+        right.appendChild(next);
+
+        pager.appendChild(left);
+        pager.appendChild(right);
+      }
+
+      // Detail modal logic
       (function(){
         const modal = document.getElementById('adminReportModal');
         const reasonInput = document.getElementById('modalReason');
         const titleEl = document.getElementById('modalTitle');
+        const bodyEl = document.getElementById('modalBody');
         const btnCancel = document.getElementById('modalCancel');
-        const btnSubmit = document.getElementById('modalSubmit');
-        let current = { id: null, action: null };
+        const btnApprove = document.getElementById('modalApprove');
+        const btnReject = document.getElementById('modalReject');
+        let currentId = null;
 
-        function openModal(id, action){
-          current.id = id; current.action = action;
-          titleEl.textContent = action === 'approve' ? 'Approve report #' + id : 'Reject report #' + id;
-          reasonInput.value = '';
+        function open(id){
+          currentId = id;
+          const r = reportsCache.find(x => Number(x.id) === Number(id)) || {};
+          titleEl.textContent = `Report #${id}`;
+          // build details
+      bodyEl.innerHTML = `
+            <div style="display:flex; gap:12px; flex-wrap:wrap">
+              <div><strong>Review ID:</strong> ${escapeHtml(r.reviewId || '')}</div>
+              <div><strong>Reported User:</strong> ${escapeHtml(r.reportedUsername || '')}</div>
+        <div><strong>Reporter:</strong> ${escapeHtml(r.reporterUsername || '')}</div>
+              <div><strong>Status:</strong> ${r.status ? `<span class="status-badge ${r.status === 'PENDING' ? 'status-pending' : r.status === 'APPROVED' ? 'status-approved' : 'status-rejected'}">${escapeHtml(r.status)}</span>` : ''}</div>
+              <div><strong>Admin:</strong> ${escapeHtml(r.adminUsername || '')}</div>
+              <div style="flex-basis:100%; margin-top:6px"><strong>Submitted reason:</strong><div style="margin-top:4px">${escapeHtml(r.reason || '')}</div></div>
+            </div>
+          `;
+          // include review/comment body if present (backend provides `comment`)
+          if (r.comment){
+            const content = escapeHtml(r.comment || '');
+            bodyEl.innerHTML += `<div style="margin-top:8px"><strong>Content:</strong><pre style="white-space:pre-wrap; background:transparent; border-radius:6px; padding:8px; border:1px solid rgba(148,163,184,0.06);">${content}</pre></div>`;
+          }
+          // populate admin reason and enable/disable controls depending on status
+          reasonInput.value = r.adminReason || '';
+          const handled = r.status && r.status !== 'PENDING';
+          if (handled) {
+            // make textarea readonly and reflect handled state on buttons
+            reasonInput.disabled = true;
+            btnApprove.disabled = true; btnReject.disabled = true;
+            if (r.status === 'APPROVED') {
+              btnApprove.textContent = 'Approved';
+              btnReject.textContent = 'Reject';
+            } else if (r.status === 'REJECTED') {
+              btnApprove.textContent = 'Approve';
+              btnReject.textContent = 'Rejected';
+            }
+          } else {
+            reasonInput.disabled = false;
+            btnApprove.disabled = false; btnReject.disabled = false;
+            btnApprove.textContent = 'Approve';
+            btnReject.textContent = 'Reject';
+          }
           modal.style.display = 'flex';
-          reasonInput.focus();
+          // focus only when editable
+          if (!reasonInput.disabled) reasonInput.focus();
         }
 
-        function closeModal(){
+        function close(){
           modal.style.display = 'none';
-          current.id = null; current.action = null;
+          currentId = null;
         }
 
-        btnCancel.addEventListener('click', (e)=>{ e.preventDefault(); closeModal(); });
-
-        btnSubmit.addEventListener('click', async (e)=>{
-          e.preventDefault();
-          if (!current.id || !current.action) return closeModal();
+        async function perform(action){
+          if (!currentId) return close();
           const reason = reasonInput.value || '';
-          btnSubmit.disabled = true; btnCancel.disabled = true;
+          // disable controls while request in-flight
+          btnApprove.disabled = true; btnReject.disabled = true; btnCancel.disabled = true;
           try{
-            await fetchJson(`${api.reports}/${current.id}/${current.action}`, {
+            await fetchJson(`${api.reports}/${currentId}/${action}`, {
               method: 'POST',
               headers: {'Content-Type':'application/json'},
               body: JSON.stringify({reason})
             });
-            showMessage(`${current.action === 'approve' ? 'Approved' : 'Rejected'} #${current.id}`);
+            showMessage(`${action === 'approve' ? 'Approved' : 'Rejected'} #${currentId}`);
             if (typeof refreshCounts === 'function') refreshCounts();
+            // refresh reports cache and update modal to show handled state
             await loadReports();
-            closeModal();
+            const updated = reportsCache.find(x => Number(x.id) === Number(currentId)) || {};
+            // populate admin reason from server if present
+            reasonInput.value = updated.adminReason || reasonInput.value || '';
+            // mark as handled and disable action buttons permanently (until re-open)
+            reasonInput.disabled = true;
+            btnApprove.disabled = true; btnReject.disabled = true;
+            if (updated.status === 'APPROVED') {
+              btnApprove.textContent = 'Approved';
+              btnReject.textContent = 'Reject';
+            } else if (updated.status === 'REJECTED') {
+              btnApprove.textContent = 'Approve';
+              btnReject.textContent = 'Rejected';
+            }
+            // allow closing the modal
+            btnCancel.disabled = false;
           }catch(err){
             console.error(err);
             showMessage('Action failed: ' + (err && err.message ? err.message : ''), true);
+            // re-enable cancel so admin can dismiss
+            btnCancel.disabled = false;
           }finally{
-            btnSubmit.disabled = false; btnCancel.disabled = false;
+            // keep approve/reject disabled after action; only ensure cancel is enabled
+            btnCancel.disabled = false;
           }
-        });
+        }
 
-        // expose helper to open modal
-        window.adminApi.handleReport = function(id, action){
-          openModal(id, action);
-        };
+        btnCancel.addEventListener('click', (e)=>{ e.preventDefault(); close(); });
+        btnApprove.addEventListener('click', (e)=>{ e.preventDefault(); perform('approve'); });
+        btnReject.addEventListener('click', (e)=>{ e.preventDefault(); perform('reject'); });
+
+        // expose to global adminApi for table handlers
+        window.adminApi.openReportDetail = open;
       })();
 
       // initial load

@@ -927,7 +927,7 @@
           window._updateSubtitleUi();
         }
 
-        // Populate subtitle language selector from movieData.subtitles if present
+              // Populate subtitle language selector from movieData.subtitles if present
         try {
           const select = document.getElementById("subtitleLangSelect");
           if (select) {
@@ -944,7 +944,7 @@
               es: "Spanish",
               fr: "French",
             };
-            if (subs.length > 0) {
+              if (subs.length > 0) {
               // dedupe by base filename (strip extension). prefer .vtt over .srt
               const byBase = {};
               subs.forEach((s) => {
@@ -1027,7 +1027,7 @@
                     defaultEntry.src || defaultEntry.filename || "default";
                   // attach default subtitle to player
                   try {
-                    attachRemoteSubtitleToVideo(
+                    attachSubtitleRespectingAd(
                       select.value,
                       defaultEntry.lang || "",
                     );
@@ -1081,6 +1081,8 @@
                   }
                   const status = document.getElementById("subtitleStatus");
                   if (status) status.textContent = "Subtitles hidden.";
+                  // mark that there is no active remote subtitle
+                  _currentSubtitleUrl = null;
                 } catch (e) {
                   console.warn("Failed to clear subtitles", e);
                 }
@@ -1089,10 +1091,12 @@
 
               // attach selected remote subtitle URL as a track
               try {
-                attachRemoteSubtitleToVideo(
+                attachSubtitleRespectingAd(
                   val,
                   select.selectedOptions[0].dataset.lang || "",
                 );
+                // remember active remote subtitle so ad flow can restore it
+                _currentSubtitleUrl = val;
                 const status = document.getElementById("subtitleStatus");
                 if (status)
                   status.textContent = `Using subtitles: ${select.selectedOptions[0].textContent}`;
@@ -1104,6 +1108,9 @@
         } catch (e) {
           console.warn("Subtitle selector populate failed", e);
         }
+
+  // Episode-level subtitle merging is handled when selecting an episode
+  // (setupTVSeries) to avoid duplicate appends. Do not fetch here.
 
         // Handle TV series vs Movie (errors here should not prevent comments from loading)
         // Initialize comments and ratings functionality (BEFORE video setup)
@@ -1298,60 +1305,118 @@
             actions.style.display = "flex";
             actions.style.alignItems = "center";
 
-            const reportBtn = document.createElement("button");
-            reportBtn.className = "comment-report";
-            reportBtn.type = "button";
-            reportBtn.textContent = "🚩 Report";
-            reportBtn.addEventListener("click", async () => {
-              if (!localStorage.getItem("token")) {
-                alert("Please log in to report comments.");
-                return;
-              }
+            // Prevent users from reporting their own review
+            try {
+              const currentUser = localStorage.getItem("username") || "";
+              const author = (review.username || "") + "";
+              if (!currentUser || currentUser !== author) {
+                const reportBtn = document.createElement("button");
+                reportBtn.className = "comment-report";
+                reportBtn.type = "button";
+                reportBtn.textContent = "🚩 Report";
+                reportBtn.addEventListener("click", async () => {
+                  if (!localStorage.getItem("token")) {
+                    alert("Please log in to report comments.");
+                    return;
+                  }
 
-              // show modal form to collect reason
-              const modal = getOrCreateReportModal();
-              modal.show(
-                review.reviewId,
-                async (reason, setError, setSubmitting) => {
+                  // show modal form to collect reason
+                  const modal = getOrCreateReportModal();
+                  modal.show(
+                    review.reviewId,
+                    async (reason, setError, setSubmitting) => {
+                      if (!reason || reason.trim().length === 0) {
+                        setError("Please provide a reason for the report.");
+                        return { success: false };
+                      }
+
+                      reportBtn.disabled = true;
+                      setSubmitting(true);
+                      try {
+                        const token = localStorage.getItem("token");
+                        console.debug("Sending report, token present?", !!token);
+
+                        const res = await fetch(
+                          `/api/user/reviews/${encodeURIComponent(review.reviewId)}/report`,
+                          {
+                            method: "POST",
+                            headers: {
+                              "Content-Type": "application/json",
+                              Authorization: `Bearer ${token}`,
+                            },
+                            body: JSON.stringify({ reason }),
+                          },
+                        );
+
+                        if (!res.ok) {
+                          let msg =
+                            "Could not send report. Please try again later.";
+                          try {
+                            const json = await res.json();
+                            if (json && json.message) msg = json.message;
+                          } catch (err) {
+                            const text = await res.text();
+                            if (text) msg = text;
+                          }
+                          setError(msg);
+                          setSubmitting(false);
+                          reportBtn.disabled = false;
+                          return { success: false };
+                        }
+
+                        reportBtn.textContent = "Reported";
+                        setSubmitting(false);
+                        return { success: true };
+                      } catch (e) {
+                        console.warn("Report failed", e);
+                        setError("Could not send report. Please try again later.");
+                        setSubmitting(false);
+                        reportBtn.disabled = false;
+                        return { success: false };
+                      }
+                    },
+                  );
+                });
+
+                actions.appendChild(reportBtn);
+              }
+            } catch (e) {
+              // if any error reading storage, fall back to showing the button
+              const reportBtn = document.createElement("button");
+              reportBtn.className = "comment-report";
+              reportBtn.type = "button";
+              reportBtn.textContent = "🚩 Report";
+              reportBtn.addEventListener("click", async () => {
+                if (!localStorage.getItem("token")) {
+                  alert("Please log in to report comments.");
+                  return;
+                }
+                const modal = getOrCreateReportModal();
+                modal.show(review.reviewId, async (reason, setError, setSubmitting) => {
                   if (!reason || reason.trim().length === 0) {
                     setError("Please provide a reason for the report.");
                     return { success: false };
                   }
-
                   reportBtn.disabled = true;
                   setSubmitting(true);
                   try {
                     const token = localStorage.getItem("token");
-                    console.debug("Sending report, token present?", !!token);
-
-                    const res = await fetch(
-                      `/api/user/reviews/${encodeURIComponent(review.reviewId)}/report`,
-                      {
-                        method: "POST",
-                        headers: {
-                          "Content-Type": "application/json",
-                          Authorization: `Bearer ${token}`,
-                        },
-                        body: JSON.stringify({ reason }),
+                    const res = await fetch(`/api/user/reviews/${encodeURIComponent(review.reviewId)}/report`, {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
                       },
-                    );
-
+                      body: JSON.stringify({ reason }),
+                    });
                     if (!res.ok) {
-                      let msg =
-                        "Could not send report. Please try again later.";
-                      try {
-                        const json = await res.json();
-                        if (json && json.message) msg = json.message;
-                      } catch (err) {
-                        const text = await res.text();
-                        if (text) msg = text;
-                      }
+                      let msg = "Could not send report. Please try again later.";
+                      try { const json = await res.json(); if (json && json.message) msg = json.message; } catch (err) { const text = await res.text(); if (text) msg = text; }
                       setError(msg);
                       setSubmitting(false);
                       reportBtn.disabled = false;
                       return { success: false };
                     }
-
                     reportBtn.textContent = "Reported";
                     setSubmitting(false);
                     return { success: true };
@@ -1362,11 +1427,10 @@
                     reportBtn.disabled = false;
                     return { success: false };
                   }
-                },
-              );
-            });
-
-            actions.appendChild(reportBtn);
+                });
+              });
+              actions.appendChild(reportBtn);
+            }
 
             row.appendChild(content);
             row.appendChild(actions);
@@ -1753,6 +1817,117 @@
           }
           if (typeof window._refreshRating === "function") {
             window._refreshRating("tv", _currentEpisodeId);
+          }
+
+          // Use the centralized fetch function to merge episode subtitles into selector
+          try {
+            fetchEpisodeSubtitlesIntoSelector(ep);
+          } catch (e) {}
+
+          // (No-op) episode subtitle merging already invoked above
+        }
+
+        async function fetchEpisodeSubtitlesIntoSelector(ep) {
+          try {
+            const select = document.getElementById("subtitleLangSelect");
+            if (!select) return;
+            const tvId = _currentMovieId;
+            const seasonNum = ep.seasonNumber || ep.season || 1;
+            const epNum = ep.episodeNumber || ep.episodeId || ep.id;
+            const res = await fetch(`/api/public/movies/tv/${encodeURIComponent(tvId)}/seasons/${encodeURIComponent(seasonNum)}/episodes/${encodeURIComponent(epNum)}/subtitles`);
+            if (!res.ok) return;
+            const list = await res.json();
+            if (!Array.isArray(list) || list.length === 0) {
+              // No episode subtitles: clear selector and show only None
+              select.innerHTML = '';
+              const noneOnly = document.createElement('option');
+              noneOnly.value = '';
+              noneOnly.textContent = 'None';
+              select.appendChild(noneOnly);
+              select.style.display = 'none';
+              return;
+            }
+            // Rebuild selector from episode-only subtitles (clear previous options)
+            select.innerHTML = '';
+
+            // Build a deduped map by filename base (prefer .vtt over .srt). Keep language where available.
+            const byBase = {};
+            list.forEach((s) => {
+              const filename = (s.filename || '').toString();
+              const low = filename.toLowerCase();
+              const dot = low.lastIndexOf('.');
+              const base = dot > 0 ? low.substring(0, dot) : low || ((s.url || '') + '').split('/').pop();
+              const ext = dot > 0 ? low.substring(dot + 1) : '';
+              const langCode = (s.lang || (filename || '').split('.')[0] || '').toString().toLowerCase();
+
+              if (!byBase[base]) {
+                byBase[base] = { url: s.url || s.filename || '', filename: s.filename || '', ext, lang: langCode };
+              } else {
+                // prefer vtt over srt
+                if (byBase[base].ext === 'srt' && ext === 'vtt') {
+                  byBase[base] = { url: s.url || s.filename || '', filename: s.filename || '', ext, lang: langCode };
+                }
+              }
+            });
+
+            // determine default entry if any
+            let defaultEntry = list.find((it) => it.default === true || it.default === 'true');
+            if (!defaultEntry && byBase['default']) defaultEntry = byBase['default'];
+
+            // Insert Default option if present
+            if (defaultEntry) {
+              const opt = document.createElement('option');
+              opt.value = defaultEntry.url || defaultEntry.filename || '';
+              opt.textContent = 'Default';
+              opt.dataset.filename = defaultEntry.filename || '';
+              opt.dataset.lang = (defaultEntry.lang || '').toString().toLowerCase();
+              select.appendChild(opt);
+            }
+
+            // None option
+            const noneOpt = document.createElement('option');
+            noneOpt.value = '';
+            noneOpt.textContent = 'None';
+            select.appendChild(noneOpt);
+
+            // language map
+            const langNames = {
+              en: 'English',
+              vi: 'Vietnamese',
+              ja: 'Japanese',
+              de: 'German',
+              my: 'Burmese',
+              es: 'Spanish',
+              fr: 'French',
+            };
+
+            // append the rest: show only languages available for this episode
+            Object.keys(byBase).forEach((base) => {
+              if (base === 'default') return;
+              const entry = byBase[base];
+              const code = (entry.lang || '').toString().toLowerCase();
+              const label = code ? langNames[code] || code.toUpperCase() : (entry.filename || base);
+              if (!label) return;
+              const opt = document.createElement('option');
+              opt.value = entry.url || entry.filename || base;
+              opt.textContent = label;
+              opt.dataset.filename = entry.filename || '';
+              opt.dataset.lang = code || '';
+              select.appendChild(opt);
+            });
+
+            if (select.options.length > 1) select.style.display = 'inline-flex';
+
+            // Auto-select episode default if available
+            try {
+              if (defaultEntry) {
+                const val = defaultEntry.url || defaultEntry.filename || '';
+                select.value = val;
+                try { attachSubtitleRespectingAd(val, (defaultEntry.lang || '').toString().toLowerCase() || ''); } catch (e) {}
+              }
+            } catch (e) {}
+          } catch (e) {
+            console.warn('fetchEpisodeSubtitles failed', e);
           }
         }
 
@@ -2312,6 +2487,8 @@
             t.src = finalUrl;
             t.default = true;
             _nativeVideo.appendChild(t);
+            // record the active remote subtitle URL so ads restore it
+            _currentSubtitleUrl = finalUrl;
           } else {
             // if no native video, try to replace tracks inside videoPlayer (iframe case unsupported)
             const vidEl = document.getElementById("videoPlayer");
@@ -2326,6 +2503,8 @@
               t.src = finalUrl;
               t.default = true;
               vidEl.appendChild(t);
+              // record the active remote subtitle URL so ads restore it
+              _currentSubtitleUrl = finalUrl;
             } else {
               console.warn(
                 "attachRemoteSubtitleToVideo: no native video element available to attach track",
@@ -2404,6 +2583,8 @@
                       t.src = dataUrl;
                       t.default = true;
                       _nativeVideo.appendChild(t);
+                      // custom subtitle overrides any remote subtitle
+                      _currentSubtitleUrl = null;
                     }
                   } catch (e) {
                     console.warn(
@@ -2465,6 +2646,8 @@
 
       // ── PRE-ROLL ADS FOR NON-PREMIUM USERS ────────────────────────────
       let _isAdPlaying = false;
+  let _prevSubtitleDuringAd = null;
+  let _pendingSubtitleAttach = null;
       let _adCountdownInterval = null;
       let _adFinishHandled = false;
       let _mainContentContext = null;
@@ -2642,6 +2825,9 @@
 
         if (!ctx) return;
 
+  // restore subtitle state after ad
+  try { _restoreSubtitlesAfterAd(); } catch (e) {}
+
         renderQualityDropdown(ctx.videoUrl, ctx.variants, ctx.isPremiumUser);
         loadVideo(ctx.videoUrl, ctx.startSec || 0);
         setTimeout(() => {
@@ -2749,6 +2935,61 @@
         });
       }
 
+      function _disableSubtitlesForAd() {
+        try {
+          // store current remote subtitle URL so we can restore it later
+          _prevSubtitleDuringAd = _currentSubtitleUrl || null;
+          // remove all non-data: tracks (remote tracks)
+          const removeTracks = (el) => {
+            if (!el) return;
+            Array.from(el.querySelectorAll('track')).forEach(t => {
+              if (t.src && !t.src.startsWith('data:')) t.remove();
+            });
+          };
+
+          if (_nativeVideo) removeTracks(_nativeVideo);
+          const vidEl = document.getElementById('videoPlayer');
+          if (vidEl && vidEl.tagName === 'VIDEO') removeTracks(vidEl);
+        } catch (e) {
+          console.warn('disableSubtitlesForAd failed', e);
+        }
+      }
+
+      function attachSubtitleRespectingAd(url, lang) {
+        try {
+          if (!_isAdPlaying) {
+            attachRemoteSubtitleToVideo(url, lang);
+          } else {
+            _pendingSubtitleAttach = { url, lang };
+            // record desired subtitle even while queued so restore has a reference
+            _currentSubtitleUrl = url;
+          }
+        } catch (e) {
+          console.warn('attachSubtitleRespectingAd failed', e);
+        }
+      }
+
+      function _restoreSubtitlesAfterAd() {
+        try {
+          // if a user-uploaded custom subtitle exists, do nothing (it overrides remote)
+          const custom = _getStoredCustomSubtitle();
+          if (custom) {
+            _prevSubtitleDuringAd = null;
+            return;
+          }
+          // if a pending attach was queued while ad played, prefer it
+          if (_pendingSubtitleAttach) {
+            try { attachRemoteSubtitleToVideo(_pendingSubtitleAttach.url, _pendingSubtitleAttach.lang || ''); } catch (e) {}
+            _pendingSubtitleAttach = null;
+          } else if (_prevSubtitleDuringAd) {
+            try { attachRemoteSubtitleToVideo(_prevSubtitleDuringAd, ''); } catch (e) {}
+          }
+          _prevSubtitleDuringAd = null;
+        } catch (e) {
+          console.warn('restoreSubtitlesAfterAd failed', e);
+        }
+      }
+
       function _playPreRollAd(ad) {
         _adFinishHandled = false;
         _isAdPlaying = true;
@@ -2756,6 +2997,8 @@
         _adMaxAllowedTime = 0;
         _adStartedOnce = false;
         _showAdUi(ad);
+  // disable subtitles while ad plays (but preserve user-uploaded custom subtitle)
+  try { _disableSubtitlesForAd(); } catch (e) {}
         _armSkippableCountdown(ad);
         _bindAdAutoplayRecovery();
 

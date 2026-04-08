@@ -31,8 +31,8 @@ public class AdminReportController {
     private final AdminLogsService adminLogsService;
 
     @GetMapping
-    public List<ReportAdminDto> listPending() {
-        return reportRepository.findByStatus(Report.Status.PENDING)
+    public List<ReportAdminDto> listAll() {
+        return reportRepository.findAll()
                 .stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
@@ -49,21 +49,21 @@ public class AdminReportController {
         r.setAdminReason(req.reason);
         r.setAdminActionAt(LocalDateTime.now());
 
-        // hide the review/comment instead of deleting to preserve DB integrity
-        Review review = r.getReview();
-        if (review != null) {
-            review.setHidden(true);
-            reviewRepository.save(review);
-            adminLogsService.saveLog(new AdminLogs(review + " is reported successfully"));
-        }
-
-        // disable reported user from commenting (reuse enabled flag: set to false)
+        // hide all reviews by the reported user and disable commenting
         User reported = r.getReview() != null && r.getReview().getUser() != null ? r.getReview().getUser() : null;
         if (reported != null) {
+            // hide all their reviews
+            var reviews = reviewRepository.findByUser_UserId(reported.getUserId());
+            for (Review rv : reviews) {
+                rv.setHidden(true);
+            }
+            reviewRepository.saveAll(reviews);
+            adminLogsService.saveLog(new AdminLogs(reported + " reviews hidden due to approved report"));
+
             // disable commenting only (do not disable login)
             reported.setCommentDisabled(true);
             userRepository.save(reported);
-            adminLogsService.saveLog(new AdminLogs(reported + " is reported successfully"));
+            adminLogsService.saveLog(new AdminLogs(reported + " is disabled from commenting due to approved report"));
         }
 
         reportRepository.save(r);
@@ -127,6 +127,8 @@ public class AdminReportController {
         d.status = r.getStatus() != null ? r.getStatus().name() : null;
         d.adminReason = r.getAdminReason();
         d.adminActionAt = r.getAdminActionAt();
+    d.comment = r.getReview() != null ? r.getReview().getComment() : null;
+    d.adminUsername = r.getAdmin() != null ? r.getAdmin().getUsername() : null;
         return d;
     }
 

@@ -36,32 +36,38 @@ public class ReviewService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Review review;
-        if ("movie".equalsIgnoreCase(type)) {
-            review = reviewRepository.findByMovieIdAndUser_Username(id, username)
-                    .orElseGet(() -> {
-                        Movie movie = movieRepository.findById(id)
-                                .orElseThrow(() -> new RuntimeException("Movie not found"));
-                        return Review.builder()
-                                .user(user)
-                                .movie(movie)
-                                .createdDate(LocalDateTime.now())
-                                .build();
-                    });
-        } else if ("episode".equalsIgnoreCase(type)) {
-            review = reviewRepository.findByEpisodeIdAndUser_Username(id, username)
-                    .orElseGet(() -> {
-                        Episode episode = episodeRepository.findById(id)
-                                .orElseThrow(() -> new RuntimeException("Episode not found"));
-                        return Review.builder()
-                                .user(user)
-                                .episode(episode)
-                                .createdDate(LocalDateTime.now())
-                                .build();
-                    });
-        } else {
-            throw new IllegalArgumentException("Invalid type: " + type);
-        }
+    // For ratings, update the user's most recent review for this item if present; otherwise create one.
+    Review review;
+    if ("movie".equalsIgnoreCase(type)) {
+        // prefer an existing rating-bearing review if present
+        review = reviewRepository.findTopByMovieIdAndUser_UsernameAndRatingGreaterThanOrderByCreatedDateDesc(id, username, 0)
+            .orElseGet(() -> reviewRepository.findTopByMovieIdAndUser_UsernameOrderByCreatedDateDesc(id, username)
+                .orElseGet(() -> {
+            Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Movie not found"));
+            return Review.builder()
+                .user(user)
+                .movie(movie)
+                .createdDate(LocalDateTime.now())
+                .build();
+                }));
+    } else if ("episode".equalsIgnoreCase(type)) {
+        // prefer an existing rating-bearing review if present
+        review = reviewRepository.findTopByEpisodeIdAndUser_UsernameAndRatingGreaterThanOrderByCreatedDateDesc(id, username, 0)
+            .orElseGet(() -> reviewRepository.findTopByEpisodeIdAndUser_UsernameOrderByCreatedDateDesc(id, username)
+                .orElseGet(() -> {
+            Episode episode = episodeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Episode not found"));
+            return Review.builder()
+                .user(user)
+                .episode(episode)
+                .createdDate(LocalDateTime.now())
+                .build();
+                }));
+    } else {
+        throw new IllegalArgumentException("Invalid type: " + type);
+    }
+       
 
         review.setRating(rating);
         review.setCreatedDate(LocalDateTime.now()); // Update timestamp if re-rating
@@ -75,9 +81,9 @@ public class ReviewService {
         if (username != null) {
             Optional<Review> existing;
             if ("movie".equalsIgnoreCase(type)) {
-                existing = reviewRepository.findByMovieIdAndUser_Username(id, username);
+                existing = reviewRepository.findTopByMovieIdAndUser_UsernameOrderByCreatedDateDesc(id, username);
             } else {
-                existing = reviewRepository.findByEpisodeIdAndUser_Username(id, username);
+                existing = reviewRepository.findTopByEpisodeIdAndUser_UsernameOrderByCreatedDateDesc(id, username);
             }
             if (existing.isPresent()) {
                 hasRated = true;
@@ -148,20 +154,15 @@ public class ReviewService {
         }
 
         Review review;
-        if (movieId != null) {
-            review = reviewRepository.findByMovieIdAndUser_Username(movieId, username)
-                    .orElseGet(() -> {
-                        Movie movie = movieRepository.findById(movieId)
-                                .orElseThrow(() -> new RuntimeException("Movie not found"));
-                        return Review.builder().user(user).movie(movie).build();
-                    });
-        } else if (episodeId != null) {
-            review = reviewRepository.findByEpisodeIdAndUser_Username(episodeId, username)
-                    .orElseGet(() -> {
-                        Episode episode = episodeRepository.findById(episodeId)
-                                .orElseThrow(() -> new RuntimeException("Episode not found"));
-                        return Review.builder().user(user).episode(episode).build();
-                    });
+    // For comments we allow multiple reviews per user; always create a new Review entry for a comment
+    if (movieId != null) {
+        Movie movie = movieRepository.findById(movieId)
+            .orElseThrow(() -> new RuntimeException("Movie not found"));
+        review = Review.builder().user(user).movie(movie).build();
+    } else if (episodeId != null) {
+        Episode episode = episodeRepository.findById(episodeId)
+            .orElseThrow(() -> new RuntimeException("Episode not found"));
+        review = Review.builder().user(user).episode(episode).build();
         } else {
             throw new IllegalArgumentException("Either movieId or episodeId must be provided");
         }
@@ -172,7 +173,7 @@ public class ReviewService {
             review.setRating(0); // Default if not rated
         }
 
-        Review saved = reviewRepository.save(review);
+    Review saved = reviewRepository.save(review);
         try {
             achievementService.checkCommentAchievements(user);
         } catch (Exception e) {

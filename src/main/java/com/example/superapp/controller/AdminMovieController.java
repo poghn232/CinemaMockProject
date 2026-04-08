@@ -278,6 +278,94 @@ public class AdminMovieController {
         return ResponseEntity.ok(dto);
     }
 
+    // Upload subtitle for a specific episode
+    @PostMapping("/tv/{tvId}/seasons/{seasonNumber}/episodes/{episodeNumber}/subtitle")
+    public ResponseEntity<Map<String, Object>> uploadEpisodeSubtitle(@PathVariable("tvId") long tvId,
+                                                                      @PathVariable("seasonNumber") int seasonNumber,
+                                                                      @PathVariable("episodeNumber") int episodeNumber,
+                                                                      @RequestParam("file") MultipartFile file,
+                                                                      @RequestParam(name = "lang", required = false) String lang) {
+        TvSeries tv = tvSeriesRepository.findById(tvId)
+                .orElseThrow(() -> new IllegalArgumentException("TV series not found"));
+
+        Season season = seasonRepository.findByTvSeriesId(tv.getId()).stream()
+                .filter(s -> s.getSeasonNumber() != null && s.getSeasonNumber() == seasonNumber)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Season not found"));
+
+        Episode episode = episodeRepository.findBySeasonId(season.getId()).stream()
+                .filter(e -> e.getEpisodeNumber() != null && e.getEpisodeNumber() == episodeNumber)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Episode not found"));
+
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("Empty subtitle file");
+        }
+
+        try {
+            // create folder for episode subtitles
+            String folder = "subtitles/tv/" + tvId + "/season-" + seasonNumber + "/episode-" + episodeNumber;
+            r2StorageService.createFolder(folder);
+
+            // write to temp file and upload
+            Path tmp = Files.createTempFile("subtitle-", ".vtt");
+            try (var in = file.getInputStream()) {
+                Files.copy(in, tmp, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            String orig = file.getOriginalFilename() == null ? "" : file.getOriginalFilename();
+            String ext = "vtt";
+            int dot = orig.lastIndexOf('.');
+            if (dot >= 0 && dot + 1 < orig.length()) {
+                ext = orig.substring(dot + 1).toLowerCase();
+            }
+
+            String filename;
+            String normalizedLang = (lang == null ? "" : lang.trim());
+            if (normalizedLang.isEmpty() || "en".equalsIgnoreCase(normalizedLang) || "default".equalsIgnoreCase(normalizedLang)) {
+                filename = "default." + ext;
+            } else {
+                String safeLang = normalizedLang.replaceAll("[^a-zA-Z0-9_-]", "").toLowerCase();
+                if (safeLang.isEmpty()) safeLang = "default";
+                filename = safeLang + "." + ext;
+            }
+
+            String objectKey = folder + "/" + filename;
+            String contentType = file.getContentType();
+            if (contentType == null) {
+                if ("srt".equals(ext)) contentType = "text/plain";
+                else if ("vtt".equals(ext)) contentType = "text/vtt";
+                else contentType = "application/octet-stream";
+            }
+
+            r2StorageService.uploadFile(tmp, objectKey, contentType);
+            Files.deleteIfExists(tmp);
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("uploaded", true);
+            result.put("objectKey", objectKey);
+            result.put("url", r2StorageService.buildPublicUrl(objectKey));
+            return ResponseEntity.ok(result);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload subtitle: " + e.getMessage(), e);
+        }
+    }
+
+    @GetMapping("/tv/{tvId}/seasons/{seasonNumber}/episodes/{episodeNumber}/subtitles")
+    public ResponseEntity<java.util.List<java.util.Map<String,String>>> listEpisodeSubtitles(@PathVariable("tvId") long tvId,
+                                                                                           @PathVariable("seasonNumber") int seasonNumber,
+                                                                                           @PathVariable("episodeNumber") int episodeNumber) {
+        String prefix = "subtitles/tv/" + tvId + "/season-" + seasonNumber + "/episode-" + episodeNumber + "/";
+        java.util.List<String> keys = r2StorageService.listObjectsByPrefix(prefix);
+
+        java.util.List<java.util.Map<String,String>> out = keys.stream().map(k -> java.util.Map.of(
+                "key", k,
+                "url", r2StorageService.buildPublicUrl(k)
+        )).collect(java.util.stream.Collectors.toList());
+
+        return ResponseEntity.ok(out);
+    }
+
     @GetMapping("/tv/{tvId}/seasons/{seasonNumber}/episodes/{episodeNumber}/source/latest")
     public ResponseEntity<VideoAssetDto> getLatestEpisodeSource(@PathVariable("tvId") long tvId,
                                                                 @PathVariable("seasonNumber") int seasonNumber,

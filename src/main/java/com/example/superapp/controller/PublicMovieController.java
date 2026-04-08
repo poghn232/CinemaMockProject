@@ -14,6 +14,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseBody;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/public/movies")
@@ -119,6 +124,112 @@ public class PublicMovieController {
             }
         } catch (Exception e) {
             // fallback: return raw bytes
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(respBytes.asByteArray());
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(respBytes.asByteArray());
+    }
+
+    @GetMapping("/tv/{tvId}/seasons/{seasonNumber}/episodes/{episodeNumber}/subtitles")
+    public ResponseEntity<List<Map<String,String>>> listEpisodeSubtitlesPublic(
+        @PathVariable("tvId") Long tvId,
+        @PathVariable("seasonNumber") Integer seasonNumber,
+        @PathVariable("episodeNumber") Integer episodeNumber
+    ) {
+    String prefix = "subtitles/tv/" + tvId + "/season-" + seasonNumber + "/episode-" + episodeNumber + "/";
+    java.util.List<String> keys = r2StorageService.listObjectsByPrefix(prefix);
+    if (keys == null) keys = java.util.Collections.emptyList();
+
+    // pick a default: prefer default.vtt > default.srt > first
+    String chosenKey = null;
+    for (String k : keys) {
+        if (k.endsWith("/default.vtt") || k.endsWith("default.vtt")) {
+            chosenKey = k;
+            break;
+        }
+    }
+    if (chosenKey == null) {
+        for (String k : keys) {
+            if (k.endsWith("/default.srt") || k.endsWith("default.srt")) {
+                chosenKey = k;
+                break;
+            }
+        }
+    }
+    if (chosenKey == null && !keys.isEmpty()) chosenKey = keys.get(0);
+
+    final String chosenFinal = chosenKey;
+
+    List<Map<String,String>> out = keys.stream().map(k -> {
+        String filename = k.substring(prefix.length());
+        String url = "/api/public/movies/tv/" + tvId + "/seasons/" + seasonNumber + "/episodes/" + episodeNumber + "/subtitle/" + filename;
+        if (chosenFinal != null && chosenFinal.equals(k)) {
+            return Map.of("filename", filename, "url", url, "default", "true");
+        }
+        return Map.of("filename", filename, "url", url);
+    }).collect(Collectors.toList());
+
+    return ResponseEntity.ok(out);
+    }
+
+    @GetMapping("/tv/{tvId}/seasons/{seasonNumber}/episodes/{episodeNumber}/subtitle/{filename:.+}")
+    @ResponseBody
+    public ResponseEntity<byte[]> proxyEpisodeSubtitle(
+            @PathVariable("tvId") Long tvId,
+            @PathVariable("seasonNumber") Integer seasonNumber,
+            @PathVariable("episodeNumber") Integer episodeNumber,
+            @PathVariable("filename") String filename
+    ) {
+        String key = "subtitles/tv/" + tvId + "/season-" + seasonNumber + "/episode-" + episodeNumber + "/" + filename;
+        var opt = r2StorageService.getObjectBytes(key);
+        if (opt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        var respBytes = opt.get();
+        try {
+            if (filename.toLowerCase().endsWith(".vtt")) {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType("text/vtt"))
+                        .body(respBytes.asByteArray());
+            }
+
+            if (filename.toLowerCase().endsWith(".srt")) {
+                String srtText = new String(respBytes.asByteArray());
+                StringBuilder vtt = new StringBuilder();
+                vtt.append("WEBVTT\n\n");
+                String normalized = srtText.replace("\r\n", "\n").replace("\r", "\n");
+                String[] blocks = normalized.split("\n\n");
+                for (String block : blocks) {
+                    String trimmed = block.trim();
+                    if (trimmed.isEmpty()) {
+                        continue;
+                    }
+                    String[] lines = trimmed.split("\n");
+                    int idx = 0;
+                    if (lines.length > 0 && lines[0].matches("^\\d+$")) {
+                        idx = 1;
+                    }
+                    if (idx >= lines.length) continue;
+                    String timeLine = lines[idx];
+                    timeLine = timeLine.replace(',', '.');
+                    vtt.append(timeLine).append('\n');
+                    for (int i = idx + 1; i < lines.length; i++) {
+                        vtt.append(lines[i]).append('\n');
+                    }
+                    vtt.append('\n');
+                }
+
+                byte[] out = vtt.toString().getBytes();
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType("text/vtt"))
+                        .body(out);
+            }
+        } catch (Exception e) {
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
                     .body(respBytes.asByteArray());

@@ -1,11 +1,18 @@
 package com.example.superapp.controller;
 
+import com.example.superapp.entity.Report;
+import com.example.superapp.entity.Review;
+import com.example.superapp.entity.User;
+import com.example.superapp.repository.ReportRepository;
+import com.example.superapp.repository.ReviewRepository;
+import com.example.superapp.repository.UserRepository;
 import com.example.superapp.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @RestController
@@ -13,6 +20,9 @@ import java.util.Map;
 public class ReviewController {
 
     private final ReviewService reviewService;
+    private final ReviewRepository reviewRepository;
+    private final ReportRepository reportRepository;
+    private final UserRepository userRepository;
 
     @PostMapping("/api/reviews/save")
     public ResponseEntity<?> saveRating(
@@ -73,6 +83,33 @@ public class ReviewController {
         }
         try {
             return ResponseEntity.ok(reviewService.saveComment(auth.getName(), payload));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/api/user/reviews/{id}/report")
+    public ResponseEntity<?> reportReview(
+            Authentication auth,
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> payload
+    ) {
+        if (auth == null) {
+            return ResponseEntity.status(401).body(Map.of("message", "Login required to report"));
+        }
+        try {
+            String reason = payload.get("reason") != null ? payload.get("reason").toString() : "";
+            Review review = reviewRepository.findById(id).orElseThrow(() -> new RuntimeException("Review not found"));
+            User reporter = userRepository.findByUsername(auth.getName()).orElseThrow(() -> new RuntimeException("User not found"));
+            Report r = Report.builder()
+                    .review(review)
+                    .reporter(reporter)
+                    .reason(reason)
+                    .createdAt(LocalDateTime.now())
+                    .status(Report.Status.PENDING)
+                    .build();
+            reportRepository.save(r);
+            return ResponseEntity.ok(Map.of("message", "Report submitted"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }

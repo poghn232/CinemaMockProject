@@ -666,6 +666,7 @@
                 const users = (await fetchJson(api.users)) || [];
                 const packs = (await fetchJson(api.packs)) || [];
                 const films = (await fetchJson(api.movies)) || [];
+                const reports = (await fetchJson(api.reports)) || [];
                 //non_admin only
                 const nonAdmin = (users || []).filter(
                     (u) => u.role !== "ADMIN",
@@ -677,6 +678,10 @@
                 document.getElementById("countFilms").textContent = (
                     films || []
                 ).length;
+                // count pending reports specifically
+                const pending = (reports || []).filter(r => r.status === 'PENDING').length;
+                const reportsEl = document.getElementById("countReports");
+                if (reportsEl) reportsEl.textContent = pending;
             } catch (e) {
                 console.error("refreshCounts", e);
             }

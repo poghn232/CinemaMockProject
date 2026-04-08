@@ -360,25 +360,7 @@
                 actions.style.gap = "6px";
                 actions.style.flexWrap = "wrap";
 
-                const trailerBtn = document.createElement("button");
-                trailerBtn.className = "btn ghost";
-                trailerBtn.textContent = f.src ? "Edit trailer" : "Set trailer";
-                trailerBtn.addEventListener("click", async () => {
-                    const current = f.src || "";
-                    const input = prompt("Enter YouTube trailer URL:", current);
-                    if (input === null) return;
-                    try {
-                        await fetchJson(api.movies + "/" + f.type + "/" + f.id + "/trailer", {
-                            method: "PUT",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ src: input.trim() || null }),
-                        });
-                        await loadFilms();
-                        refreshCounts();
-                    } catch (e) {
-                        alert("Save trailer failed: " + e);
-                    }
-                });
+                // trailer button moved into the TMDB detail modal (Set/Edit trailer will be available inside Details)
 
                 const hideBtn = document.createElement("button");
                 hideBtn.className = "btn ghost";
@@ -458,7 +440,6 @@
                     }
                 });
 
-                actions.appendChild(trailerBtn);
                 actions.appendChild(hideBtn);
                 actions.appendChild(detailsBtn);
                 actions.appendChild(regionBtn);
@@ -481,8 +462,17 @@
                 filmsCache = (await fetchJson(api.movies)) || [];
                 await renderFilms();
             } catch (e) {
-                container.innerHTML = "Failed to load films.";
                 console.error(e);
+                // Show more detailed error to help debug (includes HTTP status and server body)
+                const errMsg = (e && e.message) ? e.message : String(e);
+                // Friendly guidance for common auth errors
+                let hint = '';
+                if (errMsg.startsWith('401') || errMsg.startsWith('403')) {
+                    hint = ' Authentication error — please <a href="/login.html">login</a> again.';
+                } else {
+                    hint = ' Click the Refresh button to retry.';
+                }
+                container.innerHTML = `<div style="color:#fca5a5;">Failed to load films: ${errMsg}</div><div class="muted" style="margin-top:8px">${hint}</div>`;
             }
         }
 
@@ -760,6 +750,7 @@
                     ? details.poster_path
                     : tmdbImageBase + details.poster_path
                 : "/static/images/banner.png";
+            const exists = isExistingItem(item);
 
             modal.innerHTML = `
         <div style="display:flex; gap:12px; align-items:flex-start">
@@ -779,29 +770,30 @@
               ${cast.length ? `<div style="font-weight:600; margin-bottom:6px">Top cast</div>` : ""}
               ${cast.map((c) => `<div class="muted">${c.name}${c.character ? " as " + c.character : ""}</div>`).join("")}
             </div>
-            ${item.type === "tv" ? `<div id="tvEpisodesPanel" style="margin-top:10px"></div>` : ""}
+            ${item.type === "tv" ? `<div id="tvEpisodesPanel" style="margin-top:10px; ${!exists ? 'display:none' : ''}"></div>` : ""}
           </div>
         </div>
-                                    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:14px">
-                                                    <div style="display:flex; gap:8px; align-items:center; margin-right:auto">
-                                                    <input id="subtitleFileInput" type="file" accept=".vtt,.srt,text/vtt,text/plain" style="display:none" />
-                                                    <button id="chooseSubtitleBtn" class="btn ghost">Choose default subtitle (.vtt/.srt)</button>
-                                                            <span id="chosenSubtitleName" class="muted"></span>
-                                                            <select id="subtitleLangSelect" style="margin-left:8px">
-                                                                <option value="default">Default (English)</option>
-                                                                <option value="en">English (en)</option>
-                                                                <option value="de">German (de)</option>
-                                                                <option value="ja">Japanese (ja)</option>
-                                                                <option value="my">Myanmar (my)</option>
-                                                                <option value="vi">Vietnamese (vi)</option>
-                                                                <option value="other">Other (enter code)</option>
-                                                            </select>
-                                                            <input id="subtitleLangCustom" type="text" placeholder="e.g. es" style="width:80px; margin-left:6px; display:none" />
-                                                            <button id="uploadSubtitleBtn" class="btn ghost" style="margin-left:6px">Upload subtitle</button>
-                                                    </div>
-                                                    <button id="tmdbCancel" class="btn ghost">Cancel</button>
-                                                    <button id="tmdbConfirm" class="btn">Add this movie</button>
+                    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:14px">
+                                            <div id="modalControls" style="display:${exists ? 'flex' : 'none'}; gap:8px; align-items:center; margin-right:auto">
+                                            <input id="subtitleFileInput" type="file" accept=".vtt,.srt,text/vtt,text/plain" style="display:none" />
+                                            <button id="chooseSubtitleBtn" class="btn ghost">Choose default subtitle (.vtt/.srt)</button>
+                                                <span id="chosenSubtitleName" class="muted"></span>
+                                                <select id="subtitleLangSelect" style="margin-left:8px">
+                                                <option value="default">Default (English)</option>
+                                                <option value="en">English (en)</option>
+                                                <option value="de">German (de)</option>
+                                                <option value="ja">Japanese (ja)</option>
+                                                <option value="my">Myanmar (my)</option>
+                                                <option value="vi">Vietnamese (vi)</option>
+                                                <option value="other">Other (enter code)</option>
+                                                </select>
+                                                <input id="subtitleLangCustom" type="text" placeholder="e.g. es" style="width:80px; margin-left:6px; display:none" />
+                                                <button id="uploadSubtitleBtn" class="btn ghost" style="margin-left:6px">Upload subtitle</button>
                                             </div>
+                            <button id="tmdbCancel" class="btn ghost">Cancel</button>
+                            <button id="modalSetTrailer" class="btn ghost" style="${exists ? '' : 'display:none'}">Set trailer</button>
+                            <button id="tmdbConfirm" class="btn">Add this movie</button>
+                        </div>
       `;
 
             overlay.appendChild(modal);
@@ -817,6 +809,28 @@
             const chooseSubtitleBtn = document.getElementById("chooseSubtitleBtn");
             const subtitleInput = document.getElementById("subtitleFileInput");
             const chosenSubtitleName = document.getElementById("chosenSubtitleName");
+            const setTrailerBtn = document.getElementById('modalSetTrailer');
+            if (setTrailerBtn) {
+                setTrailerBtn.addEventListener('click', async () => {
+                    const current = details && details.trailer ? details.trailer : (details && details.src ? details.src : '');
+                    const input = prompt('Enter YouTube trailer URL:', current || '');
+                    if (input === null) return;
+                    try {
+                        await fetchJson(api.movies + '/' + item.type + '/' + item.id + '/trailer', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ src: input.trim() || null })
+                        });
+                        // refresh lists
+                        await loadTmdb();
+                        await loadFilms();
+                        refreshCounts();
+                        alert('Trailer saved');
+                    } catch (e) {
+                        alert('Save trailer failed: ' + e);
+                    }
+                });
+            }
 
             chooseSubtitleBtn.addEventListener("click", () => subtitleInput.click());
             subtitleInput.addEventListener("change", () => {
@@ -886,6 +900,12 @@
                     confirmBtn.addEventListener("click", async () => {
                         const msg = document.getElementById("tmdbMessage");
                         msg.textContent = "Adding...";
+                        // guard: make sure adminApi and api.movies exist
+                        if (!window.adminApi || !window.adminApi.fetchJson || !window.adminApi.api || !window.adminApi.api.movies) {
+                            msg.textContent = "Add failed: admin API not initialized. Please reload or login.";
+                            alert("Admin API not available. Make sure you are logged in and the admin scripts are loaded.");
+                            return;
+                        }
                         try {
                             await fetchJson(api.movies + "/import", {
                                 method: "POST",
@@ -893,45 +913,47 @@
                                 body: JSON.stringify({ tmdbId: item.id, type: item.type }),
                             });
 
-                            // if subtitle chosen, upload it to R2
+                            // if subtitle chosen, upload it to R2 (only for movies)
                             try {
-                                const f = subtitleInput.files && subtitleInput.files[0];
-                                if (f) {
-                                    const fd = new FormData();
-                                    fd.append('file', f);
-                                    // include chosen language when importing
-                                    try {
-                                        const langSel = document.getElementById('subtitleLangSelect');
-                                        const langCustom = document.getElementById('subtitleLangCustom');
-                                        let langVal = langSel && langSel.value;
-                                        if (langVal === 'other') {
-                                            const c = (langCustom && langCustom.value || '').trim();
-                                            if (c) langVal = c;
-                                        }
-                                        if (langVal && langVal !== 'default') fd.append('lang', langVal);
-                                    } catch (e) { /* ignore */ }
-                                    // include Authorization header like fetchJson does
-                                    const token = localStorage.getItem('token');
-                                    const headers = {};
-                                    if (token) headers['Authorization'] = 'Bearer ' + token;
-
-                                    const upRes = await fetch(`/api/admin/movies/movie/${encodeURIComponent(item.id)}/subtitle`, {
-                                        method: 'POST',
-                                        headers,
-                                        body: fd,
-                                    });
-
-                                    if (!upRes.ok) {
-                                        const txt = await upRes.text();
-                                        console.warn('subtitle upload failed', upRes.status, txt);
-                                        alert('Subtitle upload failed: HTTP ' + upRes.status + ' — ' + txt);
-                                    } else {
+                                if (item.type === 'movie') {
+                                    const f = subtitleInput.files && subtitleInput.files[0];
+                                    if (f) {
+                                        const fd = new FormData();
+                                        fd.append('file', f);
+                                        // include chosen language when importing
                                         try {
-                                            const json = await upRes.json();
-                                            console.info('subtitle uploaded', json);
-                                            showToast && showToast('Subtitle uploaded', 'success');
-                                        } catch (e) {
-                                            showToast && showToast('Subtitle uploaded', 'success');
+                                            const langSel = document.getElementById('subtitleLangSelect');
+                                            const langCustom = document.getElementById('subtitleLangCustom');
+                                            let langVal = langSel && langSel.value;
+                                            if (langVal === 'other') {
+                                                const c = (langCustom && langCustom.value || '').trim();
+                                                if (c) langVal = c;
+                                            }
+                                            if (langVal && langVal !== 'default') fd.append('lang', langVal);
+                                        } catch (e) { /* ignore */ }
+                                        // include Authorization header like fetchJson does
+                                        const token = localStorage.getItem('token');
+                                        const headers = {};
+                                        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+                                        const upRes = await fetch(`/api/admin/movies/movie/${encodeURIComponent(item.id)}/subtitle`, {
+                                            method: 'POST',
+                                            headers,
+                                            body: fd,
+                                        });
+
+                                        if (!upRes.ok) {
+                                            const txt = await upRes.text();
+                                            console.warn('subtitle upload failed', upRes.status, txt);
+                                            alert('Subtitle upload failed: HTTP ' + upRes.status + ' — ' + txt);
+                                        } else {
+                                            try {
+                                                const json = await upRes.json();
+                                                console.info('subtitle uploaded', json);
+                                                showToast && showToast('Subtitle uploaded', 'success');
+                                            } catch (e) {
+                                                showToast && showToast('Subtitle uploaded', 'success');
+                                            }
                                         }
                                     }
                                 }
@@ -952,13 +974,93 @@
                             }
 
                             refreshCounts();
-                            close();
+
+                            // Reveal modal controls now that item exists
+                            try {
+                                const modalControls = document.getElementById('modalControls');
+                                if (modalControls) modalControls.style.display = 'flex';
+                                const setTrailerBtnEl = document.getElementById('modalSetTrailer');
+                                if (setTrailerBtnEl) setTrailerBtnEl.style.display = '';
+                                // update confirm button state
+                                confirmBtn.textContent = 'Added';
+                                confirmBtn.className = 'btn ghost';
+                                confirmBtn.disabled = true;
+
+                                // If TV, fetch backend seasons and populate panel
+                                if (item.type === 'tv') {
+                                    try {
+                                        const panel = document.getElementById('tvEpisodesPanel');
+                                        panel.style.display = '';
+                                        // reuse existing logic to populate seasons by re-running the block
+                                        const backendSeasons = await fetchJson(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons`);
+                                        // minimal repopulate: trigger the same UI building by calling loadTmdb() path which will fetch details again
+                                        // but to keep it simple, call location of existing block by triggering a refresh of details
+                                        try {
+                                            const newDetails = await fetchJson(`/api/movies/details?id=${encodeURIComponent(item.id)}&type=${encodeURIComponent(item.type)}`);
+                                            // manually call the same code that populates episodes: recreate panel content
+                                            panel.innerHTML = '';
+                                            // Append a top control
+                                            const topControls2 = document.createElement('div');
+                                            topControls2.style.display = 'flex';
+                                            topControls2.style.gap = '8px';
+                                            topControls2.style.marginBottom = '8px';
+                                            topControls2.innerHTML = `<button id="addall-show-${item.id}" class="btn ghost">Add all episodes in show</button><span class="muted" style="align-self:center">Use with caution for large shows</span>`;
+                                            panel.appendChild(topControls2);
+                                            // then re-run the season rendering logic by copying the existing code block's essence
+                                            if (Array.isArray(newDetails.seasons)) {
+                                                for (let _idx = 0; _idx < newDetails.seasons.length; _idx++) {
+                                                    const s = newDetails.seasons[_idx];
+                                                    const snRaw = s.season_number || s.seasonNumber || s.season;
+                                                    let seasonNumber = parseInt(snRaw, 10);
+                                                    if (isNaN(seasonNumber)) {
+                                                        const nameToInspect = String(s.name || snRaw || "");
+                                                        const m = nameToInspect.match(/(\d+)/);
+                                                        if (m) seasonNumber = parseInt(m[1], 10);
+                                                        else if (s.name && nameToInspect.toLowerCase().includes('special')) seasonNumber = 0;
+                                                        else seasonNumber = _idx + 1;
+                                                    }
+                                                    const sTitle = s.name || `Season ${snRaw}`;
+                                                    const seasonDiv = document.createElement('div');
+                                                    seasonDiv.style.marginTop = '8px';
+                                                    const epCount = s.episode_count || s.episodeCount || 10;
+                                                    seasonDiv.innerHTML = `
+                                                      <div style="display:flex; align-items:center; justify-content:space-between">
+                                                        <div style="font-weight:600">${sTitle}</div>
+                                                        <div style="display:flex; gap:8px; align-items:center">
+                                                          <span class="muted">Episodes: ${epCount}</span>
+                                                          <button id="list-season-${seasonNumber}" class="btn ghost">List</button>
+                                                          <button id="addall-season-${seasonNumber}" class="btn">Add all season</button>
+                                                        </div>
+                                                      </div>
+                                                      <div class="muted" id="season-${seasonNumber}-episodes" style="display:none; margin-top:6px"></div>
+                                                    `;
+                                                    panel.appendChild(seasonDiv);
+                                                }
+                                            }
+                                        } catch (e) {}
+                                    } catch (e) {}
+                                }
+                            } catch (err) {
+                                console.warn('reveal controls failed', err);
+                            }
+
                         } catch (e) {
                             msg.textContent = "Add failed: " + e;
                         }
                     });
                 }
             } catch (ignored) {}
+
+            // hide subtitle upload controls for TV items (they use per-episode uploads)
+            try {
+                if (item.type === 'tv') {
+                    const modalControls = document.getElementById('modalControls');
+                    if (modalControls) {
+                        // disable file input and upload button to avoid accidental movie subtitle uploads
+                        modalControls.style.display = 'none';
+                    }
+                }
+            } catch (e) {}
 
             try {
                 if (item.type === "tv" && Array.isArray(details.seasons)) {
@@ -1141,7 +1243,198 @@
                                             uploadSourceBtn.addEventListener("click", async () => {
                                                 await uploadEpisodeSource(item.id, seasonNumber, e);
                                             });
+                                            // Subtitle upload / list for this episode
+                                            const subtitleBtn = document.createElement("button");
+                                            subtitleBtn.className = "btn ghost";
+                                            subtitleBtn.textContent = "Subtitles";
+
+                                            // per-episode subtitle controls will be created inside the container when Subtitles button clicked
+                                            subtitleBtn.addEventListener('click', async () => {
+                                                // Show existing subtitles and allow upload
+                                                const epSubContainerId = `episode-${item.id}-${seasonNumber}-${e}-subs`;
+                                                let epSubContainer = document.getElementById(epSubContainerId);
+                                                if (!epSubContainer) {
+                                                    epSubContainer = document.createElement('div');
+                                                    epSubContainer.id = epSubContainerId;
+                                                    epSubContainer.style.marginTop = '6px';
+                                                    epSubContainer.className = 'muted';
+                                                    // place below the episode row
+                                                    epBtn.appendChild(epSubContainer);
+                                                }
+
+                                                // fetch and render existing subtitles
+                                                try {
+                                                    const subs = await fetchJson(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(seasonNumber)}/episodes/${encodeURIComponent(e)}/subtitles`);
+                                                    epSubContainer.innerHTML = '';
+                                                    if (Array.isArray(subs) && subs.length) {
+                                                        const list = document.createElement('div');
+                                                        subs.forEach(s => {
+                                                            const a = document.createElement('a');
+                                                            a.href = s.url;
+                                                            a.target = '_blank';
+                                                            a.textContent = s.key.split('/').pop();
+                                                            a.style.display = 'block';
+                                                            list.appendChild(a);
+                                                        });
+                                                        epSubContainer.appendChild(list);
+                                                    } else {
+                                                        epSubContainer.textContent = 'No subtitles uploaded.';
+                                                    }
+
+                                                    // show upload controls (file input, chosen name, language select, upload button)
+                                                    const uploadCtrl = document.createElement('div');
+                                                    uploadCtrl.style.marginTop = '6px';
+                                                    uploadCtrl.style.display = 'flex';
+                                                    uploadCtrl.style.gap = '8px';
+
+                                                    const fileInput = document.createElement('input');
+                                                    fileInput.type = 'file';
+                                                    fileInput.accept = '.vtt,.srt,text/vtt,text/plain';
+                                                    fileInput.style.display = 'none';
+
+                                                    const chooseBtn = document.createElement('button');
+                                                    chooseBtn.className = 'btn ghost';
+                                                    chooseBtn.textContent = 'Choose subtitle file';
+
+                                                    const chosenName = document.createElement('span');
+                                                    chosenName.className = 'muted';
+                                                    chosenName.style.alignSelf = 'center';
+
+                                                    const langSelect = document.createElement('select');
+                                                    langSelect.innerHTML = `<option value="default">Default (English)</option><option value="en">en</option><option value="de">de</option><option value="ja">ja</option><option value="my">my</option><option value="vi">vi</option><option value="other">Other</option>`;
+                                                    langSelect.style.padding = '6px';
+
+                                                    const langCustom = document.createElement('input');
+                                                    langCustom.type = 'text';
+                                                    langCustom.placeholder = 'e.g. es';
+                                                    langCustom.style.width = '80px';
+                                                    langCustom.style.display = 'none';
+
+                                                    const uploadBtn = document.createElement('button');
+                                                    uploadBtn.className = 'btn';
+                                                    uploadBtn.textContent = 'Upload';
+
+                                                    uploadCtrl.appendChild(chooseBtn);
+                                                    uploadCtrl.appendChild(chosenName);
+                                                    uploadCtrl.appendChild(langSelect);
+                                                    uploadCtrl.appendChild(langCustom);
+                                                    uploadCtrl.appendChild(uploadBtn);
+                                                    epSubContainer.appendChild(uploadCtrl);
+
+                                                    chooseBtn.addEventListener('click', () => fileInput.click());
+                                                    fileInput.addEventListener('change', () => {
+                                                        const f = fileInput.files && fileInput.files[0];
+                                                        chosenName.textContent = f ? f.name : '';
+                                                    });
+
+                                                    langSelect.addEventListener('change', () => {
+                                                        if (langSelect.value === 'other') langCustom.style.display = 'inline-block';
+                                                        else langCustom.style.display = 'none';
+                                                    });
+
+                                                    uploadBtn.addEventListener('click', async () => {
+                                                        const f = fileInput.files && fileInput.files[0];
+                                                        if (!f) return alert('Choose a subtitle file first');
+                                                        let lang = langSelect.value;
+                                                        if (lang === 'other') {
+                                                            const c = (langCustom.value || '').trim();
+                                                            if (c) lang = c; else lang = 'default';
+                                                        }
+                                                        const token = localStorage.getItem('token');
+                                                        const headers = {};
+                                                        if (token) headers['Authorization'] = 'Bearer ' + token;
+                                                        const fd = new FormData();
+                                                        fd.append('file', f);
+                                                        if (lang && lang !== 'default') fd.append('lang', lang);
+                                                        try {
+                                                            const res = await fetch(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(seasonNumber)}/episodes/${encodeURIComponent(e)}/subtitle`, { method: 'POST', headers, body: fd });
+                                                            if (!res.ok) {
+                                                                const txt = await res.text();
+                                                                alert('Upload failed: ' + res.status + ' — ' + txt);
+                                                                return;
+                                                            }
+                                                            alert('Subtitle uploaded');
+                                                            // refresh subtitle list
+                                                            try {
+                                                                const subs = await fetchJson(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(seasonNumber)}/episodes/${encodeURIComponent(e)}/subtitles`);
+                                                                epSubContainer.innerHTML = '';
+                                                                if (Array.isArray(subs) && subs.length) {
+                                                                    const list = document.createElement('div');
+                                                                    subs.forEach(s => {
+                                                                        const a = document.createElement('a');
+                                                                        a.href = s.url;
+                                                                        a.target = '_blank';
+                                                                        a.textContent = s.key.split('/').pop();
+                                                                        a.style.display = 'block';
+                                                                        list.appendChild(a);
+                                                                    });
+                                                                    epSubContainer.appendChild(list);
+                                                                } else {
+                                                                    epSubContainer.textContent = 'No subtitles uploaded.';
+                                                                }
+                                                            } catch (err) {
+                                                                epSubContainer.textContent = 'Failed to refresh subtitles: ' + err;
+                                                            }
+                                                        } catch (err) {
+                                                            alert('Upload error: ' + err);
+                                                        }
+                                                    });
+                                                    epSubContainer.appendChild(fileInput);
+                                                } catch (err) {
+                                                    epSubContainer.textContent = 'Failed to list subtitles: ' + err;
+                                                }
+                                            });
+
+                                            subtitleInput.addEventListener('change', async () => {
+                                                const file = subtitleInput.files && subtitleInput.files[0];
+                                                if (!file) return;
+                                                const lang = prompt('Enter subtitle language code (e.g. en, vi) or leave blank for default:', 'default');
+                                                const token = localStorage.getItem('token');
+                                                const headers = {};
+                                                if (token) headers['Authorization'] = 'Bearer ' + token;
+                                                const fd = new FormData();
+                                                fd.append('file', file);
+                                                if (lang && lang !== 'default') fd.append('lang', lang);
+                                                try {
+                                                    const res = await fetch(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(seasonNumber)}/episodes/${encodeURIComponent(e)}/subtitle`, { method: 'POST', headers, body: fd });
+                                                    if (!res.ok) {
+                                                        const txt = await res.text();
+                                                        alert('Upload failed: ' + res.status + ' — ' + txt);
+                                                        return;
+                                                    }
+                                                    alert('Subtitle uploaded');
+                                                    // refresh subtitle list if visible
+                                                    const epSubContainer = document.getElementById(`episode-${item.id}-${seasonNumber}-${e}-subs`);
+                                                    if (epSubContainer) {
+                                                        try {
+                                                            const subs = await fetchJson(`/api/admin/movies/tv/${encodeURIComponent(item.id)}/seasons/${encodeURIComponent(seasonNumber)}/episodes/${encodeURIComponent(e)}/subtitles`);
+                                                            epSubContainer.innerHTML = '';
+                                                            if (Array.isArray(subs) && subs.length) {
+                                                                const list = document.createElement('div');
+                                                                subs.forEach(s => {
+                                                                    const a = document.createElement('a');
+                                                                    a.href = s.url;
+                                                                    a.target = '_blank';
+                                                                    a.textContent = s.key.split('/').pop();
+                                                                    a.style.display = 'block';
+                                                                    list.appendChild(a);
+                                                                });
+                                                                epSubContainer.appendChild(list);
+                                                            } else {
+                                                                epSubContainer.textContent = 'No subtitles uploaded.';
+                                                            }
+                                                        } catch (err) {
+                                                            epSubContainer.textContent = 'Failed to refresh subtitles: ' + err;
+                                                        }
+                                                    }
+                                                } catch (e) {
+                                                    alert('Upload error: ' + e);
+                                                }
+                                            });
+
                                             right.appendChild(uploadSourceBtn);
+                                            right.appendChild(subtitleBtn);
+                                            epBtn.appendChild(subtitleInput);
                                         }
 
                                         epBtn.appendChild(left);

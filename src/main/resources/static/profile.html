@@ -1720,7 +1720,6 @@
 
     function renderHistory(items) {
         const container = document.getElementById('historyContainer');
-
         if (!items || items.length === 0) {
             container.innerHTML = `
             <div class="history-empty">
@@ -1730,8 +1729,25 @@
             </div>`;
             return;
         }
+        // Deduplicate by content id (movieId for movies, tvSeriesId for TV)
+        // Keep only the most recent entry per content (based on watchedAt if available)
+        const normalized = (items || []).slice().map(it => {
+            // parse watchedAt to timestamp (fallback 0)
+            const ts = it.watchedAt ? Date.parse(it.watchedAt) : 0;
+            return Object.assign({__watchedTs: isNaN(ts) ? 0 : ts}, it);
+        });
+        // sort descending by watched timestamp (most recent first)
+        normalized.sort((a, b) => (b.__watchedTs || 0) - (a.__watchedTs || 0));
+        const seen = new Set();
+        const dedup = [];
+        for (const it of normalized) {
+            const key = it.movieId ? `m_${it.movieId}` : (it.tvSeriesId ? `t_${it.tvSeriesId}` : (`title_${(it.movieTitle||it.tvSeriesName||'').trim()}`));
+            if (seen.has(key)) continue;
+            seen.add(key);
+            dedup.push(it);
+        }
 
-        container.innerHTML = items.map(item => {
+        container.innerHTML = dedup.map(item => {
             // Lấy tiêu đề: ưu tiên movieTitle, nếu không có thì dùng tvSeriesName
             const mainTitle = item.movieTitle || item.tvSeriesName || 'Unknown Movie';
 

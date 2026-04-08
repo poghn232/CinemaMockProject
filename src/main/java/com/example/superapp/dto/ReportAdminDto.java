@@ -12,6 +12,8 @@ public class ReportAdminDto {
     public String status;
     public String adminReason;
     public LocalDateTime adminActionAt;
+    public String adminUsername;
+    public String comment; // the reported review/comment text
 
     public ReportAdminDto() {}
 }

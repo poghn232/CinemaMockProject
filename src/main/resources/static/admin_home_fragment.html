@@ -71,7 +71,8 @@
                 document.getElementById("homePacks").textContent = packs.length;
                 document.getElementById("homeMovies").textContent = movies.length;
 
-                document.getElementById("homeReports").textContent = reports.length;
+                // show only pending reports
+                document.getElementById("homeReports").textContent = (reports || []).filter(r => r.status === 'PENDING').length;
                 document.getElementById("homeBanners").textContent = banners.length;
 
                 // fetch total revenue from admin analytics
