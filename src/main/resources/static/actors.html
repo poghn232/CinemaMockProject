@@ -234,12 +234,120 @@
         box-shadow: none !important;
         z-index: 1 !important;
       }
+
+      /* Exception: allow movie-card pop inside the detail panel itself. This
+         keeps global suppression (so cards outside the panel won't overlap
+         the open detail), but still lets credits inside the panel pop and
+         show the hover glow. Placed after the global rule so it wins. */
+      .overlay-open .detail-panel .movie-card:hover,
+      .overlay-open .detail-panel .movie-card.active {
+        transform: translateY(-8px) scale(1.06) !important;
+        box-shadow: 0 28px 60px rgba(249,115,22,0.16) !important;
+        border-color: rgba(249,115,22,0.28) !important;
+        z-index: 65 !important; /* above panel content but below navbar (navbar z-index:1000) */
+      }
       .actor-card.active, .movie-card.active {
         transform: translateY(-8px) scale(1.06);
         box-shadow: 0 36px 84px rgba(249,115,22,0.20), 0 0 48px rgba(249,115,22,0.14);
         border-color: rgba(249,115,22,0.30);
         z-index: 40;
       }
+      /* Movie-card styles (match homepage) */
+      .movie-card {
+        background: rgba(15, 23, 42, 0.96);
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(31, 41, 55, 0.9);
+        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.9);
+        cursor: pointer;
+        transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+
+      .movie-card:hover {
+        transform: translateY(-8px) scale(1.06);
+        border-color: rgba(249,115,22,0.28);
+        box-shadow: 0 28px 60px rgba(249,115,22,0.16), 0 0 40px rgba(249,115,22,0.12);
+        z-index: 500;
+      }
+
+      .movie-thumb {
+        position: relative;
+        aspect-ratio: 2 / 3;
+        background-size: cover;
+        background-position: center;
+      }
+
+      .movie-badge {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        font-size: 10px;
+        background: rgba(15, 23, 42, 0.88);
+        color: #facc15;
+        border: 1px solid rgba(250, 204, 21, 0.8);
+      }
+
+      .rank-badge {
+        position: absolute;
+        bottom: 8px;
+        left: 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        background: linear-gradient(135deg, #facc15, #f59e0b);
+        color: #000;
+        font-weight: 700;
+        border: 1px solid rgba(34,34,34,0.08);
+        z-index: 30;
+      }
+
+      .movie-type {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        font-size: 10px;
+        background: rgba(15, 23, 42, 0.86);
+        color: #bfdbfe;
+        border: 1px solid rgba(96, 165, 250, 0.9);
+      }
+
+      .movie-body {
+        padding: 8px 9px 9px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+      }
+
+      .movie-title {
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 4px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .movie-meta-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 11px;
+        color: var(--text-subtle);
+        margin-top: auto;
+      }
+
+      .movie-rating { display: inline-flex; align-items: center; gap: 4px; }
+      .movie-rating span.star { color: #facc15; }
+      .movie-year { opacity: 0.8; }
       /* skeleton card to improve perceived load time */
       .skeleton {
         background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
@@ -286,13 +394,19 @@
       .person-bio {
         flex: 1;
         background: rgba(2, 6, 23, 0.5);
-        padding: 12px;
+  padding: 12px;
         border-radius: 10px;
+  overflow: auto;
       }
       .movies-list {
         margin-top: 12px;
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        /* Use a fixed column width and left-align the grid so items don't
+           stretch to fill the entire row when there are few credits. This
+           keeps actors with <10 credits visually consistent with actors
+           who have many credits. */
+        grid-template-columns: repeat(auto-fill, 140px);
+        justify-content: start;
         gap: 12px;
       }
       .pagination-wrap {
@@ -325,11 +439,27 @@
           rgba(6, 8, 27, 0.98)
         );
         box-shadow: none;
-        padding: 20px; /* default padding; JS will add extra top offset */
-        overflow: auto;
+        padding: 12px; /* reduced default padding to keep content nearer navbar */
+        overflow: auto; /* allow right-side content to scroll while left stays sticky */
         transform: translateX(100%);
         transition: transform 0.28s ease;
         z-index: 60;
+      }
+      /* when panel is open we position the Close button absolutely so it sits just below the navbar */
+      #closePerson {
+        position: fixed; /* keep the close button fixed relative to viewport so it doesn't scroll */
+        left: 16px;
+        z-index: 1100; /* above panel and navbar if needed */
+        margin: 0;
+        display: inline-block; /* keep original display */
+      }
+      /* keep the left column (meta/thumb) visible while the right column scrolls */
+      .person-detail { align-items: flex-start; }
+      .person-meta {
+        width: 260px;
+        position: sticky; /* stick inside the scrolling .detail-panel */
+        top: 0; /* value will be set dynamically to sit below navbar */
+        align-self: flex-start;
       }
       .detail-panel.open {
         transform: translateX(0);
@@ -702,6 +832,8 @@
   applyDetailPanelOffset();
   // update on resize
   window.addEventListener('resize', applyDetailPanelOffset);
+  // also update on scroll so the fixed close button and right column sizing stays correct
+  window.addEventListener('scroll', applyDetailPanelOffset, { passive: true });
       });
 
       function renderPagination(page, total) {
@@ -767,6 +899,44 @@
       }
 
       // Show person detail by fetching server detail (includes credits)
+      // create a movie-card element compatible with the homepage card
+      function createMovieCardForActor(movie) {
+        const card = document.createElement('article');
+        card.className = 'movie-card init';
+
+        const isTrending = typeof movie.rating === 'number' && movie.rating >= 8;
+        const imgUrl = movie.imageUrl || movie.image || '';
+        const year = movie.year || '';
+        const ratingText = typeof movie.rating === 'number' ? movie.rating.toFixed(1) : 'N/A';
+        const typeLabel = movie.type === 'tv' ? 'TV Series' : 'Movie';
+
+        card.innerHTML = `
+          <div class="movie-thumb" style="background-image: url('${imgUrl}')">
+            ${isTrending ? '<span class="movie-badge">Trending</span>' : ''}
+            <span class="movie-type">${typeLabel}</span>
+          </div>
+          <div class="movie-body">
+            <div class="movie-title">${movie.title}</div>
+            <div class="movie-meta-row">
+              <div class="movie-rating"><span class="star">★</span><span>${ratingText}</span></div>
+              <div class="movie-year">${year}</div>
+            </div>
+          </div>
+        `;
+
+        card.addEventListener('click', () => {
+          const token = localStorage.getItem('token');
+          if (!token) {
+            const goLogin = confirm('You need to login to view movie details. Go to login page?');
+            if (goLogin) window.location.href = 'login.html';
+            return;
+          }
+          window.location.href = '/movie-detail.html?id=' + encodeURIComponent(movie.id) + '&type=' + encodeURIComponent(movie.type || 'movie');
+        });
+
+        return card;
+      }
+
       async function showPersonDetail(id) {
         const wrap = document.getElementById("personDetailWrap");
         const list = document.getElementById("actorsList");
@@ -802,29 +972,11 @@
                 document.getElementById("personThumb").style.backgroundImage =
                   `url('${pd.profilePath}')`;
 
-              // render credits
+              // render credits using the same movie-card structure as homepage
               const moviesEl = document.getElementById("personMovies");
               moviesEl.innerHTML = "";
               (pd.credits || []).forEach((m) => {
-                const card = document.createElement("div");
-                card.style.cursor = "pointer";
-                card.className = "movie-card";
-                card.innerHTML = `<div style="background-image:url('${m.imageUrl || ""}');height:160px;background-size:cover;background-position:center;border-radius:6px;"></div><div style="margin-top:6px;font-weight:600">${m.title}</div><div style='color:var(--text-subtle);font-size:12px'>${m.type || ""}</div>`;
-                card.addEventListener("click", () => {
-                  const token = localStorage.getItem("token");
-                  if (!token) {
-                    const goLogin = confirm(
-                      "Bạn cần đăng nhập để xem chi tiết phim. Chuyển tới trang đăng nhập?",
-                    );
-                    if (goLogin) window.location.href = "login.html";
-                    return;
-                  }
-                  window.location.href =
-                    "/movie-detail.html?id=" +
-                    encodeURIComponent(m.id) +
-                    "&type=" +
-                    encodeURIComponent(m.type);
-                });
+                const card = createMovieCardForActor(m);
                 moviesEl.appendChild(card);
               });
             }
@@ -862,13 +1014,31 @@
         if (!nav || !wrap) return;
         const navRect = nav.getBoundingClientRect();
         // compute desired top offset (nav height + small gap)
-        const topOffset = Math.ceil(navRect.height + 8);
-        // set paddingTop so content moves down; keep existing padding (20)
-        wrap.style.paddingTop = (topOffset + 12) + 'px';
-        // also position the close button (if present) to remain below navbar
+        const topOffset = Math.ceil(navRect.height + 6);
+        // set paddingTop so content moves down; keep existing small padding
+        wrap.style.paddingTop = (topOffset + 6) + 'px';
+        // position the close button absolutely to sit just below the navbar
         const closeBtn = document.getElementById('closePerson');
         if (closeBtn) {
-          closeBtn.style.marginTop = (topOffset - 6) + 'px';
+          // place the close button a small fixed distance from the left edge of the viewport
+          closeBtn.style.left = '16px';
+          // place it just below the navbar (use navRect.bottom to position relative to viewport)
+          const gap = 6; // small gap between navbar and button
+          closeBtn.style.top = Math.ceil(navRect.bottom + gap) + 'px';
+        }
+        // set sticky top for left meta column so it sits below navbar inside the panel
+        const meta = wrap.querySelector('.person-meta');
+        if (meta) {
+          meta.style.top = (topOffset + 6) + 'px';
+        }
+        // constrain right column height so movies list can't run 'past' the bottom
+        const bio = wrap.querySelector('.person-bio');
+        if (bio) {
+          const viewportHeight = window.innerHeight;
+          // compute available height under the navbar inside viewport
+          const used = Math.ceil(navRect.bottom) + 32; // navbar bottom + padding + buffer
+          const available = Math.max(240, viewportHeight - used);
+          bio.style.maxHeight = available + 'px';
         }
       }
 
