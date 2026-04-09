@@ -567,8 +567,11 @@
         const isPremium = localStorage.getItem("isPremium") === "true";
 
         if (usernameEl) {
-            usernameEl.textContent = "Hello, " + username;
-        }
+                const shortName = (typeof displayNameFor === 'function')
+                    ? displayNameFor(username)
+                    : (username && username.indexOf('@')>0 ? username.split('@')[0] : username);
+                usernameEl.textContent = "Hello, " + shortName;
+            }
         if (premiumBadge) {
             premiumBadge.style.display = isPremium ? "inline-flex" : "none";
         }

@@ -1444,22 +1444,37 @@
             transform 0.8s ease;
         }
 
-        .genres-menu {
-            display: flex;
-            flex-wrap: wrap; /* allow ~3 lines */
-            justify-content: center;
-            gap: 8px;
-            align-items: center;
-            white-space: normal;
-            overflow-y: auto;
-            max-height: 110px; /* ~2 lines */
-            width: 700px;
-            max-width: calc(100vw - 40px);
-        }
+          .genres-menu {
+                /* Use a 3-column grid so genres are exactly 3 per row and wrap
+                    to additional rows without internal scrolling. Make the menu
+                    responsive by using fractional columns and allowing the grid
+                    to take the available width. */
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 8px;
+                justify-items: stretch;
+                align-items: stretch;
+                white-space: normal;
+                /* Remove internal scrolling so the dropdown grows vertically
+                    and shows all rows (no vertical scroll inside the menu). */
+                overflow: visible;
+                max-height: none;
+                width: 100%;
+                max-width: none;
+                padding: 8px;
+          }
 
         .genres-menu .genre-item.ellipsis {
             cursor: default;
             opacity: 0.7;
+        }
+        /* Make each genre item fill its grid cell and center its label */
+        .genres-menu .genre-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
         }
     </style>
 </head>
@@ -1488,18 +1503,21 @@
 
             <div class="genres-dropdown" style="position: relative">
                 <button id="genresBtn" class="nav-link" data-i18n="genres.title">Genres ▾</button>
-                <div
-                        class="genres-menu"
-                        id="genresMenu"
-                        style="
-                display: none;
-                position: absolute;
-                top: 44px;
-                left: 0;
-                min-width: 200px;
-                z-index: 40;
-              "
-                >
+                                <div
+                                                class="genres-menu"
+                                                id="genresMenu"
+                                                style="
+                                display: none;
+                                position: absolute;
+                                top: 44px;
+                                left: 50%;
+                                transform: translateX(-50%);
+                                /* make the dropdown wide and responsive so the 3-column grid
+                                     fits without causing horizontal overflow */
+                                width: min(1100px, calc(100vw - 80px));
+                                z-index: 4000;
+                            "
+                                >
                     <!-- items populated by JS -->
                 </div>
             </div>
@@ -2298,8 +2316,14 @@
                 translations && translations.nav && translations.nav.hello
                     ? translations.nav.hello
                     : "Hello";
-            usernameEl.textContent = "👋 " + hello + ", " + info.username;
-            renderWelcomeRegion(info.username, info.region);
+            // prefer displayNameFor if available (from i18n.js), otherwise
+            // fallback to the local part of an email
+            const shortName = (typeof displayNameFor === 'function')
+                ? displayNameFor(info.username)
+                : (info.username && info.username.indexOf('@')>0 ? info.username.split('@')[0] : info.username);
+
+            usernameEl.textContent = "👋 " + hello + ", " + shortName;
+            renderWelcomeRegion(shortName, info.region);
         }
 
         // Ẩn/hiện các mục navbar theo trạng thái đăng nhập
@@ -3473,8 +3497,10 @@
         const menu = document.getElementById("genresMenu");
         if (gBtn) {
             if (menu)
+                // use 'grid' display so the menu uses the 3-column layout
+                // defined in CSS instead of switching to a flex row
                 menu.style.display =
-                    menu.style.display === "flex" ? "none" : "flex";
+                    menu.style.display === "grid" ? "none" : "grid";
             return;
         }
         // click outside -> close

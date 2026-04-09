@@ -660,7 +660,10 @@
         const info = await fetchPremiumInfo();
 
         if (usernameEl) {
-            usernameEl.textContent = "👋 " + translations.nav.hello + ", " + info.username;
+            const shortName = (typeof displayNameFor === 'function')
+                ? displayNameFor(info.username)
+                : (info.username && info.username.indexOf('@')>0 ? info.username.split('@')[0] : info.username);
+            usernameEl.textContent = "👋 " + translations.nav.hello + ", " + shortName;
         }
 
         if (info.isPremium && premiumBadge) {

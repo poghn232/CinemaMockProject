@@ -154,6 +154,22 @@
       <div id="lg-body"><div class="loading-pulse">Loading…</div></div>
     </div>
 
+    <!-- Chart 4: Popular Subscription Packs -->
+    <div class="chart-card">
+      <div class="card-header">
+        <div class="card-title">Popular Subscription Packs</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="card-badge" id="sp-badge">ALL TIME</span>
+          <select class="cycle-select" id="sp-period" onchange="analyticsLoadSubpacks()">
+            <option value="all">All Time</option>
+            <option value="monthly">Monthly</option>
+            <option value="weekly">Weekly</option>
+          </select>
+        </div>
+      </div>
+      <div id="sp-body"><div class="loading-pulse">Loading…</div></div>
+    </div>
+
   </div>
 </div>
 
@@ -380,10 +396,34 @@
     });
   };
 
+  window.analyticsLoadSubpacks = function() {
+    var period = (document.getElementById('sp-period') || {}).value || 'all';
+    var badge  = document.getElementById('sp-badge');
+    var body   = document.getElementById('sp-body');
+    if (badge) badge.textContent = badgeLabel(period);
+    if (body)  body.innerHTML = '<div class="loading-pulse">Loading…</div>';
+    if (window.spChart) { window.spChart.destroy(); window.spChart = null; }
+
+    apiFetch('/api/admin/analytics/subpacks?period=' + period).then(function(d) {
+      var labels = d.labels||[], values = d.values||[];
+      if (!labels.length) {
+        var el = document.getElementById('sp-body');
+        if (el) el.innerHTML = '<div class="loading-pulse" style="animation:none;opacity:0.5;">No subscription data yet</div>';
+        return;
+      }
+      window.spChart = buildDonut('sp-body', 'sp-canvas', values, labels,
+        labels.map(function(_,i){ return PALETTE[i % PALETTE.length]; }), 0, '', true);
+    }).catch(function(e) {
+      var el = document.getElementById('sp-body');
+      if (el) el.innerHTML = '<div class="loading-pulse" style="color:#ef4444">Error: ' + e.message + '</div>';
+    });
+  };
+
   withChartJs(function() {
     window.analyticsLoadUser();
     window.analyticsLoadGenre();
     window.analyticsLoadLogin();
+  window.analyticsLoadSubpacks();
 
     if (window._analyticsTimer) clearInterval(window._analyticsTimer);
     window._analyticsTimer = setInterval(function() {

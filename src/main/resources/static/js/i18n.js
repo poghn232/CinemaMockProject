@@ -151,10 +151,20 @@ function renderUsername() {
     const username = localStorage.getItem("username") || "User";
 
     const text = t("nav.hello_user", {
-        name: username
+        name: displayNameFor(username)
     });
 
     usernameEl.textContent = "👋 " + text;
+}
+
+// Return a display-friendly name. If the username looks like an email,
+// return the local part (before @). Otherwise return as-is.
+function displayNameFor(raw) {
+    if (!raw || typeof raw !== 'string') return raw || '';
+    const s = raw.trim();
+    const at = s.indexOf('@');
+    if (at > 0) return s.substring(0, at);
+    return s;
 }
 
 function normalizeGenreKey(name) {

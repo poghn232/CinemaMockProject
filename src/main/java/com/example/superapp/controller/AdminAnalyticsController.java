@@ -152,6 +152,60 @@ public class AdminAnalyticsController {
         return result;
     }
 
+    /**
+     * Returns popularity counts for subscription packs. Uses only ACTIVE
+     * subscriptions and supports the same 'period' cutoff as other endpoints.
+     */
+    @GetMapping("/subpacks")
+    @Transactional(readOnly = true)
+    public Map<String, Object> subscriptionPackStats(@RequestParam(defaultValue = "all") String period) {
+        LocalDateTime cutoff = getCutoff(period);
+
+        List<Subscription> subs = subscriptionRepository.findAll().stream()
+                .filter(s -> s.getPack() != null)
+                // count active subscriptions only
+                .filter(s -> s.getStatus() != null && s.getStatus() == SubscriptionStatus.ACTIVE)
+                // respect period cutoff if provided
+                .filter(s -> cutoff == null || (s.getStartDate() != null && s.getStartDate().isAfter(cutoff)))
+                .toList();
+
+        Map<String, Long> packCounts = new LinkedHashMap<>();
+        for (var s : subs) {
+            var p = s.getPack();
+            if (p != null && p.getPackName() != null) {
+                packCounts.merge(p.getPackName(), 1L, Long::sum);
+            }
+        }
+
+        List<Map.Entry<String, Long>> sorted = packCounts.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .toList();
+
+        List<String> labels = new ArrayList<>();
+        List<Long> values = new ArrayList<>();
+        long othersTotal = 0;
+
+        for (int i = 0; i < sorted.size(); i++) {
+            if (i < 10) {
+                labels.add(sorted.get(i).getKey());
+                values.add(sorted.get(i).getValue());
+            } else {
+                othersTotal += sorted.get(i).getValue();
+            }
+        }
+        if (othersTotal > 0) {
+            labels.add("Others");
+            values.add(othersTotal);
+        }
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("labels", labels);
+        result.put("values", values);
+        result.put("totalSubscriptions", subs.size());
+        result.put("period", period);
+        return result;
+    }
+
     @GetMapping("/revenue")
     @Transactional(readOnly = true)
     public Map<String, Object> revenueStats() {

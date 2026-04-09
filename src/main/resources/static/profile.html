@@ -1352,8 +1352,11 @@
         }
 
         function renderUserInfo(username, email, role) {
+            const shortName = (typeof displayNameFor === 'function')
+                ? displayNameFor(username)
+                : (username && username.indexOf('@')>0 ? username.split('@')[0] : username);
             document.getElementById('navUsername').textContent =
-                "👋 " + t("nav.hello_user", {name: username});
+                "👋 " + t("nav.hello_user", {name: shortName});
             document.getElementById('bannerName').textContent = username;
             document.getElementById('bannerRole').textContent = "Role: " + role;
             document.getElementById('inputUsername').value = username;
