@@ -126,6 +126,7 @@
     "login_button": "Start Watching Now",
     "google_login": "Login with Google",
     "forgot_password": "Forgot Password?",
+    "no_account": "Don't have an account?",
     "signup": "Sign Up",
     "register_title": "Sign up an account",
     "register_caption": "Email for OTP code.",
@@ -391,5 +392,43 @@
     "loading": "Loading…",
     "empty": "No notifications yet 🎉",
     "failed": "Failed to load notifications."
+  },
+  "movie_watch": {
+    "quality": {
+      "label":"Quality",
+      "auto": "Auto"
+    },
+    "episode": {
+      "select": "Select Episode:"
+    },
+    "subtitle":{
+      "upload":"Upload Subtitles",
+      "clear":"Clear Uploaded Subtitle",
+      "none":"None",
+      "default": "Default",
+      "status_default":"Using default subtitle.",
+      "status_hidden": "Subtitles hidden.",
+      "status_uploaded":"Using uploaded subtitle.",
+      "status_using": "Using subtitles: {{name}}"
+    },
+    "ad":{
+      "title":"Upgrade to Premium for Ad-Free Experience!",
+      "desc":"Remove ads and enjoy unlimited streaming"
+    },
+    "rating":{
+      "title":"User Rating",
+      "loading": "Loading rating system...",
+      "first": "Be the first to rate!",
+      "edit": "Edit",
+      "avg_prompt": "Average: {{avg}} ⭐. What do you think?",
+      "count": "({{count}} ratings)"
+    },
+    "comments":{
+      "title":"Comments",
+      "placeholder":"Share your thoughts about this movie...",
+      "post": "Post Comment",
+      "loading":"Loading comments...",
+      "empty": "No comments yet. Be the first to post one!"
+    }
   }
 }

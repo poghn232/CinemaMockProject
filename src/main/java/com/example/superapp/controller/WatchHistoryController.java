@@ -134,6 +134,7 @@ public class WatchHistoryController {
     }
 
     @PostMapping("/save")
+    @Transactional
     public ResponseEntity<?> saveHistory(Authentication auth, @RequestBody WatchHistoryDTO dto) {
         User user = userRepository.findByUsername(auth.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));

@@ -125,6 +125,7 @@
     "login_button": "Jetzt ansehen",
     "google_login": "Mit Google anmelden",
     "forgot_password": "Passwort vergessen?",
+    "no_account": "Haben Sie noch kein Konto?",
     "signup": "Registrieren",
     "register_title": "Konto erstellen",
     "register_caption": "E-Mail für den OTP-Code.",
@@ -390,5 +391,43 @@
     "loading": "Wird geladen…",
     "empty": "Noch keine Benachrichtigungen 🎉",
     "failed": "Benachrichtigungen konnten nicht geladen werden."
+  },
+  "movie_watch": {
+    "quality": {
+      "label": "Qualität",
+      "auto": "Automatisch"
+    },
+    "episode": {
+      "select": "Episode auswählen:"
+    },
+    "subtitle": {
+      "upload": "Untertitel hochladen",
+      "clear": "Hochgeladene Untertitel entfernen",
+      "none": "Keine",
+      "default": "Standard",
+      "status_default": "Standarduntertitel wird verwendet.",
+      "status_hidden": "Untertitel ausgeblendet.",
+      "status_uploaded": "Hochgeladene Untertitel werden verwendet.",
+      "status_using": "Verwendete Untertitel: {{name}}"
+    },
+    "ad": {
+      "title": "Upgrade auf Premium für ein werbefreies Erlebnis!",
+      "desc": "Entferne Werbung und genieße unbegrenztes Streaming"
+    },
+    "rating": {
+      "title": "Nutzerbewertung",
+      "loading": "Bewertungssystem wird geladen...",
+      "first": "Sei der Erste, der bewertet!",
+      "edit": "Bearbeiten",
+      "avg_prompt": "Durchschnitt: {{avg}} ⭐. Was meinst du?",
+      "count": "({{count}} Bewertungen)"
+    },
+    "comments": {
+      "title": "Kommentare",
+      "placeholder": "Teile deine Meinung zu diesem Film...",
+      "post": "Kommentar posten",
+      "loading": "Kommentare werden geladen...",
+      "empty": "Noch keine Kommentare. Sei der Erste!"
+    }
   }
 }

@@ -126,6 +126,7 @@
     "google_login": "Googleでログイン",
     "forgot_password": "パスワードを忘れましたか？",
     "signup": "サインアップ",
+    "no_account":  "アカウントをお持ちではありませんか？",
     "register_title": "アカウント登録",
     "register_caption": "OTPコードを受け取るためのメール。",
     "email": "メール",
@@ -390,5 +391,43 @@
     "loading": "読み込み中…",
     "empty": "通知はまだありません 🎉",
     "failed": "通知の読み込みに失敗しました。"
+  },
+  "movie_watch": {
+    "quality": {
+      "label": "画質",
+      "auto": "自動"
+    },
+    "episode": {
+      "select": "エピソードを選択:"
+    },
+    "subtitle": {
+      "upload": "字幕をアップロード",
+      "clear": "アップロードした字幕を削除",
+      "none": "なし",
+      "default": "デフォルト",
+      "status_default": "デフォルトの字幕を使用しています。",
+      "status_hidden": "字幕は非表示です。",
+      "status_uploaded": "アップロードした字幕を使用しています。",
+      "status_using": "使用中の字幕: {{name}}"
+    },
+    "ad": {
+      "title": "広告なしで視聴するにはプレミアムにアップグレード！",
+      "desc": "広告を削除して無制限に視聴できます"
+    },
+    "rating": {
+      "title": "ユーザー評価",
+      "loading": "評価システムを読み込み中...",
+      "first": "最初に評価してみましょう！",
+      "edit": "編集",
+      "avg_prompt": "平均: {{avg}} ⭐。あなたの評価は？",
+      "count": "（{{count}} 件の評価）"
+    },
+    "comments": {
+      "title": "コメント",
+      "placeholder": "この映画についての感想を共有してください...",
+      "post": "コメント投稿",
+      "loading": "コメントを読み込み中...",
+      "empty": "まだコメントはありません。最初に投稿しましょう！"
+    }
   }
 }

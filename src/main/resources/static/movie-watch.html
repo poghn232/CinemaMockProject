@@ -482,13 +482,13 @@
           <div class="nav-logo">MZ</div>
           <div>
             <div class="nav-title-main">MovieZone</div>
-            <div class="nav-title-sub">Watch Movie</div>
+            <div class="nav-title-sub" data-i18n="movie_player.watch_movie">Watch Movie</div>
           </div>
         </div>
-        <a href="javascript:history.back()" class="back-link">← Back</a>
+        <a href="javascript:history.back()" class="back-link" data-i18n="movie_detail.back">← Back</a>
       </header>
 
-      <div id="loading" class="loading">Loading...</div>
+      <div id="loading" class="loading" data-i18n="common.loading">Loading...</div>
 
       <div id="content" style="display: none">
         <!-- VIDEO PLAYER -->
@@ -496,7 +496,7 @@
           <div class="video-container">
             <div id="videoPlayer" class="video-player"></div>
             <div id="adOverlay" class="ad-overlay">
-              <div class="ad-chip">Advertisement</div>
+              <div class="ad-chip" data-i18n="movie_watch.ad.title">Advertisement</div>
               <div class="ad-controls">
                 <div id="adCounter" class="ad-counter">Ad</div>
                 <button id="skipAdBtn" class="skip-ad-btn" type="button">
@@ -510,6 +510,7 @@
                 id="adCenterHint"
                 class="ad-center-hint"
                 style="display: none"
+                data-i18n="movie_watch.ad.desc"
               >
                 Playing advertisement...
               </div>
@@ -523,18 +524,19 @@
                 color: var(--text-subtle);
                 margin-right: 8px;
               "
+              data-i18n="movie_watch.quality.label"
             >
               Quality:
             </label>
             <select id="qualitySelect" class="btn" style="padding: 8px 12px">
-              <option value="auto">Auto</option>
+              <option value="auto" data-i18n="movie_watch.quality.auto">Auto</option>
             </select>
           </div>
         </div>
 
         <!-- EPISODE SELECTOR (hidden for movies) -->
         <div id="episodeSelector" class="episode-selector hidden">
-          <div class="episode-label">Select Episode:</div>
+          <div class="episode-label" data-i18n="movie_watch.episode.select">Select Episode:</div>
           <div id="episodeButtons" class="episode-buttons">
             <!-- Episode buttons will be generated here -->
           </div>
@@ -546,9 +548,9 @@
             <div id="poster" class="poster"></div>
           </div>
           <div class="info-content">
-            <h1 id="movieTitle" class="movie-title">Loading...</h1>
+            <h1 id="movieTitle" class="movie-title" data-i18n="common.loading">Loading...</h1>
             <div id="movieSubtitle" class="movie-subtitle"></div>
-            <div id="movieOverview" class="movie-overview">Loading...</div>
+            <div id="movieOverview" class="movie-overview" data-i18n="common.loading">Loading...</div>
             <div
               id="subtitleControls"
               style="
@@ -563,6 +565,7 @@
                 for="subtitleFileInput"
                 class="btn ghost"
                 style="cursor: pointer; padding: 8px 12px"
+                data-i18n="movie_watch.subtitle.upload"
                 >Upload Subtitles</label
               >
               <input
@@ -576,6 +579,7 @@
                 type="button"
                 class="btn ghost"
                 style="display: none"
+                data-i18n="movie_watch.subtitle.clear"
               >
                 Clear Uploaded Subtitle
               </button>
@@ -584,7 +588,7 @@
                 class="btn"
                 style="padding: 8px 12px; display: none"
               >
-                <option value="">None</option>
+                <option value="" data-i18n="movie_watch.subtitle.none">None</option>
               </select>
               <div
                 id="subtitleStatus"
@@ -596,10 +600,10 @@
 
         <!-- AD BANNER (shown for non-premium users) -->
         <div id="adBanner" class="ad-banner hidden">
-          <div class="ad-text">
+          <div class="ad-text" data-i18n="movie_watch.ad.title">
             🎬 Upgrade to Premium for Ad-Free Experience!
           </div>
-          <div class="ad-subtext">Remove ads and enjoy unlimited streaming</div>
+          <div class="ad-subtext" data-i18n="movie_watch.ad.desc">Remove ads and enjoy unlimited streaming</div>
         </div>
 
         <!-- USER RATING SECTION -->
@@ -608,7 +612,7 @@
           class="comments-section"
           style="margin-top: 24px; display: block"
         >
-          <h3 class="comments-title">User Rating</h3>
+          <h3 class="comments-title" data-i18n="movie_watch.rating.title">User Rating</h3>
           <div
             id="ratingPrompt"
             style="
@@ -616,6 +620,7 @@
               font-size: 14px;
               color: var(--text-subtle);
             "
+            data-i18n="movie_watch.rating.loading"
           >
             Đang nạp hệ thống đánh giá...
           </div>
@@ -636,31 +641,31 @@
                 color: var(--text-subtle);
                 margin-left: 8px;
               "
-              >(0 người đánh giá)</span
+              ></span
             >
           </div>
         </div>
 
         <!-- COMMENTS SECTION -->
         <div class="comments-section">
-          <h3 class="comments-title">Comments</h3>
+          <h3 class="comments-title" data-i18n="movie_watch.comments.title">Comments</h3>
           <div class="comment-input-container">
             <textarea
               id="commentInput"
               class="comment-input"
-              placeholder="Share your thoughts about this movie..."
+              data-i18n-placeholder="movie_watch.comments.placeholder"
               maxlength="1000"
             ></textarea>
             <div class="comment-actions">
               <div id="charCount" class="comment-char-count">0/1000</div>
-              <button id="submitComment" class="comment-submit">
+              <button id="submitComment" class="comment-submit"  data-i18n="movie_watch.comments.post">
                 Post Comment
               </button>
             </div>
           </div>
           <div id="commentError" class="comment-error hidden"></div>
           <div id="commentsList" class="comments-list">
-            <div class="comment-text">Loading comments...</div>
+            <div class="comment-text" data-i18n="movie_watch.comments.loading">Loading comments...</div>
           </div>
         </div>
       </div>
@@ -668,6 +673,7 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="js/bannerads.js"></script>
     <script src="js/rating.js?v=2.0"></script>
+    <script src="/js/i18n.js"></script>
     <script>
       console.log("movie-watch script loaded");
       window.addEventListener("error", (event) => {
@@ -1032,7 +1038,7 @@
                       defaultEntry.lang || "",
                     );
                     const status = document.getElementById("subtitleStatus");
-                    if (status) status.textContent = "Using default subtitle.";
+                    if (status) status.textContent = t("movie_watch.subtitle.status_default");
                   } catch (e) {
                     console.warn("Could not attach default subtitle", e);
                   }
@@ -1080,7 +1086,7 @@
                     }
                   }
                   const status = document.getElementById("subtitleStatus");
-                  if (status) status.textContent = "Subtitles hidden.";
+                  if (status) status.textContent = t("movie_watch.subtitle.status_hidden");
                   // mark that there is no active remote subtitle
                   _currentSubtitleUrl = null;
                 } catch (e) {
@@ -1099,7 +1105,9 @@
                 _currentSubtitleUrl = val;
                 const status = document.getElementById("subtitleStatus");
                 if (status)
-                  status.textContent = `Using subtitles: ${select.selectedOptions[0].textContent}`;
+                  status.textContent = t("movie_watch.subtitle.status_using", {
+                    name: select.selectedOptions[0].textContent
+                  });
               } catch (e) {
                 console.warn("Could not attach remote subtitle", e);
               }
@@ -1205,7 +1213,9 @@
             stars.style.display = "none";
             result.style.display = "block";
             avgEl.textContent = (s.average || 0).toFixed(1) + " ⭐";
-            countEl.textContent = `(${s.count || 0} người đánh giá)`;
+            countEl.textContent = t("movie_watch.rating.count", {
+              count: s.count || 0
+            });
             prompt.style.display = "none";
 
             const editBtn = document.createElement("button");
@@ -1225,9 +1235,11 @@
             result.style.display = "none";
             prompt.style.display = "block";
             prompt.textContent =
-              s.count === 0
-                ? "Hãy là người đầu tiên đánh giá!"
-                : `Trung bình: ${(s.average || 0).toFixed(1)} ⭐. Bạn đánh giá sao?`;
+                    s.count === 0
+                            ? t("movie_watch.rating.first")
+                            : t("movie_watch.rating.avg_prompt", {
+                              avg: (s.average || 0).toFixed(1)
+                            });
 
             RatingSystem.renderStars("ratingStars", 0, async (val) => {
               const res = await RatingSystem.saveRating(apiType, id, val);
@@ -1464,7 +1476,7 @@
               const reviews = Array.isArray(data.reviews) ? data.reviews : [];
               if (reviews.length === 0) {
                 setCommentListPlaceholder(
-                  "No comments yet. Be the first to post one!",
+                        t("movie_watch.comments.empty")
                 );
                 return;
               }
@@ -1882,7 +1894,7 @@
             if (defaultEntry) {
               const opt = document.createElement('option');
               opt.value = defaultEntry.url || defaultEntry.filename || '';
-              opt.textContent = 'Default';
+              opt.textContent = t("movie_watch.subtitle.default");
               opt.dataset.filename = defaultEntry.filename || '';
               opt.dataset.lang = (defaultEntry.lang || '').toString().toLowerCase();
               select.appendChild(opt);
@@ -1891,7 +1903,7 @@
             // None option
             const noneOpt = document.createElement('option');
             noneOpt.value = '';
-            noneOpt.textContent = 'None';
+            noneOpt.textContent = t("movie_watch.subtitle.none");
             select.appendChild(noneOpt);
 
             // language map

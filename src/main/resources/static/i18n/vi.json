@@ -126,6 +126,7 @@
     "login_button": "Bắt đầu xem ngay",
     "google_login": "Đăng nhập với Google",
     "forgot_password": "Quên mật khẩu?",
+    "no_account": "Bạn chưa có tài khoản?",
     "signup": "Đăng ký",
     "register_title": "Tạo tài khoản",
     "register_caption": "Email dùng để nhận mã OTP.",
@@ -376,5 +377,43 @@
     "loading": "Đang tải…",
     "empty": "Chưa có thông báo 🎉",
     "failed": "Tải thông báo thất bại."
+  },
+  "movie_watch": {
+    "quality": {
+      "label": "Chất lượng",
+      "auto": "Tự động"
+    },
+    "episode": {
+      "select": "Chọn tập:"
+    },
+    "subtitle": {
+      "upload": "Tải phụ đề lên",
+      "clear": "Xóa phụ đề đã tải",
+      "none": "Không có",
+      "default": "Mặc định",
+      "status_default": "Đang dùng phụ đề mặc định.",
+      "status_hidden": "Đã tắt phụ đề.",
+      "status_uploaded": "Đang dùng phụ đề tải lên.",
+      "status_using": "Đang dùng phụ đề: {{name}}"
+    },
+    "ad": {
+      "title": "Nâng cấp Premium để xem không quảng cáo!",
+      "desc": "Loại bỏ quảng cáo và xem phim không giới hạn"
+    },
+    "rating": {
+      "title": "Đánh giá người dùng",
+      "loading": "Đang tải hệ thống đánh giá...",
+      "first": "Hãy là người đầu tiên đánh giá!",
+      "edit": "Chỉnh sửa",
+      "avg_prompt": "Trung bình: {{avg}} ⭐. Bạn đánh giá sao?",
+      "count": "({{count}} người đánh giá)"
+    },
+    "comments": {
+      "title": "Bình luận",
+      "placeholder": "Chia sẻ cảm nghĩ của bạn về bộ phim...",
+      "post": "Đăng bình luận",
+      "loading": "Đang tải bình luận...",
+      "empty": "Chưa có bình luận. Hãy là người đầu tiên!"
+    }
   }
 }
