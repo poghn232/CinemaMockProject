@@ -1602,6 +1602,7 @@
                 <div class="nav-hamburger-menu" id="navHamburgerMenu" role="menu">
                     <!-- keep existing elements (use anchors/buttons that reuse current IDs) -->
                     <a href="profile.html" class="menu-item" id="profileButton" data-i18n="nav.profile">Profile</a>
+                    <a href="choose_profile.html" class="menu-item" id="switchProfileButton" data-auth="auth">🔄 Switch Profile</a>
                     <a href="contact.html" class="menu-item" id="contactButton" data-i18n="nav.contact">Contact</a>
                     <a href="login.html" class="menu-item" id="loginNav" data-auth="guest" data-i18n="nav.login">Login</a>
                     <button class="menu-item" id="logoutButton" data-auth="auth" data-i18n="nav.logout">Logout</button>
@@ -1794,6 +1795,16 @@
 </div>
 
 <script>
+    // ── Profile guard: must select profile before using homepage ──
+    (function () {
+        const token = localStorage.getItem("token");
+        const profileId = localStorage.getItem("profileId");
+        if (token && !profileId) {
+            window.location.href = "choose_profile.html";
+            return;
+        }
+    })();
+
     // ad CTA -> packs
     (function () {
         const b = document.getElementById("adUpgradeButton");
@@ -2316,11 +2327,16 @@
                 translations && translations.nav && translations.nav.hello
                     ? translations.nav.hello
                     : "Hello";
-            // prefer displayNameFor if available (from i18n.js), otherwise
-            // fallback to the local part of an email
-            const shortName = (typeof displayNameFor === 'function')
-                ? displayNameFor(info.username)
-                : (info.username && info.username.indexOf('@')>0 ? info.username.split('@')[0] : info.username);
+            // prefer profile name from localStorage, then displayNameFor
+            const profileName = localStorage.getItem("profileName");
+            let shortName;
+            if (profileName) {
+                shortName = profileName;
+            } else if (typeof displayNameFor === 'function') {
+                shortName = displayNameFor(info.username);
+            } else {
+                shortName = (info.username && info.username.indexOf('@')>0 ? info.username.split('@')[0] : info.username);
+            }
 
             usernameEl.textContent = "👋 " + hello + ", " + shortName;
             renderWelcomeRegion(shortName, info.region);
@@ -2410,7 +2426,9 @@
             try {
                 const token = localStorage.getItem('token');
                 if (token) {
-                    const res = await fetch('/api/user/history', { headers: { Authorization: 'Bearer ' + token } });
+                    const pid = localStorage.getItem('profileId');
+                    const histUrl = '/api/user/history' + (pid ? '?profileId=' + pid : '');
+                    const res = await fetch(histUrl, { headers: { Authorization: 'Bearer ' + token } });
                     if (res && res.ok) {
                         const hist = await res.json();
                         if (Array.isArray(hist) && hist.length) {

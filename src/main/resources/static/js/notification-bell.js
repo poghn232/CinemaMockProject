@@ -12,11 +12,18 @@
 (function () {
     'use strict';
 
+    function getProfileId() { return localStorage.getItem('profileId') || ''; }
+
+    function profileParam() {
+        const pid = getProfileId();
+        return pid ? 'profileId=' + pid : '';
+    }
+
     const API = {
-        list:    '/api/user/notifications',
-        unread:  '/api/user/notifications/unread',
-        readAll: '/api/user/notifications/read-all',
-        readOne: (id) => `/api/user/notifications/${id}/read`,
+        list:    () => '/api/user/notifications' + (profileParam() ? '?' + profileParam() : ''),
+        unread:  () => '/api/user/notifications/unread' + (profileParam() ? '?' + profileParam() : ''),
+        readAll: () => '/api/user/notifications/read-all' + (profileParam() ? '?' + profileParam() : ''),
+        readOne: (id) => `/api/user/notifications/${id}/read` + (profileParam() ? '?' + profileParam() : ''),
     };
 
     const POLL_MS = 30_000; // kiểm tra unread mỗi 30 giây
@@ -396,7 +403,7 @@
         async _fetchUnread() {
             if (!isLoggedIn()) return;
             try {
-                const data = await apiFetch(API.unread);
+                const data = await apiFetch(API.unread());
                 this._updateBadge(data.count);
             } catch { /* silent */ }
         }
@@ -407,7 +414,7 @@
             list.innerHTML = `<div class="nb-loading">${t('notification.loading')}</div>`;
 
             try {
-                this.items = await apiFetch(API.list);
+                this.items = await apiFetch(API.list());
                 this._renderList();
                 this._updateBadge(this.items.filter(i => !i.isRead).length);
             } catch {
@@ -429,7 +436,7 @@
 
         async _readAll() {
             try {
-                await apiFetch(API.readAll, { method: 'PUT' });
+                await apiFetch(API.readAll(), { method: 'PUT' });
                 this._updateBadge(0);
                 this.dropdown.querySelectorAll('.nb-item.unread').forEach(el => {
                     el.classList.replace('unread', 'read');

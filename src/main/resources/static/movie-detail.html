@@ -714,8 +714,9 @@
     async function checkWishlist(contentId, contentType) {
         if (!token) return false;
         try {
+            const pid = localStorage.getItem('profileId') || '';
             const res = await fetch(
-                `/api/user/wishlist/check?contentId=${encodeURIComponent(contentId)}&contentType=${encodeURIComponent(contentType)}`,
+                `/api/user/wishlist/check?contentId=${encodeURIComponent(contentId)}&contentType=${encodeURIComponent(contentType)}${pid ? '&profileId=' + pid : ''}`,
                 {headers: {Authorization: "Bearer " + token}}
             );
             if (!res.ok) return false;
@@ -749,7 +750,7 @@
                         "Content-Type": "application/json",
                         Authorization: "Bearer " + token
                     },
-                    body: JSON.stringify({contentId, contentType})
+                    body: JSON.stringify({contentId, contentType, profileId: parseInt(localStorage.getItem('profileId')) || null})
                 });
                 if (res.status === 401 || res.status === 403) {
                     showToast(t("wishlist.login_required"), "error");

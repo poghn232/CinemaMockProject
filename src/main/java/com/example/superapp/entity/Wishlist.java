@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "wishlists",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "content_id", "content_type"}))
+        uniqueConstraints = @UniqueConstraint(columnNames = {"profile_id", "content_id", "content_type"}))
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,8 +18,8 @@ public class Wishlist {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "profile_id", nullable = false)
+    private Profile profile;
 
     @Column(name = "content_id", nullable = false)
     private Long contentId;

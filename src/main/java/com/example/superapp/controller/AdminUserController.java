@@ -1,18 +1,22 @@
 package com.example.superapp.controller;
 
+import com.example.superapp.dto.ProfileAdminDto;
 import com.example.superapp.dto.UserAdminDto;
 import com.example.superapp.entity.AdminLogs;
+import com.example.superapp.entity.Profile;
 import com.example.superapp.entity.User;
 import com.example.superapp.repository.AdminLogsRepository;
+import com.example.superapp.repository.ProfileRepository;
+import com.example.superapp.repository.ReviewRepository;
 import com.example.superapp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/admin/users")
@@ -22,35 +26,49 @@ public class AdminUserController {
     private static final Logger log = LoggerFactory.getLogger(AdminUserController.class);
 
     private final UserRepository userRepository;
-    private final com.example.superapp.repository.ReviewRepository reviewRepository;
+    private final ProfileRepository profileRepository;
+    private final ReviewRepository reviewRepository;
     private final AdminLogsRepository adminLogsRepository;
 
     @GetMapping
     public List<UserAdminDto> all() {
-    return userRepository.findAll()
-        .stream()
-        // only return non-admin users to the admin UI
-        .filter(u -> u.getRole() == null || !u.getRole().toUpperCase().contains("ADMIN"))
-        .map(u -> new UserAdminDto(u.getUserId(), u.getUsername(), u.getEmail(), u.getRole(), u.getCommentDisabled()))
-        .toList();
+        return userRepository.findAll()
+            .stream()
+            .filter(u -> u.getRole() == null || !u.getRole().toUpperCase().contains("ADMIN"))
+            .map(u -> new UserAdminDto(u.getUserId(), u.getUsername(), u.getEmail(), u.getRole(), false))
+            .toList();
     }
 
-    @PutMapping("/{id}/enabled")
-    public UserAdminDto setEnabled(@PathVariable Long id, @RequestBody Boolean enabled) {
-        User u = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-    // disallow changing admin accounts
-    if (u.getRole() != null && u.getRole().toUpperCase().contains("ADMIN")) {
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot modify admin account");
+    @GetMapping("/{userId}/profiles")
+    public List<ProfileAdminDto> getProfiles(@PathVariable Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return user.getProfiles().stream()
+                .map(p -> new ProfileAdminDto(p.getProfileId(), p.getProfileName(),
+                        user.getEmail(), user.getRole(), p.getCommentDisabled()))
+                .toList();
     }
-    // Toggle commenting instead of login
-    u.setCommentDisabled(enabled);
-        User saved = userRepository.save(u);
-        String status = enabled ? "disabled" : "enabled";
-        adminLogsRepository.save(new AdminLogs("User" + saved.getUsername() + " is now " + status));
-        // If we re-enable commenting for this user, unhide their previously hidden reviews
-        if (Boolean.FALSE.equals(saved.getCommentDisabled())) {
+
+    @PutMapping("/profiles/{profileId}/comment-disabled")
+    public ProfileAdminDto setCommentDisabled(@PathVariable Long profileId, @RequestBody Boolean disabled) {
+        Profile profile = profileRepository.findByProfileId(profileId)
+                .orElseThrow(() -> new RuntimeException("Profile not found"));
+        User user = profile.getUser();
+
+        if (user.getRole() != null && user.getRole().toUpperCase().contains("ADMIN")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot modify admin account");
+        }
+
+        profile.setCommentDisabled(disabled);
+        profileRepository.save(profile);
+
+        String status = disabled ? "disabled" : "enabled";
+        adminLogsRepository.save(new AdminLogs("Profile " + profile.getProfileName() + " commenting is now " + status));
+
+        // If we re-enable commenting for this profile, unhide their previously hidden reviews
+        if (Boolean.FALSE.equals(profile.getCommentDisabled())) {
             try {
-                var reviews = reviewRepository.findByUser_UserId(saved.getUserId());
+                var reviews = reviewRepository.findByProfile_ProfileId(profile.getProfileId());
                 for (var r : reviews) {
                     if (Boolean.TRUE.equals(r.getHidden())) {
                         r.setHidden(false);
@@ -58,10 +76,49 @@ public class AdminUserController {
                 }
                 reviewRepository.saveAll(reviews);
             } catch (Exception ex) {
+                log.warn("Failed to unhide reviews for profile {}: {}", profile.getProfileName(), ex.getMessage());
+            }
+        }
+
+        log.info("Profile {} commentDisabled={}", profile.getProfileName(), profile.getCommentDisabled());
+        return new ProfileAdminDto(profile.getProfileId(), profile.getProfileName(),
+                user.getEmail(), user.getRole(), profile.getCommentDisabled());
+    }
+
+    @PutMapping("/{id}/enabled")
+    public UserAdminDto setEnabled(@PathVariable Long id, @RequestBody Boolean enabled) {
+        User u = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        if (u.getRole() != null && u.getRole().toUpperCase().contains("ADMIN")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot modify admin account");
+        }
+
+        // Toggle comment disabled on ALL profiles of this user
+        for (Profile p : u.getProfiles()) {
+            p.setCommentDisabled(enabled);
+        }
+        profileRepository.saveAll(u.getProfiles());
+
+        User saved = userRepository.save(u);
+        String status = enabled ? "disabled" : "enabled";
+        adminLogsRepository.save(new AdminLogs("User " + saved.getUsername() + " commenting is now " + status));
+
+        // If re-enabling, unhide reviews from all profiles
+        if (Boolean.FALSE.equals(enabled)) {
+            try {
+                for (Profile p : saved.getProfiles()) {
+                    var reviews = reviewRepository.findByProfile_ProfileId(p.getProfileId());
+                    for (var r : reviews) {
+                        if (Boolean.TRUE.equals(r.getHidden())) {
+                            r.setHidden(false);
+                        }
+                    }
+                    reviewRepository.saveAll(reviews);
+                }
+            } catch (Exception ex) {
                 log.warn("Failed to unhide reviews for user {}: {}", saved.getUsername(), ex.getMessage());
             }
         }
-        log.info("User {} saved commentDisabled={}", saved.getUsername(), saved.getCommentDisabled());
-        return new UserAdminDto(saved.getUserId(), saved.getUsername(), saved.getEmail(), saved.getRole(), saved.getCommentDisabled());
+        log.info("User {} all profiles commentDisabled={}", saved.getUsername(), enabled);
+        return new UserAdminDto(saved.getUserId(), saved.getUsername(), saved.getEmail(), saved.getRole(), enabled);
     }
 }

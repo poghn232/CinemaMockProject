@@ -1698,7 +1698,9 @@
 
         try {
             // Cập nhật đúng Endpoint từ WatchHistoryController
-            const res = await fetch('/api/user/history', {
+            const _pid = localStorage.getItem('profileId');
+            const _histUrl = '/api/user/history' + (_pid ? '?profileId=' + _pid : '');
+            const res = await fetch(_histUrl, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -1825,7 +1827,9 @@
         </div>`;
 
         try {
-            const res = await fetch('/api/user/wishlist', {
+            const _wPid = localStorage.getItem('profileId');
+            const _wUrl = '/api/user/wishlist' + (_wPid ? '?profileId=' + _wPid : '');
+            const res = await fetch(_wUrl, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -1913,7 +1917,7 @@
                                 'Content-Type': 'application/json',
                                 'Authorization': `Bearer ${localStorage.getItem('token')}`
                             },
-                            body: JSON.stringify({contentId: item.contentId, contentType: item.contentType})
+                            body: JSON.stringify({contentId: item.contentId, contentType: item.contentType, profileId: parseInt(localStorage.getItem('profileId')) || null})
                         });
                         if (r.ok) {
                             card.remove();
@@ -2022,7 +2026,7 @@
                 fetch('/api/user/achievements/streak', {
                     headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
                 }),
-                fetch('/api/user/history', {
+                fetch('/api/user/history' + (localStorage.getItem('profileId') ? '?profileId=' + localStorage.getItem('profileId') : ''), {
                     headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
                 })
             ]);

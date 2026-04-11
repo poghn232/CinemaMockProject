@@ -1,7 +1,9 @@
 package com.example.superapp.controller;
 
 import com.example.superapp.dto.*;
+import com.example.superapp.entity.Profile;
 import com.example.superapp.entity.User;
+import com.example.superapp.repository.ProfileRepository;
 import com.example.superapp.repository.UserRepository;
 import com.example.superapp.service.*;
 import com.example.superapp.utils.GoogleTokenVerifier;
@@ -37,8 +39,9 @@ public class AuthController {
     private final FacebookTokenVerifier facebookTokenVerifier;
     private final LoginStreakService loginStreakService;
     private final AchievementService achievementService;
+    private final ProfileRepository profileRepository;
 
-    public AuthController(AuthenticationManager authenticationManager, CustomUserDetailsService userDetailsService, UserRepository userRepository, JwtUtils jwtUtil, AuthService authService, OtpService otpService, GeoIpService geoIpService, LoginHistoryService loginHistoryService, GoogleTokenVerifier googleTokenVerifier, FacebookTokenVerifier facebookTokenVerifier, LoginStreakService loginStreakService, AchievementService achievementService) {
+    public AuthController(AuthenticationManager authenticationManager, CustomUserDetailsService userDetailsService, UserRepository userRepository, JwtUtils jwtUtil, AuthService authService, OtpService otpService, GeoIpService geoIpService, LoginHistoryService loginHistoryService, GoogleTokenVerifier googleTokenVerifier, FacebookTokenVerifier facebookTokenVerifier, LoginStreakService loginStreakService, AchievementService achievementService, ProfileRepository profileRepository) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.userRepository = userRepository;
@@ -51,6 +54,7 @@ public class AuthController {
         this.facebookTokenVerifier = facebookTokenVerifier;
         this.loginStreakService = loginStreakService;
         this.achievementService = achievementService;
+        this.profileRepository = profileRepository;
     }
 
     // ─── Normal login ────────────────────────────────────────────────────────
@@ -113,7 +117,10 @@ public class AuthController {
         // Find existing user by googleId or email, or create a new one
         User user = userRepository.findByEmail(email).orElseGet(() -> {
             User newUser = User.builder().email(email).username(email).googleId(googleId).password(null).role("CUSTOMER").enabled(true).build();
-            return userRepository.save(newUser);
+            User savedUser = userRepository.save(newUser);
+            // Auto-create default profile for new OAuth user
+            profileRepository.save(Profile.builder().profileName(savedUser.getUsername()).user(savedUser).commentDisabled(false).build());
+            return savedUser;
         });
 
         // Sync googleId in case the account was created via normal register first
@@ -181,6 +188,8 @@ public class AuthController {
             }
             user = User.builder().email(email != null && !email.isBlank() ? email : "fb_" + fbId + "@facebook.com").username(username).facebookId(fbId).password(null).role("CUSTOMER").enabled(true).build();
             user = userRepository.save(user);
+            // Auto-create default profile for new Facebook user
+            profileRepository.save(Profile.builder().profileName(user.getUsername()).user(user).commentDisabled(false).build());
         }
 
         // Sync facebookId if missing

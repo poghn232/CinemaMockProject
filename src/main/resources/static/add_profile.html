@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm Profile | MovieZone</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background:
+                radial-gradient(circle at 0 0, rgba(255,255,255,0.08), transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(255,255,255,0.05), transparent 55%),
+                linear-gradient(135deg, #050816, #0b1220 50%, #020617);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #e5e7eb;
+            overflow: hidden;
+        }
+
+        .backdrop-blur {
+            position: fixed; inset: 0;
+            background:
+                linear-gradient(to right, rgba(15,23,42,0.9), rgba(15,23,42,0.7)),
+                url("https://images.pexels.com/photos/7991377/pexels-photo-7991377.jpeg?auto=compress&cs=tinysrgb&w=1600") center/cover no-repeat;
+            filter: brightness(0.9);
+            z-index: -1;
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px 20px;
+            max-width: 480px;
+            width: 100%;
+        }
+
+        .logo {
+            display: inline-flex; align-items: center; gap: 10px;
+            font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+            font-size: 14px; color: #e5e7eb; margin-bottom: 20px;
+        }
+
+        .logo span.icon {
+            width: 30px; height: 30px; border-radius: 999px;
+            background: radial-gradient(circle at 30% 20%, #f97316, #e11d48 55%, #4f46e5);
+            display: inline-flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 25px rgba(248,113,113,0.45);
+            font-size: 14px;
+        }
+
+        h1 {
+            font-size: clamp(22px, 3vw, 28px);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        h1 .highlight { color: #f97316; }
+
+        .subtitle {
+            font-size: 14px;
+            color: #9ca3af;
+            margin-bottom: 28px;
+        }
+
+        .form-card {
+            background: radial-gradient(circle at 0 0, rgba(148,163,184,0.28), transparent 55%),
+                        radial-gradient(circle at 100% 100%, rgba(59,130,246,0.3), transparent 55%),
+                        rgba(15,23,42,0.96);
+            padding: 30px 28px 26px;
+            border-radius: 18px;
+            box-shadow: 0 0 0 1px rgba(148,163,184,0.35), 0 18px 45px rgba(15,23,42,0.95);
+            text-align: left;
+            backdrop-filter: blur(22px);
+        }
+
+        .field {
+            margin-bottom: 16px;
+        }
+
+        .field-label {
+            font-size: 12px;
+            margin-bottom: 5px;
+            color: #d1d5db;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 11px 14px;
+            box-sizing: border-box;
+            border-radius: 10px;
+            border: 1px solid rgba(148,163,184,0.6);
+            background-color: rgba(15,23,42,0.9);
+            color: #e5e7eb;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .field input::placeholder { color: #6b7280; }
+
+        .field input:focus {
+            border-color: #f97316;
+            box-shadow: 0 0 0 1px rgba(249,115,22,0.65), 0 0 0 10px rgba(249,115,22,0.1);
+            background-color: rgba(15,23,42,1);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            background: linear-gradient(135deg, #f97316, #ec4899);
+            border: none;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 999px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            box-shadow: 0 12px 25px rgba(248,113,113,0.5), 0 0 0 1px rgba(248,113,113,0.45);
+            transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+            box-shadow: 0 16px 30px rgba(248,113,113,0.7), 0 0 0 1px rgba(248,113,113,0.75);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-back {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background: transparent;
+            border: 1px solid rgba(148,163,184,0.5);
+            color: #9ca3af;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 999px;
+            transition: all 0.15s ease;
+        }
+
+        .btn-back:hover {
+            color: #e5e7eb;
+            border-color: rgba(249,115,22,0.6);
+        }
+
+        .error-msg {
+            color: #fca5a5;
+            margin-top: 12px;
+            font-size: 12px;
+            min-height: 16px;
+            text-align: center;
+        }
+
+        .success-msg {
+            color: #86efac;
+            margin-top: 12px;
+            font-size: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="backdrop-blur"></div>
+
+<div class="container">
+    <div class="logo">
+        <span class="icon">MZ</span>
+        <span>MovieZone</span>
+    </div>
+
+    <h1>Add <span class="highlight">Profile</span></h1>
+    <p class="subtitle">Add a new profile for someone else watching MovieZone.</p>
+
+    <div class="form-card">
+        <div class="field">
+            <div class="field-label">Profile Name</div>
+            <input type="text" id="profileName" placeholder="Enter profile name" maxlength="50">
+        </div>
+
+        <button type="button" id="submitBtn" class="btn-primary">Create Profile</button>
+        <button type="button" class="btn-back" onclick="window.location.href='choose_profile.html'">← Back to Profiles</button>
+
+        <p id="error" class="error-msg"></p>
+        <p id="success" class="success-msg"></p>
+    </div>
+</div>
+
+<script>
+    const token = localStorage.getItem("token");
+    if (!token) {
+        window.location.href = "login.html";
+    }
+
+    // Check premium status — only premium users can add profiles
+    (async function checkPremium() {
+        try {
+            const res = await fetch("/api/user/profile", {
+                headers: { Authorization: "Bearer " + token }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                const subs = Array.isArray(data.subscriptions) ? data.subscriptions : [];
+                const hasActive = subs.some(s => s && s.status === "ACTIVE");
+                if (!hasActive) {
+                    alert("Only premium users can create additional profiles. Please upgrade your subscription.");
+                    window.location.href = "choose_profile.html";
+                    return;
+                }
+            }
+        } catch (e) { /* proceed anyway */ }
+    })();
+
+    const btn = document.getElementById("submitBtn");
+    const errorEl = document.getElementById("error");
+    const successEl = document.getElementById("success");
+
+    function showError(msg) {
+        errorEl.textContent = msg;
+        successEl.textContent = "";
+    }
+
+    function clearMessages() {
+        errorEl.textContent = "";
+        successEl.textContent = "";
+    }
+
+    btn.addEventListener("click", async () => {
+        clearMessages();
+        const profileName = document.getElementById("profileName").value.trim();
+
+        if (!profileName) {
+            showError("Profile name cannot be empty.");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = "Creating...";
+
+        try {
+            const response = await fetch("/api/user/profiles", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: JSON.stringify({ profileName: profileName })
+            });
+
+            if (response.status === 409) {
+                showError("You have reached the maximum number of profiles for your subscription plan. Upgrade to Premium for more!");
+                btn.disabled = false;
+                btn.textContent = "Create Profile";
+                return;
+            }
+
+            if (!response.ok) {
+                const body = await response.json().catch(() => ({}));
+                showError(body.message || "Failed to create profile.");
+                btn.disabled = false;
+                btn.textContent = "Create Profile";
+                return;
+            }
+
+            successEl.textContent = "Profile created successfully! Redirecting...";
+            setTimeout(() => {
+                window.location.href = "choose_profile.html";
+            }, 1000);
+
+        } catch (err) {
+            showError("Network error. Please try again.");
+            btn.disabled = false;
+            btn.textContent = "Create Profile";
+        }
+    });
+
+    // Allow Enter key
+    document.getElementById("profileName").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") btn.click();
+    });
+</script>
+</body>
+</html>

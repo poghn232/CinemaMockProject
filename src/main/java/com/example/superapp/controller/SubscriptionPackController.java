@@ -30,7 +30,7 @@ public class SubscriptionPackController {
     public List<SubscriptionPackDto> all() {
         return packRepo.findAll()
                 .stream()
-                .map(p -> new SubscriptionPackDto(p.getPackId(), p.getPackName(), p.getPackPrice(), p.getDurationDays()))
+                .map(p -> new SubscriptionPackDto(p.getPackId(), p.getPackName(), p.getPackPrice(), p.getDurationDays(), p.getMaxProfiles()))
                 .toList();
     }
 
@@ -40,9 +40,10 @@ public class SubscriptionPackController {
         p.setPackName(dto.packName());
         p.setPackPrice(dto.packPrice());
         p.setDurationDays(dto.durationDays());
+        p.setMaxProfiles(dto.maxProfiles());
         SubscriptionPack saved = packRepo.save(p);
         adminLogsService.saveLog(new AdminLogs(saved + " is added to database"));
-        return new SubscriptionPackDto(saved.getPackId(), saved.getPackName(), saved.getPackPrice(), saved.getDurationDays());
+        return new SubscriptionPackDto(saved.getPackId(), saved.getPackName(), saved.getPackPrice(), saved.getDurationDays(), saved.getMaxProfiles());
     }
 
     @PutMapping("/{id}")
@@ -51,9 +52,10 @@ public class SubscriptionPackController {
         p.setPackName(dto.packName());
         p.setPackPrice(dto.packPrice());
         p.setDurationDays(dto.durationDays());
+        p.setMaxProfiles(dto.maxProfiles());
         SubscriptionPack saved = packRepo.save(p);
         adminLogsService.saveLog(new AdminLogs(saved + " is updated to database"));
-        return new SubscriptionPackDto(saved.getPackId(), saved.getPackName(), saved.getPackPrice(), saved.getDurationDays());
+        return new SubscriptionPackDto(saved.getPackId(), saved.getPackName(), saved.getPackPrice(), saved.getDurationDays(), saved.getMaxProfiles());
     }
 
     @DeleteMapping("/{id}")

@@ -25,6 +25,8 @@ public class SubscriptionPack {
 
     private Integer durationDays; // ví dụ 30, 90, 365
 
+    @Column(name = "max_profiles")
+    private Integer maxProfiles; // số profile tối đa cho gói này
     @OneToMany(mappedBy = "pack")
     private List<Subscription> subscriptions;
 

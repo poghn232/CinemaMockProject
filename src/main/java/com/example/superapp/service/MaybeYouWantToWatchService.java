@@ -45,8 +45,11 @@ public class MaybeYouWantToWatchService {
         User user = userRepository.findByUsername(auth.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<WatchHistory> history = watchHistoryRepository.findByUser_UserIdOrderByWatchedAtDesc(user.getUserId());
-        if (history == null || history.isEmpty()) {
+        List<WatchHistory> history = new ArrayList<>();
+        for (var p : user.getProfiles()) {
+            history.addAll(watchHistoryRepository.findAllByProfile_ProfileIdOrderByWatchedAtDesc(p.getProfileId()));
+        }
+        if (history.isEmpty()) {
             return List.of();
         }
 

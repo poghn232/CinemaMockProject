@@ -1,8 +1,10 @@
 package com.example.superapp.service;
 
 import com.example.superapp.dto.RegisterRequest;
+import com.example.superapp.entity.Profile;
 import com.example.superapp.entity.PendingUser;
 import com.example.superapp.entity.User;
+import com.example.superapp.repository.ProfileRepository;
 import com.example.superapp.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,16 +16,19 @@ import java.security.SecureRandom;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final ProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
     private final OtpService otpService;
     private final EmailService emailService;
     private final SecureRandom secureRandom = new SecureRandom();
 
     public AuthService(UserRepository userRepository,
+                       ProfileRepository profileRepository,
                        PasswordEncoder passwordEncoder,
                        OtpService otpService,
                        EmailService emailService) {
         this.userRepository = userRepository;
+        this.profileRepository = profileRepository;
         this.passwordEncoder = passwordEncoder;
         this.otpService = otpService;
         this.emailService = emailService;
@@ -78,6 +83,14 @@ public class AuthService {
         user.setRole("CUSTOMER");
 
         userRepository.save(user);
+
+        // Auto-create default profile
+        Profile defaultProfile = Profile.builder()
+                .profileName(user.getUsername())
+                .user(user)
+                .commentDisabled(false)
+                .build();
+        profileRepository.save(defaultProfile);
 
         otpService.removePendingUser(email);
     }

@@ -1,19 +1,19 @@
 package com.example.superapp.controller;
 
 import com.example.superapp.dto.WatchHistoryDTO;
+import com.example.superapp.entity.Profile;
 import com.example.superapp.entity.User;
 import com.example.superapp.entity.WatchHistory;
 import com.example.superapp.repository.WatchHistoryRepository;
 import com.example.superapp.repository.UserRepository;
-import com.example.superapp.repository.MovieRepository; // Cần thêm
-import com.example.superapp.repository.EpisodeRepository; // Cần thêm
+import com.example.superapp.repository.ProfileRepository;
+import com.example.superapp.repository.MovieRepository;
+import com.example.superapp.repository.EpisodeRepository;
 import com.example.superapp.service.AchievementService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
 import com.example.superapp.utils.JwtUtils;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 @RestController
 @RequestMapping("/api/user/history")
 @CrossOrigin(origins = "*")
-
+@RequiredArgsConstructor
 public class WatchHistoryController {
 
     private static final Logger log = LoggerFactory.getLogger(WatchHistoryController.class);
@@ -38,37 +38,37 @@ public class WatchHistoryController {
     @Value("${tmdb.image-base-url}")
     private String imageBaseUrl;
 
-    @Autowired
-    private WatchHistoryRepository watchHistoryRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private MovieRepository movieRepository;     // Đảm bảo tên class này chính xác
-    @Autowired
-    private EpisodeRepository episodeRepository; // Đảm bảo tên class này chính xác
-    @Autowired
-    private JwtUtils jwtUtils;
-    @Autowired
-    private AchievementService achievementService;
-
-    // Constructor thủ công để đảm bảo tiêm đủ các Repository
-    public WatchHistoryController(WatchHistoryRepository watchHistoryRepository,
-            UserRepository userRepository,
-            MovieRepository movieRepository,
-            EpisodeRepository episodeRepository) {
-        this.watchHistoryRepository = watchHistoryRepository;
-        this.userRepository = userRepository;
-        this.movieRepository = movieRepository;
-        this.episodeRepository = episodeRepository;
-    }
+    private final WatchHistoryRepository watchHistoryRepository;
+    private final UserRepository userRepository;
+    private final ProfileRepository profileRepository;
+    private final MovieRepository movieRepository;
+    private final EpisodeRepository episodeRepository;
+    private final JwtUtils jwtUtils;
+    private final AchievementService achievementService;
 
     @GetMapping
     @Transactional
-    public ResponseEntity<List<WatchHistoryDTO>> getHistory(Authentication auth, jakarta.servlet.http.HttpServletRequest request) {
+    public ResponseEntity<List<WatchHistoryDTO>> getHistory(
+            Authentication auth,
+            @RequestParam(value = "profileId", required = false) Long profileId,
+            jakarta.servlet.http.HttpServletRequest request) {
+
+        // Verify profile belongs to user
         User user = userRepository.findByUsername(auth.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<WatchHistory> list = watchHistoryRepository.findByUser_UserIdOrderByWatchedAtDesc(user.getUserId());
+        // Fallback to first profile if not provided
+        if (profileId == null) {
+            if (user.getProfiles() == null || user.getProfiles().isEmpty()) {
+                throw new RuntimeException("User has no profile");
+            }
+            profileId = user.getProfiles().get(0).getProfileId();
+        }
+
+        Profile profile = profileRepository.findByProfileIdAndUser(profileId, user)
+                .orElseThrow(() -> new RuntimeException("Profile not found"));
+
+        List<WatchHistory> list = watchHistoryRepository.findAllByProfile_ProfileIdOrderByWatchedAtDesc(profile.getProfileId());
 
         String userRegion = extractRegionFromRequest(request);
 
@@ -135,22 +135,36 @@ public class WatchHistoryController {
 
     @PostMapping("/save")
     @Transactional
-    public ResponseEntity<?> saveHistory(Authentication auth, @RequestBody WatchHistoryDTO dto) {
+    public ResponseEntity<?> saveHistory(
+            Authentication auth,
+            @RequestBody WatchHistoryDTO dto,
+            @RequestHeader(value = "X-Profile-Id", required = false) Long headerProfileId) {
+
         User user = userRepository.findByUsername(auth.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // Determine profileId: prefer header, fallback to first profile
+        Long profileId = headerProfileId;
+        if (profileId == null) {
+            Profile firstProfile = user.getProfiles().isEmpty() ? null : user.getProfiles().get(0);
+            if (firstProfile == null) throw new RuntimeException("User has no profile");
+            profileId = firstProfile.getProfileId();
+        }
+
+        Profile profile = profileRepository.findByProfileIdAndUser(profileId, user)
+                .orElseThrow(() -> new RuntimeException("Profile not found"));
+
         Optional<WatchHistory> existing;
         if (dto.getMovieId() != null) {
-            existing = watchHistoryRepository.findByUser_UserIdAndMovie_Id(user.getUserId(), dto.getMovieId());
+            existing = watchHistoryRepository.findByProfile_ProfileIdAndMovie_Id(profile.getProfileId(), dto.getMovieId());
         } else {
-            existing = watchHistoryRepository.findByUser_UserIdAndEpisode_Id(user.getUserId(), dto.getEpisodeId());
+            existing = watchHistoryRepository.findByProfile_ProfileIdAndEpisode_Id(profile.getProfileId(), dto.getEpisodeId());
         }
 
         WatchHistory history = existing.orElse(new WatchHistory());
 
-        // QUAN TRỌNG: Gán liên kết thực thể nếu là bản ghi mới
         if (history.getId() == null) {
-            history.setUser(user);
+            history.setProfile(profile);
             if (dto.getMovieId() != null) {
                 history.setMovie(movieRepository.findById(dto.getMovieId()).orElse(null));
             } else if (dto.getEpisodeId() != null) {
@@ -162,15 +176,14 @@ public class WatchHistoryController {
         history.setDurationSec(dto.getDurationSec());
         history.setWatchedAt(LocalDateTime.now());
 
-        watchHistoryRepository.save(history);
-        // Check watch achievements async
+        watchHistoryRepository.saveAndFlush(history);
+
+        // Achievement check runs in a separate context — failure should NOT rollback watch history
+        final User checkedUser = user;
         try {
-            User userEntity = userRepository.findByUsername(auth.getName()).orElse(null);
-            if (userEntity != null) {
-                achievementService.checkWatchAchievements(userEntity);
-            }
+            achievementService.checkWatchAchievements(checkedUser);
         } catch (Exception e) {
-            log.warn("Achievement check failed: {}", e.getMessage());
+            log.warn("Achievement check failed (non-fatal): {}", e.getMessage());
         }
         return ResponseEntity.ok(Map.of("message", "History saved"));
     }

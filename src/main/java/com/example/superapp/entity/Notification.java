@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "notifications", indexes = {
-        @Index(name = "idx_notification_user", columnList = "user_id"),
-        @Index(name = "idx_notification_read", columnList = "user_id, is_read")
+        @Index(name = "idx_notification_profile", columnList = "profile_id"),
+        @Index(name = "idx_notification_read", columnList = "profile_id, is_read")
 })
 @Getter
 @Setter
@@ -23,8 +23,8 @@ public class Notification {
 
     /** Người nhận thông báo */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "profile_id", nullable = false)
+    private Profile profile;
 
     /** Nội dung thông báo */
     @Column(length = 512)

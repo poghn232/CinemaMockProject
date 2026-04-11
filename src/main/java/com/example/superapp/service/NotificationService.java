@@ -2,8 +2,10 @@ package com.example.superapp.service;
 
 import com.example.superapp.dto.NotificationDto;
 import com.example.superapp.entity.Notification;
+import com.example.superapp.entity.Profile;
 import com.example.superapp.entity.User;
 import com.example.superapp.repository.NotificationRepository;
+import com.example.superapp.repository.ProfileRepository;
 import com.example.superapp.repository.UserRepository;
 import com.example.superapp.repository.WishlistRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,6 +27,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final WishlistRepository wishlistRepository;
     private final UserRepository userRepository;
+    private final ProfileRepository profileRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     // ── PUBLIC API ────────────────────────────────────────────────────────
@@ -56,22 +59,23 @@ public class NotificationService {
 
         String poster = posterPath != null ? TMDB_IMG + posterPath : null;
 
-        List<User> users = wishlistRepository.findUsersByContentIdAndContentType(contentId, contentType);
+        // Now we notify profiles instead of users
+        List<Profile> profiles = wishlistRepository.findProfilesByContentIdAndContentType(contentId, contentType);
 
-        if (users.isEmpty()) {
-            log.info("[Notification] No wishlist users → skip");
+        if (profiles.isEmpty()) {
+            log.info("[Notification] No wishlist profiles → skip");
             return;
         }
 
-        for (User user : users) {
+        for (Profile profile : profiles) {
             boolean alreadyExists = notificationRepository
-                    .existsByUserAndContentIdAndContentTypeAndEventTypeAndEpisodeId(
-                            user, contentId, contentType, eventType, episodeId);
+                    .existsByProfileAndContentIdAndContentTypeAndEventTypeAndEpisodeId(
+                            profile, contentId, contentType, eventType, episodeId);
 
             if (alreadyExists) continue;
 
             Notification notif = Notification.builder()
-                    .user(user)
+                    .profile(profile)
                     .contentId(contentId)
                     .contentType(contentType)
                     .contentTitle(contentTitle)
@@ -87,38 +91,38 @@ public class NotificationService {
         }
     }
 
-    // ── USER-FACING ───────────────────────────────────────────────────────
+    // ── PROFILE-FACING ───────────────────────────────────────────────────
 
     @Transactional(readOnly = true)
-    public List<NotificationDto> getNotifications(String username) {
-        User user = getUser(username);
+    public List<NotificationDto> getNotifications(Long profileId) {
+        Profile profile = getProfile(profileId);
         return notificationRepository
-                .findTop20ByUserOrderByCreatedAtDesc(user)
+                .findTop20ByProfileOrderByCreatedAtDesc(profile)
                 .stream()
                 .map(this::toDto)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public long countUnread(String username) {
-        return notificationRepository.countByUserAndIsReadFalse(getUser(username));
+    public long countUnread(Long profileId) {
+        return notificationRepository.countByProfileAndIsReadFalse(getProfile(profileId));
     }
 
     @Transactional
-    public void markAllRead(String username) {
-        notificationRepository.markAllAsRead(getUser(username));
+    public void markAllRead(Long profileId) {
+        notificationRepository.markAllAsRead(getProfile(profileId));
     }
 
     @Transactional
-    public void markOneRead(String username, Long notifId) {
-        notificationRepository.markOneAsRead(notifId, getUser(username));
+    public void markOneRead(Long profileId, Long notifId) {
+        notificationRepository.markOneAsRead(notifId, getProfile(profileId));
     }
 
     // ── HELPERS ───────────────────────────────────────────────────────────
 
-    private User getUser(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+    private Profile getProfile(Long profileId) {
+        return profileRepository.findByProfileId(profileId)
+                .orElseThrow(() -> new RuntimeException("Profile not found: " + profileId));
     }
 
     private String buildMessageKey(String eventType, Long episodeId) {
@@ -147,7 +151,6 @@ public class NotificationService {
 
         String key = n.getMessageKey();
 
-        // 🔥 FIX thông minh
         if (key == null || key.isBlank()) {
             if ("ACHIEVEMENT_UNLOCK".equals(n.getEventType())) {
                 key = "notif.achievement_unlock";
@@ -158,10 +161,8 @@ public class NotificationService {
 
         return new NotificationDto(
                 n.getId(),
-
-                key, // ✅ dùng key đã xử lý
+                key,
                 safe(n.getMessageParams(), "{}"),
-
                 n.getCreatedAt(),
                 n.isRead(),
                 n.getContentId(),

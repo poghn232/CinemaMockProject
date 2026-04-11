@@ -53,12 +53,13 @@ public class SecurityConfig {
                                 "/movie-detail.html", "/movie-trailer.html", "/movie-watch.html",
                                 "/packs.html", "/contact.html", "/detect-region.html",
                                 "/index.html", "/admin.html", "/profile.html",
-                                "/css/**", "/js/**", "/images/**", "/favicon.ico",
+                                "/css/**", "/js/**", "/images/**", "/favicon.ico","/choose_profile.html","add_profile.html",
                                 "/api/auth/**",
                                 "/api/movies/**", "/api/contact",
                                 "/api/public/**", "/i18n/**",
                                 "/api/user/history/**",
                                 "/api/ai-chat",
+                                "/api/user/profile/**",
                                 // ✅ VNPay callbacks
                                 "/api/vnpay/**",
                                 "/api/payment/**", // nếu dùng path này

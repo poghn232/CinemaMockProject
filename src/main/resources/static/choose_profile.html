@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chọn Profile | MovieZone</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background:
+                radial-gradient(circle at 0 0, rgba(255,255,255,0.08), transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(255,255,255,0.05), transparent 55%),
+                linear-gradient(135deg, #050816, #0b1220 50%, #020617);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #e5e7eb;
+            overflow: hidden;
+        }
+
+        .backdrop-blur {
+            position: fixed; inset: 0;
+            background:
+                linear-gradient(to right, rgba(15,23,42,0.9), rgba(15,23,42,0.7)),
+                url("https://images.pexels.com/photos/7991377/pexels-photo-7991377.jpeg?auto=compress&cs=tinysrgb&w=1600") center/cover no-repeat;
+            filter: brightness(0.9);
+            z-index: -1;
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px 20px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .logo {
+            display: inline-flex; align-items: center; gap: 10px;
+            font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+            font-size: 14px; color: #e5e7eb; margin-bottom: 20px;
+        }
+
+        .logo span.icon {
+            width: 30px; height: 30px; border-radius: 999px;
+            background: radial-gradient(circle at 30% 20%, #f97316, #e11d48 55%, #4f46e5);
+            display: inline-flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 25px rgba(248,113,113,0.45);
+            font-size: 14px;
+        }
+
+        h1 {
+            font-size: clamp(24px, 3vw, 32px);
+            font-weight: 700;
+            margin-bottom: 32px;
+        }
+
+        h1 .highlight { color: #f97316; }
+
+        .profiles-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: center;
+            margin-bottom: 32px;
+        }
+
+        .profile-card {
+            width: 140px;
+            cursor: pointer;
+            text-align: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            text-decoration: none;
+            color: #e5e7eb;
+        }
+
+        .profile-card:hover {
+            transform: translateY(-8px) scale(1.05);
+        }
+
+        .profile-avatar {
+            width: 100px; height: 100px;
+            border-radius: 16px;
+            margin: 0 auto 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 42px;
+            border: 3px solid transparent;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            overflow: hidden;
+        }
+
+        .profile-card:hover .profile-avatar {
+            border-color: #f97316;
+            box-shadow: 0 0 30px rgba(249,115,22,0.4);
+        }
+
+        .profile-name {
+            font-size: 14px;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .add-profile-card {
+            width: 140px;
+            cursor: pointer;
+            text-align: center;
+            transition: transform 0.2s ease;
+            text-decoration: none;
+            color: #9ca3af;
+        }
+
+        .add-profile-card:hover {
+            transform: translateY(-8px) scale(1.05);
+            color: #f97316;
+        }
+
+        .add-profile-avatar {
+            width: 100px; height: 100px;
+            border-radius: 16px;
+            margin: 0 auto 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 42px;
+            border: 3px dashed rgba(148,163,184,0.5);
+            transition: border-color 0.2s ease;
+            background: rgba(15,23,42,0.6);
+        }
+
+        .add-profile-card:hover .add-profile-avatar {
+            border-color: #f97316;
+        }
+
+        .add-label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .loading {
+            font-size: 16px;
+            color: #9ca3af;
+            padding: 40px;
+        }
+
+        /* Avatar color palette */
+        .avatar-0 { background: linear-gradient(135deg, #f97316, #ec4899); }
+        .avatar-1 { background: linear-gradient(135deg, #3b82f6, #8b5cf6); }
+        .avatar-2 { background: linear-gradient(135deg, #10b981, #06b6d4); }
+        .avatar-3 { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+        .avatar-4 { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
+
+        .manage-link {
+            margin-top: 16px;
+            display: inline-block;
+            color: #9ca3af;
+            font-size: 13px;
+            text-decoration: none;
+            border: 1px solid rgba(148,163,184,0.4);
+            padding: 8px 20px;
+            border-radius: 999px;
+            transition: all 0.15s ease;
+        }
+
+        .manage-link:hover {
+            color: #e5e7eb;
+            border-color: rgba(249,115,22,0.6);
+        }
+    </style>
+</head>
+<body>
+
+<div class="backdrop-blur"></div>
+
+<div class="container">
+    <div class="logo">
+        <span class="icon">MZ</span>
+        <span>MovieZone</span>
+    </div>
+
+    <h1>Who's <span class="highlight">watching</span>?</h1>
+
+    <div id="loadingMsg" class="loading">Loading profiles...</div>
+
+    <div class="profiles-grid" id="profilesGrid" style="display: none;"></div>
+
+    <a href="profile.html" class="manage-link">Manage Profiles</a>
+</div>
+
+<script>
+    const avatarEmojis = ['🎬', '🍿', '🎭', '🎵', '🌟'];
+
+    async function loadProfiles() {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        // Clear previous profile selection
+        localStorage.removeItem("profileId");
+        localStorage.removeItem("profileName");
+
+        try {
+            const response = await fetch("/api/user/profiles", {
+                headers: { Authorization: 'Bearer ' + token }
+            });
+
+            if (!response.ok) {
+                if (response.status === 401 || response.status === 403) {
+                    localStorage.clear();
+                    window.location.href = 'login.html';
+                    return;
+                }
+                throw new Error("Failed to load profiles");
+            }
+
+            const profiles = await response.json();
+            const grid = document.getElementById("profilesGrid");
+            const loading = document.getElementById("loadingMsg");
+
+            loading.style.display = "none";
+            grid.style.display = "flex";
+
+            profiles.forEach((profile, index) => {
+                const card = document.createElement("div");
+                card.className = "profile-card";
+                card.innerHTML = `
+                    <div class="profile-avatar avatar-${index % 5}">
+                        ${avatarEmojis[index % 5]}
+                    </div>
+                    <div class="profile-name">${escapeHtml(profile.profileName)}</div>
+                `;
+                card.addEventListener("click", () => {
+                    localStorage.setItem("profileId", profile.profileId);
+                    localStorage.setItem("profileName", profile.profileName);
+                    window.location.href = 'homepage.html';
+                });
+                grid.appendChild(card);
+            });
+
+            // Check if user can add more profiles (needs premium subscription)
+            let canAddMore = false;
+            try {
+                const profileRes = await fetch("/api/user/profile", {
+                    headers: { Authorization: 'Bearer ' + token }
+                });
+                if (profileRes.ok) {
+                    const userData = await profileRes.json();
+                    const subs = Array.isArray(userData.subscriptions) ? userData.subscriptions : [];
+                    const hasActive = subs.some(s => s && s.status === "ACTIVE");
+                    if (hasActive) {
+                        // Find max profiles from subscription pack
+                        let maxProfiles = 5; // default for premium
+                        for (const s of subs) {
+                            if (s.status === "ACTIVE" && s.packMaxProfiles) {
+                                maxProfiles = Math.max(maxProfiles, s.packMaxProfiles);
+                            }
+                        }
+                        canAddMore = profiles.length < maxProfiles;
+                    }
+                }
+            } catch (e) { /* ignore */ }
+
+            // Show "Add Profile" card only if premium and under limit
+            if (canAddMore) {
+                const addCard = document.createElement("div");
+                addCard.className = "add-profile-card";
+                addCard.innerHTML = `
+                    <div class="add-profile-avatar">＋</div>
+                    <div class="add-label">Add Profile</div>
+                `;
+                addCard.addEventListener("click", () => {
+                    window.location.href = 'add_profile.html';
+                });
+                grid.appendChild(addCard);
+            }
+
+        } catch (err) {
+            document.getElementById("loadingMsg").textContent = "Error loading profiles. Please try again.";
+            console.error(err);
+        }
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    loadProfiles();
+</script>
+</body>
+</html>

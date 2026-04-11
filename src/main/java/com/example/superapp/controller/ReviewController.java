@@ -1,8 +1,10 @@
 package com.example.superapp.controller;
 
+import com.example.superapp.entity.Profile;
 import com.example.superapp.entity.Report;
 import com.example.superapp.entity.Review;
 import com.example.superapp.entity.User;
+import com.example.superapp.repository.ProfileRepository;
 import com.example.superapp.repository.ReportRepository;
 import com.example.superapp.repository.ReviewRepository;
 import com.example.superapp.repository.UserRepository;
@@ -23,6 +25,7 @@ public class ReviewController {
     private final ReviewRepository reviewRepository;
     private final ReportRepository reportRepository;
     private final UserRepository userRepository;
+    private final ProfileRepository profileRepository;
 
     @PostMapping("/api/reviews/save")
     public ResponseEntity<?> saveRating(
@@ -58,8 +61,6 @@ public class ReviewController {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
-
-
 
     @GetMapping("/api/public/reviews")
     public ResponseEntity<?> getPublicReviews(
@@ -99,11 +100,24 @@ public class ReviewController {
         }
         try {
             String reason = payload.get("reason") != null ? payload.get("reason").toString() : "";
+            Long profileId = payload.get("profileId") != null ? Long.valueOf(payload.get("profileId").toString()) : null;
+
             Review review = reviewRepository.findById(id).orElseThrow(() -> new RuntimeException("Review not found"));
-            User reporter = userRepository.findByUsername(auth.getName()).orElseThrow(() -> new RuntimeException("User not found"));
+            User user = userRepository.findByUsername(auth.getName()).orElseThrow(() -> new RuntimeException("User not found"));
+
+            // Determine profile for the reporter
+            Profile reporterProfile;
+            if (profileId != null) {
+                reporterProfile = profileRepository.findByProfileIdAndUser(profileId, user)
+                        .orElseThrow(() -> new RuntimeException("Profile not found"));
+            } else {
+                reporterProfile = user.getProfiles().isEmpty() ? null : user.getProfiles().get(0);
+                if (reporterProfile == null) throw new RuntimeException("User has no profile");
+            }
+
             Report r = Report.builder()
                     .review(review)
-                    .reporter(reporter)
+                    .reporter(reporterProfile)
                     .reason(reason)
                     .createdAt(LocalDateTime.now())
                     .status(Report.Status.PENDING)

@@ -2413,6 +2413,7 @@
           headers: {
             "Content-Type": "application/json",
             Authorization: "Bearer " + _histToken,
+            "X-Profile-Id": localStorage.getItem("profileId") || "",
           },
           body: JSON.stringify(payload),
         }).catch(() => {});
@@ -2432,6 +2433,7 @@
         xhr.open("POST", "/api/user/history/save", false);
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.setRequestHeader("Authorization", "Bearer " + _histToken);
+        xhr.setRequestHeader("X-Profile-Id", localStorage.getItem("profileId") || "");
         try {
           xhr.send(JSON.stringify(payload));
         } catch (e) {}
@@ -2445,7 +2447,9 @@
         // Load saved progress from DB to resume from where the user left off
         if (_histId && _histToken) {
           try {
-            const res = await fetch("/api/user/history", {
+            const _pid = localStorage.getItem('profileId');
+            const _histApiUrl = '/api/user/history' + (_pid ? '?profileId=' + _pid : '');
+            const res = await fetch(_histApiUrl, {
               headers: { Authorization: "Bearer " + _histToken },
             });
             if (res.ok) {
