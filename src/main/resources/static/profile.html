@@ -1397,9 +1397,10 @@
 
                 let actionsHtml = '';
                 if (sub.status === 'ACTIVE') {
+                    let packId = (sub.pack && sub.pack.packId) ? sub.pack.packId : null;
                     actionsHtml = `
                 <div class="sub-actions">
-                    <button class="btn btn-save" onclick="extendSubscription(${sub.subId})">
+                    <button class="btn btn-save" id="extendBtn_${sub.subId}" onclick="extendSubscription(${sub.subId}, ${packId}, '${packName.replace(/'/g, "\\'")}')"> 
                         ${t("profile.subscription.extend")}
                     </button>
                 </div>
@@ -1680,8 +1681,55 @@
     }
 
 
-    window.extendSubscription = function (subscriptionId) {
-        window.location.href = `packs.html?mode=extend&subscriptionId=${subscriptionId}`;
+    window.extendSubscription = async function (subscriptionId, packId, packName) {
+        if (!packId) {
+            alert('Cannot determine the pack for this subscription.');
+            return;
+        }
+        if (!confirm(`Extend subscription "${packName}"? You will be redirected to VNPay for payment.`)) {
+            return;
+        }
+
+        const btn = document.getElementById(`extendBtn_${subscriptionId}`);
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = 'Processing...';
+        }
+
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch('/api/payments/vnpay', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({
+                    packId: packId,
+                    subscriptionId: subscriptionId
+                })
+            });
+
+            if (res.status === 401) {
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            if (!res.ok) {
+                const errText = await res.text();
+                throw new Error(errText || 'Failed to create payment');
+            }
+
+            const data = await res.json();
+            window.location.href = data.paymentUrl;
+        } catch (e) {
+            alert('Error: ' + e.message);
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = 'Extend';
+            }
+        }
     };
     /* ── History functions — global scope so sidebar click can reach them ── */
 

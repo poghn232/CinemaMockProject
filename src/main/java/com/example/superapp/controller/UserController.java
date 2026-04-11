@@ -50,9 +50,11 @@ public class UserController {
                     // Trích xuất thông tin gói (Pack)
                     if (sub.getPack() != null) {
                         Map<String, Object> packMap = new HashMap<>();
+                        packMap.put("packId", sub.getPack().getPackId());
                         packMap.put("packName", sub.getPack().getPackName());
                         packMap.put("packPrice", sub.getPack().getPackPrice());
                         packMap.put("durationDays", sub.getPack().getDurationDays());
+                        packMap.put("maxProfiles", sub.getPack().getMaxProfiles());
                         subMap.put("pack", packMap);
                     }
                     return subMap;

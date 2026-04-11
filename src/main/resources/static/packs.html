@@ -600,10 +600,22 @@
             packs.forEach(p => {
                 const el = document.createElement("div");
                 el.className = "pack-card";
+                const maxProfilesText = (p.maxProfiles && p.maxProfiles > 0) ? p.maxProfiles : 1;
                 el.innerHTML = `
                     <p class="pack-name">${p.packName}</p>
                     <p class="pack-price">${moneyVND(p.packPrice)}</p>
                     <p class="pack-meta">Duration: ${p.durationDays ?? 30} days</p>
+                    <p class="pack-meta" style="margin-top:-8px;">
+                        <span style="display:inline-flex;align-items:center;gap:5px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                            Max Profiles: <strong style="color:#f97316;">${maxProfilesText}</strong>
+                        </span>
+                    </p>
                     <button onclick="buy(${p.packId})">Buy Now</button>
                 `;
                 grid.appendChild(el);
