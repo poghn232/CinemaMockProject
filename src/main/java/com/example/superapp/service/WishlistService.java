@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 public class WishlistService {
 
     private final WishlistRepository wishlistRepository;
-    private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
     private final MovieRepository movieRepository;
     private final TvSeriesRepository tvSeriesRepository;
@@ -140,7 +139,7 @@ public class WishlistService {
                     .contentId(req.contentId())
                     .contentType(req.contentType())
                     .build());
-            achievementService.checkWishlistAchievements(user);
+            achievementService.checkWishlistAchievements(profile);
             return new WishlistToggleResponse(true, "Added to wishlist");
         }
     }

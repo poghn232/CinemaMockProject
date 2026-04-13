@@ -209,3 +209,18 @@ window.addEventListener("languageChanged", () => {
     if (typeof loadHistory === "function") loadHistory();
     if (typeof loadWishlist === "function") loadWishlist();
 });
+
+async function switchToProfile(profileId, profileName) {
+    localStorage.setItem("profileId", profileId);
+    localStorage.setItem("profileName", profileName);
+
+    // Record streak cho profile được chọn/switch sang
+    try {
+        await fetch(`/api/user/achievements/streak/record?profileId=${profileId}`, {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
+    } catch (e) {
+        // non-critical
+    }
+}

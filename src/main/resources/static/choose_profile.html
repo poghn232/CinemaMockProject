@@ -233,11 +233,28 @@
                     </div>
                     <div class="profile-name">${escapeHtml(profile.profileName)}</div>
                 `;
-                card.addEventListener("click", () => {
-                    localStorage.setItem("profileId", profile.profileId);
-                    localStorage.setItem("profileName", profile.profileName);
+                // card.addEventListener("click", async () => {
+                //     localStorage.setItem("profileId", profile.profileId);
+                //     localStorage.setItem("profileName", profile.profileName);
+                //
+                //     // Record streak cho profile được chọn
+                //     try {
+                //         await fetch(`/api/user/achievements/streak/record?profileId=${profile.profileId}`, {
+                //             method: 'POST',
+                //             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                //         });
+                //     } catch (e) {
+                //         // non-critical, bỏ qua lỗi
+                //     }
+                //
+                //     window.location.href = 'homepage.html';
+                // });
+
+                card.addEventListener("click", async () => {
+                    await switchToProfile(profile.profileId, profile.profileName);
                     window.location.href = 'homepage.html';
                 });
+
                 grid.appendChild(card);
             });
 
@@ -290,6 +307,19 @@
         return div.innerHTML;
     }
 
+    async function switchToProfile(profileId, profileName) {
+        localStorage.setItem("profileId", profileId);
+        localStorage.setItem("profileName", profileName);
+
+        try {
+            await fetch(`/api/user/achievements/streak/record?profileId=${profileId}`, {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+            });
+        } catch (e) {
+            // non-critical
+        }
+    }
     loadProfiles();
 </script>
 </body>

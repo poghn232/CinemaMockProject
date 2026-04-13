@@ -6,11 +6,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.annotation.PostConstruct;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 @Slf4j
 @Service
@@ -57,43 +58,37 @@ public class AchievementService {
     }
 
     // ── Grant achievement (safe: skips if already earned) ───────────────────
-    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
-    public boolean grant(User user, String code) {
-        if (userAchievementRepository.existsByUserAndAchievement_Code(user, code)) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public boolean grant(Profile profile, String code) {
+        if (userAchievementRepository.existsByProfileAndAchievement_Code(profile, code)) {
             return false;
         }
         Achievement achievement = achievementRepository.findByCode(code).orElse(null);
         if (achievement == null) return false;
 
         userAchievementRepository.save(UserAchievement.builder()
-                .user(user).achievement(achievement).build());
+                .profile(profile)
+                .achievement(achievement)
+                .build());
 
-        // 🔥 TẠO NOTIFICATION - use first profile of user
-        Profile firstProfile = user.getProfiles() != null && !user.getProfiles().isEmpty() ? user.getProfiles().get(0) : null;
-        if (firstProfile == null) {
-            log.warn("[Achievement] User {} has no profile, skipping notification", user.getUsername());
-            return true;
-        }
+        // Notification
         Notification notif = Notification.builder()
-                .profile(firstProfile)
+                .profile(profile)
                 .message("🏆 Achievement unlocked: " + achievement.getName())
                 .contentId(0L)
                 .contentType("achievement")
-                .contentTitle(achievement.getName()) // ✅ FIX
-
+                .contentTitle(achievement.getName())
                 .messageKey("notif.achievement_unlock")
-                .messageParams(buildAchievementParams(achievement.getName()))// ✅ FIX
-
+                .messageParams(buildAchievementParams(achievement.getName()))
                 .iconUrl(achievement.getIcon())
                 .posterUrl(null)
-
                 .eventType("ACHIEVEMENT_UNLOCK")
                 .isRead(false)
                 .build();
-
         notificationRepository.save(notif);
 
-        log.info("[Achievement] {} earned '{}' ({})", user.getUsername(), achievement.getName(), code);
+        log.info("[Achievement] profile={} earned '{}' ({})",
+                profile.getProfileName(), achievement.getName(), code);
         return true;
     }
 
@@ -122,58 +117,46 @@ public class AchievementService {
     }
 
     // ── Check all watch-based achievements ──────────────────────────────────
-    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
-    public void checkWatchAchievements(User user) {
-        // Aggregate watch history across all profiles
-        long totalWatched = 0;
-        for (Profile p : user.getProfiles()) {
-            totalWatched += watchHistoryRepository.findAllByProfile_ProfileIdOrderByWatchedAtDesc(p.getProfileId()).size();
-        }
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void checkWatchAchievements(Profile profile) {
+        long totalWatched = watchHistoryRepository
+                .findAllByProfile_ProfileIdOrderByWatchedAtDesc(profile.getProfileId()).size();
 
-        if (totalWatched >= 1)   grant(user, "FIRST_WATCH");
-        if (totalWatched >= 10)  grant(user, "WATCH_10");
-        if (totalWatched >= 50)  grant(user, "WATCH_50");
-        if (totalWatched >= 100) grant(user, "WATCH_100");
+        if (totalWatched >= 1)   grant(profile, "FIRST_WATCH");
+        if (totalWatched >= 10)  grant(profile, "WATCH_10");
+        if (totalWatched >= 50)  grant(profile, "WATCH_50");
+        if (totalWatched >= 100) grant(profile, "WATCH_100");
 
-        checkNightOwl(user);
-        checkBingeWatcher(user);
-        checkGenreExplorer(user);
+        checkNightOwl(profile);
+        checkBingeWatcher(profile);
+        checkGenreExplorer(profile);
     }
 
     // ── Check all comment-based achievements ────────────────────────────────
     @Transactional
-    public void checkCommentAchievements(User user) {
-        // Aggregate reviews across all profiles
-        long totalComments = 0;
-        for (Profile p : user.getProfiles()) {
-            totalComments += reviewRepository.findByProfile_ProfileId(p.getProfileId()).size();
-        }
+    public void checkCommentAchievements(Profile profile) {
+        long totalComments = reviewRepository.findByProfile_ProfileId(profile.getProfileId()).size();
 
-        if (totalComments >= 1)  grant(user, "FIRST_COMMENT");
-        if (totalComments >= 5)  grant(user, "COMMENT_5");
-        if (totalComments >= 20) grant(user, "COMMENT_20");
+        if (totalComments >= 1)  grant(profile, "FIRST_COMMENT");
+        if (totalComments >= 5)  grant(profile, "COMMENT_5");
+        if (totalComments >= 20) grant(profile, "COMMENT_20");
     }
 
     // ── Night Owl: watched after midnight ───────────────────────────────────
-    private void checkNightOwl(User user) {
-        java.util.List<WatchHistory> allHistory = new java.util.ArrayList<>();
-        for (Profile p : user.getProfiles()) {
-            allHistory.addAll(watchHistoryRepository.findAllByProfile_ProfileIdOrderByWatchedAtDesc(p.getProfileId()));
-        }
-        boolean nightWatch = allHistory.stream()
-                .anyMatch(h -> h.getWatchedAt() != null && h.getWatchedAt().getHour() >= 0
-                        && h.getWatchedAt().getHour() < 5);
-        if (nightWatch) grant(user, "NIGHT_OWL");
+    private void checkNightOwl(Profile profile) {
+        List<WatchHistory> history = watchHistoryRepository
+                .findAllByProfile_ProfileIdOrderByWatchedAtDesc(profile.getProfileId());
+        boolean nightWatch = history.stream()
+                .anyMatch(h -> h.getWatchedAt() != null && h.getWatchedAt().getHour() < 5);
+        if (nightWatch) grant(profile, "NIGHT_OWL");
     }
 
     // ── Binge Watcher: 5 episodes same series same day ──────────────────────
-    private void checkBingeWatcher(User user) {
-        java.util.List<WatchHistory> history = new java.util.ArrayList<>();
-        for (Profile p : user.getProfiles()) {
-            history.addAll(watchHistoryRepository.findAllByProfile_ProfileIdOrderByWatchedAtDesc(p.getProfileId()));
-        }
+    private void checkBingeWatcher(Profile profile) {
+        List<WatchHistory> history = watchHistoryRepository
+                .findAllByProfile_ProfileIdOrderByWatchedAtDesc(profile.getProfileId());
 
-        java.util.Map<String, Long> countMap = new java.util.HashMap<>();
+        Map<String, Long> countMap = new HashMap<>();
         for (var h : history) {
             if (h.getEpisode() != null && h.getWatchedAt() != null
                     && h.getEpisode().getSeason() != null
@@ -184,38 +167,34 @@ public class AchievementService {
             }
         }
         if (countMap.values().stream().anyMatch(c -> c >= 5)) {
-            grant(user, "BINGE_WATCHER");
+            grant(profile, "BINGE_WATCHER");
         }
     }
 
     // ── Genre Explorer: 5 distinct genres ───────────────────────────────────
-    private void checkGenreExplorer(User user) {
-        java.util.List<WatchHistory> history = new java.util.ArrayList<>();
-        for (Profile p : user.getProfiles()) {
-            history.addAll(watchHistoryRepository.findAllByProfile_ProfileIdOrderByWatchedAtDesc(p.getProfileId()));
-        }
-        java.util.Set<Long> genreIds = new java.util.HashSet<>();
+    private void checkGenreExplorer(Profile profile) {
+        List<WatchHistory> history = watchHistoryRepository
+                .findAllByProfile_ProfileIdOrderByWatchedAtDesc(profile.getProfileId());
+        Set<Long> genreIds = new HashSet<>();
 
         for (var h : history) {
-            if (h.getMovie() != null && h.getMovie().getGenres() != null) {
+            if (h.getMovie() != null && h.getMovie().getGenres() != null)
                 h.getMovie().getGenres().forEach(g -> genreIds.add(g.getId()));
-            }
             if (h.getEpisode() != null
                     && h.getEpisode().getSeason() != null
                     && h.getEpisode().getSeason().getTvSeries() != null
-                    && h.getEpisode().getSeason().getTvSeries().getGenres() != null) {
+                    && h.getEpisode().getSeason().getTvSeries().getGenres() != null)
                 h.getEpisode().getSeason().getTvSeries().getGenres()
                         .forEach(g -> genreIds.add(g.getId()));
-            }
         }
-        if (genreIds.size() >= 5) grant(user, "GENRE_EXPLORER");
+        if (genreIds.size() >= 5) grant(profile, "GENRE_EXPLORER");
     }
 
     // ── Get user achievements ────────────────────────────────────────────────
     @Transactional
-    public List<UserAchievement> getUserAchievements(User user) {
-        checkPremiumAchievement(user);
-        return userAchievementRepository.findByUserOrderByEarnedAtDesc(user);
+    public List<UserAchievement> getUserAchievements(Profile profile) {
+        checkPremiumAchievement(profile);
+        return userAchievementRepository.findByProfileOrderByEarnedAtDesc(profile);
     }
 
     // ── Get ALL achievements (for showing locked ones) ───────────────────────
@@ -225,24 +204,15 @@ public class AchievementService {
     }
 
     @Transactional
-    public void checkWishlistAchievements(User user) {
-        long totalWishlist = 0;
-        for (Profile p : user.getProfiles()) {
-            totalWishlist += wishlistRepository.countByProfile(p);
-        }
-
-        if (totalWishlist >= 10) {
-            grant(user, "WISHLIST_10");
-        }
+    public void checkWishlistAchievements(Profile profile) {
+        long totalWishlist = wishlistRepository.countByProfile(profile);
+        if (totalWishlist >= 10) grant(profile, "WISHLIST_10");
     }
 
     @Transactional
-    public void checkPremiumAchievement(User user) {
+    public void checkPremiumAchievement(Profile profile) {
         boolean isPremium = subscriptionRepository
-                .existsByUserAndStatus(user, SubscriptionStatus.ACTIVE);
-
-        if (isPremium) {
-            grant(user, "PREMIUM_MEMBER");
-        }
+                .existsByUserAndStatus(profile.getUser(), SubscriptionStatus.ACTIVE);
+        if (isPremium) grant(profile, "PREMIUM_MEMBER");
     }
 }

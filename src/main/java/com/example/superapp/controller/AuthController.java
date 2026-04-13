@@ -81,18 +81,6 @@ public class AuthController {
             loginHistoryService.saveLoginHistory(request.getUsername(), clientIp, region);
         }
 
-        // Record login streak (chỉ với CUSTOMER)
-        if (role.toUpperCase().contains("CUSTOMER")) {
-            try {
-                User streakUser = userRepository.findByUsername(request.getUsername()).orElse(null);
-                if (streakUser != null) {
-                    loginStreakService.recordLogin(streakUser);
-                }
-            } catch (Exception e) {
-                log.warn("Streak record failed: {}", e.getMessage());
-            }
-        }
-
         return ResponseEntity.ok(resp);
     }
 
@@ -148,8 +136,9 @@ public class AuthController {
             loginHistoryService.saveLoginHistory(user.getUsername(), clientIp, region);
         }
         try {
-            loginStreakService.recordLogin(user);
-            achievementService.checkPremiumAchievement(user);
+            for (Profile p : user.getProfiles()) {
+                achievementService.checkPremiumAchievement(p);
+            }
         } catch (Exception e) { /* non-critical */ }
 
         return ResponseEntity.ok(resp);
@@ -215,8 +204,9 @@ public class AuthController {
             loginHistoryService.saveLoginHistory(user.getUsername(), clientIp, region);
         }
         try {
-            loginStreakService.recordLogin(user);
-            achievementService.checkPremiumAchievement(user);
+            for (Profile p : user.getProfiles()) {
+                achievementService.checkPremiumAchievement(p);
+            }
         } catch (Exception e) { /* non-critical */ }
 
         return ResponseEntity.ok(resp);

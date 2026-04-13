@@ -181,7 +181,7 @@ public class WatchHistoryController {
         // Achievement check runs in a separate context — failure should NOT rollback watch history
         final User checkedUser = user;
         try {
-            achievementService.checkWatchAchievements(checkedUser);
+            achievementService.checkWatchAchievements(profile);
         } catch (Exception e) {
             log.warn("Achievement check failed (non-fatal): {}", e.getMessage());
         }

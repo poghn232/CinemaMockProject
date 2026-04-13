@@ -14,18 +14,18 @@ public class LoginStreak {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
-    private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_id", nullable = false, unique = true)
+    private Profile profile;
 
     @Column(nullable = false)
-    private Integer currentStreak = 0;   // streak hiện tại
+    private Integer currentStreak = 0;
 
     @Column(nullable = false)
-    private Integer longestStreak = 0;   // streak dài nhất từ trước đến nay
+    private Integer longestStreak = 0;
 
     @Column(nullable = false)
-    private Integer totalLoginDays = 0;  // tổng số ngày đã đăng nhập
+    private Integer totalLoginDays = 0;
 
-    private LocalDate lastLoginDate;     // ngày đăng nhập gần nhất
+    private LocalDate lastLoginDate;
 }

@@ -74,8 +74,9 @@ public class VnPayCallbackService {
                 sub.setEndDate(end);
                 sub.setStatus(SubscriptionStatus.ACTIVE);
                 try {
-                    User u = sub.getUser();
-                    achievementService.grant(u, "PREMIUM_MEMBER");
+                    for (Profile p : sub.getUser().getProfiles()) {
+                        achievementService.grant(p, "PREMIUM_MEMBER");
+                    }
                 } catch (Exception e) { /* ignore */ }
             }
 
@@ -90,8 +91,9 @@ public class VnPayCallbackService {
                 sub.setEndDate(baseEnd.plusDays(durationDays));
                 sub.setStatus(SubscriptionStatus.ACTIVE);
                 try {
-                    User u = sub.getUser();
-                    achievementService.grant(u, "PREMIUM_MEMBER");
+                    for (Profile p : sub.getUser().getProfiles()) {
+                        achievementService.grant(p, "PREMIUM_MEMBER");
+                    }
                 } catch (Exception e) { /* ignore */ }
             }
 
@@ -110,8 +112,9 @@ public class VnPayCallbackService {
                 sub.setEndDate(baseEnd.plusDays(durationDays));
                 sub.setStatus(SubscriptionStatus.ACTIVE);
                 try {
-                    User u = sub.getUser();
-                    achievementService.grant(u, "PREMIUM_MEMBER");
+                    for (Profile p : sub.getUser().getProfiles()) {
+                        achievementService.grant(p, "PREMIUM_MEMBER");
+                    }
                 } catch (Exception e) { /* ignore */ }
             }
 

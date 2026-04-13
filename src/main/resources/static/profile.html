@@ -1987,6 +1987,7 @@
     }
 
     async function loadAchievements() {
+
         const earnedGrid  = document.getElementById('earnedGrid');
         const lockedGrid  = document.getElementById('lockedGrid');
         const statsEl     = document.getElementById('achievementStats');
@@ -1996,13 +1997,15 @@
             ${t('profile_extra.achievement.loading')}
         </div>
     `;
-
         earnedGrid.innerHTML = loadingHtml;
         lockedGrid.innerHTML = loadingHtml;
         statsEl.innerHTML = loadingHtml;
 
         try {
-            const res = await fetch('/api/user/achievements', {
+            const pid = localStorage.getItem('profileId');
+            const url = '/api/user/achievements' + (pid ? '?profileId=' + pid : '');
+
+            const res = await fetch(url, {
                 headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
             });
 
@@ -2070,11 +2073,14 @@
 
     async function loadStreak() {
         try {
+            const pid = localStorage.getItem('profileId');
+            const streakUrl = '/api/user/achievements/streak' + (pid ? '?profileId=' + pid : '');
+
             const [streakRes, histRes] = await Promise.all([
-                fetch('/api/user/achievements/streak', {
+                fetch(streakUrl, {  // ← thêm profileId vào đây
                     headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
                 }),
-                fetch('/api/user/history' + (localStorage.getItem('profileId') ? '?profileId=' + localStorage.getItem('profileId') : ''), {
+                fetch('/api/user/history' + (pid ? '?profileId=' + pid : ''), {
                     headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
                 })
             ]);

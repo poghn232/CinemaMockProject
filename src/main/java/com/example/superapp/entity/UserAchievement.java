@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user_achievements",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "achievement_id"}))
+        uniqueConstraints = @UniqueConstraint(columnNames = {"profile_id", "achievement_id"}))
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor @Builder
 public class UserAchievement {
@@ -16,8 +16,8 @@ public class UserAchievement {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "profile_id", nullable = false)
+    private Profile profile;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "achievement_id", nullable = false)

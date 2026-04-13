@@ -1,8 +1,6 @@
 package com.example.superapp.controller;
 
-import com.example.superapp.entity.Achievement;
-import com.example.superapp.entity.User;
-import com.example.superapp.entity.UserAchievement;
+import com.example.superapp.entity.*;
 import com.example.superapp.repository.UserRepository;
 import com.example.superapp.service.AchievementService;
 import com.example.superapp.service.LoginStreakService;
@@ -26,11 +24,16 @@ public class AchievementController {
     private final LoginStreakService loginStreakService;
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getAchievements(Authentication auth) {
+    public ResponseEntity<Map<String, Object>> getAchievements(
+            Authentication auth,
+            @RequestParam(value = "profileId", required = false) Long profileId) {
+
         User user = userRepository.findByUsername(auth.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<UserAchievement> earned = achievementService.getUserAchievements(user);
+        Profile profile = resolveProfile(user, profileId);
+
+        List<UserAchievement> earned = achievementService.getUserAchievements(profile);
         List<Achievement> all = achievementService.getAllAchievements();
 
         Set<String> earnedCodes = earned.stream()
@@ -71,11 +74,15 @@ public class AchievementController {
     }
 
     @GetMapping("/streak")
-    public ResponseEntity<Map<String, Object>> getStreak(Authentication auth) {
+    public ResponseEntity<Map<String, Object>> getStreak(
+            Authentication auth,
+            @RequestParam(value = "profileId", required = false) Long profileId) {
+
         User user = userRepository.findByUsername(auth.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        var streak = loginStreakService.getStreak(user);
+        Profile profile = resolveProfile(user, profileId);
+        var streak = loginStreakService.getStreak(profile);
 
         return ResponseEntity.ok(Map.of(
                 "currentStreak",  streak.getCurrentStreak(),
@@ -85,4 +92,37 @@ public class AchievementController {
                         ? streak.getLastLoginDate().toString() : ""
         ));
     }
+
+    @PostMapping("/streak/record")
+    public ResponseEntity<Map<String, Object>> recordStreak(
+            Authentication auth,
+            @RequestParam(value = "profileId", required = false) Long profileId) {
+
+        User user = userRepository.findByUsername(auth.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Profile profile = resolveProfile(user, profileId);
+        LoginStreak streak = loginStreakService.recordLogin(profile);
+
+        return ResponseEntity.ok(Map.of(
+                "currentStreak",  streak.getCurrentStreak(),
+                "longestStreak",  streak.getLongestStreak(),
+                "totalLoginDays", streak.getTotalLoginDays(),
+                "lastLoginDate",  streak.getLastLoginDate() != null
+                        ? streak.getLastLoginDate().toString() : ""
+        ));
+    }
+
+    // Helper
+    private Profile resolveProfile(User user, Long profileId) {
+        if (profileId != null) {
+            return user.getProfiles().stream()
+                    .filter(p -> p.getProfileId().equals(profileId))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Profile not found"));
+        }
+        if (user.getProfiles().isEmpty()) throw new RuntimeException("User has no profile");
+        return user.getProfiles().get(0);
+    }
+
 }

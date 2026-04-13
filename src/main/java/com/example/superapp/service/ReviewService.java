@@ -185,7 +185,7 @@ public class ReviewService {
 
         Review saved = reviewRepository.save(review);
         try {
-            achievementService.checkCommentAchievements(user);
+            achievementService.checkCommentAchievements(profile);
         } catch (Exception e) {
             // ignore
         }

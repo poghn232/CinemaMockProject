@@ -18,12 +18,12 @@ public class LoginStreakService {
     private final AchievementService achievementService;
 
     @Transactional
-    public LoginStreak recordLogin(User user) {
+    public LoginStreak recordLogin(Profile profile) {
         LocalDate today = LocalDate.now();
 
-        LoginStreak streak = loginStreakRepository.findByUser(user)
+        LoginStreak streak = loginStreakRepository.findByProfile(profile)
                 .orElseGet(() -> LoginStreak.builder()
-                        .user(user)
+                        .profile(profile)
                         .currentStreak(0)
                         .longestStreak(0)
                         .totalLoginDays(0)
@@ -31,54 +31,45 @@ public class LoginStreakService {
 
         LocalDate last = streak.getLastLoginDate();
 
-        // Đã đăng nhập hôm nay rồi → không làm gì
-        if (today.equals(last)) {
-            return streak;
-        }
+        if (today.equals(last)) return streak;
 
-        // Đăng nhập ngày hôm qua → tiếp tục streak
         if (last != null && last.plusDays(1).equals(today)) {
             streak.setCurrentStreak(streak.getCurrentStreak() + 1);
         } else {
-            // Bỏ ngày hoặc lần đầu → reset
             streak.setCurrentStreak(1);
         }
 
         streak.setLastLoginDate(today);
         streak.setTotalLoginDays(streak.getTotalLoginDays() + 1);
 
-        // Cập nhật longest streak
         if (streak.getCurrentStreak() > streak.getLongestStreak()) {
             streak.setLongestStreak(streak.getCurrentStreak());
         }
 
         LoginStreak saved = loginStreakRepository.save(streak);
+        checkStreakAchievements(profile, saved.getCurrentStreak());
 
-        // Check streak achievements
-        checkStreakAchievements(user, saved.getCurrentStreak());
-
-        log.info("[Streak] {} | current={} longest={} total={}",
-                user.getUsername(),
+        log.info("[Streak] profile={} | current={} longest={} total={}",
+                profile.getProfileName(),
                 saved.getCurrentStreak(),
                 saved.getLongestStreak(),
                 saved.getTotalLoginDays());
-        log.info("Last login: {}, Today: {}", last, today);
         return saved;
     }
 
-    private void checkStreakAchievements(User user, int current) {
-        if (current >= 3)   achievementService.grant(user, "STREAK_3");
-        if (current >= 7)   achievementService.grant(user, "STREAK_7");
-        if (current >= 14)  achievementService.grant(user, "STREAK_14");
-        if (current >= 30)  achievementService.grant(user, "STREAK_30");
-        if (current >= 100) achievementService.grant(user, "STREAK_100");
+    private void checkStreakAchievements(Profile profile, int current) {
+        if (current >= 3)   achievementService.grant(profile, "STREAK_3");
+        if (current >= 7)   achievementService.grant(profile, "STREAK_7");
+        if (current >= 14)  achievementService.grant(profile, "STREAK_14");
+        if (current >= 30)  achievementService.grant(profile, "STREAK_30");
+        if (current >= 100) achievementService.grant(profile, "STREAK_100");
     }
 
     @Transactional(readOnly = true)
-    public LoginStreak getStreak(User user) {
-        return loginStreakRepository.findByUser(user)
+    public LoginStreak getStreak(Profile profile) {
+        return loginStreakRepository.findByProfile(profile)
                 .orElseGet(() -> LoginStreak.builder()
-                        .user(user)
+                        .profile(profile)
                         .currentStreak(0)
                         .longestStreak(0)
                         .totalLoginDays(0)
