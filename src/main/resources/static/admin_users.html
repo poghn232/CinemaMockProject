@@ -11,7 +11,8 @@
     />
     <select id="userSortField" style="padding: 8px; border-radius: 8px">
       <option value="username" data-i18n="profile.username">Username</option>
-      <option value="role" data-i18n="profile.username">Role</option>
+      <option value="role">Role</option>
+      <option value="premium">Premium</option>
       <option value="commentDisabled" data-i18n="admin.enabled">Commenting disabled</option>
     </select>
 
@@ -60,11 +61,12 @@
         list = list.filter(u => (u.username || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q));
       }
 
-      const field = document.getElementById('userSortField').value;
+  const field = document.getElementById('userSortField').value;
       const dir = document.getElementById('userSortDir').dataset.dir;
       if (field === 'username') list.sort((a,b) => (a.username||'').localeCompare(b.username||''));
       else if (field === 'role') list.sort((a,b) => (a.role||'').localeCompare(b.role||''));
-      else if (field === 'commentDisabled') list.sort((a,b) => (a.commentDisabled?1:0) - (b.commentDisabled?1:0));
+  else if (field === 'premium') list.sort((a,b) => ((a.premium?1:0) - (b.premium?1:0)));
+  else if (field === 'commentDisabled') list.sort((a,b) => (a.commentDisabled?1:0) - (b.commentDisabled?1:0));
       if (dir === 'desc') list.reverse();
 
       const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
@@ -157,7 +159,7 @@
         // left: info
         const left = document.createElement('div');
         left.className = 'profile-meta';
-        left.innerHTML = `<div style="font-weight:600">${p.profileName || p.profileId}</div><div class="muted">ID: ${p.profileId}</div>`;
+  left.innerHTML = `<div style="font-weight:600">${p.profileName || ''}</div>`;
   // right: toggle only (premium shown at user level)
   const right = document.createElement('div');
   right.className = 'profile-actions';

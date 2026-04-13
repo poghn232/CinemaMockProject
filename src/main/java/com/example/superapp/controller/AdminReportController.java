@@ -59,6 +59,7 @@ public class AdminReportController {
             var reviews = reviewRepository.findByProfile_ProfileId(reportedProfile.getProfileId());
             for (Review rv : reviews) {
                 rv.setHidden(true);
+                rv.setHiddenByReport(true);
             }
             reviewRepository.saveAll(reviews);
             adminLogsService.saveLog(new AdminLogs(reportedProfile.getProfileName() + " reviews hidden due to approved report"));

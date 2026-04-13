@@ -33,6 +33,10 @@ public class Review {
     @Builder.Default
     private Boolean hidden = false;
 
+    @Column(name = "hidden_by_report")
+    @Builder.Default
+    private Boolean hiddenByReport = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id", nullable = false)
     private Profile profile;

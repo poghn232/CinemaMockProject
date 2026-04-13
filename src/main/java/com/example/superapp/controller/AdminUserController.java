@@ -74,8 +74,10 @@ public class AdminUserController {
             try {
                 var reviews = reviewRepository.findByProfile_ProfileId(profile.getProfileId());
                 for (var r : reviews) {
-                    if (Boolean.TRUE.equals(r.getHidden())) {
+                    // only restore reviews that were NOT hidden due to a report
+                    if (Boolean.TRUE.equals(r.getHidden()) && !Boolean.TRUE.equals(r.getHiddenByReport())) {
                         r.setHidden(false);
+                        // leave hiddenByReport as-is (if null/false)
                     }
                 }
                 reviewRepository.saveAll(reviews);
@@ -112,7 +114,8 @@ public class AdminUserController {
                 for (Profile p : saved.getProfiles()) {
                     var reviews = reviewRepository.findByProfile_ProfileId(p.getProfileId());
                     for (var r : reviews) {
-                        if (Boolean.TRUE.equals(r.getHidden())) {
+                        // only restore reviews that were NOT hidden due to a report
+                        if (Boolean.TRUE.equals(r.getHidden()) && !Boolean.TRUE.equals(r.getHiddenByReport())) {
                             r.setHidden(false);
                         }
                     }
