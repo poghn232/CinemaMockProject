@@ -35,7 +35,11 @@ public class AdminUserController {
         return userRepository.findAll()
             .stream()
             .filter(u -> u.getRole() == null || !u.getRole().toUpperCase().contains("ADMIN"))
-            .map(u -> new UserAdminDto(u.getUserId(), u.getUsername(), u.getEmail(), u.getRole(), false))
+            .map(u -> {
+                boolean isPremium = u.getSubscriptions() != null && u.getSubscriptions().stream().anyMatch(s -> s.getStatus() != null && s.getStatus().name().equals("ACTIVE"));
+                // UserAdminDto now expects (userId, username, email, role, premium, commentDisabled)
+                return new UserAdminDto(u.getUserId(), u.getUsername(), u.getEmail(), u.getRole(), isPremium, false);
+            })
             .toList();
     }
 
@@ -44,9 +48,9 @@ public class AdminUserController {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return user.getProfiles().stream()
-                .map(p -> new ProfileAdminDto(p.getProfileId(), p.getProfileName(),
-                        user.getEmail(), user.getRole(), p.getCommentDisabled()))
-                .toList();
+            .map(p -> new ProfileAdminDto(p.getProfileId(), p.getProfileName(),
+                user.getEmail(), user.getRole(), p.getCommentDisabled()))
+            .toList();
     }
 
     @PutMapping("/profiles/{profileId}/comment-disabled")
@@ -81,8 +85,8 @@ public class AdminUserController {
         }
 
         log.info("Profile {} commentDisabled={}", profile.getProfileName(), profile.getCommentDisabled());
-        return new ProfileAdminDto(profile.getProfileId(), profile.getProfileName(),
-                user.getEmail(), user.getRole(), profile.getCommentDisabled());
+    return new ProfileAdminDto(profile.getProfileId(), profile.getProfileName(),
+        user.getEmail(), user.getRole(), profile.getCommentDisabled());
     }
 
     @PutMapping("/{id}/enabled")
@@ -119,6 +123,7 @@ public class AdminUserController {
             }
         }
         log.info("User {} all profiles commentDisabled={}", saved.getUsername(), enabled);
-        return new UserAdminDto(saved.getUserId(), saved.getUsername(), saved.getEmail(), saved.getRole(), enabled);
+    boolean isPremium = saved.getSubscriptions() != null && saved.getSubscriptions().stream().anyMatch(s -> s.getStatus() != null && s.getStatus().name().equals("ACTIVE"));
+    return new UserAdminDto(saved.getUserId(), saved.getUsername(), saved.getEmail(), saved.getRole(), isPremium, enabled);
     }
 }

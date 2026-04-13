@@ -121,6 +121,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+        <!-- Flyway for versioned DB migrations -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
         <!-- Google OAuth2 token verification -->
         <dependency>
             <groupId>com.google.api-client</groupId>
