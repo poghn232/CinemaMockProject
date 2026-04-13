@@ -14,7 +14,7 @@
             --text-main: #e5e7eb;
             --text-subtle: #9ca3af;
             --border-soft: rgba(148, 163, 184, 0.45);
-        }   
+        }
 
         * {
             box-sizing: border-box;
@@ -60,18 +60,20 @@
             transition: transform 0.18s ease, box-shadow 0.18s ease;
             will-change: transform, box-shadow;
         }
+
         /* stronger hover/active for both card types; actor cards will match movie cards */
         /* reduced pop so cards don't get clipped; still visible glow */
         .actor-card:hover, .movie-card:hover {
             transform: translateY(-6px) scale(1.04);
-            box-shadow: 0 20px 44px rgba(249,115,22,0.14), 0 0 30px rgba(249,115,22,0.10);
+            box-shadow: 0 20px 44px rgba(249, 115, 22, 0.14), 0 0 30px rgba(249, 115, 22, 0.10);
             /* lift above sibling cards but remain under the navbar */
             z-index: 500;
         }
+
         .actor-card.active, .movie-card.active {
             transform: translateY(-8px) scale(1.06);
-            box-shadow: 0 36px 84px rgba(249,115,22,0.20), 0 0 48px rgba(249,115,22,0.14);
-            border-color: rgba(249,115,22,0.30);
+            box-shadow: 0 36px 84px rgba(249, 115, 22, 0.20), 0 0 48px rgba(249, 115, 22, 0.14);
+            border-color: rgba(249, 115, 22, 0.30);
             z-index: 40;
         }
 
@@ -79,16 +81,28 @@
            Ensure actor cards also pop on hover and when active (click transient). */
         .page-shell .actor-card:hover {
             transform: translateY(-8px) scale(1.06) !important;
-            box-shadow: 0 28px 60px rgba(249,115,22,0.16) !important;
+            box-shadow: 0 28px 60px rgba(249, 115, 22, 0.16) !important;
             z-index: 30 !important;
         }
+
         .page-shell .actor-card.active {
             transform: translateY(-12px) scale(1.08) !important;
-            box-shadow: 0 48px 110px rgba(249,115,22,0.24) !important;
+            box-shadow: 0 48px 110px rgba(249, 115, 22, 0.24) !important;
             z-index: 40 !important;
         }
-    .actor-card.init, .movie-card.init { opacity: 0; transform: translateY(20px); filter: blur(4px); }
-    .actor-card.in, .movie-card.in { transition: all 0.5s ease; opacity:1; transform: translateY(0); filter: none; }
+
+        .actor-card.init, .movie-card.init {
+            opacity: 0;
+            transform: translateY(20px);
+            filter: blur(4px);
+        }
+
+        .actor-card.in, .movie-card.in {
+            transition: all 0.5s ease;
+            opacity: 1;
+            transform: translateY(0);
+            filter: none;
+        }
 
         /* NAVBAR */
         .navbar {
@@ -282,9 +296,18 @@
             transition: transform 0.2s ease, opacity 0.2s ease;
         }
 
-    /* ensure SVG icon is visible and matches nav tone (subtle warm white) */
-    .nav-hamburger svg { color: #f1f5f9; width: 18px; height: 18px; fill: currentColor; }
-    .nav-hamburger:hover svg { opacity: 0.98; transform: translateY(-1px); }
+        /* ensure SVG icon is visible and matches nav tone (subtle warm white) */
+        .nav-hamburger svg {
+            color: #f1f5f9;
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        .nav-hamburger:hover svg {
+            opacity: 0.98;
+            transform: translateY(-1px);
+        }
 
         .nav-hamburger-menu {
             position: absolute;
@@ -303,7 +326,9 @@
             gap: 6px;
         }
 
-        .nav-hamburger-menu.show { display: flex; }
+        .nav-hamburger-menu.show {
+            display: flex;
+        }
 
         /* menu items styled like nav links */
         .nav-hamburger-menu .menu-item {
@@ -700,7 +725,7 @@
             cursor: default;
         }
 
-    .movie-card {
+        .movie-card {
             background: rgba(15, 23, 42, 0.96);
             border-radius: 16px;
             overflow: hidden;
@@ -720,8 +745,8 @@
         .movie-card:hover {
             /* stronger pop & glow to match actor-card hover behavior */
             transform: translateY(-8px) scale(1.06);
-            border-color: rgba(249,115,22,0.28);
-            box-shadow: 0 28px 60px rgba(249,115,22,0.16), 0 0 40px rgba(249,115,22,0.12);
+            border-color: rgba(249, 115, 22, 0.28);
+            box-shadow: 0 28px 60px rgba(249, 115, 22, 0.16), 0 0 40px rgba(249, 115, 22, 0.12);
             /* raise above other cards but keep below navbar (navbar z-index:1000) */
             z-index: 500;
         }
@@ -757,24 +782,54 @@
             background: linear-gradient(135deg, #facc15, #f59e0b);
             color: #000;
             font-weight: 700;
-            border: 1px solid rgba(34,34,34,0.08);
+            border: 1px solid rgba(34, 34, 34, 0.08);
             z-index: 30; /* above poster but below hover glow */
         }
 
-    /* Continue Watching row specifics */
-    .continue-row .movie-card { width: 180px; }
-    .continue-thumb { position: relative; }
-    .continue-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 8px; background: rgba(0,0,0,0.4); }
-    .continue-progress > .bar { height: 100%; background: linear-gradient(90deg,#f97316,#ec4899); width: 0%; }
-    .resume-pill { position: absolute; right: 8px; bottom: 12px; padding: 6px 8px; border-radius: 999px; font-size: 12px; cursor: pointer;
-        background: linear-gradient(135deg, #f97316, #ec4899);
-        color: #fff;
-        font-weight: 600;
-        border: none;
-        box-shadow: 0 12px 25px rgba(248, 113, 113, 0.6), 0 0 0 1px rgba(248, 113, 113, 0.7);
-        transition: filter 0.12s ease, transform 0.12s ease;
-    }
-    .resume-pill:hover { filter: brightness(1.05); transform: translateY(-1px); }
+        /* Continue Watching row specifics */
+        .continue-row .movie-card {
+            width: 180px;
+        }
+
+        .continue-thumb {
+            position: relative;
+        }
+
+        .continue-progress {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .continue-progress > .bar {
+            height: 100%;
+            background: linear-gradient(90deg, #f97316, #ec4899);
+            width: 0%;
+        }
+
+        .resume-pill {
+            position: absolute;
+            right: 8px;
+            bottom: 12px;
+            padding: 6px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #f97316, #ec4899);
+            color: #fff;
+            font-weight: 600;
+            border: none;
+            box-shadow: 0 12px 25px rgba(248, 113, 113, 0.6), 0 0 0 1px rgba(248, 113, 113, 0.7);
+            transition: filter 0.12s ease, transform 0.12s ease;
+        }
+
+        .resume-pill:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+        }
 
         .movie-type {
             position: absolute;
@@ -1299,7 +1354,7 @@
             outline-offset: 3px;
         }
 
-    .btn-info {
+        .btn-info {
             padding: 12px 20px;
             border-radius: 999px;
             border: 1px solid rgba(255, 255, 255, 0.18);
@@ -1444,30 +1499,31 @@
             transform 0.8s ease;
         }
 
-          .genres-menu {
-                /* Use a 3-column grid so genres are exactly 3 per row and wrap
-                    to additional rows without internal scrolling. Make the menu
-                    responsive by using fractional columns and allowing the grid
-                    to take the available width. */
-                display: grid;
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-                gap: 8px;
-                justify-items: stretch;
-                align-items: stretch;
-                white-space: normal;
-                /* Remove internal scrolling so the dropdown grows vertically
-                    and shows all rows (no vertical scroll inside the menu). */
-                overflow: visible;
-                max-height: none;
-                width: 100%;
-                max-width: none;
-                padding: 8px;
-          }
+        .genres-menu {
+            /* Use a 3-column grid so genres are exactly 3 per row and wrap
+                to additional rows without internal scrolling. Make the menu
+                responsive by using fractional columns and allowing the grid
+                to take the available width. */
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+            justify-items: stretch;
+            align-items: stretch;
+            white-space: normal;
+            /* Remove internal scrolling so the dropdown grows vertically
+                and shows all rows (no vertical scroll inside the menu). */
+            overflow: visible;
+            max-height: none;
+            width: 100%;
+            max-width: none;
+            padding: 8px;
+        }
 
         .genres-menu .genre-item.ellipsis {
             cursor: default;
             opacity: 0.7;
         }
+
         /* Make each genre item fill its grid cell and center its label */
         .genres-menu .genre-item {
             display: flex;
@@ -1503,10 +1559,10 @@
 
             <div class="genres-dropdown" style="position: relative">
                 <button id="genresBtn" class="nav-link" data-i18n="genres.title">Genres ▾</button>
-                                <div
-                                                class="genres-menu"
-                                                id="genresMenu"
-                                                style="
+                <div
+                        class="genres-menu"
+                        id="genresMenu"
+                        style="
                                 display: none;
                                 position: absolute;
                                 top: 44px;
@@ -1517,7 +1573,7 @@
                                 width: min(1100px, calc(100vw - 80px));
                                 z-index: 4000;
                             "
-                                >
+                >
                     <!-- items populated by JS -->
                 </div>
             </div>
@@ -1592,19 +1648,21 @@
             <div style="position:relative;">
                 <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
                     <!-- vertical ellipsis icon -->
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <circle cx="12" cy="5" r="2" fill="currentColor" />
-                        <circle cx="12" cy="12" r="2" fill="currentColor" />
-                        <circle cx="12" cy="19" r="2" fill="currentColor" />
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                         aria-hidden="true">
+                        <circle cx="12" cy="5" r="2" fill="currentColor"/>
+                        <circle cx="12" cy="12" r="2" fill="currentColor"/>
+                        <circle cx="12" cy="19" r="2" fill="currentColor"/>
                     </svg>
                 </button>
 
                 <div class="nav-hamburger-menu" id="navHamburgerMenu" role="menu">
                     <!-- keep existing elements (use anchors/buttons that reuse current IDs) -->
                     <a href="profile.html" class="menu-item" id="profileButton" data-i18n="nav.profile">Profile</a>
-                    <a href="choose_profile.html" class="menu-item" id="switchProfileButton" data-auth="auth">🔄 Switch Profile</a>
+                    <a href="choose_profile.html" class="menu-item" id="switchProfileButton" data-auth="auth" data-i18n="choose_profile.switch_profile">🔄 Switch Profile</a>
                     <a href="contact.html" class="menu-item" id="contactButton" data-i18n="nav.contact">Contact</a>
-                    <a href="login.html" class="menu-item" id="loginNav" data-auth="guest" data-i18n="nav.login">Login</a>
+                    <a href="login.html" class="menu-item" id="loginNav" data-auth="guest"
+                       data-i18n="nav.login">Login</a>
                     <button class="menu-item" id="logoutButton" data-auth="auth" data-i18n="nav.logout">Logout</button>
                     <!-- Genres removed from hamburger menu -->
                 </div>
@@ -2006,13 +2064,13 @@
         const dir = order === 'asc' ? 1 : -1;
         switch (field) {
             case 'title':
-                cloned.sort((a,b) => dir * String((a.title||'')).localeCompare(String(b.title||''), undefined, {sensitivity:'base'}));
+                cloned.sort((a, b) => dir * String((a.title || '')).localeCompare(String(b.title || ''), undefined, {sensitivity: 'base'}));
                 break;
             case 'rating':
-                cloned.sort((a,b) => dir * ((Number(a.rating)||0) - (Number(b.rating)||0)));
+                cloned.sort((a, b) => dir * ((Number(a.rating) || 0) - (Number(b.rating) || 0)));
                 break;
             case 'year':
-                cloned.sort((a,b) => dir * ((Number(a.year)||0) - (Number(b.year)||0)));
+                cloned.sort((a, b) => dir * ((Number(a.year) || 0) - (Number(b.year) || 0)));
                 break;
             default:
                 break;
@@ -2024,9 +2082,9 @@
         const container = document.getElementById("moviesContainer");
         if (!list || !list.length) return;
 
-    const row = document.createElement("div");
-    // mark as actor-row so other code can find and reorder it
-    row.className = "movie-row actor-row";
+        const row = document.createElement("div");
+        // mark as actor-row so other code can find and reorder it
+        row.className = "movie-row actor-row";
 
         const titleEl = document.createElement("div");
         titleEl.className = "movie-row-title";
@@ -2035,7 +2093,7 @@
 
         const scroll = document.createElement("div");
         scroll.className = "movie-row-scroll";
-        
+
         list.forEach((m, idx) => {
             const card = createMovieCard(m);
             // Ranking badge: place under the poster in the body to avoid covering the trending badge
@@ -2044,7 +2102,7 @@
             rank.textContent = `#${idx + 1}`;
             const thumb = card.querySelector('.movie-thumb');
             if (thumb) thumb.appendChild(rank);
-            
+
             scroll.appendChild(card);
             setTimeout(() => card.classList.add("in"), 100 + (idx * 50));
         });
@@ -2061,8 +2119,10 @@
                 if (continueRow.nextSibling) container.insertBefore(actorRow, continueRow.nextSibling);
                 else container.appendChild(actorRow);
             }
-        } catch (e) { /* silent */ }
+        } catch (e) { /* silent */
+        }
     }
+
     let currentFilter = "all"; // all | movie | tv
     let currentSearch = "";
     let currentSortField = "default"; // default | title | rating | year
@@ -2103,7 +2163,7 @@
                         {headers},
                     );
                 } catch (e) {
-                        // network error fetching single page
+                    // network error fetching single page
                     res = null;
                 }
 
@@ -2254,7 +2314,7 @@
             }
             totalPages = data.totalPages || 1;
 
-              renderMovies(useSearch); // search mode if useSearch true
+            renderMovies(useSearch); // search mode if useSearch true
             renderPagination();
         } catch (e) {
             console.error(e);
@@ -2335,7 +2395,7 @@
             } else if (typeof displayNameFor === 'function') {
                 shortName = displayNameFor(info.username);
             } else {
-                shortName = (info.username && info.username.indexOf('@')>0 ? info.username.split('@')[0] : info.username);
+                shortName = (info.username && info.username.indexOf('@') > 0 ? info.username.split('@')[0] : info.username);
             }
 
             usernameEl.textContent = "👋 " + hello + ", " + shortName;
@@ -2372,20 +2432,20 @@
         const countEl = document.getElementById("resultCount");
 
         // hide or show featured and pagination depending on search state or current view
-    const featuredEl = document.getElementById("featuredMovie");
-    const paginationEl = document.getElementById("mainPagination");
-                const doGridMode = isSearch || currentView === "grid";
-                // hide featured when in any grid mode (search or explicit grid)
-                if (doGridMode) {
-                    if (featuredEl) featuredEl.style.display = "none";
-                } else {
-                    if (featuredEl) featuredEl.style.display = "";
-                }
-                // pagination: show for normal listings and grid view, hide only for search overlays
-                if (paginationEl) {
-                    if (isSearch) paginationEl.style.display = "none";
-                    else paginationEl.style.display = "";
-                }
+        const featuredEl = document.getElementById("featuredMovie");
+        const paginationEl = document.getElementById("mainPagination");
+        const doGridMode = isSearch || currentView === "grid";
+        // hide featured when in any grid mode (search or explicit grid)
+        if (doGridMode) {
+            if (featuredEl) featuredEl.style.display = "none";
+        } else {
+            if (featuredEl) featuredEl.style.display = "";
+        }
+        // pagination: show for normal listings and grid view, hide only for search overlays
+        if (paginationEl) {
+            if (isSearch) paginationEl.style.display = "none";
+            else paginationEl.style.display = "";
+        }
 
         // smooth replace: wait fade out, replace, then fade in
         await fadeOut(container);
@@ -2428,7 +2488,7 @@
                 if (token) {
                     const pid = localStorage.getItem('profileId');
                     const histUrl = '/api/user/history' + (pid ? '?profileId=' + pid : '');
-                    const res = await fetch(histUrl, { headers: { Authorization: 'Bearer ' + token } });
+                    const res = await fetch(histUrl, {headers: {Authorization: 'Bearer ' + token}});
                     if (res && res.ok) {
                         const hist = await res.json();
                         if (Array.isArray(hist) && hist.length) {
@@ -2436,7 +2496,8 @@
                         }
                     }
                 }
-                } catch (err) { /* ignore history fetch errors */ }
+            } catch (err) { /* ignore history fetch errors */
+            }
 
             // actor row will be rendered later after movies/tv rows to ensure stable ordering
 
@@ -2448,162 +2509,163 @@
         } catch (e) {
             // discovery rows init failed
         }
-    // pass full lists to renderRow; rows will only display first ROW_DISPLAY_LIMIT items
-    const trendingList = movies.filter((m) => m.rating >= 8);
-    renderRow(t("home.trending"), trendingList.slice(0, ROW_DISPLAY_LIMIT), trendingList);
+        // pass full lists to renderRow; rows will only display first ROW_DISPLAY_LIMIT items
+        const trendingList = movies.filter((m) => m.rating >= 8);
+        renderRow(t("home.trending"), trendingList.slice(0, ROW_DISPLAY_LIMIT), trendingList);
 
-    // actor row handled earlier to control ordering
-    const moviesOnly = movies.filter((m) => m.type === "movie");
-    // movies row count logged in dev
-    renderRow(t("home.movies"), moviesOnly, moviesOnly);
+        // actor row handled earlier to control ordering
+        const moviesOnly = movies.filter((m) => m.type === "movie");
+        // movies row count logged in dev
+        renderRow(t("home.movies"), moviesOnly, moviesOnly);
 
-    const tvOnly = movies.filter((m) => m.type === "tv");
-    // tv row count logged in dev
-    renderRow(t("home.tv_series"), tvOnly, tvOnly);
+        const tvOnly = movies.filter((m) => m.type === "tv");
+        // tv row count logged in dev
+        renderRow(t("home.tv_series"), tvOnly, tvOnly);
 
-    // Now render Top Actors so it appears after Movies and TV rows (stable DOM order)
-    try {
-        const topActors = await collectTopActors(20);
-        if (topActors && topActors.length) {
-            renderActorRow(t("home.top_actors"), topActors);
+        // Now render Top Actors so it appears after Movies and TV rows (stable DOM order)
+        try {
+            const topActors = await collectTopActors(20);
+            if (topActors && topActors.length) {
+                renderActorRow(t("home.top_actors"), topActors);
+            }
+        } catch (e) { /* ignore actor fetch errors */
         }
-    } catch (e) { /* ignore actor fetch errors */ }
 
-    // helper: render continue watching row
-    function renderContinueWatchingRow(title, list) {
-        const container = document.getElementById('moviesContainer');
-        if (!list || !list.length) return;
-        const row = document.createElement('div');
-        row.className = 'movie-row continue-row';
-        const titleEl = document.createElement('div');
-        titleEl.className = 'movie-row-title';
-        titleEl.innerHTML = `<span style="width: 4px; height: 18px; background: var(--accent); border-radius: 2px; display:inline-block; margin-right:8px; vertical-align:middle;"></span> ${title}`;
-        row.appendChild(titleEl);
-        const scroll = document.createElement('div');
-        scroll.className = 'movie-row-scroll';
-        // Deduplicate TV series so we only show the latest watched episode per series.
-        // Strategy: group by tvSeriesId when present; keep the item with the latest
-        // timestamp (watchedAt/createdAt/timestamp) if available, else compare season/episode,
-        // else prefer the most recent item in the list.
-        const grouped = new Map();
-        list.forEach((item, idx) => {
-            const isTv = !!item.tvSeriesId || item.type === 'tv';
-            const id = isTv ? (item.tvSeriesId || item.id) : (item.movieId || item.id);
-            const key = (isTv ? 'tv:' : 'm:') + String(id || '');
-            const existing = grouped.get(key);
-            if (!existing) {
-                grouped.set(key, Object.assign({}, item, { __idx: idx }));
-                return;
-            }
-
-            // try to compare by well-known time fields
-            const timeKeys = ['watchedAt','watched_at','timestamp','createdAt','created_at','time','lastWatched'];
-            const getTime = (o) => {
-                for (const k of timeKeys) if (o && o[k]) return Date.parse(o[k]);
-                return null;
-            };
-            const aT = getTime(existing);
-            const bT = getTime(item);
-            if (aT && bT) {
-                if (bT >= aT) grouped.set(key, Object.assign({}, item, { __idx: idx }));
-                return;
-            }
-
-            // fallback: compare season/episode numbers for TV
-            const aSeason = existing.seasonNumber || existing.season || 0;
-            const aEp = existing.episodeNumber || existing.episode || existing.episodeIndex || 0;
-            const bSeason = item.seasonNumber || item.season || 0;
-            const bEp = item.episodeNumber || item.episode || item.episodeIndex || 0;
-            if (bSeason > aSeason || (bSeason === aSeason && bEp >= aEp)) {
-                grouped.set(key, Object.assign({}, item, { __idx: idx }));
-                return;
-            }
-
-            // last-resort: prefer later item in the original list
-            if (idx > (existing.__idx || 0)) grouped.set(key, Object.assign({}, item, { __idx: idx }));
-        });
-
-        // convert grouped map to array and show most-recent-first
-        const deduped = Array.from(grouped.values()).sort((a, b) => (b.__idx || 0) - (a.__idx || 0));
-
-        deduped.forEach((item, idx) => {
-            // map fields similar to profile.renderHistory
-            const mainTitle = item.movieTitle || item.tvSeriesName || item.title || 'Unknown';
-            const progressSec = item.progressSec || item.positionSeconds || 0;
-            const durationSec = item.durationSec || item.duration || 1;
-            const percent = Math.min(100, Math.round((progressSec / durationSec) * 100));
-            const poster = item.posterPath || item.imageUrl || item.image || 'https://placehold.co/200x300/1f2937/9ca3af?text=No+Poster';
-
-            // Build a lightweight movie-like object for createMovieCard
-            const movieObj = {
-                id: item.movieId || item.tvSeriesId || item.id,
-                title: mainTitle,
-                imageUrl: poster,
-                type: item.tvSeriesId ? 'tv' : (item.type || 'movie'),
-                rating: item.rating || item.score
-            };
-
-            const card = createMovieCard(movieObj);
-            const thumb = card.querySelector('.movie-thumb');
-            if (thumb) {
-                thumb.classList.add('continue-thumb');
-                const progressWrap = document.createElement('div');
-                progressWrap.className = 'continue-progress';
-                const bar = document.createElement('div');
-                bar.className = 'bar';
-                bar.style.width = percent + '%';
-                progressWrap.appendChild(bar);
-                thumb.appendChild(progressWrap);
-
-                const resume = document.createElement('div');
-                resume.className = 'resume-pill';
-                resume.textContent = 'Resume';
-                resume.addEventListener('click', (ev) => {
-                    ev.stopPropagation();
-                    let link;
-                    if (item.movieId) {
-                        link = `movie-watch.html?id=${item.movieId}&type=movie&t=${progressSec}`;
-                    } else if (item.tvSeriesId) {
-                        link = `movie-watch.html?id=${item.tvSeriesId}&type=tv&season=${item.seasonNumber || item.season || 1}&episode=${item.episodeNumber || item.episode || 1}&t=${progressSec}`;
-                    } else {
-                        link = `movie-watch.html?id=${encodeURIComponent(movieObj.id)}&type=${encodeURIComponent(movieObj.type)}&t=${progressSec}`;
-                    }
-                    window.location.href = link;
-                });
-                thumb.appendChild(resume);
-            }
-
-            // update title and meta rows to show correct title and progress info
-            const body = card.querySelector('.movie-body');
-            if (body) {
-                const titleEl = body.querySelector('.movie-title');
-                if (titleEl) titleEl.textContent = mainTitle;
-
-                // Hide rating in Continue Watching since it's N/A for history items
-                const ratingNode = body.querySelector('.movie-rating');
-                if (ratingNode) ratingNode.style.display = 'none';
-
-                // show episode label for TV series (SxEx or Episode #)
-                if (item.tvSeriesId || item.type === 'tv') {
-                    const season = item.seasonNumber || item.season || 1;
-                    const episode = item.episodeNumber || item.episode || item.episodeIndex || null;
-                    const epText = episode ? `S${season}E${String(episode).padStart(2,'0')}` : (item.episodeName ? item.episodeName : 'Episode');
-                    const epEl = document.createElement('div');
-                    epEl.className = 'movie-episode';
-                    epEl.textContent = epText;
-                    epEl.style.fontSize = '12px';
-                    epEl.style.color = 'var(--text-subtle)';
-                    epEl.style.marginTop = '4px';
-                    body.appendChild(epEl);
+        // helper: render continue watching row
+        function renderContinueWatchingRow(title, list) {
+            const container = document.getElementById('moviesContainer');
+            if (!list || !list.length) return;
+            const row = document.createElement('div');
+            row.className = 'movie-row continue-row';
+            const titleEl = document.createElement('div');
+            titleEl.className = 'movie-row-title';
+            titleEl.innerHTML = `<span style="width: 4px; height: 18px; background: var(--accent); border-radius: 2px; display:inline-block; margin-right:8px; vertical-align:middle;"></span> ${title}`;
+            row.appendChild(titleEl);
+            const scroll = document.createElement('div');
+            scroll.className = 'movie-row-scroll';
+            // Deduplicate TV series so we only show the latest watched episode per series.
+            // Strategy: group by tvSeriesId when present; keep the item with the latest
+            // timestamp (watchedAt/createdAt/timestamp) if available, else compare season/episode,
+            // else prefer the most recent item in the list.
+            const grouped = new Map();
+            list.forEach((item, idx) => {
+                const isTv = !!item.tvSeriesId || item.type === 'tv';
+                const id = isTv ? (item.tvSeriesId || item.id) : (item.movieId || item.id);
+                const key = (isTv ? 'tv:' : 'm:') + String(id || '');
+                const existing = grouped.get(key);
+                if (!existing) {
+                    grouped.set(key, Object.assign({}, item, {__idx: idx}));
+                    return;
                 }
-            }
 
-            scroll.appendChild(card);
-            setTimeout(()=>card.classList.add('in'), 100 + (idx*30));
-        });
-        row.appendChild(scroll);
-        container.appendChild(row);
-    }
+                // try to compare by well-known time fields
+                const timeKeys = ['watchedAt', 'watched_at', 'timestamp', 'createdAt', 'created_at', 'time', 'lastWatched'];
+                const getTime = (o) => {
+                    for (const k of timeKeys) if (o && o[k]) return Date.parse(o[k]);
+                    return null;
+                };
+                const aT = getTime(existing);
+                const bT = getTime(item);
+                if (aT && bT) {
+                    if (bT >= aT) grouped.set(key, Object.assign({}, item, {__idx: idx}));
+                    return;
+                }
+
+                // fallback: compare season/episode numbers for TV
+                const aSeason = existing.seasonNumber || existing.season || 0;
+                const aEp = existing.episodeNumber || existing.episode || existing.episodeIndex || 0;
+                const bSeason = item.seasonNumber || item.season || 0;
+                const bEp = item.episodeNumber || item.episode || item.episodeIndex || 0;
+                if (bSeason > aSeason || (bSeason === aSeason && bEp >= aEp)) {
+                    grouped.set(key, Object.assign({}, item, {__idx: idx}));
+                    return;
+                }
+
+                // last-resort: prefer later item in the original list
+                if (idx > (existing.__idx || 0)) grouped.set(key, Object.assign({}, item, {__idx: idx}));
+            });
+
+            // convert grouped map to array and show most-recent-first
+            const deduped = Array.from(grouped.values()).sort((a, b) => (b.__idx || 0) - (a.__idx || 0));
+
+            deduped.forEach((item, idx) => {
+                // map fields similar to profile.renderHistory
+                const mainTitle = item.movieTitle || item.tvSeriesName || item.title || 'Unknown';
+                const progressSec = item.progressSec || item.positionSeconds || 0;
+                const durationSec = item.durationSec || item.duration || 1;
+                const percent = Math.min(100, Math.round((progressSec / durationSec) * 100));
+                const poster = item.posterPath || item.imageUrl || item.image || 'https://placehold.co/200x300/1f2937/9ca3af?text=No+Poster';
+
+                // Build a lightweight movie-like object for createMovieCard
+                const movieObj = {
+                    id: item.movieId || item.tvSeriesId || item.id,
+                    title: mainTitle,
+                    imageUrl: poster,
+                    type: item.tvSeriesId ? 'tv' : (item.type || 'movie'),
+                    rating: item.rating || item.score
+                };
+
+                const card = createMovieCard(movieObj);
+                const thumb = card.querySelector('.movie-thumb');
+                if (thumb) {
+                    thumb.classList.add('continue-thumb');
+                    const progressWrap = document.createElement('div');
+                    progressWrap.className = 'continue-progress';
+                    const bar = document.createElement('div');
+                    bar.className = 'bar';
+                    bar.style.width = percent + '%';
+                    progressWrap.appendChild(bar);
+                    thumb.appendChild(progressWrap);
+
+                    const resume = document.createElement('div');
+                    resume.className = 'resume-pill';
+                    resume.textContent = 'Resume';
+                    resume.addEventListener('click', (ev) => {
+                        ev.stopPropagation();
+                        let link;
+                        if (item.movieId) {
+                            link = `movie-watch.html?id=${item.movieId}&type=movie&t=${progressSec}`;
+                        } else if (item.tvSeriesId) {
+                            link = `movie-watch.html?id=${item.tvSeriesId}&type=tv&season=${item.seasonNumber || item.season || 1}&episode=${item.episodeNumber || item.episode || 1}&t=${progressSec}`;
+                        } else {
+                            link = `movie-watch.html?id=${encodeURIComponent(movieObj.id)}&type=${encodeURIComponent(movieObj.type)}&t=${progressSec}`;
+                        }
+                        window.location.href = link;
+                    });
+                    thumb.appendChild(resume);
+                }
+
+                // update title and meta rows to show correct title and progress info
+                const body = card.querySelector('.movie-body');
+                if (body) {
+                    const titleEl = body.querySelector('.movie-title');
+                    if (titleEl) titleEl.textContent = mainTitle;
+
+                    // Hide rating in Continue Watching since it's N/A for history items
+                    const ratingNode = body.querySelector('.movie-rating');
+                    if (ratingNode) ratingNode.style.display = 'none';
+
+                    // show episode label for TV series (SxEx or Episode #)
+                    if (item.tvSeriesId || item.type === 'tv') {
+                        const season = item.seasonNumber || item.season || 1;
+                        const episode = item.episodeNumber || item.episode || item.episodeIndex || null;
+                        const epText = episode ? `S${season}E${String(episode).padStart(2, '0')}` : (item.episodeName ? item.episodeName : 'Episode');
+                        const epEl = document.createElement('div');
+                        epEl.className = 'movie-episode';
+                        epEl.textContent = epText;
+                        epEl.style.fontSize = '12px';
+                        epEl.style.color = 'var(--text-subtle)';
+                        epEl.style.marginTop = '4px';
+                        body.appendChild(epEl);
+                    }
+                }
+
+                scroll.appendChild(card);
+                setTimeout(() => card.classList.add('in'), 100 + (idx * 30));
+            });
+            row.appendChild(scroll);
+            container.appendChild(row);
+        }
 
         // Render top genre rows (prefer server-provided list when available)
         const MAX_GENRE_ROWS = 12; // render more rows based on genre
@@ -2750,27 +2812,27 @@
         infoWrap.style.color = 'var(--text-subtle)';
         infoWrap.style.padding = '6px 10px';
 
-    const info = document.createElement('div');
-    info.textContent = `Page ${currentPage} / ${totalPages}`;
-    infoWrap.appendChild(info);
+        const info = document.createElement('div');
+        info.textContent = `Page ${currentPage} / ${totalPages}`;
+        infoWrap.appendChild(info);
 
-    const input = document.createElement('input');
-    input.type = 'number';
-    input.min = 1;
-    input.max = totalPages;
-    input.value = currentPage;
-    // style input to match page buttons
-    input.style.width = '64px';
-    input.style.padding = '8px 10px';
-    input.style.borderRadius = '8px';
-    input.style.border = '1px solid rgba(148,163,184,0.12)';
-    input.style.background = 'rgba(15, 23, 42, 0.9)';
-    input.style.color = 'var(--text-main)';
-    infoWrap.appendChild(input);
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.min = 1;
+        input.max = totalPages;
+        input.value = currentPage;
+        // style input to match page buttons
+        input.style.width = '64px';
+        input.style.padding = '8px 10px';
+        input.style.borderRadius = '8px';
+        input.style.border = '1px solid rgba(148,163,184,0.12)';
+        input.style.background = 'rgba(15, 23, 42, 0.9)';
+        input.style.color = 'var(--text-main)';
+        infoWrap.appendChild(input);
 
-    const go = document.createElement('button');
-    go.className = 'page-button';
-    go.textContent = 'Go';
+        const go = document.createElement('button');
+        go.className = 'page-button';
+        go.textContent = 'Go';
         go.onclick = async () => {
             let v = parseInt(input.value, 10) || 1;
             v = Math.max(1, Math.min(totalPages, v));
@@ -2837,7 +2899,8 @@
         try {
             const sample = (Array.isArray(list) ? list.slice(0, 6) : []).map((m) => ({id: m.id, title: m.title}));
             // renderRow preparing row (dev log omitted)
-        } catch (e) {}
+        } catch (e) {
+        }
 
         // watch all button
         const watchAll = document.createElement("button");
@@ -3004,11 +3067,11 @@
 
         // hide featured and main pagination while viewing a grid from a row/genre
         const featuredEl = document.getElementById("featuredMovie");
-    const paginationEl = document.getElementById("mainPagination");
+        const paginationEl = document.getElementById("mainPagination");
 
         currentView = "grid";
         if (featuredEl) featuredEl.style.display = "none";
-    if (paginationEl) paginationEl.style.display = "none";
+        if (paginationEl) paginationEl.style.display = "none";
 
         (async function () {
             await fadeOut(container);
@@ -3126,7 +3189,9 @@
                         applyFadeInAnimation(grid);
                     })();
                 };
-                input.addEventListener('keydown', (e) => { if (e.key === 'Enter') goBtn.click(); });
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') goBtn.click();
+                });
 
                 paginationWrap.appendChild(prevBtn);
                 paginationWrap.appendChild(infoWrap);
@@ -3565,7 +3630,7 @@
         overlay.classList.remove("hidden");
         overlay.setAttribute("aria-hidden", "false");
         // focus input
-    setTimeout(() => overlayInput && overlayInput.focus(), 80);
+        setTimeout(() => overlayInput && overlayInput.focus(), 80);
         // stop featured from auto-rotating while searching
         if (featuredInterval) clearInterval(featuredInterval);
         currentView = "search";
@@ -3774,7 +3839,7 @@
             };
         }
 
-    setTimeout(() => {
+        setTimeout(() => {
             popup.style.display = "none";
         }, 6000);
     }
@@ -3851,10 +3916,12 @@
 
         // reflect current state
         fieldSel.value = currentSortField || 'default';
+
         // update visibility depending on view
         function updateSortVisibility() {
             wrap.style.display = currentView === 'rows' ? 'none' : 'flex';
         }
+
         updateSortVisibility();
 
         fieldSel.addEventListener('change', async () => {
@@ -3888,7 +3955,7 @@
 
         // ensure visibility updates when view changes
         const origRenderMovies = renderMovies;
-        renderMovies = async function(isSearch) {
+        renderMovies = async function (isSearch) {
             updateSortVisibility();
             return origRenderMovies.call(this, isSearch);
         };
@@ -3905,7 +3972,7 @@
         await initUserUi();
         initSearch();
         initNavbarSearchToggle();
-    initHamburgerMenu();
+        initHamburgerMenu();
         adjustFeaturedHeight();
         // unlock featured full-screen when user scrolls or touches
         window.addEventListener("wheel", unlockFeaturedOnScroll, {
@@ -3916,8 +3983,8 @@
         });
         handlePaymentReturnMessage();
         initPremiumAndLogout();
-    initSortUI();
-    await loadMovies(currentFilter);
+        initSortUI();
+        await loadMovies(currentFilter);
     })();
 
     // wire featured down button

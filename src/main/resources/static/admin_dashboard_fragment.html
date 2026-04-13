@@ -1,437 +1,720 @@
 <!-- Analytics Dashboard Fragment -->
 <style>
-  .analytics-root {
-    --c-card:    rgba(15, 23, 42, 0.95);
-    --c-border:  rgba(148, 163, 184, 0.18);
-    --c-accent:  #f97316;
-    --c-text:    #e2e8f0;
-    --c-muted:   #64748b;
-    --c-green:   #22c55e;
-    font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  }
-  .analytics-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 28px; padding-bottom: 18px;
-    border-bottom: 1px solid var(--c-border);
-  }
-  .analytics-title {
-    font-size: 28px; font-weight: 700; letter-spacing: -0.02em;
-    background: linear-gradient(135deg, #f97316, #ec4899);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  }
-  .analytics-subtitle {
-    font-size: 14px; color: var(--c-muted); margin-top: 2px;
-  }
-  .charts-grid { display: flex; flex-direction: column; gap: 20px; }
-  .chart-card {
-    background: var(--c-card); border: 1px solid var(--c-border);
-    border-radius: 16px; padding: 20px; position: relative;
-    overflow: hidden; transition: border-color 0.2s; width: 100%;
-  }
-  .chart-card::before {
-    content: ''; position: absolute; inset: 0; border-radius: 16px;
-    background: radial-gradient(circle at top left, rgba(249,115,22,0.06), transparent 60%);
-    pointer-events: none;
-  }
-  .chart-card:hover { border-color: rgba(249,115,22,0.35); }
-  .card-header {
-    display: flex; align-items: flex-start; justify-content: space-between;
-    margin-bottom: 16px; gap: 10px;
-  }
-  .card-title {
-    font-size: 15px; font-weight: 600; text-transform: uppercase;
-    letter-spacing: 0.08em; color: var(--c-muted);
-  }
-  .card-badge {
-    font-size: 12px; padding: 3px 8px; border-radius: 999px;
-    background: rgba(249,115,22,0.12); color: var(--c-accent);
-    border: 1px solid rgba(249,115,22,0.25); white-space: nowrap;
-  }
-  .cycle-select {
-    appearance: none; -webkit-appearance: none;
-    background: rgba(15,23,42,0.9); border: 1px solid var(--c-border);
-    border-radius: 8px; color: var(--c-text); font-size: 13px;
-    font-family: inherit; padding: 5px 24px 5px 9px; cursor: pointer;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2364748b'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: right 7px center;
-    outline: none; transition: border-color 0.15s;
-  }
-  .cycle-select:hover, .cycle-select:focus { border-color: rgba(249,115,22,0.5); }
-  .cycle-select option { background: #0f172a; color: #e2e8f0; }
-  .chart-body { display: flex; align-items: center; gap: 24px; width: 100%; }
-  .chart-canvas-wrap { position: relative; flex-shrink: 0; width: 180px; height: 180px; }
-  .chart-center-label {
-    position: absolute; inset: 0; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; pointer-events: none;
-  }
-  .chart-center-num { font-size: 26px; font-weight: 700; line-height: 1; color: var(--c-text); }
-  .chart-center-sub { font-size: 12px; color: var(--c-muted); margin-top: 3px; }
-  .legend-list  { flex: 1; display: flex; flex-direction: column; gap: 7px; min-width: 0; list-style: none; margin: 0; padding: 0; }
-  .legend-item  { display: flex; align-items: center; gap: 8px; font-size: 14px; }
-  .legend-dot   { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .legend-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--c-text); }
-  .legend-value { font-size: 13px; color: var(--c-muted); white-space: nowrap; }
-  .login-legend-list { flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 0; list-style: none; margin: 0; padding: 0; }
-  .login-legend-item { display: flex; align-items: center; gap: 7px; font-size: 13px; }
-  .login-flag    { font-size: 16px; flex-shrink: 0; }
-  .login-country { font-weight: 600; color: var(--c-text); width: 32px; flex-shrink: 0; }
-  .login-bars    { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-  .login-bar-row { display: flex; align-items: center; gap: 5px; }
-  .login-bar-track { flex: 1; height: 4px; background: rgba(148,163,184,0.1); border-radius: 99px; overflow: hidden; }
-  .login-bar-fill  { height: 100%; border-radius: 99px; transition: width 0.6s ease; }
-  .login-bar-num   { font-size: 12px; color: var(--c-muted); width: 32px; text-align: right; }
-  @keyframes pulse-load { 0%,100%{opacity:0.4} 50%{opacity:1} }
-  .loading-pulse {
-    animation: pulse-load 1.4s ease-in-out infinite;
-    color: var(--c-muted); font-size: 14px; text-align: center; padding: 40px 0;
-  }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
-  .live-dot {
-    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
-    background: var(--c-green); margin-right: 5px; vertical-align: middle;
-    animation: blink 2s ease infinite;
-  }
+    .analytics-root {
+        --c-card: rgba(15, 23, 42, 0.95);
+        --c-border: rgba(148, 163, 184, 0.18);
+        --c-accent: #f97316;
+        --c-text: #e2e8f0;
+        --c-muted: #64748b;
+        --c-green: #22c55e;
+        font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .analytics-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 28px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--c-border);
+    }
+
+    .analytics-title {
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, #f97316, #ec4899);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .analytics-subtitle {
+        font-size: 14px;
+        color: var(--c-muted);
+        margin-top: 2px;
+    }
+
+    .charts-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .chart-card {
+        background: var(--c-card);
+        border: 1px solid var(--c-border);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition: border-color 0.2s;
+        width: 100%;
+    }
+
+    .chart-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 16px;
+        background: radial-gradient(circle at top left, rgba(249, 115, 22, 0.06), transparent 60%);
+        pointer-events: none;
+    }
+
+    .chart-card:hover {
+        border-color: rgba(249, 115, 22, 0.35);
+    }
+
+    .card-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 16px;
+        gap: 10px;
+    }
+
+    .card-title {
+        font-size: 15px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--c-muted);
+    }
+
+    .card-badge {
+        font-size: 12px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        background: rgba(249, 115, 22, 0.12);
+        color: var(--c-accent);
+        border: 1px solid rgba(249, 115, 22, 0.25);
+        white-space: nowrap;
+    }
+
+    .cycle-select {
+        appearance: none;
+        -webkit-appearance: none;
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid var(--c-border);
+        border-radius: 8px;
+        color: var(--c-text);
+        font-size: 13px;
+        font-family: inherit;
+        padding: 5px 24px 5px 9px;
+        cursor: pointer;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2364748b'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 7px center;
+        outline: none;
+        transition: border-color 0.15s;
+    }
+
+    .cycle-select:hover, .cycle-select:focus {
+        border-color: rgba(249, 115, 22, 0.5);
+    }
+
+    .cycle-select option {
+        background: #0f172a;
+        color: #e2e8f0;
+    }
+
+    .chart-body {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        width: 100%;
+    }
+
+    .chart-canvas-wrap {
+        position: relative;
+        flex-shrink: 0;
+        width: 180px;
+        height: 180px;
+    }
+
+    .chart-center-label {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+    }
+
+    .chart-center-num {
+        font-size: 26px;
+        font-weight: 700;
+        line-height: 1;
+        color: var(--c-text);
+    }
+
+    .chart-center-sub {
+        font-size: 12px;
+        color: var(--c-muted);
+        margin-top: 3px;
+    }
+
+    .legend-list {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        min-width: 0;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+    }
+
+    .legend-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .legend-label {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: var(--c-text);
+    }
+
+    .legend-value {
+        font-size: 13px;
+        color: var(--c-muted);
+        white-space: nowrap;
+    }
+
+    .login-legend-list {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        min-width: 0;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .login-legend-item {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 13px;
+    }
+
+    .login-flag {
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .login-country {
+        font-weight: 600;
+        color: var(--c-text);
+        width: 32px;
+        flex-shrink: 0;
+    }
+
+    .login-bars {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .login-bar-row {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .login-bar-track {
+        flex: 1;
+        height: 4px;
+        background: rgba(148, 163, 184, 0.1);
+        border-radius: 99px;
+        overflow: hidden;
+    }
+
+    .login-bar-fill {
+        height: 100%;
+        border-radius: 99px;
+        transition: width 0.6s ease;
+    }
+
+    .login-bar-num {
+        font-size: 12px;
+        color: var(--c-muted);
+        width: 32px;
+        text-align: right;
+    }
+
+    @keyframes pulse-load {
+        0%, 100% {
+            opacity: 0.4
+        }
+        50% {
+            opacity: 1
+        }
+    }
+
+    .loading-pulse {
+        animation: pulse-load 1.4s ease-in-out infinite;
+        color: var(--c-muted);
+        font-size: 14px;
+        text-align: center;
+        padding: 40px 0;
+    }
+
+    @keyframes blink {
+        0%, 100% {
+            opacity: 1
+        }
+        50% {
+            opacity: 0.2
+        }
+    }
+
+    .live-dot {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--c-green);
+        margin-right: 5px;
+        vertical-align: middle;
+        animation: blink 2s ease infinite;
+    }
 </style>
 
 <div class="analytics-root">
-  <div class="analytics-header">
-    <div>
-      <div class="analytics-title">Analytics Dashboard</div>
-      <div class="analytics-subtitle"><span class="live-dot"></span>Live data ·
-        auto-refreshes every 60s</div>
-    </div>
-  </div>
-  <div class="charts-grid">
-
-    <!-- Chart 1: User Overview -->
-    <div class="chart-card">
-      <div class="card-header">
-        <div class="card-title">User Overview</div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span class="card-badge" id="ub-badge">ALL TIME</span>
-          <select class="cycle-select" id="ub-period"
-            onchange="analyticsLoadUser()">
-            <option value="all">All Time</option>
-            <option value="monthly">Monthly</option>
-            <option value="weekly">Weekly</option>
-          </select>
+    <div class="analytics-header">
+        <div>
+            <div class="analytics-title" data-i18n="analytics.title">Analytics Dashboard</div>
+            <div class="analytics-subtitle">
+                <span class="live-dot"></span>
+                <span data-i18n="analytics.subtitle_live">Live data</span> ·
+                <span data-i18n="analytics.subtitle_refresh">
+    auto-refreshes every 60s
+  </span>
+            </div>
         </div>
-      </div>
-      <div id="ub-body"><div class="loading-pulse">Loading…</div></div>
     </div>
+    <div class="charts-grid">
 
-    <!-- Chart 2: Genre Popularity -->
-    <div class="chart-card">
-      <div class="card-header">
-        <div class="card-title">Genre Popularity</div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span class="card-badge" id="gn-badge">ALL TIME</span>
-          <select class="cycle-select" id="gn-period"
-            onchange="analyticsLoadGenre()">
-            <option value="all">All Time</option>
-            <option value="monthly">Monthly</option>
-            <option value="weekly">Weekly</option>
-          </select>
+        <!-- Chart 1: User Overview -->
+        <div class="chart-card">
+            <div class="card-header">
+                <div class="card-title" data-i18n="analytics.user_overview">User Overview</div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="card-badge" id="ub-badge">ALL TIME</span>
+                    <select class="cycle-select" id="ub-period"
+                            onchange="analyticsLoadUser()">
+                        <option value="all" data-i18n="analytics.select_all">All Time</option>
+                        <option value="monthly" data-i18n="analytics.select_monthly">Monthly</option>
+                        <option value="weekly" data-i18n="analytics.select_weekly">Weekly</option>
+                    </select>
+                </div>
+            </div>
+            <div id="ub-body">
+                <div class="loading-pulse">Loading…</div>
+            </div>
         </div>
-      </div>
-      <div id="gn-body"><div class="loading-pulse">Loading…</div></div>
-    </div>
 
-    <!-- Chart 3: Logins by Region -->
-    <div class="chart-card">
-      <div class="card-header">
-        <div class="card-title">Logins by Region</div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span class="card-badge" id="lg-badge">ALL TIME</span>
-          <select class="cycle-select" id="lg-period"
-            onchange="analyticsLoadLogin()">
-            <option value="all">All Time</option>
-            <option value="monthly">Monthly</option>
-            <option value="weekly">Weekly</option>
-          </select>
+        <!-- Chart 2: Genre Popularity -->
+        <div class="chart-card">
+            <div class="card-header">
+                <div class="card-title" data-i18n="analytics.genre_popularity">Genre Popularity</div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="card-badge" id="gn-badge">ALL TIME</span>
+                    <select class="cycle-select" id="gn-period"
+                            onchange="analyticsLoadGenre()">
+                        <option value="all" data-i18n="analytics.select_all">All Time</option>
+                        <option value="monthly" data-i18n="analytics.select_monthly">Monthly</option>
+                        <option value="weekly" data-i18n="analytics.select_weekly">Weekly</option>
+                    </select>
+                </div>
+            </div>
+            <div id="gn-body">
+                <div class="loading-pulse">Loading…</div>
+            </div>
         </div>
-      </div>
-      <div id="lg-body"><div class="loading-pulse">Loading…</div></div>
-    </div>
 
-    <!-- Chart 4: Popular Subscription Packs -->
-    <div class="chart-card">
-      <div class="card-header">
-        <div class="card-title">Popular Subscription Packs</div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span class="card-badge" id="sp-badge">ALL TIME</span>
-          <select class="cycle-select" id="sp-period" onchange="analyticsLoadSubpacks()">
-            <option value="all">All Time</option>
-            <option value="monthly">Monthly</option>
-            <option value="weekly">Weekly</option>
-          </select>
+        <!-- Chart 3: Logins by Region -->
+        <div class="chart-card">
+            <div class="card-header">
+                <div class="card-title" data-i18n="analytics.logins_region">Logins by Region</div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="card-badge" id="lg-badge">ALL TIME</span>
+                    <select class="cycle-select" id="lg-period"
+                            onchange="analyticsLoadLogin()">
+                        <option value="all" data-i18n="analytics.select_all">All Time</option>
+                        <option value="monthly" data-i18n="analytics.select_monthly">Monthly</option>
+                        <option value="weekly" data-i18n="analytics.select_weekly">Weekly</option>
+                    </select>
+                </div>
+            </div>
+            <div id="lg-body">
+                <div class="loading-pulse">Loading…</div>
+            </div>
         </div>
-      </div>
-      <div id="sp-body"><div class="loading-pulse">Loading…</div></div>
-    </div>
 
-  </div>
+        <!-- Chart 4: Popular Subscription Packs -->
+        <div class="chart-card">
+            <div class="card-header">
+                <div class="card-title" data-i18n="analytics.subscription_packs">Popular Subscription Packs</div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="card-badge" id="sp-badge">ALL TIME</span>
+                    <select class="cycle-select" id="sp-period" onchange="analyticsLoadSubpacks()">
+                        <option value="all" data-i18n="analytics.select_all">All Time</option>
+                        <option value="monthly" data-i18n="analytics.select_monthly">Monthly</option>
+                        <option value="weekly" data-i18n="analytics.select_weekly">Weekly</option>
+                    </select>
+                </div>
+            </div>
+            <div id="sp-body">
+                <div class="loading-pulse">Loading…</div>
+            </div>
+        </div>
+
+    </div>
 </div>
 
 <script data-fragment-script>
-(function () {
+    (function () {
 
-  function withChartJs(cb) {
-    if (window.Chart) { cb(); return; }
-    var s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
-    s.onload = cb;
-    s.onerror = function() {
-      ['ub-body','gn-body','lg-body'].forEach(function(id) {
-        var el = document.getElementById(id);
-        if (el) el.innerHTML = '<div class="loading-pulse" style="color:#ef4444">Chart.js failed to load</div>';
-      });
-    };
-    document.head.appendChild(s);
-  }
+        function withChartJs(cb) {
+            if (window.Chart) {
+                cb();
+                return;
+            }
+            var s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+            s.onload = cb;
+            s.onerror = function () {
+                ['ub-body', 'gn-body', 'lg-body'].forEach(function (id) {
+                    var el = document.getElementById(id);
+                    if (el) el.innerHTML =
+                        '<div class="loading-pulse" style="color:#ef4444">' +
+                        t("analytics.chart_load_fail") +
+                        '</div>';
+                });
+            };
+            document.head.appendChild(s);
+        }
 
-  var PALETTE = [
-    '#f97316','#ec4899','#3b82f6','#14b8a6',
-    '#a855f7','#22c55e','#eab308','#ef4444',
-    '#06b6d4','#8b5cf6','#94a3b8'
-  ];
+        var PALETTE = [
+            '#f97316', '#ec4899', '#3b82f6', '#14b8a6',
+            '#a855f7', '#22c55e', '#eab308', '#ef4444',
+            '#06b6d4', '#8b5cf6', '#94a3b8'
+        ];
 
-  var FLAGS = {
-    VN:'🇻🇳',US:'🇺🇸',JP:'🇯🇵',HK:'🇭🇰',KR:'🇰🇷',
-    CN:'🇨🇳',GB:'🇬🇧',DE:'🇩🇪',FR:'🇫🇷',SG:'🇸🇬',
-    TH:'🇹🇭',AU:'🇦🇺',CA:'🇨🇦',IN:'🇮🇳',MY:'🇲🇾',
-    ID:'🇮🇩',PH:'🇵🇭',TW:'🇹🇼',BR:'🇧🇷',NL:'🇳🇱'
-  };
-  function flag(c) { return FLAGS[c] || '🌐'; }
+        var FLAGS = {
+            VN: '🇻🇳', US: '🇺🇸', JP: '🇯🇵', HK: '🇭🇰', KR: '🇰🇷',
+            CN: '🇨🇳', GB: '🇬🇧', DE: '🇩🇪', FR: '🇫🇷', SG: '🇸🇬',
+            TH: '🇹🇭', AU: '🇦🇺', CA: '🇨🇦', IN: '🇮🇳', MY: '🇲🇾',
+            ID: '🇮🇩', PH: '🇵🇭', TW: '🇹🇼', BR: '🇧🇷', NL: '🇳🇱'
+        };
 
-  function badgeLabel(p) {
-    return { all: 'ALL TIME', monthly: 'MONTHLY', weekly: 'WEEKLY' }[p] || 'ALL TIME';
-  }
+        function flag(c) {
+            return FLAGS[c] || '🌐';
+        }
 
-  function apiFetch(url) {
-    var token = localStorage.getItem('token');
-    var headers = token ? { 'Authorization': 'Bearer ' + token } : {};
-    return fetch(url, { headers: headers }).then(function(r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
-    });
-  }
+        function badgeLabel(p) {
+            return {
+                all: t("analytics.all_time"),
+                monthly: t("analytics.monthly"),
+                weekly: t("analytics.weekly")
+            }[p] || t("analytics.all_time");
+        }
 
-  var ubChart = null, gnChart = null, lgChart = null;
+        function apiFetch(url) {
+            var token = localStorage.getItem('token');
+            var headers = token ? {'Authorization': 'Bearer ' + token} : {};
+            return fetch(url, {headers: headers}).then(function (r) {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.json();
+            });
+        }
 
-  function buildDonut(bodyId, canvasId, data, labels, colors, centerNum, centerSub, fullCircle) {
-    var body = document.getElementById(bodyId);
-    if (!body) return null;
-    body.innerHTML =
-      '<div class="chart-body">' +
-        '<div class="chart-canvas-wrap">' +
-          '<canvas id="' + canvasId + '" width="180" height="180"></canvas>' +
-          (!fullCircle ? '<div class="chart-center-label">' +
-            '<div class="chart-center-num">' + centerNum + '</div>' +
-            '<div class="chart-center-sub">' + centerSub + '</div>' +
-          '</div>' : '') +
-        '</div>' +
-        '<ul class="legend-list" id="' + canvasId + '-legend"></ul>' +
-      '</div>';
+        var ubChart = null, gnChart = null, lgChart = null;
 
-    var ctx = document.getElementById(canvasId);
-    if (!ctx) return null;
-    var chart = new Chart(ctx.getContext('2d'), {
-      type: 'doughnut',
-      data: {
-        labels: labels,
-        datasets: [{ data: data, backgroundColor: colors,
-          borderColor: 'rgba(2,6,23,0.9)', borderWidth: 2, hoverOffset: 6 }]
-      },
-      options: {
-        cutout: fullCircle ? '0%' : '72%',
-        plugins: {
-          legend: { display: false },
-          tooltip: { callbacks: { label: function(c) {
-            var total = c.dataset.data.reduce(function(a,b){return a+b;},0);
-            var pct = total ? ((c.parsed/total)*100).toFixed(1) : 0;
-            return ' ' + c.label + ': ' + c.formattedValue + ' (' + pct + '%)';
-          }}}
-        },
-        animation: { duration: 700 }
-      }
-    });
+        function buildDonut(bodyId, canvasId, data, labels, colors, centerNum, centerSub, fullCircle) {
+            var body = document.getElementById(bodyId);
+            if (!body) return null;
+            body.innerHTML =
+                '<div class="chart-body">' +
+                '<div class="chart-canvas-wrap">' +
+                '<canvas id="' + canvasId + '" width="180" height="180"></canvas>' +
+                (!fullCircle ? '<div class="chart-center-label">' +
+                    '<div class="chart-center-num">' + centerNum + '</div>' +
+                    '<div class="chart-center-sub">' + centerSub + '</div>' +
+                    '</div>' : '') +
+                '</div>' +
+                '<ul class="legend-list" id="' + canvasId + '-legend"></ul>' +
+                '</div>';
 
-    var legendEl = document.getElementById(canvasId + '-legend');
-    var total = data.reduce(function(a,b){return a+b;},0);
-    labels.forEach(function(lbl, i) {
-      var pct = total ? ((data[i]/total)*100).toFixed(1) : 0;
-      var li = document.createElement('li');
-      li.className = 'legend-item';
-      li.innerHTML =
-        '<span class="legend-dot" style="background:' + colors[i] + '"></span>' +
-        '<span class="legend-label" title="' + lbl + '">' + lbl + '</span>' +
-        '<span class="legend-value">' + data[i].toLocaleString() + ' · ' + pct + '%</span>';
-      legendEl.appendChild(li);
-    });
-    return chart;
-  }
+            var ctx = document.getElementById(canvasId);
+            if (!ctx) return null;
+            var chart = new Chart(ctx.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data, backgroundColor: colors,
+                        borderColor: 'rgba(2,6,23,0.9)', borderWidth: 2, hoverOffset: 6
+                    }]
+                },
+                options: {
+                    cutout: fullCircle ? '0%' : '72%',
+                    plugins: {
+                        legend: {display: false},
+                        tooltip: {
+                            callbacks: {
+                                label: function (c) {
+                                    var total = c.dataset.data.reduce(function (a, b) {
+                                        return a + b;
+                                    }, 0);
+                                    var pct = total ? ((c.parsed / total) * 100).toFixed(1) : 0;
+                                    return ' ' + c.label + ': ' + c.formattedValue + ' (' + pct + '%)';
+                                }
+                            }
+                        }
+                    },
+                    animation: {duration: 700}
+                }
+            });
 
-  function buildLoginChart(bodyId, canvasId, labels, totalVals, totalLogins) {
-    var body = document.getElementById(bodyId);
-    if (!body) return null;
-    var maxVal = Math.max.apply(null, totalVals.length ? totalVals : [1]);
+            var legendEl = document.getElementById(canvasId + '-legend');
+            var total = data.reduce(function (a, b) {
+                return a + b;
+            }, 0);
+            labels.forEach(function (lbl, i) {
+                var pct = total ? ((data[i] / total) * 100).toFixed(1) : 0;
+                var li = document.createElement('li');
+                li.className = 'legend-item';
+                li.innerHTML =
+                    '<span class="legend-dot" style="background:' + colors[i] + '"></span>' +
+                    '<span class="legend-label" title="' + lbl + '">' + lbl + '</span>' +
+                    '<span class="legend-value">' + data[i].toLocaleString() + ' · ' + pct + '%</span>';
+                legendEl.appendChild(li);
+            });
+            return chart;
+        }
 
-    var rows = '';
-    labels.forEach(function(lbl, i) {
-      var pct = ((totalVals[i] / maxVal) * 100).toFixed(1);
-      rows +=
-        '<li class="login-legend-item">' +
-          '<span class="login-flag">' + flag(lbl) + '</span>' +
-          '<span class="login-country">' + lbl + '</span>' +
-          '<div class="login-bars">' +
-            '<div class="login-bar-row">' +
-              '<div class="login-bar-track"><div class="login-bar-fill" style="width:' + pct + '%;background:#3b82f6;"></div></div>' +
-              '<span class="login-bar-num">' + totalVals[i] + '</span>' +
-            '</div>' +
-          '</div>' +
-        '</li>';
-    });
+        function buildLoginChart(bodyId, canvasId, labels, totalVals, totalLogins) {
+            var body = document.getElementById(bodyId);
+            if (!body) return null;
+            var maxVal = Math.max.apply(null, totalVals.length ? totalVals : [1]);
 
-    body.innerHTML =
-      '<div class="chart-body">' +
-        '<div class="chart-canvas-wrap">' +
-          '<canvas id="' + canvasId + '" width="180" height="180"></canvas>' +
-          '<div class="chart-center-label">' +
-            '<div class="chart-center-num">' + totalLogins.toLocaleString() + '</div>' +
-            '<div class="chart-center-sub">total logins</div>' +
-          '</div>' +
-        '</div>' +
-        '<div style="flex:1;min-width:0;">' +
-          '<ul class="login-legend-list">' + rows + '</ul>' +
-        '</div>' +
-      '</div>';
+            var rows = '';
+            labels.forEach(function (lbl, i) {
+                var pct = ((totalVals[i] / maxVal) * 100).toFixed(1);
+                rows +=
+                    '<li class="login-legend-item">' +
+                    '<span class="login-flag">' + flag(lbl) + '</span>' +
+                    '<span class="login-country">' + lbl + '</span>' +
+                    '<div class="login-bars">' +
+                    '<div class="login-bar-row">' +
+                    '<div class="login-bar-track"><div class="login-bar-fill" style="width:' + pct + '%;background:#3b82f6;"></div></div>' +
+                    '<span class="login-bar-num">' + totalVals[i] + '</span>' +
+                    '</div>' +
+                    '</div>' +
+                    '</li>';
+            });
 
-    var ctx = document.getElementById(canvasId);
-    if (!ctx) return null;
-    var chart = new Chart(ctx.getContext('2d'), {
-      type: 'doughnut',
-      data: {
-        labels: labels,
-        datasets: [{ data: totalVals,
-          backgroundColor: labels.map(function(_,i){ return PALETTE[i % PALETTE.length]; }),
-          borderColor: 'rgba(2,6,23,0.9)', borderWidth: 2, hoverOffset: 6 }]
-      },
-      options: {
-        cutout: '72%',
-        plugins: {
-          legend: { display: false },
-          tooltip: { callbacks: { label: function(c) {
-            var total = c.dataset.data.reduce(function(a,b){return a+b;},0);
-            var pct = total ? ((c.parsed/total)*100).toFixed(1) : 0;
-            return ' ' + flag(c.label) + ' ' + c.label + ': ' + c.formattedValue + ' (' + pct + '%)';
-          }}}
-        },
-        animation: { duration: 700 }
-      }
-    });
-    return chart;
-  }
+            body.innerHTML =
+                '<div class="chart-body">' +
+                '<div class="chart-canvas-wrap">' +
+                '<canvas id="' + canvasId + '" width="180" height="180"></canvas>' +
+                '<div class="chart-center-label">' +
+                '<div class="chart-center-num">' + totalLogins.toLocaleString() + '</div>' +
+                '<div class="chart-center-sub">' + t("analytics.total_logins") + '</div>' +
+                '</div>' +
+                '</div>' +
+                '<div style="flex:1;min-width:0;">' +
+                '<ul class="login-legend-list">' + rows + '</ul>' +
+                '</div>' +
+                '</div>';
 
-  window.analyticsLoadUser = function() {
-    var period = (document.getElementById('ub-period') || {}).value || 'all';
-    var badge  = document.getElementById('ub-badge');
-    var body   = document.getElementById('ub-body');
-    if (badge) badge.textContent = badgeLabel(period);
-    if (body)  body.innerHTML = '<div class="loading-pulse">Loading…</div>';
-    if (ubChart) { ubChart.destroy(); ubChart = null; }
+            var ctx = document.getElementById(canvasId);
+            if (!ctx) return null;
+            var chart = new Chart(ctx.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: totalVals,
+                        backgroundColor: labels.map(function (_, i) {
+                            return PALETTE[i % PALETTE.length];
+                        }),
+                        borderColor: 'rgba(2,6,23,0.9)', borderWidth: 2, hoverOffset: 6
+                    }]
+                },
+                options: {
+                    cutout: '72%',
+                    plugins: {
+                        legend: {display: false},
+                        tooltip: {
+                            callbacks: {
+                                label: function (c) {
+                                    var total = c.dataset.data.reduce(function (a, b) {
+                                        return a + b;
+                                    }, 0);
+                                    var pct = total ? ((c.parsed / total) * 100).toFixed(1) : 0;
+                                    return ' ' + flag(c.label) + ' ' + c.label + ': ' + c.formattedValue + ' (' + pct + '%)';
+                                }
+                            }
+                        }
+                    },
+                    animation: {duration: 700}
+                }
+            });
+            return chart;
+        }
 
-    apiFetch('/api/admin/analytics/users?period=' + period).then(function(d) {
-      var total = d.totalUsers||0, sub = d.subscribedUsers||0,
-          notSub = Math.max(0, total - sub);
-      ubChart = buildDonut('ub-body', 'ub-canvas',
-        [sub, notSub],
-        ['Subscribed', 'Not Subscribed'],
-        [PALETTE[0], PALETTE[2]],
-        total, 'total users');
-    }).catch(function(e) {
-      var el = document.getElementById('ub-body');
-      if (el) el.innerHTML = '<div class="loading-pulse" style="color:#ef4444">Error: ' + e.message + '</div>';
-    });
-  };
+        window.analyticsLoadUser = function () {
+            var period = (document.getElementById('ub-period') || {}).value || 'all';
+            var badge = document.getElementById('ub-badge');
+            var body = document.getElementById('ub-body');
+            if (badge) badge.textContent = badgeLabel(period);
+            body.innerHTML = `<div class="loading-pulse">${t("analytics.loading")}</div>`;
+            if (ubChart) {
+                ubChart.destroy();
+                ubChart = null;
+            }
 
-  window.analyticsLoadGenre = function() {
-    var period = (document.getElementById('gn-period') || {}).value || 'all';
-    var badge  = document.getElementById('gn-badge');
-    var body   = document.getElementById('gn-body');
-    if (badge) badge.textContent = badgeLabel(period);
-    if (body)  body.innerHTML = '<div class="loading-pulse">Loading…</div>';
-    if (gnChart) { gnChart.destroy(); gnChart = null; }
+            apiFetch('/api/admin/analytics/users?period=' + period).then(function (d) {
+                var total = d.totalUsers || 0, sub = d.subscribedUsers || 0,
+                    notSub = Math.max(0, total - sub);
+                ubChart = buildDonut('ub-body', 'ub-canvas',
+                    [sub, notSub],
+                    [
+                        t("analytics.subscribed"),
+                        t("analytics.not_subscribed")
+                    ],
+                    [PALETTE[0], PALETTE[2]],
+                    total, t("analytics.total_users"));
+            }).catch(function (e) {
+                var el = document.getElementById('ub-body');
+                if (el) el.innerHTML =
+                    '<div class="loading-pulse" style="color:#ef4444">' +
+                    t("analytics.error") + ': ' + e.message +
+                    '</div>';
+            });
+        };
 
-    apiFetch('/api/admin/analytics/genres?period=' + period).then(function(d) {
-      var labels = d.labels||[], values = d.values||[];
-      gnChart = buildDonut('gn-body', 'gn-canvas', values, labels,
-        labels.map(function(_,i){ return PALETTE[i % PALETTE.length]; }),
-        0, '', true);
-    }).catch(function(e) {
-      var el = document.getElementById('gn-body');
-      if (el) el.innerHTML = '<div class="loading-pulse" style="color:#ef4444">Error: ' + e.message + '</div>';
-    });
-  };
+        window.analyticsLoadGenre = function () {
+            var period = (document.getElementById('gn-period') || {}).value || 'all';
+            var badge = document.getElementById('gn-badge');
+            var body = document.getElementById('gn-body');
+            if (badge) badge.textContent = badgeLabel(period);
+            if (body) body.innerHTML = `<div class="loading-pulse">${t("analytics.loading")}</div>`;
+            if (gnChart) {
+                gnChart.destroy();
+                gnChart = null;
+            }
 
-  window.analyticsLoadLogin = function() {
-    var period = (document.getElementById('lg-period') || {}).value || 'all';
-    var badge  = document.getElementById('lg-badge');
-    var body   = document.getElementById('lg-body');
-    if (badge) badge.textContent = badgeLabel(period);
-    if (body)  body.innerHTML = '<div class="loading-pulse">Loading…</div>';
-    if (lgChart) { lgChart.destroy(); lgChart = null; }
+            apiFetch('/api/admin/analytics/genres?period=' + period).then(function (d) {
+                var labels = d.labels || [], values = d.values || [];
+                gnChart = buildDonut('gn-body', 'gn-canvas', values, labels,
+                    labels.map(function (_, i) {
+                        return PALETTE[i % PALETTE.length];
+                    }),
+                    0, '', true);
+            }).catch(function (e) {
+                var el = document.getElementById('gn-body');
+                if (el) el.innerHTML =
+                    '<div class="loading-pulse" style="color:#ef4444">' +
+                    t("analytics.error") + ': ' + e.message +
+                    '</div>';
+            });
+        };
 
-    apiFetch('/api/admin/analytics/logins?period=' + period).then(function(d) {
-      var labels = d.labels||[], tv = d.totalValues||[], tl = d.totalLogins||0;
-      if (!labels.length) {
-        var el = document.getElementById('lg-body');
-        if (el) el.innerHTML = '<div class="loading-pulse" style="animation:none;opacity:0.5;">No login data yet</div>';
-        return;
-      }
-      lgChart = buildLoginChart('lg-body', 'lg-canvas', labels, tv, tl);
-    }).catch(function(e) {
-      var el = document.getElementById('lg-body');
-      if (el) el.innerHTML = '<div class="loading-pulse" style="color:#ef4444">Error: ' + e.message + '</div>';
-    });
-  };
+        window.analyticsLoadLogin = function () {
+            var period = (document.getElementById('lg-period') || {}).value || 'all';
+            var badge = document.getElementById('lg-badge');
+            var body = document.getElementById('lg-body');
+            if (badge) badge.textContent = badgeLabel(period);
+            if (body) body.innerHTML = `<div class="loading-pulse">${t("analytics.loading")}</div>`;
+            if (lgChart) {
+                lgChart.destroy();
+                lgChart = null;
+            }
 
-  window.analyticsLoadSubpacks = function() {
-    var period = (document.getElementById('sp-period') || {}).value || 'all';
-    var badge  = document.getElementById('sp-badge');
-    var body   = document.getElementById('sp-body');
-    if (badge) badge.textContent = badgeLabel(period);
-    if (body)  body.innerHTML = '<div class="loading-pulse">Loading…</div>';
-    if (window.spChart) { window.spChart.destroy(); window.spChart = null; }
+            apiFetch('/api/admin/analytics/logins?period=' + period).then(function (d) {
+                var labels = d.labels || [], tv = d.totalValues || [], tl = d.totalLogins || 0;
+                if (!labels.length) {
+                    var el = document.getElementById('lg-body');
+                    el.innerHTML =
+                        '<div class="loading-pulse" style="animation:none;opacity:0.5;">' +
+                        t("analytics.no_login_data") +
+                        '</div>';
+                    return;
+                }
+                lgChart = buildLoginChart('lg-body', 'lg-canvas', labels, tv, tl);
+            }).catch(function (e) {
+                var el = document.getElementById('lg-body');
+                if (el) el.innerHTML =
+                    '<div class="loading-pulse" style="color:#ef4444">' +
+                    t("analytics.error") + ': ' + e.message +
+                    '</div>';
+            });
+        };
 
-    apiFetch('/api/admin/analytics/subpacks?period=' + period).then(function(d) {
-      var labels = d.labels||[], values = d.values||[];
-      if (!labels.length) {
-        var el = document.getElementById('sp-body');
-        if (el) el.innerHTML = '<div class="loading-pulse" style="animation:none;opacity:0.5;">No subscription data yet</div>';
-        return;
-      }
-      window.spChart = buildDonut('sp-body', 'sp-canvas', values, labels,
-        labels.map(function(_,i){ return PALETTE[i % PALETTE.length]; }), 0, '', true);
-    }).catch(function(e) {
-      var el = document.getElementById('sp-body');
-      if (el) el.innerHTML = '<div class="loading-pulse" style="color:#ef4444">Error: ' + e.message + '</div>';
-    });
-  };
+        window.analyticsLoadSubpacks = function () {
+            var period = (document.getElementById('sp-period') || {}).value || 'all';
+            var badge = document.getElementById('sp-badge');
+            var body = document.getElementById('sp-body');
+            if (badge) badge.textContent = badgeLabel(period);
+            if (body) body.innerHTML = `<div class="loading-pulse">${t("analytics.loading")}</div>`;
+            if (window.spChart) {
+                window.spChart.destroy();
+                window.spChart = null;
+            }
 
-  withChartJs(function() {
-    window.analyticsLoadUser();
-    window.analyticsLoadGenre();
-    window.analyticsLoadLogin();
-  window.analyticsLoadSubpacks();
+            apiFetch('/api/admin/analytics/subpacks?period=' + period).then(function (d) {
+                var labels = d.labels || [], values = d.values || [];
+                if (!labels.length) {
+                    var el = document.getElementById('sp-body');
+                    if (el) el.innerHTML = '<div class="loading-pulse" style="animation:none;opacity:0.5;">'+ t("analytics.no_subscription_data") +'</div>';
+                    return;
+                }
+                window.spChart = buildDonut('sp-body', 'sp-canvas', values, labels,
+                    labels.map(function (_, i) {
+                        return PALETTE[i % PALETTE.length];
+                    }), 0, '', true);
+            }).catch(function (e) {
+                var el = document.getElementById('sp-body');
+                if (el) el.innerHTML =
+                    '<div class="loading-pulse" style="color:#ef4444">' +
+                    t("analytics.error") + ': ' + e.message +
+                    '</div>';
+            });
+        };
 
-    if (window._analyticsTimer) clearInterval(window._analyticsTimer);
-    window._analyticsTimer = setInterval(function() {
-      window.analyticsLoadUser();
-      window.analyticsLoadGenre();
-      window.analyticsLoadLogin();
-    }, 60000);
-  });
+        withChartJs(function () {
+            window.analyticsLoadUser();
+            window.analyticsLoadGenre();
+            window.analyticsLoadLogin();
+            window.analyticsLoadSubpacks();
 
-})();
+            if (window._analyticsTimer) clearInterval(window._analyticsTimer);
+            window._analyticsTimer = setInterval(function () {
+                window.analyticsLoadUser();
+                window.analyticsLoadGenre();
+                window.analyticsLoadLogin();
+            }, 60000);
+        });
+
+    })();
 </script>

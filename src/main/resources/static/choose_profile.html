@@ -5,14 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chọn Profile | MovieZone</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
             font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background:
-                radial-gradient(circle at 0 0, rgba(255,255,255,0.08), transparent 50%),
-                radial-gradient(circle at 100% 100%, rgba(255,255,255,0.05), transparent 55%),
-                linear-gradient(135deg, #050816, #0b1220 50%, #020617);
+            background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.08), transparent 50%),
+            radial-gradient(circle at 100% 100%, rgba(255, 255, 255, 0.05), transparent 55%),
+            linear-gradient(135deg, #050816, #0b1220 50%, #020617);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -23,10 +26,10 @@
         }
 
         .backdrop-blur {
-            position: fixed; inset: 0;
-            background:
-                linear-gradient(to right, rgba(15,23,42,0.9), rgba(15,23,42,0.7)),
-                url("https://images.pexels.com/photos/7991377/pexels-photo-7991377.jpeg?auto=compress&cs=tinysrgb&w=1600") center/cover no-repeat;
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(to right, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.7)),
+            url("https://images.pexels.com/photos/7991377/pexels-photo-7991377.jpeg?auto=compress&cs=tinysrgb&w=1600") center/cover no-repeat;
             filter: brightness(0.9);
             z-index: -1;
         }
@@ -39,16 +42,26 @@
         }
 
         .logo {
-            display: inline-flex; align-items: center; gap: 10px;
-            font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-            font-size: 14px; color: #e5e7eb; margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-size: 14px;
+            color: #e5e7eb;
+            margin-bottom: 20px;
         }
 
         .logo span.icon {
-            width: 30px; height: 30px; border-radius: 999px;
+            width: 30px;
+            height: 30px;
+            border-radius: 999px;
             background: radial-gradient(circle at 30% 20%, #f97316, #e11d48 55%, #4f46e5);
-            display: inline-flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 25px rgba(248,113,113,0.45);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px rgba(248, 113, 113, 0.45);
             font-size: 14px;
         }
 
@@ -58,7 +71,9 @@
             margin-bottom: 32px;
         }
 
-        h1 .highlight { color: #f97316; }
+        h1 .highlight {
+            color: #f97316;
+        }
 
         .profiles-grid {
             display: flex;
@@ -82,10 +97,13 @@
         }
 
         .profile-avatar {
-            width: 100px; height: 100px;
+            width: 100px;
+            height: 100px;
             border-radius: 16px;
             margin: 0 auto 12px;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 42px;
             border: 3px solid transparent;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -94,7 +112,7 @@
 
         .profile-card:hover .profile-avatar {
             border-color: #f97316;
-            box-shadow: 0 0 30px rgba(249,115,22,0.4);
+            box-shadow: 0 0 30px rgba(249, 115, 22, 0.4);
         }
 
         .profile-name {
@@ -120,14 +138,17 @@
         }
 
         .add-profile-avatar {
-            width: 100px; height: 100px;
+            width: 100px;
+            height: 100px;
             border-radius: 16px;
             margin: 0 auto 12px;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 42px;
-            border: 3px dashed rgba(148,163,184,0.5);
+            border: 3px dashed rgba(148, 163, 184, 0.5);
             transition: border-color 0.2s ease;
-            background: rgba(15,23,42,0.6);
+            background: rgba(15, 23, 42, 0.6);
         }
 
         .add-profile-card:hover .add-profile-avatar {
@@ -146,11 +167,25 @@
         }
 
         /* Avatar color palette */
-        .avatar-0 { background: linear-gradient(135deg, #f97316, #ec4899); }
-        .avatar-1 { background: linear-gradient(135deg, #3b82f6, #8b5cf6); }
-        .avatar-2 { background: linear-gradient(135deg, #10b981, #06b6d4); }
-        .avatar-3 { background: linear-gradient(135deg, #f59e0b, #ef4444); }
-        .avatar-4 { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
+        .avatar-0 {
+            background: linear-gradient(135deg, #f97316, #ec4899);
+        }
+
+        .avatar-1 {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        }
+
+        .avatar-2 {
+            background: linear-gradient(135deg, #10b981, #06b6d4);
+        }
+
+        .avatar-3 {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+        }
+
+        .avatar-4 {
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+        }
 
         .manage-link {
             margin-top: 16px;
@@ -158,7 +193,7 @@
             color: #9ca3af;
             font-size: 13px;
             text-decoration: none;
-            border: 1px solid rgba(148,163,184,0.4);
+            border: 1px solid rgba(148, 163, 184, 0.4);
             padding: 8px 20px;
             border-radius: 999px;
             transition: all 0.15s ease;
@@ -166,7 +201,7 @@
 
         .manage-link:hover {
             color: #e5e7eb;
-            border-color: rgba(249,115,22,0.6);
+            border-color: rgba(249, 115, 22, 0.6);
         }
     </style>
 </head>
@@ -180,15 +215,22 @@
         <span>MovieZone</span>
     </div>
 
-    <h1>Who's <span class="highlight">watching</span>?</h1>
+    <h1>
+        <span data-i18n="choose_profile.title_prefix">Who's</span>
+        <span class="highlight" data-i18n="choose_profile.title_highlight">watching</span>?
+    </h1>
 
-    <div id="loadingMsg" class="loading">Loading profiles...</div>
+    <div id="loadingMsg" class="loading" data-i18n="choose_profile.loading">
+        Loading profiles...
+    </div>
 
     <div class="profiles-grid" id="profilesGrid" style="display: none;"></div>
 
-    <a href="profile.html" class="manage-link">Manage Profiles</a>
+    <a href="profile.html" class="manage-link" data-i18n="choose_profile.manage">
+        Manage Profiles
+    </a>
 </div>
-
+<script src="/js/i18n.js"></script>
 <script>
     const avatarEmojis = ['🎬', '🍿', '🎭', '🎵', '🌟'];
 
@@ -205,7 +247,7 @@
 
         try {
             const response = await fetch("/api/user/profiles", {
-                headers: { Authorization: 'Bearer ' + token }
+                headers: {Authorization: 'Bearer ' + token}
             });
 
             if (!response.ok) {
@@ -233,22 +275,6 @@
                     </div>
                     <div class="profile-name">${escapeHtml(profile.profileName)}</div>
                 `;
-                // card.addEventListener("click", async () => {
-                //     localStorage.setItem("profileId", profile.profileId);
-                //     localStorage.setItem("profileName", profile.profileName);
-                //
-                //     // Record streak cho profile được chọn
-                //     try {
-                //         await fetch(`/api/user/achievements/streak/record?profileId=${profile.profileId}`, {
-                //             method: 'POST',
-                //             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-                //         });
-                //     } catch (e) {
-                //         // non-critical, bỏ qua lỗi
-                //     }
-                //
-                //     window.location.href = 'homepage.html';
-                // });
 
                 card.addEventListener("click", async () => {
                     await switchToProfile(profile.profileId, profile.profileName);
@@ -262,7 +288,7 @@
             let canAddMore = false;
             try {
                 const profileRes = await fetch("/api/user/profile", {
-                    headers: { Authorization: 'Bearer ' + token }
+                    headers: {Authorization: 'Bearer ' + token}
                 });
                 if (profileRes.ok) {
                     const userData = await profileRes.json();
@@ -279,15 +305,16 @@
                         canAddMore = profiles.length < maxProfiles;
                     }
                 }
-            } catch (e) { /* ignore */ }
+            } catch (e) { /* ignore */
+            }
 
             // Show "Add Profile" card only if premium and under limit
             if (canAddMore) {
                 const addCard = document.createElement("div");
                 addCard.className = "add-profile-card";
                 addCard.innerHTML = `
-                    <div class="add-profile-avatar">＋</div>
-                    <div class="add-label">Add Profile</div>
+                     <div class="add-profile-avatar">＋</div>
+                    <div class="add-label">${t("choose_profile.add")}</div>
                 `;
                 addCard.addEventListener("click", () => {
                     window.location.href = 'add_profile.html';
@@ -296,7 +323,7 @@
             }
 
         } catch (err) {
-            document.getElementById("loadingMsg").textContent = "Error loading profiles. Please try again.";
+            document.getElementById("loadingMsg").textContent = t("choose_profile.error");
             console.error(err);
         }
     }
@@ -314,12 +341,13 @@
         try {
             await fetch(`/api/user/achievements/streak/record?profileId=${profileId}`, {
                 method: 'POST',
-                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}
             });
         } catch (e) {
             // non-critical
         }
     }
+
     loadProfiles();
 </script>
 </body>

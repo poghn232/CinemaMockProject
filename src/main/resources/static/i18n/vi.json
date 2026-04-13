@@ -116,7 +116,9 @@
     "duration": "Thời hạn",
     "create_pack": "Tạo / Sửa gói",
     "enabled": "Kích hoạt",
-    "user_toggle": "Bật/tắt quyền đăng nhập của người dùng"
+    "user_toggle": "Bật/tắt quyền đăng nhập của người dùng",
+    "dashboard": "Bảng điều khiển",
+    "reports": "Báo cáo"
   },
   "auth": {
     "login": "Đăng nhập",
@@ -207,7 +209,13 @@
     },
     "subscription": {
       "empty": "Bạn chưa mua gói đăng ký nào.",
-      "extend": "Gia hạn gói"
+      "extend": "Gia hạn gói",
+      "duration_days": "ngày",
+      "max_profiles": "Số hồ sơ tối đa",
+      "not_available": "Không có",
+      "edit": "Chỉnh sửa",
+      "delete": "Xóa",
+      "delete_confirm": "Xóa gói này?"
     }
   },
   "common": {
@@ -415,5 +423,43 @@
       "loading": "Đang tải bình luận...",
       "empty": "Chưa có bình luận. Hãy là người đầu tiên!"
     }
+  },
+  "choose_profile": {
+    "title_prefix": "Ai",
+    "title_highlight": "Đang xem",
+    "loading": "Đang tải hồ sơ...",
+    "error": "Lỗi tải hồ sơ. Vui lòng thử lại.",
+    "manage": "Quản lý hồ sơ",
+    "add": "Thêm hồ sơ",
+    "switch_profile": "Chuyển hồ sơ"
+  },
+  "analytics": {
+    "title": "Bảng điều khiển phân tích",
+    "subtitle_live": "Dữ liệu thời gian thực",
+    "subtitle_refresh": "tự động làm mới mỗi 60 giây",
+
+    "user_overview": "Tổng quan người dùng",
+    "genre_popularity": "Độ phổ biến thể loại",
+    "logins_region": "Đăng nhập theo khu vực",
+    "subscription_packs": "Gói đăng ký phổ biến",
+
+    "all_time": "TOÀN BỘ",
+    "monthly": "THEO THÁNG",
+    "weekly": "THEO TUẦN",
+
+    "select_all": "Tất cả",
+    "select_monthly": "Theo tháng",
+    "select_weekly": "Theo tuần",
+
+    "loading": "Đang tải…",
+    "error": "Lỗi",
+    "no_login_data": "Chưa có dữ liệu đăng nhập",
+    "no_subscription_data": "Chưa có dữ liệu gói đăng ký",
+
+    "subscribed": "Đã đăng ký",
+    "not_subscribed": "Chưa đăng ký",
+    "total_users": "tổng người dùng",
+    "total_logins": "tổng lượt đăng nhập",
+    "chart_load_fail": "Không thể tải Chart.js"
   }
 }

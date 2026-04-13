@@ -35,7 +35,7 @@
             <button class="btn ghost" id="resetPack" type="button" data-i18n="common.reset">Reset</button>
         </div>
     </form>
-
+    <script src="/js/i18n.js"></script>
     <script data-fragment-script>
         (async function () {
             const { fetchJson, api, titleCase, formatPrice, refreshCounts } =
@@ -100,7 +100,10 @@
                     row.innerHTML = `
                 <div>
                     <div style="font-weight:600">${name}</div>
-                    <div class="muted">${p.durationDays} days - $${price} · Max Profiles: ${p.maxProfiles || 'N/A'}</div>
+                    <div class="muted">
+                         ${p.durationDays} ${t("profile.subscription.duration_days")} - $${price} ·
+                        ${t("profile.subscription.max_profiles")}: ${p.maxProfiles || t("profile.subscription.not_available")}
+                </div>
                 </div>
             `;
 
@@ -108,7 +111,7 @@
                     // EDIT button
                     const edit = document.createElement("button");
                     edit.className = "btn ghost";
-                    edit.textContent = "Edit";
+                    edit.textContent = t("profile.subscription.edit");
                     edit.addEventListener("click", () => {
                         document.getElementById("packId").value = p.packId;
                         document.getElementById("packName").value = p.packName;
@@ -119,9 +122,9 @@
                     // DELETE button
                     const del = document.createElement("button");
                     del.className = "btn ghost";
-                    del.textContent = "Delete";
+                    del.textContent = t("profile.subscription.delete");
                     del.addEventListener("click", async () => {
-                        if (!confirm("Delete pack?")) return;
+                        if (!confirm(t("profile.subscription.delete_confirm"))) return;
                         await fetchJson(api.packs + "/" + p.packId, { method: "DELETE" });
                         await loadPacks();
                         refreshCounts();

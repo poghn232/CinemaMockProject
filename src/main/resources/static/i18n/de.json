@@ -115,7 +115,9 @@
     "duration": "Dauer (Tage)",
     "create_pack": "Paket erstellen / bearbeiten",
     "enabled": "Aktiviert",
-    "user_toggle": "Umschalten, um Login für einen Benutzer zu deaktivieren"
+    "user_toggle": "Umschalten, um Login für einen Benutzer zu deaktivieren",
+    "dashboard": "Analyse-Dashboard",
+    "reports": "Berichte"
   },
   "auth": {
     "login": "Anmelden",
@@ -206,7 +208,13 @@
     },
     "subscription": {
       "empty": "Sie haben noch kein Abonnement gekauft.",
-      "extend": "Abonnement verlängern"
+      "extend": "Abonnement verlängern",
+      "duration_days": "Tage",
+      "max_profiles": "Maximale Profile",
+      "not_available": "Nicht verfügbar",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "delete_confirm": "Paket löschen?"
     }
   },
   "common": {
@@ -429,5 +437,43 @@
       "loading": "Kommentare werden geladen...",
       "empty": "Noch keine Kommentare. Sei der Erste!"
     }
+  },
+  "choose_profile": {
+    "title_prefix": "Wer",
+    "title_highlight": "schaut gerade",
+    "loading": "Profile werden geladen...",
+    "error": "Fehler beim Laden der Profile. Bitte versuche es erneut.",
+    "manage": "Profile verwalten",
+    "add": "Profil hinzufügen",
+    "switch_profile": "Profil wechseln"
+  },
+  "analytics": {
+    "title": "Analyse-Dashboard",
+    "subtitle_live": "Echtzeitdaten",
+    "subtitle_refresh": "aktualisiert sich alle 60 Sekunden automatisch",
+
+    "user_overview": "Benutzerübersicht",
+    "genre_popularity": "Beliebtheit nach Genre",
+    "logins_region": "Anmeldungen nach Region",
+    "subscription_packs": "Beliebte Abonnements",
+
+    "all_time": "GESAMT",
+    "monthly": "MONATLICH",
+    "weekly": "WÖCHENTLICH",
+
+    "select_all": "Gesamtzeit",
+    "select_monthly": "Monatlich",
+    "select_weekly": "Wöchentlich",
+
+    "loading": "Wird geladen…",
+    "error": "Fehler",
+    "no_login_data": "Noch keine Login-Daten",
+    "no_subscription_data": "Noch keine Abonnement-Daten",
+
+    "subscribed": "Abonniert",
+    "not_subscribed": "Nicht abonniert",
+    "total_users": "Gesamtbenutzer",
+    "total_logins": "Gesamtanmeldungen",
+    "chart_load_fail": "Chart.js konnte nicht geladen werden"
   }
 }

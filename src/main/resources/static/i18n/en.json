@@ -116,7 +116,9 @@
     "duration": "Duration days",
     "create_pack": "Create / Edit Pack",
     "enabled": "Enabled",
-    "user_toggle": "Toggle to disable login for an user"
+    "user_toggle": "Toggle to disable login for an user",
+    "dashboard": "Analytics",
+    "reports": "Reports"
   },
   "auth": {
     "login": "Login",
@@ -207,7 +209,13 @@
     },
     "subscription": {
       "empty": "You have not purchased any subscription yet.",
-      "extend": "Extend Subscription"
+      "extend": "Extend Subscription",
+      "duration_days": "days",
+      "max_profiles": "Max Profiles",
+      "not_available": "N/A",
+      "edit": "Edit",
+      "delete": "Delete",
+      "delete_confirm": "Delete pack?"
     }
   },
   "common": {
@@ -430,5 +438,43 @@
       "loading":"Loading comments...",
       "empty": "No comments yet. Be the first to post one!"
     }
+  },
+  "choose_profile": {
+    "title_prefix": "Who's",
+    "title_highlight": "watching",
+    "loading": "Loading profiles...",
+    "error": "Error loading profiles. Please try again.",
+    "manage": "Manage Profiles",
+    "add": "Add Profile",
+    "switch_profile": "Switch Profile"
+  },
+  "analytics": {
+    "title": "Analytics Dashboard",
+    "subtitle_live": "Live data",
+    "subtitle_refresh": "auto-refreshes every 60s",
+
+    "user_overview": "User Overview",
+    "genre_popularity": "Genre Popularity",
+    "logins_region": "Logins by Region",
+    "subscription_packs": "Popular Subscription Packs",
+
+    "all_time": "ALL TIME",
+    "monthly": "MONTHLY",
+    "weekly": "WEEKLY",
+
+    "select_all": "All Time",
+    "select_monthly": "Monthly",
+    "select_weekly": "Weekly",
+
+    "loading": "Loading…",
+    "error": "Error",
+    "no_login_data": "No login data yet",
+    "no_subscription_data": "No subscription data yet",
+
+    "subscribed": "Subscribed",
+    "not_subscribed": "Not Subscribed",
+    "total_users": "total users",
+    "total_logins": "total logins",
+    "chart_load_fail": "Chart.js failed to load"
   }
 }

@@ -115,7 +115,9 @@
     "duration": "ကာလ (ရက်)",
     "create_pack": "ပက်ကေ့ခ်ျ ဖန်တီး / ပြင်ဆင်",
     "enabled": "အသုံးပြုနိုင်",
-    "user_toggle": "အသုံးပြုသူ Login ကို ပိတ်ရန် Toggle"
+    "user_toggle": "အသုံးပြုသူ Login ကို ပိတ်ရန် Toggle",
+    "dashboard": "ထိန်းချုပ်ဘောင်",
+    "reports": "အစီရင်ခံစာ"
   },
   "auth": {
     "login": "အကောင့်ဝင်ရန်",
@@ -206,7 +208,13 @@
     },
     "subscription": {
       "empty": "သင် subscription မဝယ်ရသေးပါ။",
-      "extend": "Subscription သက်တမ်းတိုးရန်"
+      "extend": "Subscription သက်တမ်းတိုးရန်",
+      "duration_days": "ရက်",
+      "max_profiles": "အများဆုံး Profile များ",
+      "not_available": "မရှိ",
+      "edit": "ပြင်ဆင်ရန်",
+      "delete": "ဖျက်ရန်",
+      "delete_confirm": "ဒီ pack ကို ဖျက်မလား?"
     }
   },
   "common": {
@@ -429,5 +437,43 @@
       "loading": "မှတ်ချက်များကို တင်နေသည်...",
       "empty": "မှတ်ချက်မရှိသေးပါ။ ပထမဆုံးရေးသူဖြစ်ပါ!"
     }
+  },
+  "choose_profile": {
+    "title_prefix": "ဘယ်သူ",
+    "title_highlight": "ကြည့်နေပါသလဲ",
+    "loading": "ပရိုဖိုင်များ တင်နေသည်...",
+    "error": "ပရိုဖိုင်များ တင်ရာတွင် အမှားဖြစ်ပွားသည်။ ကျေးဇူးပြု၍ ထပ်မံကြိုးစားပါ။",
+    "manage": "ပရိုဖိုင်များ စီမံခန့်ခွဲရန်",
+    "add": "ပရိုဖိုင် အသစ် ထည့်ရန်",
+    "switch_profile": "ပရိုဖိုင် ပြောင်းရန်"
+  },
+  "analytics": {
+    "title": "အချက်အလက်ခွဲခြမ်းစိတ်ဖြာ Dashboard",
+    "subtitle_live": "အချိန်နှင့်တပြေးညီ ဒေတာ",
+    "subtitle_refresh": "၆၀ စက္ကန့်တိုင်း အလိုအလျောက် ပြန်လည်ဆန်းသစ်သည်",
+
+    "user_overview": "အသုံးပြုသူ အနှစ်ချုပ်",
+    "genre_popularity": "အမျိုးအစား လူကြိုက်များမှု",
+    "logins_region": "ဒေသအလိုက် Login များ",
+    "subscription_packs": "လူကြိုက်များသော Subscription Packs",
+
+    "all_time": "အချိန်အားလုံး",
+    "monthly": "လစဉ်",
+    "weekly": "အပတ်စဉ်",
+
+    "select_all": "အားလုံး",
+    "select_monthly": "လစဉ်",
+    "select_weekly": "အပတ်စဉ်",
+
+    "loading": "လုပ်ဆောင်နေသည်…",
+    "error": "အမှား",
+    "no_login_data": "Login ဒေတာ မရှိသေးပါ",
+    "no_subscription_data": "Subscription ဒေတာ မရှိသေးပါ",
+
+    "subscribed": "စာရင်းသွင်းထားသည်",
+    "not_subscribed": "စာရင်းမသွင်းရသေးပါ",
+    "total_users": "စုစုပေါင်း အသုံးပြုသူများ",
+    "total_logins": "စုစုပေါင်း Login များ",
+    "chart_load_fail": "Chart.js ကို တင်၍မရပါ"
   }
 }
