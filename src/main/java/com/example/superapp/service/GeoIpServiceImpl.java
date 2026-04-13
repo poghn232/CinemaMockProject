@@ -24,6 +24,8 @@ public class GeoIpServiceImpl implements GeoIpService {
 
     private GeoIpResponse buildLocalResponse() {
         GeoIpResponse local = new GeoIpResponse();
+
+
         local.setCountryCode("LOCAL");
         local.setRegion("LOCAL");
         local.setRegionCode("LOCAL");

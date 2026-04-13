@@ -29,6 +29,17 @@ public class ProfileController {
         User user = userRepository.findByUsername(auth.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // Ensure legacy users or any users without a profile get a default one
+        if (user.getProfiles() == null || user.getProfiles().isEmpty()) {
+            Profile defaultProfile = Profile.builder()
+                    .profileName(user.getUsername())
+                    .user(user)
+                    .commentDisabled(false)
+                    .build();
+            profileRepository.save(defaultProfile);
+            user.getProfiles().add(defaultProfile);
+        }
+
         List<ProfileDto> profiles = user.getProfiles().stream()
                 .map(p -> new ProfileDto(p.getProfileId(), p.getProfileName(), user.getUsername()))
                 .toList();
