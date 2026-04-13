@@ -1294,7 +1294,9 @@
 
             const author = document.createElement("div");
             author.className = "comment-author";
-            author.textContent = review.username || "Anonymous";
+            const uName = review.username || "Anonymous";
+            const pName = review.profileName;
+            author.textContent = pName ? `${uName} (${pName})` : uName;
 
             const time = document.createElement("div");
             time.className = "comment-time";
@@ -1639,7 +1641,10 @@
             submitBtn.disabled = true;
 
             try {
-              const body = { comment };
+              const body = {
+                comment,
+                profileId: parseInt(localStorage.getItem("profileId")),
+              };
               if (_currentType === "tv") {
                 if (!_currentEpisodeId) {
                   setError(

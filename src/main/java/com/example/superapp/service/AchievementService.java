@@ -133,7 +133,7 @@ public class AchievementService {
     }
 
     // ── Check all comment-based achievements ────────────────────────────────
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void checkCommentAchievements(Profile profile) {
         long totalComments = reviewRepository.findByProfile_ProfileId(profile.getProfileId()).size();
 
@@ -203,13 +203,13 @@ public class AchievementService {
         return achievementRepository.findAll();
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void checkWishlistAchievements(Profile profile) {
         long totalWishlist = wishlistRepository.countByProfile(profile);
         if (totalWishlist >= 10) grant(profile, "WISHLIST_10");
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void checkPremiumAchievement(Profile profile) {
         boolean isPremium = subscriptionRepository
                 .existsByUserAndStatus(profile.getUser(), SubscriptionStatus.ACTIVE);

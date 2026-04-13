@@ -30,7 +30,12 @@ const RatingSystem = {
                     "Content-Type": "application/json",
                     Authorization: "Bearer " + token
                 },
-                body: JSON.stringify({ type, id, rating })
+                body: JSON.stringify({ 
+                    type, 
+                    id, 
+                    rating, 
+                    profileId: localStorage.getItem("profileId") 
+                })
             });
             if (!res.ok) {
                 const err = await res.json();

@@ -23,7 +23,7 @@ public class ReviewService {
     private final AchievementService achievementService;
 
     @Transactional
-    public void saveRating(String username, String type, Long id, Integer rating) {
+    public void saveRating(String username, String type, Long id, Integer rating, Long profileId) {
         if (rating < 1 || rating > 10) {
             throw new IllegalArgumentException("Rating must be between 1 and 10");
         }
@@ -31,8 +31,15 @@ public class ReviewService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Rating stays at user level - use the first profile or any profile of this user
-        Profile profile = user.getProfiles().isEmpty() ? null : user.getProfiles().get(0);
+        // Profile determination
+        Profile profile;
+        if (profileId != null) {
+            profile = profileRepository.findByProfileIdAndUser(profileId, user)
+                    .orElseThrow(() -> new RuntimeException("Profile not found or not yours"));
+        } else {
+            profile = user.getProfiles().isEmpty() ? null : user.getProfiles().get(0);
+        }
+
         if (profile == null) {
             throw new RuntimeException("User has no profile");
         }

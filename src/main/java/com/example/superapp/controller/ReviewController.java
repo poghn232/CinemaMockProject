@@ -39,9 +39,10 @@ public class ReviewController {
         String type = (String) payload.get("type");
         Long id = Long.valueOf(payload.get("id").toString());
         Integer rating = Integer.valueOf(payload.get("rating").toString());
+        Long profileId = payload.get("profileId") != null ? Long.valueOf(payload.get("profileId").toString()) : null;
 
         try {
-            reviewService.saveRating(auth.getName(), type, id, rating);
+            reviewService.saveRating(auth.getName(), type, id, rating, profileId);
             return ResponseEntity.ok(Map.of("message", "Rating saved successfully"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
