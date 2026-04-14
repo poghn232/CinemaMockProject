@@ -22,7 +22,7 @@
           <th style="padding:10px; text-align:left;">Review ID</th>
           <th style="padding:10px; text-align:left;">Reported User</th>
           <th style="padding:10px; text-align:left;">Reporter</th>
-          <th style="padding:10px; text-align:left;">Reason</th>
+          <!-- Reason column removed from the list; kept in the detail modal -->
           <th style="padding:10px; text-align:left;">Created At</th>
           <th style="padding:10px; text-align:left;">Status</th>
           <th style="padding:10px; text-align:left;">Admin</th>
@@ -30,7 +30,7 @@
         </tr>
       </thead>
       <tbody id="reportsTableBody">
-        <tr><td colspan="7" style="padding:12px">Loading...</td></tr>
+        <tr><td colspan="8" style="padding:12px">Loading...</td></tr>
       </tbody>
     </table>
   </div>
@@ -101,7 +101,7 @@
       function render(list){
         const tbody = document.getElementById('reportsTableBody');
         if (!list.length){
-          tbody.innerHTML = '<tr><td colspan="7" style="padding:12px">No pending reports</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="8" style="padding:12px">No pending reports</td></tr>';
           return;
         }
         // compute pagination
@@ -112,7 +112,7 @@
         const pageItems = list.slice(start, start + pageSize);
 
         tbody.innerHTML = '';
-        pageItems.forEach(r => {
+  pageItems.forEach(r => {
           const tr = document.createElement('tr');
           tr.style.borderTop = '1px solid rgba(255,255,255,0.04)';
           tr.innerHTML = `
@@ -120,7 +120,6 @@
             <td style="padding:10px">${r.reviewId || ''}</td>
             <td style="padding:10px">${r.reportedUsername || ''}</td>
             <td style="padding:10px">${r.reporterUsername || ''}</td>
-            <td style="padding:10px; max-width:420px">${escapeHtml(r.reason || '')}</td>
             <td style="padding:10px">${r.createdAt ? new Date(r.createdAt).toLocaleString() : ''}</td>
             <td style="padding:10px">${r.status ? `<span class="status-badge ${r.status === 'PENDING' ? 'status-pending' : r.status === 'APPROVED' ? 'status-approved' : 'status-rejected'}">${r.status}</span>` : ''}</td>
             <td style="padding:10px">${r.adminUsername || ''}</td>
