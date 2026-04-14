@@ -126,6 +126,11 @@
             return (filmsCache || []).some((f) => f.type === it.type && String(f.id) === String(it.id));
         }
 
+        function getExistingItem(it) {
+            if (!it) return null;
+            return (filmsCache || []).find((f) => f.type === it.type && String(f.id) === String(it.id));
+        }
+
         async function fetchVideoAssetStatus(type, id) {
             try {
                 return await fetchJson(`/api/admin/movies/${encodeURIComponent(type)}/${encodeURIComponent(id)}/source/latest`);
@@ -391,7 +396,7 @@
                             `/api/movies/details?id=${encodeURIComponent(f.id)}&type=${encodeURIComponent(f.type)}`
                         );
                         msg.textContent = "";
-                        showTmdbDetailModal(details, { id: f.id, type: f.type, title: f.title });
+                        showTmdbDetailModal(details, f);
                     } catch (e) {
                         msg.textContent = "Failed to load details: " + e;
                     }
@@ -750,7 +755,9 @@
                     ? details.poster_path
                     : tmdbImageBase + details.poster_path
                 : "/static/images/banner.png";
-            const exists = isExistingItem(item);
+            const existing = getExistingItem(item);
+            const exists = !!existing;
+            const hasTrailer = !!(existing && existing.src);
 
             modal.innerHTML = `
         <div style="display:flex; gap:12px; align-items:flex-start">
@@ -791,7 +798,7 @@
                                                 <button id="uploadSubtitleBtn" class="btn ghost" style="margin-left:6px">Upload subtitle</button>
                                             </div>
                             <button id="tmdbCancel" class="btn ghost">Cancel</button>
-                            <button id="modalSetTrailer" class="btn ghost" style="${exists ? '' : 'display:none'}">Set trailer</button>
+                            <button id="modalSetTrailer" class="btn ghost" style="${exists ? '' : 'display:none'}">${hasTrailer ? 'Edit trailer' : 'Set trailer'}</button>
                             <button id="tmdbConfirm" class="btn">Add this movie</button>
                         </div>
       `;
@@ -811,21 +818,27 @@
             const chosenSubtitleName = document.getElementById("chosenSubtitleName");
             const setTrailerBtn = document.getElementById('modalSetTrailer');
             if (setTrailerBtn) {
+                let currentTrailerSrc = (existing && existing.src) || (item && item.src) || (details && details.trailer) || '';
                 setTrailerBtn.addEventListener('click', async () => {
-                    const current = details && details.trailer ? details.trailer : (details && details.src ? details.src : '');
-                    const input = prompt('Enter YouTube trailer URL:', current || '');
+                    const input = prompt('Enter YouTube trailer URL:', currentTrailerSrc);
                     if (input === null) return;
                     try {
+                        const newSrc = input.trim();
                         await fetchJson(api.movies + '/' + item.type + '/' + item.id + '/trailer', {
                             method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ src: input.trim() || null })
+                            body: JSON.stringify({ src: newSrc || null })
                         });
                         // refresh lists
                         await loadTmdb();
                         await loadFilms();
                         refreshCounts();
-                        alert('Trailer saved');
+                        
+                        // Update local state and button text
+                        currentTrailerSrc = newSrc;
+                        setTrailerBtn.textContent = newSrc ? 'Edit trailer' : 'Set trailer';
+                        
+                        alert('Update successfully');
                     } catch (e) {
                         alert('Save trailer failed: ' + e);
                     }
@@ -1209,7 +1222,7 @@
                                                             body: JSON.stringify({ src: input.trim() || null }),
                                                         }
                                                     );
-                                                    alert("Trailer updated.");
+                                                    alert("Update successfully");
                                                     trailerBtn.textContent = input.trim() ? "Edit trailer" : "Set trailer";
                                                 } catch (err) {
                                                     alert("Save trailer failed: " + err);

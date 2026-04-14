@@ -53,11 +53,12 @@ public class ReviewController {
     public ResponseEntity<?> getRatingStatus(
             Authentication auth,
             @RequestParam String type,
-            @RequestParam Long id
+            @RequestParam Long id,
+            @RequestParam(required = false) Long profileId
     ) {
         String username = auth != null ? auth.getName() : null;
         try {
-            return ResponseEntity.ok(reviewService.getRatingStatus(username, type, id));
+            return ResponseEntity.ok(reviewService.getRatingStatus(username, type, id, profileId));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }

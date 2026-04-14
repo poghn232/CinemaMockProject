@@ -1234,12 +1234,7 @@
             stars.style.display = "flex";
             result.style.display = "none";
             prompt.style.display = "block";
-            prompt.textContent =
-                    s.count === 0
-                            ? t("movie_watch.rating.first")
-                            : t("movie_watch.rating.avg_prompt", {
-                              avg: (s.average || 0).toFixed(1)
-                            });
+            prompt.textContent = "Bạn đánh giá phim này như thế nào?";
 
             RatingSystem.renderStars("ratingStars", 0, async (val) => {
               const res = await RatingSystem.saveRating(apiType, id, val);

@@ -25,6 +25,13 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Optional<Review> findTopByMovieIdAndProfile_User_UsernameAndRatingGreaterThanOrderByCreatedDateDesc(Long movieId, String username, Integer ratingThreshold);
     Optional<Review> findTopByEpisodeIdAndProfile_User_UsernameAndRatingGreaterThanOrderByCreatedDateDesc(Long episodeId, String username, Integer ratingThreshold);
 
+    // Profile-specific rating lookups
+    Optional<Review> findTopByMovieIdAndProfile_ProfileIdOrderByCreatedDateDesc(Long movieId, Long profileId);
+    Optional<Review> findTopByEpisodeIdAndProfile_ProfileIdOrderByCreatedDateDesc(Long episodeId, Long profileId);
+
+    Optional<Review> findTopByMovieIdAndProfile_ProfileIdAndRatingGreaterThanOrderByCreatedDateDesc(Long movieId, Long profileId, Integer ratingThreshold);
+    Optional<Review> findTopByEpisodeIdAndProfile_ProfileIdAndRatingGreaterThanOrderByCreatedDateDesc(Long episodeId, Long profileId, Integer ratingThreshold);
+
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.movie.id = :movieId AND r.rating > 0 AND (r.hidden = false OR r.hidden IS NULL)")
     Double getAverageRatingForMovie(@Param("movieId") Long movieId);
 
@@ -43,12 +50,12 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Long getRatingCountForTvSeries(@Param("tvId") Long tvId);
 
     @Query("SELECT r.movie, AVG(r.rating) as avgRating FROM Review r " +
-           "WHERE r.movie IS NOT NULL AND (r.hidden = false OR r.hidden IS NULL) " +
+           "WHERE r.movie IS NOT NULL AND r.rating > 0 AND (r.hidden = false OR r.hidden IS NULL) " +
            "GROUP BY r.movie ORDER BY avgRating DESC")
     List<Object[]> findTopMoviesByRating(org.springframework.data.domain.Pageable pageable);
 
     @Query("SELECT r.episode.season.tvSeries, AVG(r.rating) as avgRating FROM Review r " +
-           "WHERE r.episode IS NOT NULL AND (r.hidden = false OR r.hidden IS NULL) " +
+           "WHERE r.episode IS NOT NULL AND r.rating > 0 AND (r.hidden = false OR r.hidden IS NULL) " +
            "GROUP BY r.episode.season.tvSeries ORDER BY avgRating DESC")
     List<Object[]> findTopTvSeriesByRating(org.springframework.data.domain.Pageable pageable);
 }

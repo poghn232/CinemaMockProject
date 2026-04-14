@@ -47,8 +47,9 @@ public class AchievementController {
             m.put("description", ua.getAchievement().getDescription());
             m.put("icon",        ua.getAchievement().getIcon());
             m.put("rarity",      ua.getAchievement().getRarity());
-            m.put("earnedAt",    ua.getEarnedAt()
-                    .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+            m.put("earnedAt",    ua.getEarnedAt() != null
+                    ? ua.getEarnedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                    : "Recently");
             return m;
         }).collect(Collectors.toList());
 

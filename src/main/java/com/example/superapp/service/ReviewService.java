@@ -46,8 +46,8 @@ public class ReviewService {
 
         Review review;
         if ("movie".equalsIgnoreCase(type)) {
-            review = reviewRepository.findTopByMovieIdAndProfile_User_UsernameAndRatingGreaterThanOrderByCreatedDateDesc(id, username, 0)
-                .orElseGet(() -> reviewRepository.findTopByMovieIdAndProfile_User_UsernameOrderByCreatedDateDesc(id, username)
+            review = reviewRepository.findTopByMovieIdAndProfile_ProfileIdAndRatingGreaterThanOrderByCreatedDateDesc(id, profile.getProfileId(), 0)
+                .orElseGet(() -> reviewRepository.findTopByMovieIdAndProfile_ProfileIdOrderByCreatedDateDesc(id, profile.getProfileId())
                     .orElseGet(() -> {
                         Movie movie = movieRepository.findById(id)
                             .orElseThrow(() -> new RuntimeException("Movie not found"));
@@ -58,8 +58,8 @@ public class ReviewService {
                             .build();
                     }));
         } else if ("episode".equalsIgnoreCase(type)) {
-            review = reviewRepository.findTopByEpisodeIdAndProfile_User_UsernameAndRatingGreaterThanOrderByCreatedDateDesc(id, username, 0)
-                .orElseGet(() -> reviewRepository.findTopByEpisodeIdAndProfile_User_UsernameOrderByCreatedDateDesc(id, username)
+            review = reviewRepository.findTopByEpisodeIdAndProfile_ProfileIdAndRatingGreaterThanOrderByCreatedDateDesc(id, profile.getProfileId(), 0)
+                .orElseGet(() -> reviewRepository.findTopByEpisodeIdAndProfile_ProfileIdOrderByCreatedDateDesc(id, profile.getProfileId())
                     .orElseGet(() -> {
                         Episode episode = episodeRepository.findById(id)
                             .orElseThrow(() -> new RuntimeException("Episode not found"));
@@ -78,16 +78,16 @@ public class ReviewService {
         reviewRepository.save(review);
     }
 
-    public Map<String, Object> getRatingStatus(String username, String type, Long id) {
+    public Map<String, Object> getRatingStatus(String username, String type, Long id, Long profileId) {
         boolean hasRated = false;
         Integer userRating = null;
 
-        if (username != null) {
+        if (profileId != null) {
             Optional<Review> existing;
             if ("movie".equalsIgnoreCase(type)) {
-                existing = reviewRepository.findTopByMovieIdAndProfile_User_UsernameOrderByCreatedDateDesc(id, username);
+                existing = reviewRepository.findTopByMovieIdAndProfile_ProfileIdOrderByCreatedDateDesc(id, profileId);
             } else {
-                existing = reviewRepository.findTopByEpisodeIdAndProfile_User_UsernameOrderByCreatedDateDesc(id, username);
+                existing = reviewRepository.findTopByEpisodeIdAndProfile_ProfileIdOrderByCreatedDateDesc(id, profileId);
             }
             if (existing.isPresent()) {
                 hasRated = true;

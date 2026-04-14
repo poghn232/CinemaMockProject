@@ -8,7 +8,9 @@ const RatingSystem = {
         const token = localStorage.getItem("token");
         const headers = token ? { Authorization: "Bearer " + token } : {};
         try {
-            const res = await fetch(`/api/reviews/status?type=${type}&id=${id}`, { headers });
+            const profileId = localStorage.getItem("profileId");
+            const url = `/api/reviews/status?type=${type}&id=${id}${profileId ? `&profileId=${profileId}` : ""}`;
+            const res = await fetch(url, { headers });
             if (!res.ok) return null;
             return await res.json();
         } catch (e) {

@@ -69,6 +69,7 @@ public class AchievementService {
         userAchievementRepository.save(UserAchievement.builder()
                 .profile(profile)
                 .achievement(achievement)
+                .earnedAt(java.time.LocalDateTime.now())
                 .build());
 
         // Notification
