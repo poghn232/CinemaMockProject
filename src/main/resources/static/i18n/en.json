@@ -403,39 +403,39 @@
   },
   "movie_watch": {
     "quality": {
-      "label":"Quality",
+      "label": "Quality",
       "auto": "Auto"
     },
     "episode": {
       "select": "Select Episode:"
     },
-    "subtitle":{
-      "upload":"Upload Subtitles",
-      "clear":"Clear Uploaded Subtitle",
-      "none":"None",
+    "subtitle": {
+      "upload": "Upload Subtitles",
+      "clear": "Clear Uploaded Subtitle",
+      "none": "None",
       "default": "Default",
-      "status_default":"Using default subtitle.",
+      "status_default": "Using default subtitle.",
       "status_hidden": "Subtitles hidden.",
-      "status_uploaded":"Using uploaded subtitle.",
+      "status_uploaded": "Using uploaded subtitle.",
       "status_using": "Using subtitles: {{name}}"
     },
-    "ad":{
-      "title":"Upgrade to Premium for Ad-Free Experience!",
-      "desc":"Remove ads and enjoy unlimited streaming"
+    "ad": {
+      "title": "Upgrade to Premium for Ad-Free Experience!",
+      "desc": "Remove ads and enjoy unlimited streaming"
     },
-    "rating":{
-      "title":"User Rating",
+    "rating": {
+      "title": "User Rating",
       "loading": "Loading rating system...",
       "first": "Be the first to rate!",
       "edit": "Edit",
       "avg_prompt": "Average: {{avg}} ⭐. What do you think?",
       "count": "({{count}} ratings)"
     },
-    "comments":{
-      "title":"Comments",
-      "placeholder":"Share your thoughts about this movie...",
+    "comments": {
+      "title": "Comments",
+      "placeholder": "Share your thoughts about this movie...",
       "post": "Post Comment",
-      "loading":"Loading comments...",
+      "loading": "Loading comments...",
       "empty": "No comments yet. Be the first to post one!"
     }
   },
@@ -452,29 +452,149 @@
     "title": "Analytics Dashboard",
     "subtitle_live": "Live data",
     "subtitle_refresh": "auto-refreshes every 60s",
-
     "user_overview": "User Overview",
     "genre_popularity": "Genre Popularity",
     "logins_region": "Logins by Region",
     "subscription_packs": "Popular Subscription Packs",
-
     "all_time": "ALL TIME",
     "monthly": "MONTHLY",
     "weekly": "WEEKLY",
-
     "select_all": "All Time",
     "select_monthly": "Monthly",
     "select_weekly": "Weekly",
-
     "loading": "Loading…",
     "error": "Error",
     "no_login_data": "No login data yet",
     "no_subscription_data": "No subscription data yet",
-
     "subscribed": "Subscribed",
     "not_subscribed": "Not Subscribed",
     "total_users": "total users",
     "total_logins": "total logins",
     "chart_load_fail": "Chart.js failed to load"
+  },
+  "admin_reports": {
+    "title": "Reports (Pending)",
+    "description": "Review and moderate reported comments. Approve to remove the comment and disable commenting for the reported user; Reject to notify the reporter.",
+    "table": {
+      "id": "ID",
+      "review_id": "Review ID",
+      "reported_user": "Reported User",
+      "reporter": "Reporter",
+      "created_at": "Created At",
+      "status": "Status",
+      "admin": "Admin",
+      "actions": "Actions",
+      "loading": "Loading...",
+      "empty": "No pending reports",
+      "failed": "Failed to load"
+    },
+    "status": {
+      "pending": "PENDING",
+      "approved": "APPROVED",
+      "rejected": "REJECTED"
+    },
+    "actions": {
+      "detail": "Detail",
+      "approve": "Approve",
+      "approved": "Approved",
+      "reject": "Reject",
+      "rejected": "Rejected",
+      "close": "Close",
+      "prev": "Prev",
+      "next": "Next",
+      "go": "Go"
+    },
+    "modal": {
+      "title": "Report details",
+      "review_id": "Review ID",
+      "reported_user": "Reported User",
+      "reporter": "Reporter",
+      "status": "Status",
+      "admin": "Admin",
+      "submitted_reason": "Submitted reason",
+      "content": "Content",
+      "admin_note": "Provide a short reason to include in email notifications (optional)."
+    },
+    "message": {
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "failed_load": "Failed to load reports",
+      "action_failed": "Action failed"
+    }
+  },
+  "admin_logs": {
+    "title": "Admin Logs",
+    "description": "History system logs",
+    "search": {
+      "placeholder": "Search by username, action, IP..."
+    },
+    "count": {
+      "label": "{{filtered}} / {{total}} logs",
+      "simple": "{{total}} logs"
+    },
+    "actions": {
+      "refresh": "Refresh"
+    },
+    "table": {
+      "loading": "Loading logs...",
+      "empty": "No logs yet.",
+      "no_result": "Cannot find any result",
+      "error": "Cannot load logs"
+    },
+    "pagination": {
+      "displaying": "Displaying {{from}}–{{to}} of {{total}} logs",
+      "rows_per_page": "Rows per page"
+    },
+    "columns": {
+      "logId": "ID",
+      "username": "Username",
+      "action": "Action",
+      "level": "Level",
+      "message": "Message",
+      "details": "Details",
+      "ipAddress": "IP Address",
+      "endpoint": "Endpoint",
+      "method": "Method",
+      "status": "Status",
+      "createdAt": "Time",
+      "updatedAt": "Updated",
+      "region": "Region",
+      "countryCode": "Country"
+    }
+  },
+  "admin_banners": {
+    "title": "Banner Management",
+    "description": "Preview image. Click \"Change\" to update.",
+    "buttons": {
+      "change_left": "← Change Left",
+      "change_right": "Change Right →",
+      "change_bottom": "↓ Change Bottom",
+      "cancel": "Cancel",
+      "save": "Save changes",
+      "saving": "Saving..."
+    },
+    "panel": {
+      "title": "Change Banner",
+      "current": "CURRENT BANNER",
+      "new_image": "New image",
+      "choose": "Choose image",
+      "drag": "or pull here",
+      "hint": "PNG, JPG, WebP — maximum 5 MB",
+      "url": "URL when click into banner",
+      "url_placeholder": "https://example.com/..."
+    },
+    "info": {
+      "left": "LEFT BANNER · ID 2",
+      "bottom": "BOTTOM BANNER · ID 1",
+      "right": "RIGHT BANNER · ID 3",
+      "no_url": "No URL yet"
+    },
+    "toast": {
+      "file_big": "File too big! Maximum 5MB.",
+      "choose_image": "Please choose image.",
+      "enter_url": "Please enter URL.",
+      "success": "Save successful! Reloading...",
+      "error": "Error"
+    }
   }
 }

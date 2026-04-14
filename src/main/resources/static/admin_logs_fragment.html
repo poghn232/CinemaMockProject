@@ -206,29 +206,29 @@
   <!-- header -->
   <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
     <div>
-      <h2 style="font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;">
+      <h2 style="font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;" data-i18n="admin_logs.title">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
         </svg>
         Admin Logs
       </h2>
-      <p class="muted" style="margin-top:3px;font-size:12px;">History system logs</p>
+      <p class="muted" style="margin-top:3px;font-size:12px;" data-i18n="admin_logs.description">History system logs</p>
     </div>
   </div>
 
   <!-- toolbar -->
   <div class="logs-toolbar">
     <div class="logs-search-wrap">
-      <input id="logsSearch" class="logs-search" type="text" placeholder="Tìm theo username, action, IP…" autocomplete="off"/>
+      <input id="logsSearch" class="logs-search" type="text" data-i18n-placeholder="admin_logs.search.placeholder" autocomplete="off"/>
     </div>
     <span class="logs-count-badge" id="logsCountBadge">-- log</span>
     <button class="logs-refresh-btn" id="logsRefreshBtn">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
         <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
       </svg>
-      Refresh
+      <span data-i18n="admin_logs.actions.refresh">Refresh</span>
     </button>
-    <select class="page-size-select" id="logsPageSize" title="Rows per page">
+    <select class="page-size-select" id="logsPageSize" title="Rows per page" data-i18n-title="admin_logs.pagination.rows_per_page">
       <option value="10">10 / page</option>
       <option value="20" selected>20 / page</option>
       <option value="50">50 / page</option>
@@ -259,7 +259,7 @@
   </div>
 
 </div>
-
+<script src="/js/i18n.js"></script>
 <script data-fragment-script>
   (function () {
   /* ─── state ─── */
@@ -284,25 +284,24 @@
   const pageSizeEl = document.getElementById('logsPageSize');
 
   /* ─── column config: detect automatically + pretty labels ─── */
-  const LABEL_MAP = {
-    logId:          'ID',
-    username:    'Username',
-    action:      'Action',
-    level:       'Level',
-    message:     'Message',
-    details:     'Details',
-    ipAddress:   'IP Address',
-    ip:          'IP Address',
-    endpoint:    'Endpoint',
-    method:      'Method',
-    status:      'Status',
-    createdAt:   'Thời gian',
-    timestamp:   'Thời gian',
-    loginTime:   'Thời gian',
-    updatedAt:   'Cập nhật',
-    region:      'Region',
-    countryCode: 'Country',
-  };
+    function getLabelMap() {
+      return {
+        logId:      t('admin_logs.columns.logId'),
+        username:   t('admin_logs.columns.username'),
+        action:     t('admin_logs.columns.action'),
+        level:      t('admin_logs.columns.level'),
+        message:    t('admin_logs.columns.message'),
+        details:    t('admin_logs.columns.details'),
+        ipAddress:  t('admin_logs.columns.ipAddress'),
+        endpoint:   t('admin_logs.columns.endpoint'),
+        method:     t('admin_logs.columns.method'),
+        status:     t('admin_logs.columns.status'),
+        createdAt:  t('admin_logs.columns.createdAt'),
+        updatedAt:  t('admin_logs.columns.updatedAt'),
+        region:     t('admin_logs.columns.region'),
+        countryCode:t('admin_logs.columns.countryCode'),
+      };
+    }
 
   /* fields to render as level badge */
   const LEVEL_FIELDS = new Set(['level','status','method']);
@@ -370,7 +369,7 @@
 
     /* header */
     headerRow.innerHTML = cols.map(k => {
-      const label = LABEL_MAP[k] || k;
+      const label = getLabelMap()[k] || k;
       const isActive = sortCol === k;
       const cls = `sortable${isActive ? ' sort-' + sortDir : ''}`;
       return `<th class="${cls}" data-col="${k}">${label}<span class="sort-arrow"></span></th>`;
@@ -408,7 +407,10 @@
       });
     }
 
-    countBadge.textContent = `${filtered.length} / ${allLogs.length} logs`;
+    countBadge.textContent = t('admin_logs.count.label', {
+      filtered: filtered.length,
+      total: allLogs.length
+    });
     renderBody(buildColumns(allLogs));
     renderPagination();
   }
@@ -423,13 +425,13 @@
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
-        Cannot find any result
+        ${t('admin_logs.table.no_result')}
       </td></tr>`;
       return;
     }
 
     body.innerHTML = page.map(log => `<tr>${cols.map(k => {
-      const isId   = k === 'id';
+      const isId = k === 'id' || k === 'logId';
       const isTime = TIME_FIELDS.has(k);
       const cls    = isId ? 'id-cell' : isTime ? 'time-cell' : '';
       return `<td class="${cls}">${fmt(k, log[k])}</td>`;
@@ -446,7 +448,11 @@
 
     const from = (currentPage - 1) * ps + 1;
     const to   = Math.min(currentPage * ps, total);
-    pageInfo.textContent = `Displaying ${from}–${to} of ${total} logs`;
+    pageInfo.textContent = t('admin_logs.pagination.displaying', {
+      from,
+      to,
+      total
+    });
 
     /* build page buttons (max 7 visible) */
     const btns = [];
@@ -491,7 +497,7 @@
       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
         <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
       </svg>
-      Loading logs`;
+      ${t('admin_logs.table.loading')}`;
     state.style.display = 'block';
     table.style.display = 'none';
     pagination.style.display = 'none';
@@ -516,15 +522,17 @@
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
             <polyline points="14 2 14 8 20 8"/>
           </svg>
-          No logs yet.`;
-        countBadge.textContent = '0 logs';
+           ${t('admin_logs.table.empty')}`;
+        countBadge.textContent = t('admin_logs.count.simple', { total: 0 });
         return;
       }
 
       state.style.display = 'none';
       table.style.display  = 'table';
 
-      countBadge.textContent = `${allLogs.length} logs`;
+      countBadge.textContent = t('admin_logs.count.simple', {
+        total: allLogs.length
+      });
       render();
       applyFilterSort();
 
@@ -533,7 +541,7 @@
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="1.4">
           <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
         </svg>
-        <span style="color:#f87171">Cannot load logs</span><br>
+        <span style="color:#f87171">${t('admin_logs.table.error')}</span><br>
         <span style="font-size:12px;color:#6b7280">${err.message}</span>`;
     } finally {
       refreshBtn.classList.remove('spinning');

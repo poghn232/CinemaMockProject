@@ -128,7 +128,7 @@
     "google_login": "Googleでログイン",
     "forgot_password": "パスワードを忘れましたか？",
     "signup": "サインアップ",
-    "no_account":  "アカウントをお持ちではありませんか？",
+    "no_account": "アカウントをお持ちではありませんか？",
     "register_title": "アカウント登録",
     "register_caption": "OTPコードを受け取るためのメール。",
     "email": "メール",
@@ -451,29 +451,149 @@
     "title": "分析ダッシュボード",
     "subtitle_live": "リアルタイムデータ",
     "subtitle_refresh": "60秒ごとに自動更新",
-
     "user_overview": "ユーザー概要",
     "genre_popularity": "ジャンルの人気度",
     "logins_region": "地域別ログイン",
     "subscription_packs": "人気のサブスクリプション",
-
     "all_time": "全期間",
     "monthly": "月間",
     "weekly": "週間",
-
     "select_all": "全期間",
     "select_monthly": "月間",
     "select_weekly": "週間",
-
     "loading": "読み込み中…",
     "error": "エラー",
     "no_login_data": "ログインデータがありません",
     "no_subscription_data": "サブスクリプションデータがありません",
-
     "subscribed": "登録済み",
     "not_subscribed": "未登録",
     "total_users": "ユーザー総数",
     "total_logins": "ログイン総数",
     "chart_load_fail": "Chart.jsの読み込みに失敗しました"
+  },
+  "admin_reports": {
+    "title": "通報（保留中）",
+    "description": "通報されたコメントを確認・管理します。承認するとコメントを削除し、対象ユーザーのコメント機能を無効化します。却下すると通報者に通知されます。",
+    "table": {
+      "id": "ID",
+      "review_id": "レビューID",
+      "reported_user": "通報対象ユーザー",
+      "reporter": "通報者",
+      "created_at": "作成日時",
+      "status": "ステータス",
+      "admin": "管理者",
+      "actions": "操作",
+      "loading": "読み込み中...",
+      "empty": "通報はありません",
+      "failed": "読み込み失敗"
+    },
+    "status": {
+      "pending": "保留中",
+      "approved": "承認済み",
+      "rejected": "却下済み"
+    },
+    "actions": {
+      "detail": "詳細",
+      "approve": "承認",
+      "approved": "承認済み",
+      "reject": "却下",
+      "rejected": "却下済み",
+      "close": "閉じる",
+      "prev": "前へ",
+      "next": "次へ",
+      "go": "移動"
+    },
+    "modal": {
+      "title": "通報の詳細",
+      "review_id": "レビューID",
+      "reported_user": "通報対象ユーザー",
+      "reporter": "通報者",
+      "status": "ステータス",
+      "admin": "管理者",
+      "submitted_reason": "送信された理由",
+      "content": "内容",
+      "admin_note": "メール通知に含める理由を入力してください（任意）"
+    },
+    "message": {
+      "approved": "承認しました",
+      "rejected": "却下しました",
+      "failed_load": "通報の読み込みに失敗しました",
+      "action_failed": "操作に失敗しました"
+    }
+  },
+  "admin_logs": {
+    "title": "管理ログ",
+    "description": "システムログ履歴",
+    "search": {
+      "placeholder": "ユーザー名、操作、IPで検索..."
+    },
+    "count": {
+      "label": "{{filtered}} / {{total}} 件",
+      "simple": "{{total}} 件"
+    },
+    "actions": {
+      "refresh": "更新"
+    },
+    "table": {
+      "loading": "読み込み中...",
+      "empty": "ログがありません。",
+      "no_result": "結果が見つかりません",
+      "error": "ログを読み込めません"
+    },
+    "pagination": {
+      "displaying": "{{total}}件中 {{from}}〜{{to}} を表示",
+      "rows_per_page": "1ページあたりの件数"
+    },
+    "columns": {
+      "logId": "ID",
+      "username": "ユーザー",
+      "action": "操作",
+      "level": "レベル",
+      "message": "メッセージ",
+      "details": "詳細",
+      "ipAddress": "IPアドレス",
+      "endpoint": "エンドポイント",
+      "method": "メソッド",
+      "status": "ステータス",
+      "createdAt": "時間",
+      "updatedAt": "更新日時",
+      "region": "地域",
+      "countryCode": "国"
+    }
+  },
+  "admin_banners": {
+    "title": "バナー管理",
+    "description": "画像をプレビューします。「変更」をクリックして更新。",
+    "buttons": {
+      "change_left": "← 左を変更",
+      "change_right": "右を変更 →",
+      "change_bottom": "↓ 下を変更",
+      "cancel": "キャンセル",
+      "save": "保存",
+      "saving": "保存中..."
+    },
+    "panel": {
+      "title": "バナー変更",
+      "current": "現在のバナー",
+      "new_image": "新しい画像",
+      "choose": "画像を選択",
+      "drag": "またはここにドラッグ",
+      "hint": "PNG, JPG, WebP — 最大5MB",
+      "url": "クリック時のURL",
+      "url_placeholder": "https://example.com/..."
+    },
+    "info": {
+      "left": "左バナー · ID 2",
+      "bottom": "下バナー · ID 1",
+      "right": "右バナー · ID 3",
+      "no_url": "URLなし"
+    },
+    "toast": {
+      "file_big": "ファイルが大きすぎます（最大5MB）",
+      "choose_image": "画像を選択してください",
+      "enter_url": "URLを入力してください",
+      "success": "保存成功！再読み込み中...",
+      "error": "エラー"
+    }
   }
 }

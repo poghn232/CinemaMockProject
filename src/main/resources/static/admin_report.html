@@ -1,5 +1,5 @@
 <div class="card">
-  <h2>Reports (Pending)</h2>
+  <h2 data-i18n="admin_reports.title">Reports (Pending)</h2>
   <style>
     .btn-approve{ background:#16a34a; color:#fff; border-color:rgba(0,0,0,0.05); }
     .btn-approve.ghost{ background:transparent; color:#16a34a; border-color:rgba(22,163,74,0.15); }
@@ -10,7 +10,7 @@
     .status-approved{ background:rgba(16,185,129,0.12); color:#10b981; }
     .status-rejected{ background:rgba(239,68,68,0.12); color:#ef4444; }
   </style>
-  <div class="muted">Review and moderate reported comments. Approve to remove the comment and disable commenting for the reported user; Reject to notify the reporter.</div>
+  <div class="muted" data-i18n="admin_reports.description">Review and moderate reported comments. Approve to remove the comment and disable commenting for the reported user; Reject to notify the reporter.</div>
 
   <div id="reportsMessage" style="margin-top:12px"></div>
 
@@ -18,19 +18,19 @@
     <table style="width:100%; border-collapse: collapse;">
       <thead>
         <tr style="opacity:0.9; background: rgba(255,255,255,0.02)">
-          <th style="padding:10px; text-align:left;">ID</th>
-          <th style="padding:10px; text-align:left;">Review ID</th>
-          <th style="padding:10px; text-align:left;">Reported User</th>
-          <th style="padding:10px; text-align:left;">Reporter</th>
+          <th style="padding:10px; text-align:left;" data-i18n="admin_reports.table.id">ID</th>
+          <th style="padding:10px; text-align:left;" data-i18n="admin_reports.table.review_id">Review ID</th>
+          <th style="padding:10px; text-align:left;" data-i18n="admin_reports.table.reported_user">Reported User</th>
+          <th style="padding:10px; text-align:left;" data-i18n="admin_reports.table.reporter">Reporter</th>
           <!-- Reason column removed from the list; kept in the detail modal -->
-          <th style="padding:10px; text-align:left;">Created At</th>
-          <th style="padding:10px; text-align:left;">Status</th>
-          <th style="padding:10px; text-align:left;">Admin</th>
-          <th style="padding:10px; text-align:left;">Actions</th>
+          <th style="padding:10px; text-align:left;" data-i18n="admin_reports.table.created_at">Created At</th>
+          <th style="padding:10px; text-align:left;" data-i18n="admin_reports.table.status">Status</th>
+          <th style="padding:10px; text-align:left;" data-i18n="admin_reports.table.admin">Admin</th>
+          <th style="padding:10px; text-align:left;" data-i18n="admin_reports.table.actions">Actions</th>
         </tr>
       </thead>
       <tbody id="reportsTableBody">
-        <tr><td colspan="8" style="padding:12px">Loading...</td></tr>
+        <tr><td colspan="8" style="padding:12px" data-i18n="admin_reports.table.loading">Loading...</td></tr>
       </tbody>
     </table>
   </div>
@@ -38,20 +38,21 @@
   <!-- Report detail modal -->
   <div id="adminReportModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; z-index:60;">
     <div class="card" style="width:640px; max-width:95%; margin:auto;">
-      <h3 id="modalTitle">Report details</h3>
+      <h3 id="modalTitle"  data-i18n="admin_reports.modal.title">Report details</h3>
       <div id="modalBody" style="margin-top:8px; color:var(--text-subtle); max-height:320px; overflow:auto;">
         <!-- populated dynamically -->
       </div>
-      <div class="muted" style="margin-top:8px">Provide a short reason to include in email notifications (optional).</div>
+      <div class="muted" style="margin-top:8px" data-i18n="admin_reports.modal.admin_note">Provide a short reason to include in email notifications (optional).</div>
       <textarea id="modalReason" style="width:100%; height:100px; padding:10px; border-radius:8px; background:transparent; color:var(--text-main); border:1px solid rgba(148,163,184,0.12); margin-top:8px"></textarea>
       <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px">
-        <button id="modalCancel" class="btn ghost">Close</button>
-        <button id="modalReject" class="btn btn-reject">Reject</button>
-        <button id="modalApprove" class="btn btn-approve">Approve</button>
+        <button id="modalCancel" class="btn ghost" data-i18n="admin_reports.actions.close">Close</button>
+        <button id="modalReject" class="btn btn-reject" data-i18n="admin_reports.actions.reject">Reject</button>
+        <button id="modalApprove" class="btn btn-approve" data-i18n="admin_reports.actions.approve">Approve</button>
       </div>
     </div>
   </div>
 
+  <script src="/js/i18n.js"></script>
   <script data-fragment-script>
     (async function(){
       const { fetchJson, api, refreshCounts } = window.adminApi;
@@ -85,8 +86,8 @@
           render(reportsCache);
         }catch(e){
           console.error(e);
-          showMessage('Failed to load reports', true);
-          document.getElementById('reportsTableBody').innerHTML = '<tr><td colspan="7" style="padding:12px">Failed to load</td></tr>';
+          showMessage(t('admin_reports.message.failed_load'), true);
+          document.getElementById('reportsTableBody').innerHTML = `<tr><td colspan="7" style="padding:12px">${t('admin_reports.table.failed')}</td></tr>`
         }
       }
 
@@ -101,7 +102,7 @@
       function render(list){
         const tbody = document.getElementById('reportsTableBody');
         if (!list.length){
-          tbody.innerHTML = '<tr><td colspan="8" style="padding:12px">No pending reports</td></tr>';
+          tbody.innerHTML = `<tr><td colspan="8" style="padding:12px">${t('admin_reports.table.empty')}</td></tr>`;
           return;
         }
         // compute pagination
@@ -121,10 +122,10 @@
             <td style="padding:10px">${r.reportedUsername || ''}</td>
             <td style="padding:10px">${r.reporterUsername || ''}</td>
             <td style="padding:10px">${r.createdAt ? new Date(r.createdAt).toLocaleString() : ''}</td>
-            <td style="padding:10px">${r.status ? `<span class="status-badge ${r.status === 'PENDING' ? 'status-pending' : r.status === 'APPROVED' ? 'status-approved' : 'status-rejected'}">${r.status}</span>` : ''}</td>
+            <td style="padding:10px">${r.status ? `<span class="status-badge ${r.status === 'PENDING' ? 'status-pending' : r.status === 'APPROVED' ? 'status-approved' : 'status-rejected'}">${t(`admin_reports.status.${r.status.toLowerCase()}`)}</span>` : ''}</td>
             <td style="padding:10px">${r.adminUsername || ''}</td>
             <td style="padding:10px">
-              <button class="btn" onclick="window.adminApi.openReportDetail(${r.id})">Detail</button>
+              <button class="btn" onclick="window.adminApi.openReportDetail(${r.id})">${t('admin_reports.actions.detail')}</button>
             </td>
           `;
           tbody.appendChild(tr);
@@ -157,13 +158,13 @@
 
         const prev = document.createElement('button');
         prev.className = 'btn ghost';
-        prev.textContent = 'Prev';
+        prev.textContent = t('admin_reports.actions.prev');
         prev.disabled = page <= 1;
         prev.addEventListener('click', ()=>{ currentPage = Math.max(1, page-1); render(reportsCache); });
 
         const next = document.createElement('button');
         next.className = 'btn ghost';
-        next.textContent = 'Next';
+        next.textContent = t('admin_reports.actions.next');
         next.disabled = page >= totalPages;
         next.addEventListener('click', ()=>{ currentPage = Math.min(totalPages, page+1); render(reportsCache); });
 
@@ -179,7 +180,7 @@
 
         const go = document.createElement('button');
         go.className = 'btn';
-        go.textContent = 'Go';
+        go.textContent = t('admin_reports.actions.go');
         go.addEventListener('click', ()=>{ const v = Number(input.value)||1; currentPage = Math.min(Math.max(1, v), totalPages); render(reportsCache); });
 
         right.appendChild(prev);
@@ -209,18 +210,18 @@
           // build details
       bodyEl.innerHTML = `
             <div style="display:flex; gap:12px; flex-wrap:wrap">
-              <div><strong>Review ID:</strong> ${escapeHtml(r.reviewId || '')}</div>
-              <div><strong>Reported User:</strong> ${escapeHtml(r.reportedUsername || '')}</div>
-        <div><strong>Reporter:</strong> ${escapeHtml(r.reporterUsername || '')}</div>
-              <div><strong>Status:</strong> ${r.status ? `<span class="status-badge ${r.status === 'PENDING' ? 'status-pending' : r.status === 'APPROVED' ? 'status-approved' : 'status-rejected'}">${escapeHtml(r.status)}</span>` : ''}</div>
-              <div><strong>Admin:</strong> ${escapeHtml(r.adminUsername || '')}</div>
-              <div style="flex-basis:100%; margin-top:6px"><strong>Submitted reason:</strong><div style="margin-top:4px">${escapeHtml(r.reason || '')}</div></div>
+              <div><strong>${t('admin_reports.modal.review_id')}:</strong> ${escapeHtml(r.reviewId || '')}</div>
+              <div><strong>${t('admin_reports.modal.reported_user')}:</strong> ${escapeHtml(r.reportedUsername || '')}</div>
+        <div><strong>${t('admin_reports.modal.reporter')}:</strong> ${escapeHtml(r.reporterUsername || '')}</div>
+              <div><strong>${t('admin_reports.modal.status')}:</strong> ${r.status ? `<span class="status-badge ${r.status === 'PENDING' ? 'status-pending' : r.status === 'APPROVED' ? 'status-approved' : 'status-rejected'}">${escapeHtml(r.status)}</span>` : ''}</div>
+              <div><strong>${t('admin_reports.modal.admin')}:</strong> ${escapeHtml(r.adminUsername || '')}</div>
+              <div style="flex-basis:100%; margin-top:6px"><strong>${t('admin_reports.modal.submitted_reason')}:</strong><div style="margin-top:4px">${escapeHtml(r.reason || '')}</div></div>
             </div>
           `;
           // include review/comment body if present (backend provides `comment`)
           if (r.comment){
             const content = escapeHtml(r.comment || '');
-            bodyEl.innerHTML += `<div style="margin-top:8px"><strong>Content:</strong><pre style="white-space:pre-wrap; background:transparent; border-radius:6px; padding:8px; border:1px solid rgba(148,163,184,0.06);">${content}</pre></div>`;
+            bodyEl.innerHTML += `<div style="margin-top:8px"><strong>${t('admin_reports.modal.content')}:</strong><pre style="white-space:pre-wrap; background:transparent; border-radius:6px; padding:8px; border:1px solid rgba(148,163,184,0.06);">${content}</pre></div>`;
           }
           // populate admin reason and enable/disable controls depending on status
           reasonInput.value = r.adminReason || '';
@@ -230,17 +231,17 @@
             reasonInput.disabled = true;
             btnApprove.disabled = true; btnReject.disabled = true;
             if (r.status === 'APPROVED') {
-              btnApprove.textContent = 'Approved';
-              btnReject.textContent = 'Reject';
+              btnApprove.textContent = t('admin_reports.actions.approve');
+              btnReject.textContent = t('admin_reports.actions.reject');
             } else if (r.status === 'REJECTED') {
-              btnApprove.textContent = 'Approve';
-              btnReject.textContent = 'Rejected';
+              btnApprove.textContent = t('admin_reports.actions.approve');
+              btnReject.textContent = t('admin_reports.actions.reject');
             }
           } else {
             reasonInput.disabled = false;
             btnApprove.disabled = false; btnReject.disabled = false;
-            btnApprove.textContent = 'Approve';
-            btnReject.textContent = 'Reject';
+            btnApprove.textContent = t('admin_reports.actions.approve');
+            btnReject.textContent = t('admin_reports.actions.reject');
           }
           modal.style.display = 'flex';
           // focus only when editable
@@ -263,7 +264,9 @@
               headers: {'Content-Type':'application/json'},
               body: JSON.stringify({reason})
             });
-            showMessage(`${action === 'approve' ? 'Approved' : 'Rejected'} #${currentId}`);
+            showMessage(
+                    t(`admin_reports.message.${action === 'approve' ? 'approved' : 'rejected'}`) + ` #${currentId}`
+            );
             if (typeof refreshCounts === 'function') refreshCounts();
             // refresh reports cache and update modal to show handled state
             await loadReports();
@@ -274,17 +277,17 @@
             reasonInput.disabled = true;
             btnApprove.disabled = true; btnReject.disabled = true;
             if (updated.status === 'APPROVED') {
-              btnApprove.textContent = 'Approved';
-              btnReject.textContent = 'Reject';
+              btnApprove.textContent = t('admin_reports.actions.approve');
+              btnReject.textContent = t('admin_reports.actions.reject');
             } else if (updated.status === 'REJECTED') {
-              btnApprove.textContent = 'Approve';
-              btnReject.textContent = 'Rejected';
+              btnApprove.textContent = t('admin_reports.actions.approve');
+              btnReject.textContent = t('admin_reports.actions.reject');
             }
             // allow closing the modal
             btnCancel.disabled = false;
           }catch(err){
             console.error(err);
-            showMessage('Action failed: ' + (err && err.message ? err.message : ''), true);
+            showMessage(t('admin_reports.message.action_failed') + ': ' + (err?.message || ''), true);
             // re-enable cancel so admin can dismiss
             btnCancel.disabled = false;
           }finally{

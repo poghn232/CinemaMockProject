@@ -1,454 +1,810 @@
 <style>
-  .banners-page { display: flex; flex-direction: column; gap: 20px; }
+    .banners-page {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
 
-  .banner-canvas {
-    background: rgba(15,23,42,0.95);
-    border: 1px solid rgba(148,163,184,0.18);
-    border-radius: 14px;
-    padding: 32px 24px;
-    display: flex; flex-direction: column;
-    gap: 20px; align-items: center;
-  }
-  .banner-canvas-inner {
-    display: flex; align-items: center;
-    justify-content: center; gap: 20px; width: 100%;
-  }
-  .banner-slot {
-    border: 2px dashed rgba(148,163,184,0.22); border-radius: 10px;
-    background: rgba(255,255,255,0.02);
-    display: flex; align-items: center; justify-content: center;
-    overflow: hidden; position: relative; flex-shrink: 0;
-    transition: border-color 0.2s;
-  }
-  .banner-slot:hover { border-color: rgba(249,115,22,0.4); }
-  .banner-slot.slot-left, .banner-slot.slot-right { width: 90px; height: 210px; }
-  .banner-slot.slot-bottom { width: 320px; height: 65px; }
-  .banner-slot img { width:100%; height:100%; object-fit:cover; display:none; }
-  .banner-slot.has-img img { display:block; }
-  .banner-slot.has-img .slot-placeholder { display:none; }
-  .banner-slot.loading::after {
-    content:''; position:absolute; inset:0;
-    background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 100%);
-    background-size:200% 100%; animation: shimmer 1.2s infinite;
-  }
-  @keyframes shimmer { to { background-position: -200% 0; } }
-  .slot-placeholder {
-    position:absolute; display:flex; flex-direction:column;
-    align-items:center; justify-content:center;
-    gap:5px; color:#4b5563; font-size:11px; text-align:center; padding:8px;
-    pointer-events:none;
-  }
-  .slot-placeholder svg { opacity:0.3; }
+    .banner-canvas {
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 14px;
+        padding: 32px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
+    }
 
-  .change-btn {
-    padding:8px 16px; border-radius:8px;
-    border:1px solid rgba(148,163,184,0.25);
-    background:rgba(15,23,42,0.9); color:#e5e7eb;
-    font-size:12px; cursor:pointer; white-space:nowrap;
-    transition:all .15s; flex-shrink:0;
-  }
-  .change-btn:hover { border-color:#f97316; color:#f97316; background:rgba(249,115,22,0.08); }
+    .banner-canvas-inner {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        width: 100%;
+    }
 
-  .banner-info-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
-  .banner-info-card {
-    padding:14px; border-radius:10px;
-    background:rgba(249,115,22,0.06); border:1px solid rgba(249,115,22,0.15);
-  }
-  .banner-info-card .label { font-size:11px; color:#9ca3af; margin-bottom:6px; letter-spacing:.05em; }
-  .banner-info-card .url-val { font-size:12px; color:#e5e7eb; word-break:break-all; }
-  .banner-info-card .url-val.empty { color:#4b5563; font-style:italic; }
+    .banner-slot {
+        border: 2px dashed rgba(148, 163, 184, 0.22);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+        flex-shrink: 0;
+        transition: border-color 0.2s;
+    }
 
-  /* panel */
-  .banner-backdrop {
-    position:fixed; inset:0; background:rgba(2,6,23,0.72);
-    backdrop-filter:blur(5px); z-index:100; opacity:0; pointer-events:none; transition:opacity .25s;
-  }
-  .banner-backdrop.open { opacity:1; pointer-events:all; }
-  .banner-panel {
-    position:fixed; top:0; left:50%;
-    transform:translateX(-50%) translateY(-115%);
-    width:min(460px,94vw); background:#0f172a;
-    border:1px solid rgba(148,163,184,0.22); border-top:none;
-    border-radius:0 0 20px 20px;
-    box-shadow:0 28px 60px rgba(0,0,0,.75);
-    z-index:101; padding:26px 26px 22px;
-    transition:transform .38s cubic-bezier(0.34,1.08,0.64,1);
-    display:flex; flex-direction:column; gap:16px;
-  }
-  .banner-panel.open { transform:translateX(-50%) translateY(0); }
+    .banner-slot:hover {
+        border-color: rgba(249, 115, 22, 0.4);
+    }
 
-  .panel-header { display:flex; align-items:center; justify-content:space-between; }
-  .panel-header h3 { font-size:14px; font-weight:700; display:flex; align-items:center; gap:8px; }
-  .panel-close {
-    width:28px; height:28px; border-radius:50%;
-    border:1px solid rgba(148,163,184,0.2); background:transparent;
-    color:#9ca3af; cursor:pointer; font-size:14px;
-    display:flex; align-items:center; justify-content:center; transition:all .14s;
-  }
-  .panel-close:hover { border-color:#f87171; color:#f87171; }
+    .banner-slot.slot-left, .banner-slot.slot-right {
+        width: 90px;
+        height: 210px;
+    }
 
-  .panel-current {
-    display:flex; align-items:center; gap:12px; padding:10px 12px;
-    border-radius:10px; background:rgba(255,255,255,0.03);
-    border:1px solid rgba(148,163,184,0.1);
-  }
-  .panel-current img { border-radius:6px; object-fit:cover; flex-shrink:0; border:1px solid rgba(148,163,184,0.15); }
-  .panel-current-info .cur-label { font-size:11px; color:#6b7280; margin-bottom:3px; }
-  .panel-current-info .cur-url { font-size:12px; color:#9ca3af; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .banner-slot.slot-bottom {
+        width: 320px;
+        height: 65px;
+    }
 
-  .panel-field { display:flex; flex-direction:column; gap:6px; }
-  .panel-label { font-size:11px; color:#9ca3af; font-weight:600; letter-spacing:.05em; text-transform:uppercase; }
-  .drop-zone {
-    position:relative; border:2px dashed rgba(148,163,184,0.18); border-radius:11px;
-    padding:22px 14px; display:flex; flex-direction:column; align-items:center; gap:7px;
-    cursor:pointer; transition:all .18s; background:rgba(255,255,255,0.01);
-  }
-  .drop-zone input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
-  .drop-zone:hover, .drop-zone.over { border-color:#f97316; background:rgba(249,115,22,0.05); }
-  .drop-zone-icon { font-size:24px; }
-  .drop-zone-text { font-size:13px; color:#9ca3af; }
-  .drop-zone-text strong { color:#f97316; }
-  .drop-zone-hint { font-size:11px; color:#4b5563; }
-  .drop-preview { width:100%; max-height:90px; object-fit:contain; border-radius:6px; display:none; margin-top:4px; }
-  .drop-preview.show { display:block; }
-  .drop-fname { font-size:11px; color:#34d399; display:none; }
-  .drop-fname.show { display:block; }
+    .banner-slot img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: none;
+    }
 
-  .panel-input {
-    width:100%; padding:10px 12px; border-radius:9px;
-    border:1px solid rgba(148,163,184,0.18);
-    background:rgba(255,255,255,0.03); color:#e5e7eb;
-    font-size:13px; outline:none; transition:border-color .15s;
-  }
-  .panel-input:focus { border-color:#f97316; }
-  .panel-input::placeholder { color:#4b5563; }
+    .banner-slot.has-img img {
+        display: block;
+    }
 
-  .panel-actions { display:flex; gap:10px; justify-content:flex-end; padding-top:4px; }
-  .btn-cancel {
-    padding:9px 18px; border-radius:9px;
-    border:1px solid rgba(148,163,184,0.2); background:transparent;
-    color:#9ca3af; font-size:13px; cursor:pointer; transition:all .14s;
-  }
-  .btn-cancel:hover { border-color:#9ca3af; color:#e5e7eb; }
-  .btn-save {
-    padding:9px 22px; border-radius:9px; border:none;
-    background:linear-gradient(135deg,#f97316,#ec4899);
-    color:white; font-size:13px; font-weight:600;
-    cursor:pointer; transition:opacity .14s,transform .14s;
-    display:none; align-items:center; gap:7px;
-  }
-  .btn-save.show { display:flex; }
-  .btn-save:hover { opacity:.88; transform:translateY(-1px); }
-  .btn-save:disabled { opacity:.5; cursor:not-allowed; transform:none; }
-  .btn-save .spin {
-    width:13px; height:13px;
-    border:2px solid rgba(255,255,255,.3); border-top-color:#fff;
-    border-radius:50%; animation:rot .7s linear infinite; display:none;
-  }
-  .btn-save.loading .spin { display:block; }
-  @keyframes rot { to { transform:rotate(360deg); } }
+    .banner-slot.has-img .slot-placeholder {
+        display: none;
+    }
 
-  .b-toast {
-    position:fixed; bottom:28px; left:50%;
-    transform:translateX(-50%) translateY(16px);
-    background:#0f172a; border:1px solid rgba(148,163,184,0.2);
-    border-radius:12px; padding:11px 20px;
-    font-size:13px; color:#e5e7eb;
-    box-shadow:0 12px 30px rgba(0,0,0,.5);
-    z-index:200; opacity:0; pointer-events:none;
-    transition:all .3s; display:flex; align-items:center; gap:8px;
-  }
-  .b-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-  .b-toast.success { border-color:rgba(52,211,153,.4); }
-  .b-toast.error   { border-color:rgba(248,113,113,.4); }
+    .banner-slot.loading::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.07) 50%, rgba(255, 255, 255, 0.03) 100%);
+        background-size: 200% 100%;
+        animation: shimmer 1.2s infinite;
+    }
+
+    @keyframes shimmer {
+        to {
+            background-position: -200% 0;
+        }
+    }
+
+    .slot-placeholder {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        color: #4b5563;
+        font-size: 11px;
+        text-align: center;
+        padding: 8px;
+        pointer-events: none;
+    }
+
+    .slot-placeholder svg {
+        opacity: 0.3;
+    }
+
+    .change-btn {
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        background: rgba(15, 23, 42, 0.9);
+        color: #e5e7eb;
+        font-size: 12px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all .15s;
+        flex-shrink: 0;
+    }
+
+    .change-btn:hover {
+        border-color: #f97316;
+        color: #f97316;
+        background: rgba(249, 115, 22, 0.08);
+    }
+
+    .banner-info-grid {
+        display: grid;
+        grid-template-columns:repeat(3, 1fr);
+        gap: 12px;
+    }
+
+    .banner-info-card {
+        padding: 14px;
+        border-radius: 10px;
+        background: rgba(249, 115, 22, 0.06);
+        border: 1px solid rgba(249, 115, 22, 0.15);
+    }
+
+    .banner-info-card .label {
+        font-size: 11px;
+        color: #9ca3af;
+        margin-bottom: 6px;
+        letter-spacing: .05em;
+    }
+
+    .banner-info-card .url-val {
+        font-size: 12px;
+        color: #e5e7eb;
+        word-break: break-all;
+    }
+
+    .banner-info-card .url-val.empty {
+        color: #4b5563;
+        font-style: italic;
+    }
+
+    /* panel */
+    .banner-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(2, 6, 23, 0.72);
+        backdrop-filter: blur(5px);
+        z-index: 100;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .25s;
+    }
+
+    .banner-backdrop.open {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    .banner-panel {
+        position: fixed;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%) translateY(-115%);
+        width: min(460px, 94vw);
+        background: #0f172a;
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        border-top: none;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 28px 60px rgba(0, 0, 0, .75);
+        z-index: 101;
+        padding: 26px 26px 22px;
+        transition: transform .38s cubic-bezier(0.34, 1.08, 0.64, 1);
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .banner-panel.open {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .panel-header h3 {
+        font-size: 14px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .panel-close {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        background: transparent;
+        color: #9ca3af;
+        cursor: pointer;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all .14s;
+    }
+
+    .panel-close:hover {
+        border-color: #f87171;
+        color: #f87171;
+    }
+
+    .panel-current {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(148, 163, 184, 0.1);
+    }
+
+    .panel-current img {
+        border-radius: 6px;
+        object-fit: cover;
+        flex-shrink: 0;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+    }
+
+    .panel-current-info .cur-label {
+        font-size: 11px;
+        color: #6b7280;
+        margin-bottom: 3px;
+    }
+
+    .panel-current-info .cur-url {
+        font-size: 12px;
+        color: #9ca3af;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .panel-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .panel-label {
+        font-size: 11px;
+        color: #9ca3af;
+        font-weight: 600;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+    }
+
+    .drop-zone {
+        position: relative;
+        border: 2px dashed rgba(148, 163, 184, 0.18);
+        border-radius: 11px;
+        padding: 22px 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+        transition: all .18s;
+        background: rgba(255, 255, 255, 0.01);
+    }
+
+    .drop-zone input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+    }
+
+    .drop-zone:hover, .drop-zone.over {
+        border-color: #f97316;
+        background: rgba(249, 115, 22, 0.05);
+    }
+
+    .drop-zone-icon {
+        font-size: 24px;
+    }
+
+    .drop-zone-text {
+        font-size: 13px;
+        color: #9ca3af;
+    }
+
+    .drop-zone-text strong {
+        color: #f97316;
+    }
+
+    .drop-zone-hint {
+        font-size: 11px;
+        color: #4b5563;
+    }
+
+    .drop-preview {
+        width: 100%;
+        max-height: 90px;
+        object-fit: contain;
+        border-radius: 6px;
+        display: none;
+        margin-top: 4px;
+    }
+
+    .drop-preview.show {
+        display: block;
+    }
+
+    .drop-fname {
+        font-size: 11px;
+        color: #34d399;
+        display: none;
+    }
+
+    .drop-fname.show {
+        display: block;
+    }
+
+    .panel-input {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 9px;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        background: rgba(255, 255, 255, 0.03);
+        color: #e5e7eb;
+        font-size: 13px;
+        outline: none;
+        transition: border-color .15s;
+    }
+
+    .panel-input:focus {
+        border-color: #f97316;
+    }
+
+    .panel-input::placeholder {
+        color: #4b5563;
+    }
+
+    .panel-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        padding-top: 4px;
+    }
+
+    .btn-cancel {
+        padding: 9px 18px;
+        border-radius: 9px;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        background: transparent;
+        color: #9ca3af;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all .14s;
+    }
+
+    .btn-cancel:hover {
+        border-color: #9ca3af;
+        color: #e5e7eb;
+    }
+
+    .btn-save {
+        padding: 9px 22px;
+        border-radius: 9px;
+        border: none;
+        background: linear-gradient(135deg, #f97316, #ec4899);
+        color: white;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity .14s, transform .14s;
+        display: none;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .btn-save.show {
+        display: flex;
+    }
+
+    .btn-save:hover {
+        opacity: .88;
+        transform: translateY(-1px);
+    }
+
+    .btn-save:disabled {
+        opacity: .5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-save .spin {
+        width: 13px;
+        height: 13px;
+        border: 2px solid rgba(255, 255, 255, .3);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: rot .7s linear infinite;
+        display: none;
+    }
+
+    .btn-save.loading .spin {
+        display: block;
+    }
+
+    @keyframes rot {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .b-toast {
+        position: fixed;
+        bottom: 28px;
+        left: 50%;
+        transform: translateX(-50%) translateY(16px);
+        background: #0f172a;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 12px;
+        padding: 11px 20px;
+        font-size: 13px;
+        color: #e5e7eb;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, .5);
+        z-index: 200;
+        opacity: 0;
+        pointer-events: none;
+        transition: all .3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .b-toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    .b-toast.success {
+        border-color: rgba(52, 211, 153, .4);
+    }
+
+    .b-toast.error {
+        border-color: rgba(248, 113, 113, .4);
+    }
 </style>
 
 <div class="card banners-page">
-  <div>
-    <h2 style="font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
-      </svg>
-      Banner Management
-    </h2>
-    <p class="muted" style="font-size:12px;margin-top:3px;">Preview image. Click "Change" to update.</p>
-  </div>
-
-  <div class="banner-canvas">
-    <div class="banner-canvas-inner">
-
-      <button class="change-btn" data-target="left">← Change Left</button>
-
-      <div class="banner-slot slot-left loading" id="slotLeft">
-        <img id="imgLeft" alt="Left Banner"/>
-        <div class="slot-placeholder">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
-            <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="21" x2="21" y2="3"/>
-          </svg>
-          Left
-        </div>
-      </div>
-
-      <div style="display:flex;flex-direction:column;align-items:center;gap:14px;flex:1;">
-        <div class="banner-slot slot-bottom loading" id="slotBottom">
-          <img id="imgBottom" alt="Bottom Banner"/>
-          <div class="slot-placeholder" style="flex-direction:row;gap:6px;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
-              <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="21" x2="21" y2="3"/>
+    <div>
+        <h2 style="font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;" data-i18n="admin_banners.title">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <path d="M3 9h18M9 21V9"/>
             </svg>
-            Bottom
-          </div>
+            Banner Management
+        </h2>
+        <p class="muted" style="font-size:12px;margin-top:3px;" data-i18n="admin_banners.description">Preview image. Click "Change" to update.</p>
+    </div>
+
+    <div class="banner-canvas">
+        <div class="banner-canvas-inner">
+
+            <button class="change-btn" data-target="left" data-i18n="admin_banners.buttons.change_left">← Change Left</button>
+
+            <div class="banner-slot slot-left loading" id="slotLeft">
+                <img id="imgLeft" alt="Left Banner"/>
+                <div class="slot-placeholder" data-i18n="admin_banners.targets.left">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="1.4">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <line x1="3" y1="21" x2="21" y2="3"/>
+                    </svg>
+                    Left
+                </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;align-items:center;gap:14px;flex:1;">
+                <div class="banner-slot slot-bottom loading" id="slotBottom">
+                    <img id="imgBottom" alt="Bottom Banner"/>
+                    <div class="slot-placeholder" style="flex-direction:row;gap:6px;" data-i18n="admin_banners.targets.bottom">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="1.4">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <line x1="3" y1="21" x2="21" y2="3"/>
+                        </svg>
+                        Bottom
+                    </div>
+                </div>
+                <button class="change-btn" data-target="bottom" data-i18n="admin_banners.buttons.change_bottom">↓ Change Bottom</button>
+            </div>
+
+            <div class="banner-slot slot-right loading" id="slotRight">
+                <img id="imgRight" alt="Right Banner"/>
+                <div class="slot-placeholder" data-i18n="admin_banners.targets.right">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="1.4">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <line x1="3" y1="21" x2="21" y2="3"/>
+                    </svg>
+                    Right
+                </div>
+            </div>
+
+            <button class="change-btn" data-target="right" data-i18n="admin_banners.buttons.change_right">Change Right →</button>
         </div>
-        <button class="change-btn" data-target="bottom">↓ Change Bottom</button>
-      </div>
+    </div>
 
-      <div class="banner-slot slot-right loading" id="slotRight">
-        <img id="imgRight" alt="Right Banner"/>
-        <div class="slot-placeholder">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
-            <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="21" x2="21" y2="3"/>
-          </svg>
-          Right
+    <div class="banner-info-grid">
+        <div class="banner-info-card">
+            <div class="label" data-i18n="admin_banners.info.left">LEFT BANNER · ID 2</div>
+            <div class="url-val empty" id="infoLeft" data-i18n="common.loading">Loading...</div>
         </div>
-      </div>
-
-      <button class="change-btn" data-target="right">Change Right →</button>
+        <div class="banner-info-card">
+            <div class="label" data-i18n="admin_banners.info.bottom">BOTTOM BANNER · ID 1</div>
+            <div class="url-val empty" id="infoBottom" data-i18n="common.loading">Loading...</div>
+        </div>
+        <div class="banner-info-card">
+            <div class="label" data-i18n="admin_banners.info.right">RIGHT BANNER · ID 3</div>
+            <div class="url-val empty" id="infoRight" data-i18n="common.loading">Loading...</div>
+        </div>
     </div>
-  </div>
-
-  <div class="banner-info-grid">
-    <div class="banner-info-card">
-      <div class="label">LEFT BANNER · ID 2</div>
-      <div class="url-val empty" id="infoLeft">Loading...</div>
-    </div>
-    <div class="banner-info-card">
-      <div class="label">BOTTOM BANNER · ID 1</div>
-      <div class="url-val empty" id="infoBottom">Loading...</div>
-    </div>
-    <div class="banner-info-card">
-      <div class="label">RIGHT BANNER · ID 3</div>
-      <div class="url-val empty" id="infoRight">Loading...</div>
-    </div>
-  </div>
 </div>
 
 <!-- PANEL -->
 <div class="banner-backdrop" id="bannerBackdrop"></div>
 <div class="banner-panel" id="bannerPanel">
-  <div class="panel-header">
-    <h3>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2">
-        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-      </svg>
-      <span id="panelTitleSpan">Change Banner</span>
-    </h3>
-    <button class="panel-close" id="panelClose">✕</button>
-  </div>
-
-  <div class="panel-current">
-    <img id="panelCurImg" width="44" height="44" alt="" src="" style="display:none;"/>
-    <div class="panel-current-info">
-      <div class="cur-label">CURRENT BANNER</div>
-      <div class="cur-url" id="panelCurUrl">—</div>
+    <div class="panel-header">
+        <h3>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            <span id="panelTitleSpan" data-i18n="admin_banners.panel.title">Change Banner</span>
+        </h3>
+        <button class="panel-close" id="panelClose">✕</button>
     </div>
-  </div>
 
-  <div class="panel-field">
-    <div class="panel-label">New image</div>
-    <div class="drop-zone" id="dropZone">
-      <input type="file" id="fileInput" accept="image/*"/>
-      <div class="drop-zone-icon">🖼️</div>
-      <div class="drop-zone-text"><strong>Choose image</strong> or pull here</div>
-      <div class="drop-zone-hint">PNG, JPG, WebP — maximum 5 MB</div>
-      <img class="drop-preview" id="dropPreview" alt="preview"/>
-      <div class="drop-fname" id="dropFname"></div>
+    <div class="panel-current">
+        <img id="panelCurImg" width="44" height="44" alt="" src="" style="display:none;"/>
+        <div class="panel-current-info">
+            <div class="cur-label" data-i18n="admin_banners.panel.current">CURRENT BANNER</div>
+            <div class="cur-url" id="panelCurUrl">—</div>
+        </div>
     </div>
-  </div>
 
-  <div class="panel-field">
-    <div class="panel-label">URL when click into banner</div>
-    <input class="panel-input" type="url" id="urlInput" placeholder="https://example.com/..."/>
-  </div>
+    <div class="panel-field">
+        <div class="panel-label" data-i18n="admin_banners.panel.new_image">New image</div>
+        <div class="drop-zone" id="dropZone">
+            <input type="file" id="fileInput" accept="image/*"/>
+            <div class="drop-zone-icon">🖼️</div>
+            <div class="drop-zone-text">
+                <strong data-i18n="admin_banners.panel.choose">Choose image</strong>
+                <span data-i18n="admin_banners.panel.drag">or pull here</span>
+            </div>
+            <div class="drop-zone-hint" data-i18n="admin_banners.panel.hint">PNG, JPG, WebP — maximum 5 MB</div>
+            <img class="drop-preview" id="dropPreview" alt="preview"/>
+            <div class="drop-fname" id="dropFname"></div>
+        </div>
+    </div>
 
-  <div class="panel-actions">
-    <button class="btn-cancel" id="btnCancel">Cancel</button>
-    <button class="btn-save" id="btnSave">
-      <div class="spin"></div>
-      <span id="btnSaveLabel">Save changes</span>
-    </button>
-  </div>
+    <div class="panel-field">
+        <div class="panel-label" data-i18n="admin_banners.panel.url">URL when click into banner</div>
+        <input class="panel-input" type="url" id="urlInput" data-i18n-placeholder="admin_banners.panel.url_placeholder"/>
+    </div>
+
+    <div class="panel-actions">
+        <button class="btn-cancel" id="btnCancel" data-i18n="admin_banners.buttons.cancel">Cancel</button>
+        <button class="btn-save" id="btnSave">
+            <div class="spin"></div>
+            <span id="btnSaveLabel" data-i18n="admin_banners.buttons.save">Save changes</span>
+        </button>
+    </div>
 </div>
 
 <div class="b-toast" id="bToast"></div>
-
+<script src="/js/i18n.js"></script>
 <script data-fragment-script>
-(function () {
-  const CONFIG = {
-    left:   { id: 2, label: 'Left Banner',  endpoint: '/api/admin/banner/upload/left'   },
-    right:  { id: 3, label: 'Right Banner',  endpoint: '/api/admin/banner/upload/right'  },
-    bottom: { id: 1, label: 'Bottom Banner',  endpoint: '/api/admin/banner/upload/bottom' },
-  };
-  const INFO_EL = { 2: 'infoLeft', 1: 'infoBottom', 3: 'infoRight' };
-  const SLOT_MAP = { left: 'slotLeft', right: 'slotRight', bottom: 'slotBottom' };
-  const IMG_MAP  = { left: 'imgLeft',  right: 'imgRight',  bottom: 'imgBottom'  };
+    (function () {
+        const CONFIG = {
+            left: {id: 2, label: 'Left Banner', endpoint: '/api/admin/banner/upload/left'},
+            right: {id: 3, label: 'Right Banner', endpoint: '/api/admin/banner/upload/right'},
+            bottom: {id: 1, label: 'Bottom Banner', endpoint: '/api/admin/banner/upload/bottom'},
+        };
+        const INFO_EL = {2: 'infoLeft', 1: 'infoBottom', 3: 'infoRight'};
+        const SLOT_MAP = {left: 'slotLeft', right: 'slotRight', bottom: 'slotBottom'};
+        const IMG_MAP = {left: 'imgLeft', right: 'imgRight', bottom: 'imgBottom'};
 
-  /* ── load ảnh từ DB với cache-bust ── */
-  const ts = Date.now();
-  ['left','right','bottom'].forEach(t => {
-    const cfg   = CONFIG[t];
-    const slot  = document.getElementById(SLOT_MAP[t]);
-    const img   = document.getElementById(IMG_MAP[t]);
-    img.onload  = () => { slot.classList.remove('loading'); slot.classList.add('has-img'); };
-    img.onerror = () => { slot.classList.remove('loading'); };
-    img.src = `/api/image/${cfg.id}?t=${ts}`;
-  });
+        /* ── load ảnh từ DB với cache-bust ── */
+        const ts = Date.now();
+        ['left', 'right', 'bottom'].forEach(t => {
+            const cfg = CONFIG[t];
+            const slot = document.getElementById(SLOT_MAP[t]);
+            const img = document.getElementById(IMG_MAP[t]);
+            img.onload = () => {
+                slot.classList.remove('loading');
+                slot.classList.add('has-img');
+            };
+            img.onerror = () => {
+                slot.classList.remove('loading');
+            };
+            img.src = `/api/image/${cfg.id}?t=${ts}`;
+        });
 
-  /* ── load URL info ── */
-  (async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/banner', {
-        headers: token ? { Authorization: 'Bearer ' + token } : {}
-      });
-      if (!res.ok) return;
-      const list = await res.json();
-      list.forEach(b => {
-        const el = document.getElementById(INFO_EL[b.id]);
-        if (!el) return;
-        if (b.toURL) { el.textContent = b.toURL; el.classList.remove('empty'); }
-        else          { el.textContent = 'No URL yet'; }
-      });
-    } catch(e) { console.warn(e); }
-  })();
+        /* ── load URL info ── */
+        (async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch('/api/banner', {
+                    headers: token ? {Authorization: 'Bearer ' + token} : {}
+                });
+                if (!res.ok) return;
+                const list = await res.json();
+                list.forEach(b => {
+                    const el = document.getElementById(INFO_EL[b.id]);
+                    if (!el) return;
+                    if (b.toURL) {
+                        el.textContent = b.toURL;
+                        el.classList.remove('empty');
+                    } else {
+                        el.textContent = t('admin_banners.info.no_url');
+                    }
+                });
+            } catch (e) {
+                console.warn(e);
+            }
+        })();
 
-  /* ── panel refs ── */
-  const backdrop   = document.getElementById('bannerBackdrop');
-  const panel      = document.getElementById('bannerPanel');
-  const titleSpan  = document.getElementById('panelTitleSpan');
-  const curImg     = document.getElementById('panelCurImg');
-  const curUrl     = document.getElementById('panelCurUrl');
-  const fileInput  = document.getElementById('fileInput');
-  const dropZone   = document.getElementById('dropZone');
-  const dropPrev   = document.getElementById('dropPreview');
-  const dropFname  = document.getElementById('dropFname');
-  const urlInput   = document.getElementById('urlInput');
-  const btnSave    = document.getElementById('btnSave');
-  const btnCancel  = document.getElementById('btnCancel');
-  const panelClose = document.getElementById('panelClose');
-  const toast      = document.getElementById('bToast');
+        /* ── panel refs ── */
+        const backdrop = document.getElementById('bannerBackdrop');
+        const panel = document.getElementById('bannerPanel');
+        const titleSpan = document.getElementById('panelTitleSpan');
+        const curImg = document.getElementById('panelCurImg');
+        const curUrl = document.getElementById('panelCurUrl');
+        const fileInput = document.getElementById('fileInput');
+        const dropZone = document.getElementById('dropZone');
+        const dropPrev = document.getElementById('dropPreview');
+        const dropFname = document.getElementById('dropFname');
+        const urlInput = document.getElementById('urlInput');
+        const btnSave = document.getElementById('btnSave');
+        const btnCancel = document.getElementById('btnCancel');
+        const panelClose = document.getElementById('panelClose');
+        const toast = document.getElementById('bToast');
 
-  let currentTarget = null;
-  let selectedFile  = null;
+        let currentTarget = null;
+        let selectedFile = null;
 
-  /* ── open ── */
-  function open(target) {
-    currentTarget = target; selectedFile = null;
-    fileInput.value = ''; urlInput.value = '';
-    dropPrev.classList.remove('show'); dropFname.classList.remove('show');
+        /* ── open ── */
+        function open(target) {
+            currentTarget = target;
+            selectedFile = null;
+            fileInput.value = '';
+            urlInput.value = '';
+            dropPrev.classList.remove('show');
+            dropFname.classList.remove('show');
 
-    const cfg = CONFIG[target];
-    titleSpan.textContent = cfg.label;
+            const cfg = CONFIG[target];
+            titleSpan.textContent = cfg.label;
 
-    curImg.onerror = () => { curImg.style.display = 'none'; };
-    curImg.onload  = () => {};
-    curImg.src = `/api/image/${cfg.id}?t=${Date.now()}`;
-    curImg.style.display = 'block';
+            curImg.onerror = () => {
+                curImg.style.display = 'none';
+            };
+            curImg.onload = () => {
+            };
+            curImg.src = `/api/image/${cfg.id}?t=${Date.now()}`;
+            curImg.style.display = 'block';
 
-    const infoEl = document.getElementById(INFO_EL[cfg.id]);
-    curUrl.textContent = infoEl ? infoEl.textContent : '—';
+            const infoEl = document.getElementById(INFO_EL[cfg.id]);
+            curUrl.textContent = infoEl ? infoEl.textContent : '—';
 
-    checkSave();
-    backdrop.classList.add('open');
-    panel.classList.add('open');
-  }
-
-  function close() {
-    backdrop.classList.remove('open'); panel.classList.remove('open');
-    currentTarget = null; selectedFile = null;
-  }
-
-  backdrop.addEventListener('click', close);
-  btnCancel.addEventListener('click', close);
-  panelClose.addEventListener('click', close);
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && panel.classList.contains('open')) close();
-  });
-  document.querySelectorAll('.change-btn').forEach(b =>
-    b.addEventListener('click', () => open(b.dataset.target))
-  );
-
-  /* ── file pick ── */
-  function handleFile(file) {
-    if (!file || !file.type.startsWith('image/')) return;
-    if (file.size > 5 * 1024 * 1024) { showToast('File too big! Maximum 5MB.', 'error'); return; }
-    selectedFile = file;
-    dropFname.textContent = '✔ ' + file.name; dropFname.classList.add('show');
-    const reader = new FileReader();
-    reader.onload = e => { dropPrev.src = e.target.result; dropPrev.classList.add('show'); };
-    reader.readAsDataURL(file);
-    checkSave();
-  }
-
-  fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
-  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('over'); });
-  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
-  dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('over'); handleFile(e.dataTransfer.files[0]); });
-  urlInput.addEventListener('input', checkSave);
-
-  function checkSave() {
-    btnSave.classList.toggle('show', !!(selectedFile || urlInput.value.trim()));
-  }
-
-  /* ── save → upload → reload fragment ── */
-  btnSave.addEventListener('click', async () => {
-    const url = urlInput.value.trim();
-    if (!selectedFile) { showToast('Please choose image.', 'error'); return; }
-    if (!url)          { showToast('Please enter URL.', 'error'); return; }
-
-    setLoading(true);
-    try {
-      const token = localStorage.getItem('token');
-      const fd = new FormData();
-      fd.append('file', selectedFile);
-      fd.append('toURL', url);
-
-      const res = await fetch(CONFIG[currentTarget].endpoint, {
-        method: 'POST',
-        headers: token ? { Authorization: 'Bearer ' + token } : {},
-        body: fd,
-      });
-      if (!res.ok) throw new Error('HTTP ' + res.status + ' — ' + await res.text());
-
-      showToast('Save successful! Reloading...', 'success');
-      close();
-
-      /* reload fragment sau 800ms → ảnh mới lấy thẳng từ DB */
-      setTimeout(() => {
-        if (window.adminApi?.loadFragment) {
-          window.adminApi.loadFragment('admin_banners_fragment.html');
-        } else {
-          location.reload();
+            checkSave();
+            backdrop.classList.add('open');
+            panel.classList.add('open');
         }
-      }, 800);
 
-    } catch (err) {
-      showToast('Lỗi: ' + err.message, 'error');
-      setLoading(false);
-    }
-  });
+        function close() {
+            backdrop.classList.remove('open');
+            panel.classList.remove('open');
+            currentTarget = null;
+            selectedFile = null;
+        }
 
-  function setLoading(on) {
-    btnSave.disabled = on;
-    btnSave.classList.toggle('loading', on);
-    document.getElementById('btnSaveLabel').textContent = on ? 'Saving...' : 'Save changes';
-  }
+        backdrop.addEventListener('click', close);
+        btnCancel.addEventListener('click', close);
+        panelClose.addEventListener('click', close);
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && panel.classList.contains('open')) close();
+        });
+        document.querySelectorAll('.change-btn').forEach(b =>
+            b.addEventListener('click', () => open(b.dataset.target))
+        );
 
-  let toastTimer;
-  function showToast(msg, type = 'success') {
-    toast.textContent = msg; toast.className = 'b-toast show ' + type;
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
-  }
-})();
+        /* ── file pick ── */
+        function handleFile(file) {
+            if (!file || !file.type.startsWith('image/')) return;
+            if (file.size > 5 * 1024 * 1024) {
+                showToast(t('admin_banners.toast.file_big'), 'error');
+                return;
+            }
+            selectedFile = file;
+            dropFname.textContent = '✔ ' + file.name;
+            dropFname.classList.add('show');
+            const reader = new FileReader();
+            reader.onload = e => {
+                dropPrev.src = e.target.result;
+                dropPrev.classList.add('show');
+            };
+            reader.readAsDataURL(file);
+            checkSave();
+        }
+
+        fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
+        dropZone.addEventListener('dragover', e => {
+            e.preventDefault();
+            dropZone.classList.add('over');
+        });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('over');
+            handleFile(e.dataTransfer.files[0]);
+        });
+        urlInput.addEventListener('input', checkSave);
+
+        function checkSave() {
+            btnSave.classList.toggle('show', !!(selectedFile || urlInput.value.trim()));
+        }
+
+        /* ── save → upload → reload fragment ── */
+        btnSave.addEventListener('click', async () => {
+            const url = urlInput.value.trim();
+            if (!selectedFile) {
+                showToast(t('admin_banners.toast.choose_image'), 'error');
+                return;
+            }
+            if (!url) {
+                showToast(t('admin_banners.toast.enter_url'), 'error');
+                return;
+            }
+
+            setLoading(true);
+            try {
+                const token = localStorage.getItem('token');
+                const fd = new FormData();
+                fd.append('file', selectedFile);
+                fd.append('toURL', url);
+
+                const res = await fetch(CONFIG[currentTarget].endpoint, {
+                    method: 'POST',
+                    headers: token ? {Authorization: 'Bearer ' + token} : {},
+                    body: fd,
+                });
+                if (!res.ok) throw new Error('HTTP ' + res.status + ' — ' + await res.text());
+
+                showToast(t('admin_banners.toast.success'), 'success');
+                close();
+
+                /* reload fragment sau 800ms → ảnh mới lấy thẳng từ DB */
+                setTimeout(() => {
+                    if (window.adminApi?.loadFragment) {
+                        window.adminApi.loadFragment('admin_banners_fragment.html');
+                    } else {
+                        location.reload();
+                    }
+                }, 800);
+
+            } catch (err) {
+                showToast(t('admin_banners.toast.error') + ': ' + err.message, 'error');
+                setLoading(false);
+            }
+        });
+
+        function setLoading(on) {
+            btnSave.disabled = on;
+            btnSave.classList.toggle('loading', on);
+            document.getElementById('btnSaveLabel').textContent =
+                on ? t('admin_banners.buttons.saving')
+                    : t('admin_banners.buttons.save');
+        }
+
+        let toastTimer;
+
+        function showToast(msg, type = 'success') {
+            toast.textContent = msg;
+            toast.className = 'b-toast show ' + type;
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+        }
+    })();
 </script>

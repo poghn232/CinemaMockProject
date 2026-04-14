@@ -85,12 +85,21 @@ public class AchievementController {
         Profile profile = resolveProfile(user, profileId);
         var streak = loginStreakService.getStreak(profile);
 
+        // Tính các ngày login dựa trên streak thực tế
+        List<String> loginDays = new java.util.ArrayList<>();
+        if (streak.getLastLoginDate() != null && streak.getCurrentStreak() > 0) {
+            for (int i = 0; i < Math.min(streak.getCurrentStreak(), 30); i++) {
+                loginDays.add(streak.getLastLoginDate().minusDays(i).toString());
+            }
+        }
+
         return ResponseEntity.ok(Map.of(
                 "currentStreak",  streak.getCurrentStreak(),
                 "longestStreak",  streak.getLongestStreak(),
                 "totalLoginDays", streak.getTotalLoginDays(),
                 "lastLoginDate",  streak.getLastLoginDate() != null
-                        ? streak.getLastLoginDate().toString() : ""
+                        ? streak.getLastLoginDate().toString() : "",
+                "loginDays", loginDays
         ));
     }
 

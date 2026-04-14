@@ -437,29 +437,149 @@
     "title": "Bảng điều khiển phân tích",
     "subtitle_live": "Dữ liệu thời gian thực",
     "subtitle_refresh": "tự động làm mới mỗi 60 giây",
-
     "user_overview": "Tổng quan người dùng",
     "genre_popularity": "Độ phổ biến thể loại",
     "logins_region": "Đăng nhập theo khu vực",
     "subscription_packs": "Gói đăng ký phổ biến",
-
     "all_time": "TOÀN BỘ",
     "monthly": "THEO THÁNG",
     "weekly": "THEO TUẦN",
-
     "select_all": "Tất cả",
     "select_monthly": "Theo tháng",
     "select_weekly": "Theo tuần",
-
     "loading": "Đang tải…",
     "error": "Lỗi",
     "no_login_data": "Chưa có dữ liệu đăng nhập",
     "no_subscription_data": "Chưa có dữ liệu gói đăng ký",
-
     "subscribed": "Đã đăng ký",
     "not_subscribed": "Chưa đăng ký",
     "total_users": "tổng người dùng",
     "total_logins": "tổng lượt đăng nhập",
     "chart_load_fail": "Không thể tải Chart.js"
+  },
+  "admin_reports": {
+    "title": "Báo cáo (Chờ xử lý)",
+    "description": "Xem xét và kiểm duyệt các bình luận bị báo cáo. Duyệt để xóa bình luận và khóa quyền bình luận của người bị báo cáo; Từ chối để thông báo cho người báo cáo.",
+    "table": {
+      "id": "ID",
+      "review_id": "ID đánh giá",
+      "reported_user": "Người bị báo cáo",
+      "reporter": "Người báo cáo",
+      "created_at": "Thời gian tạo",
+      "status": "Trạng thái",
+      "admin": "Quản trị viên",
+      "actions": "Hành động",
+      "loading": "Đang tải...",
+      "empty": "Không có báo cáo",
+      "failed": "Tải thất bại"
+    },
+    "status": {
+      "pending": "CHỜ XỬ LÝ",
+      "approved": "ĐÃ DUYỆT",
+      "rejected": "ĐÃ TỪ CHỐI"
+    },
+    "actions": {
+      "detail": "Chi tiết",
+      "approve": "Duyệt",
+      "approved": "Đã duyệt",
+      "reject": "Từ chối",
+      "rejected": "Đã từ chối",
+      "close": "Đóng",
+      "prev": "Trước",
+      "next": "Sau",
+      "go": "Đi"
+    },
+    "modal": {
+      "title": "Chi tiết báo cáo",
+      "review_id": "ID đánh giá",
+      "reported_user": "Người bị báo cáo",
+      "reporter": "Người báo cáo",
+      "status": "Trạng thái",
+      "admin": "Quản trị viên",
+      "submitted_reason": "Lý do đã gửi",
+      "content": "Nội dung",
+      "admin_note": "Nhập lý do gửi qua email (không bắt buộc)."
+    },
+    "message": {
+      "approved": "Đã duyệt",
+      "rejected": "Đã từ chối",
+      "failed_load": "Tải báo cáo thất bại",
+      "action_failed": "Thao tác thất bại"
+    }
+  },
+  "admin_logs": {
+    "title": "Nhật ký quản trị",
+    "description": "Lịch sử hệ thống",
+    "search": {
+      "placeholder": "Tìm theo tên người dùng, hành động, IP..."
+    },
+    "count": {
+      "label": "{{filtered}} / {{total}} bản ghi",
+      "simple": "{{total}} bản ghi"
+    },
+    "actions": {
+      "refresh": "Làm mới"
+    },
+    "table": {
+      "loading": "Đang tải dữ liệu...",
+      "empty": "Chưa có dữ liệu.",
+      "no_result": "Không tìm thấy kết quả",
+      "error": "Không thể tải dữ liệu"
+    },
+    "pagination": {
+      "displaying": "Hiển thị {{from}}–{{to}} / {{total}} bản ghi",
+      "rows_per_page": "Số dòng mỗi trang"
+    },
+    "columns": {
+      "logId": "ID",
+      "username": "Người dùng",
+      "action": "Hành động",
+      "level": "Mức độ",
+      "message": "Nội dung",
+      "details": "Chi tiết",
+      "ipAddress": "Địa chỉ IP",
+      "endpoint": "API",
+      "method": "Phương thức",
+      "status": "Trạng thái",
+      "createdAt": "Thời gian",
+      "updatedAt": "Cập nhật",
+      "region": "Khu vực",
+      "countryCode": "Quốc gia"
+    }
+  },
+  "admin_banners": {
+    "title": "Quản lý Banner",
+    "description": "Xem trước ảnh. Nhấn \"Thay đổi\" để cập nhật.",
+    "buttons": {
+      "change_left": "← Đổi bên trái",
+      "change_right": "Đổi bên phải →",
+      "change_bottom": "↓ Đổi phía dưới",
+      "cancel": "Hủy",
+      "save": "Lưu thay đổi",
+      "saving": "Đang lưu..."
+    },
+    "panel": {
+      "title": "Thay đổi Banner",
+      "current": "BANNER HIỆN TẠI",
+      "new_image": "Ảnh mới",
+      "choose": "Chọn ảnh",
+      "drag": "hoặc kéo vào đây",
+      "hint": "PNG, JPG, WebP — tối đa 5MB",
+      "url": "URL khi nhấn vào banner",
+      "url_placeholder": "https://example.com/..."
+    },
+    "info": {
+      "left": "BANNER TRÁI · ID 2",
+      "bottom": "BANNER DƯỚI · ID 1",
+      "right": "BANNER PHẢI · ID 3",
+      "no_url": "Chưa có URL"
+    },
+    "toast": {
+      "file_big": "File quá lớn! Tối đa 5MB.",
+      "choose_image": "Vui lòng chọn ảnh.",
+      "enter_url": "Vui lòng nhập URL.",
+      "success": "Lưu thành công! Đang tải lại...",
+      "error": "Lỗi"
+    }
   }
 }
