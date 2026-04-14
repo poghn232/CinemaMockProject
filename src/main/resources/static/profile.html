@@ -2076,14 +2076,9 @@
             const pid = localStorage.getItem('profileId');
             const streakUrl = '/api/user/achievements/streak' + (pid ? '?profileId=' + pid : '');
 
-            const [streakRes, histRes] = await Promise.all([
-                fetch(streakUrl, {  // ← thêm profileId vào đây
-                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-                }),
-                fetch('/api/user/history' + (pid ? '?profileId=' + pid : ''), {
-                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-                })
-            ]);
+            const streakRes = await fetch(streakUrl, {
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+            });
 
             if (!streakRes.ok) throw new Error('Failed');
             const s = await streakRes.json();
@@ -2097,23 +2092,13 @@
 
             // Fire emoji intensity theo streak
             const fireEl = document.querySelector('.streak-fire');
-            if      (s.currentStreak === 0)   fireEl.style.filter = 'grayscale(1)';
-            else if (s.currentStreak >= 30)   fireEl.textContent = '🔥🔥🔥';
-            else if (s.currentStreak >= 7)    fireEl.textContent = '🔥🔥';
+            if      (s.currentStreak === 0)  fireEl.style.filter = 'grayscale(1)';
+            else if (s.currentStreak >= 30)  fireEl.textContent = '🔥🔥🔥';
+            else if (s.currentStreak >= 7)   fireEl.textContent = '🔥🔥';
+            else { fireEl.textContent = '🔥'; fireEl.style.filter = ''; }
 
-            // --- 30-day calendar từ login history ---
-            const loginDates = new Set();
-            if (histRes.ok) {
-                const hist = await histRes.json();
-                // Lấy watchedAt dates
-                hist.forEach(h => {
-                    if (h.watchedAt) {
-                        loginDates.add(h.watchedAt.substring(0, 10));
-                    }
-                });
-            }
-            // Luôn thêm lastLoginDate nếu có
-            if (s.lastLoginDate) loginDates.add(s.lastLoginDate);
+            // --- Calendar dùng loginDays từ API (chính xác theo streak thực tế) ---
+            const loginDates = new Set(s.loginDays || []);
             renderCalendar(loginDates);
 
             // --- Milestones ---
@@ -2132,7 +2117,9 @@
         for (let i = 29; i >= 0; i--) {
             const d = new Date(today);
             d.setDate(today.getDate() - i);
-            const dateStr = d.toISOString().substring(0, 10);
+            const dateStr = d.getFullYear() + '-'
+                + String(d.getMonth() + 1).padStart(2, '0') + '-'
+                + String(d.getDate()).padStart(2, '0');
             const isToday = i === 0;
             const isLogged = loginDates.has(dateStr);
 

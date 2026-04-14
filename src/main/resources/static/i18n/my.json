@@ -451,29 +451,149 @@
     "title": "အချက်အလက်ခွဲခြမ်းစိတ်ဖြာ Dashboard",
     "subtitle_live": "အချိန်နှင့်တပြေးညီ ဒေတာ",
     "subtitle_refresh": "၆၀ စက္ကန့်တိုင်း အလိုအလျောက် ပြန်လည်ဆန်းသစ်သည်",
-
     "user_overview": "အသုံးပြုသူ အနှစ်ချုပ်",
     "genre_popularity": "အမျိုးအစား လူကြိုက်များမှု",
     "logins_region": "ဒေသအလိုက် Login များ",
     "subscription_packs": "လူကြိုက်များသော Subscription Packs",
-
     "all_time": "အချိန်အားလုံး",
     "monthly": "လစဉ်",
     "weekly": "အပတ်စဉ်",
-
     "select_all": "အားလုံး",
     "select_monthly": "လစဉ်",
     "select_weekly": "အပတ်စဉ်",
-
     "loading": "လုပ်ဆောင်နေသည်…",
     "error": "အမှား",
     "no_login_data": "Login ဒေတာ မရှိသေးပါ",
     "no_subscription_data": "Subscription ဒေတာ မရှိသေးပါ",
-
     "subscribed": "စာရင်းသွင်းထားသည်",
     "not_subscribed": "စာရင်းမသွင်းရသေးပါ",
     "total_users": "စုစုပေါင်း အသုံးပြုသူများ",
     "total_logins": "စုစုပေါင်း Login များ",
     "chart_load_fail": "Chart.js ကို တင်၍မရပါ"
+  },
+  "admin_reports": {
+    "title": "အစီရင်ခံချက်များ (စောင့်ဆိုင်းနေသည်)",
+    "description": "တင်ပြထားသော မှတ်ချက်များကို စစ်ဆေးပြီး ထိန်းချုပ်ပါ။ Approve လုပ်ပါက မှတ်ချက်ကို ဖျက်ပြီး အသုံးပြုသူ၏ မှတ်ချက်ရေးခွင့်ကို ပိတ်မည်။ Reject လုပ်ပါက တင်ပြသူအား အသိပေးမည်။",
+    "table": {
+      "id": "ID",
+      "review_id": "Review ID",
+      "reported_user": "တိုင်ကြားခံထားသူ",
+      "reporter": "တိုင်ကြားသူ",
+      "created_at": "ဖန်တီးသည့်အချိန်",
+      "status": "အခြေအနေ",
+      "admin": "Admin",
+      "actions": "လုပ်ဆောင်ချက်များ",
+      "loading": "တင်နေသည်...",
+      "empty": "တိုင်ကြားချက်မရှိပါ",
+      "failed": "တင်မရပါ"
+    },
+    "status": {
+      "pending": "စောင့်ဆိုင်းနေသည်",
+      "approved": "အတည်ပြုပြီး",
+      "rejected": "ပယ်ချပြီး"
+    },
+    "actions": {
+      "detail": "အသေးစိတ်",
+      "approve": "အတည်ပြုရန်",
+      "approved": "အတည်ပြုပြီး",
+      "reject": "ပယ်ချရန်",
+      "rejected": "ပယ်ချပြီး",
+      "close": "ပိတ်ရန်",
+      "prev": "ရှေ့",
+      "next": "နောက်",
+      "go": "သွားမည်"
+    },
+    "modal": {
+      "title": "အစီရင်ခံချက် အသေးစိတ်",
+      "review_id": "Review ID",
+      "reported_user": "တိုင်ကြားခံထားသူ",
+      "reporter": "တိုင်ကြားသူ",
+      "status": "အခြေအနေ",
+      "admin": "Admin",
+      "submitted_reason": "တင်ပြထားသော အကြောင်းပြချက်",
+      "content": "အကြောင်းအရာ",
+      "admin_note": "Email မှာ ထည့်ပို့ရန် အကြောင်းပြချက်ကို ရေးပါ (ရွေးချယ်နိုင်သည်)"
+    },
+    "message": {
+      "approved": "အတည်ပြုပြီး",
+      "rejected": "ပယ်ချပြီး",
+      "failed_load": "အစီရင်ခံချက်များကို မတင်နိုင်ပါ",
+      "action_failed": "လုပ်ဆောင်မှု မအောင်မြင်ပါ"
+    }
+  },
+  "admin_logs": {
+    "title": "အက်ဒမင် မှတ်တမ်းများ",
+    "description": "စနစ် မှတ်တမ်းများ",
+    "search": {
+      "placeholder": "အသုံးပြုသူအမည်၊ လုပ်ဆောင်ချက်၊ IP ဖြင့်ရှာဖွေပါ..."
+    },
+    "count": {
+      "label": "{{filtered}} / {{total}} မှတ်တမ်းများ",
+      "simple": "{{total}} မှတ်တမ်းများ"
+    },
+    "actions": {
+      "refresh": "ပြန်လည်တင်ပါ"
+    },
+    "table": {
+      "loading": "ဒေတာ တင်နေသည်...",
+      "empty": "မှတ်တမ်း မရှိသေးပါ။",
+      "no_result": "ရလဒ် မတွေ့ပါ",
+      "error": "ဒေတာ မရနိုင်ပါ"
+    },
+    "pagination": {
+      "displaying": "{{total}} မှ {{from}}–{{to}} ကို ပြသနေသည်",
+      "rows_per_page": "စာမျက်နှာတစ်ခုလျှင် အရေအတွက်"
+    },
+    "columns": {
+      "logId": "ID",
+      "username": "အသုံးပြုသူ",
+      "action": "လုပ်ဆောင်ချက်",
+      "level": "အဆင့်",
+      "message": "မက်ဆေ့ချ်",
+      "details": "အသေးစိတ်",
+      "ipAddress": "IP လိပ်စာ",
+      "endpoint": "API",
+      "method": "နည်းလမ်း",
+      "status": "အခြေအနေ",
+      "createdAt": "အချိန်",
+      "updatedAt": "ပြင်ဆင်ချိန်",
+      "region": "ဒေသ",
+      "countryCode": "နိုင်ငံ"
+    }
+  },
+  "admin_banners": {
+    "title": "Banner စီမံခန့်ခွဲမှု",
+    "description": "ပုံကိုကြိုတင်ကြည့်ပါ။ \"ပြောင်းမည်\" ကိုနှိပ်ပါ။",
+    "buttons": {
+      "change_left": "← ဘယ်ဘက်ပြောင်း",
+      "change_right": "ညာဘက်ပြောင်း →",
+      "change_bottom": "↓ အောက်ပြောင်း",
+      "cancel": "မလုပ်တော့",
+      "save": "သိမ်းမည်",
+      "saving": "သိမ်းနေသည်..."
+    },
+    "panel": {
+      "title": "Banner ပြောင်းမည်",
+      "current": "လက်ရှိ Banner",
+      "new_image": "ပုံအသစ်",
+      "choose": "ပုံရွေးပါ",
+      "drag": "သို့မဟုတ် ဒီနေရာသို့ဆွဲပါ",
+      "hint": "PNG, JPG, WebP — 5MB အထိ",
+      "url": "နှိပ်သောအခါ URL",
+      "url_placeholder": "https://example.com/..."
+    },
+    "info": {
+      "left": "ဘယ် Banner · ID 2",
+      "bottom": "အောက် Banner · ID 1",
+      "right": "ညာ Banner · ID 3",
+      "no_url": "URL မရှိသေးပါ"
+    },
+    "toast": {
+      "file_big": "ဖိုင်အရွယ်အစားကြီးလွန်းသည် (5MB)",
+      "choose_image": "ပုံရွေးပါ",
+      "enter_url": "URL ထည့်ပါ",
+      "success": "သိမ်းပြီးပါပြီ!",
+      "error": "အမှားရှိသည်"
+    }
   }
 }

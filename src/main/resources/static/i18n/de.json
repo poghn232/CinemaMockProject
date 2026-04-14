@@ -451,29 +451,149 @@
     "title": "Analyse-Dashboard",
     "subtitle_live": "Echtzeitdaten",
     "subtitle_refresh": "aktualisiert sich alle 60 Sekunden automatisch",
-
     "user_overview": "Benutzerübersicht",
     "genre_popularity": "Beliebtheit nach Genre",
     "logins_region": "Anmeldungen nach Region",
     "subscription_packs": "Beliebte Abonnements",
-
     "all_time": "GESAMT",
     "monthly": "MONATLICH",
     "weekly": "WÖCHENTLICH",
-
     "select_all": "Gesamtzeit",
     "select_monthly": "Monatlich",
     "select_weekly": "Wöchentlich",
-
     "loading": "Wird geladen…",
     "error": "Fehler",
     "no_login_data": "Noch keine Login-Daten",
     "no_subscription_data": "Noch keine Abonnement-Daten",
-
     "subscribed": "Abonniert",
     "not_subscribed": "Nicht abonniert",
     "total_users": "Gesamtbenutzer",
     "total_logins": "Gesamtanmeldungen",
     "chart_load_fail": "Chart.js konnte nicht geladen werden"
+  },
+  "admin_reports": {
+    "title": "Meldungen (Ausstehend)",
+    "description": "Überprüfen und moderieren Sie gemeldete Kommentare. Genehmigen, um den Kommentar zu entfernen und das Kommentieren für den gemeldeten Nutzer zu deaktivieren; Ablehnen, um den Melder zu benachrichtigen.",
+    "table": {
+      "id": "ID",
+      "review_id": "Bewertungs-ID",
+      "reported_user": "Gemeldeter Benutzer",
+      "reporter": "Meldender",
+      "created_at": "Erstellt am",
+      "status": "Status",
+      "admin": "Admin",
+      "actions": "Aktionen",
+      "loading": "Wird geladen...",
+      "empty": "Keine Meldungen vorhanden",
+      "failed": "Laden fehlgeschlagen"
+    },
+    "status": {
+      "pending": "AUSSTEHEND",
+      "approved": "GENEHMIGT",
+      "rejected": "ABGELEHNT"
+    },
+    "actions": {
+      "detail": "Details",
+      "approve": "Genehmigen",
+      "approved": "Genehmigt",
+      "reject": "Ablehnen",
+      "rejected": "Abgelehnt",
+      "close": "Schließen",
+      "prev": "Zurück",
+      "next": "Weiter",
+      "go": "Los"
+    },
+    "modal": {
+      "title": "Meldungsdetails",
+      "review_id": "Bewertungs-ID",
+      "reported_user": "Gemeldeter Benutzer",
+      "reporter": "Meldender",
+      "status": "Status",
+      "admin": "Admin",
+      "submitted_reason": "Eingereichter Grund",
+      "content": "Inhalt",
+      "admin_note": "Geben Sie optional einen Grund für die E-Mail-Benachrichtigung an."
+    },
+    "message": {
+      "approved": "Genehmigt",
+      "rejected": "Abgelehnt",
+      "failed_load": "Meldungen konnten nicht geladen werden",
+      "action_failed": "Aktion fehlgeschlagen"
+    }
+  },
+  "admin_logs": {
+    "title": "Admin-Protokolle",
+    "description": "Systemprotokollverlauf",
+    "search": {
+      "placeholder": "Nach Benutzer, Aktion oder IP suchen..."
+    },
+    "count": {
+      "label": "{{filtered}} / {{total}} Einträge",
+      "simple": "{{total}} Einträge"
+    },
+    "actions": {
+      "refresh": "Aktualisieren"
+    },
+    "table": {
+      "loading": "Daten werden geladen...",
+      "empty": "Noch keine Einträge vorhanden.",
+      "no_result": "Keine Ergebnisse gefunden",
+      "error": "Daten konnten nicht geladen werden"
+    },
+    "pagination": {
+      "displaying": "Zeige {{from}}–{{to}} von {{total}} Einträgen",
+      "rows_per_page": "Zeilen pro Seite"
+    },
+    "columns": {
+      "logId": "ID",
+      "username": "Benutzer",
+      "action": "Aktion",
+      "level": "Level",
+      "message": "Nachricht",
+      "details": "Details",
+      "ipAddress": "IP-Adresse",
+      "endpoint": "Endpunkt",
+      "method": "Methode",
+      "status": "Status",
+      "createdAt": "Zeit",
+      "updatedAt": "Aktualisiert",
+      "region": "Region",
+      "countryCode": "Land"
+    }
+  },
+  "admin_banners": {
+    "title": "Bannerverwaltung",
+    "description": "Vorschau anzeigen. Klicken Sie auf „Ändern“.",
+    "buttons": {
+      "change_left": "← Links ändern",
+      "change_right": "Rechts ändern →",
+      "change_bottom": "↓ Unten ändern",
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "saving": "Speichert..."
+    },
+    "panel": {
+      "title": "Banner ändern",
+      "current": "AKTUELLER BANNER",
+      "new_image": "Neues Bild",
+      "choose": "Bild auswählen",
+      "drag": "oder hier ziehen",
+      "hint": "PNG, JPG, WebP — max. 5MB",
+      "url": "URL beim Klick",
+      "url_placeholder": "https://example.com/..."
+    },
+    "info": {
+      "left": "LINKER BANNER · ID 2",
+      "bottom": "UNTERER BANNER · ID 1",
+      "right": "RECHTER BANNER · ID 3",
+      "no_url": "Keine URL"
+    },
+    "toast": {
+      "file_big": "Datei zu groß! Maximal 5MB.",
+      "choose_image": "Bitte Bild auswählen.",
+      "enter_url": "Bitte URL eingeben.",
+      "success": "Erfolgreich gespeichert!",
+      "error": "Fehler"
+    }
   }
 }
