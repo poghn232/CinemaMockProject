@@ -595,5 +595,90 @@
       "success": "保存成功！再読み込み中...",
       "error": "エラー"
     }
+  },
+  "admin_ads": {
+    "title": "動画広告管理",
+    "description": "広告作成、MP4アップロード、またはR2のHLSアセットをリンク",
+    "create": "+ 広告作成",
+    "loading": "広告を読み込み中...",
+    "empty": "広告がありません。「広告作成」をクリックしてください。",
+    "no_title": "タイトルなし",
+
+    "modal": {
+      "title": "動画広告を作成",
+      "fields": {
+        "title": "タイトル",
+        "type": "広告タイプ",
+        "status": "ステータス",
+        "skippable": "スキップ可能",
+        "skip_after": "スキップ可能時間（秒）",
+        "r2_source": "R2からアセットをリンク（元広告ID）",
+        "file": "MP4ファイル（任意）"
+      },
+      "placeholders": {
+        "title": "例: Coca Cola 15秒 pre-roll",
+        "skip_after": "例: 5",
+        "r2_source": "例: 12"
+      },
+      "hint": {
+        "r2": "既にR2にある広告IDを入力してください",
+        "file": "R2アセットを使う場合は空欄にしてください"
+      },
+      "buttons": {
+        "cancel": "キャンセル",
+        "create_r2": "作成＆R2リンク",
+        "create_upload": "作成＆アップロード"
+      }
+    },
+
+    "asset": {
+      "encode_status": "エンコード状態",
+      "progress": "進行状況",
+      "duration": "再生時間",
+      "variants": "バリエーション",
+      "playback": "再生リンク",
+      "not_ready": "未準備",
+      "open": "プレイリストを開く",
+      "r2_status": "R2状態",
+      "r2_playback": "R2再生",
+      "not_checked": "未確認",
+      "found": "R2で見つかりました",
+      "not_found": "R2で見つかりません"
+    },
+
+    "actions": {
+      "upload": "MP4アップロード",
+      "activate": "有効化",
+      "activate_exclusive": "排他的に有効化",
+      "deactivate": "無効化",
+      "refresh": "更新",
+      "check_r2": "R2確認",
+      "sync_r2": "R2から同期"
+    },
+
+    "toast": {
+      "invalid_file": ".mp4ファイルのみ対応",
+      "missing_title": "タイトルを入力してください",
+      "upload_success": "アップロード成功",
+      "created_success": "広告作成とアップロード成功",
+      "activated": "有効化しました",
+      "activated_exclusive": "排他的に有効化しました",
+      "deactivated": "無効化しました",
+      "refreshed": "更新しました",
+      "enter_source": "R2の広告IDを入力してください",
+      "created_and_link_success": "R2からリンクして作成成功",
+      "check_r2_failed": "R2確認失敗",
+      "sync_failed": "同期失敗"
+    }
+  },
+  "ip_resolve": {
+    "title": "アクセス地域の確認",
+    "description": "システムはアクセス地域を特定するために公開IPを自動取得しています。",
+    "loading_ip": "公開IPを取得中...",
+    "ip_fetched": "IP取得完了: {{ip}}。地域を判定中...",
+    "success": "地域の特定に成功しました。ページを移動しています...",
+    "error_default": "IPの確認中にエラーが発生しました。",
+    "retry": "再試行",
+    "failed": "ipifyから公開IPを取得できませんでした"
   }
 }

@@ -581,5 +581,91 @@
       "success": "Lưu thành công! Đang tải lại...",
       "error": "Lỗi"
     }
+  },
+  "admin_ads": {
+    "title": "Quản lý Video Ads",
+    "description": "Tạo ad mới, upload MP4 hoặc liên kết asset HLS từ R2",
+    "create": "+ Tạo quảng cáo",
+    "loading": "Đang tải quảng cáo...",
+    "empty": "Chưa có quảng cáo nào. Bấm \"Tạo quảng cáo\" để bắt đầu.",
+    "no_title": "Không có tên",
+
+    "modal": {
+      "title": "Tạo quảng cáo video",
+      "fields": {
+        "title": "Tiêu đề",
+        "type": "Loại quảng cáo",
+        "status": "Trạng thái",
+        "skippable": "Cho phép bỏ qua",
+        "skip_after": "Bỏ qua sau (giây)",
+        "r2_source": "Link asset từ R2 (ID quảng cáo nguồn)",
+        "file": "MP4 source file (optional)"
+      },
+      "placeholders": {
+        "title": "Ví dụ: Coca Cola 15s pre-roll",
+        "skip_after": "Ví dụ: 5",
+        "r2_source": "Ví dụ: 12"
+      },
+      "hint": {
+        "r2": "Nhập ID ad đã có asset trên R2 để không cần upload MP4",
+        "file": "Để trống nếu dùng asset từ R2"
+      },
+      "buttons": {
+        "cancel": "Hủy",
+        "create_r2": "Tạo & link từ R2",
+        "create_upload": "Tạo & upload"
+      }
+    },
+
+    "asset": {
+      "encode_status": "Trạng thái encode",
+      "progress": "Tiến độ",
+      "duration": "Thời lượng",
+      "variants": "Các phiên bản",
+      "playback": "Link phát",
+      "not_ready": "Chưa sẵn sàng",
+      "open": "Mở playlist",
+      "r2_status": "Trạng thái R2",
+      "r2_playback": "Phát từ R2",
+      "not_checked": "Chưa kiểm tra",
+      "found": "Đã tìm thấy trên R2",
+      "not_found": "Không tìm thấy trên R2"
+    },
+
+    "actions": {
+      "upload": "Upload MP4",
+      "activate": "Kích hoạt",
+      "activate_exclusive": "Kích hoạt độc quyền",
+      "deactivate": "Tắt",
+      "refresh": "Làm mới trạng thái",
+      "check_r2": "Kiểm tra R2",
+      "sync_r2": "Đồng bộ từ R2"
+    },
+
+    "toast": {
+      "invalid_file": "Chỉ hỗ trợ file .mp4",
+      "missing_title": "Vui lòng nhập tiêu đề",
+      "upload_success": "Upload MP4 thành công",
+      "created_success": "Tạo quảng cáo và upload MP4 thành công",
+      "activated": "Đã kích hoạt",
+      "activated_exclusive": "Đã kích hoạt độc quyền",
+      "deactivated": "Đã tắt",
+      "refreshed": "Đã làm mới",
+      "enter_source": "Vui lòng nhập Source Ad ID trên R2",
+      "created_and_link_success": "Tạo quảng cáo và liên kết asset từ R2 thành công",
+      "check_r2_failed": "Kiểm tra R2 thất bại",
+      "sync_failed": "Đồng bộ từ R2 thất bại"
+
+    }
+  },
+  "ip_resolve": {
+    "title": "Xác nhận khu vực truy cập",
+    "description": "Hệ thống đang tự động lấy IP công khai của bạn để xác định khu vực truy cập.",
+    "loading_ip": "Đang lấy IP công khai...",
+    "ip_fetched": "Đã lấy IP: {{ip}}. Đang xác định khu vực...",
+    "success": "Xác định khu vực thành công. Đang chuyển trang...",
+    "error_default": "Có lỗi xảy ra khi xác nhận IP.",
+    "retry": "Thử lại",
+    "failed": "Không lấy được public IP từ ipify"
   }
 }

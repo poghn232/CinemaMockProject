@@ -1,77 +1,445 @@
 <style>
-    .ads-page { display:flex; flex-direction:column; gap:18px; }
-    .ads-toolbar { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
-    .ads-toolbar-left h2 { font-size:16px; font-weight:700; display:flex; align-items:center; gap:8px; }
-    .ads-toolbar-left p { font-size:12px; color:#9ca3af; margin-top:4px; }
-    .ads-create-btn { padding:10px 16px; border:none; border-radius:10px; background:linear-gradient(135deg,#f97316,#ec4899); color:#fff; font-size:13px; font-weight:600; cursor:pointer; transition:opacity .15s,transform .15s; }
-    .ads-create-btn:hover { opacity:.9; transform:translateY(-1px); }
-    .ads-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(330px,1fr)); gap:16px; }
-    .ad-card { background:rgba(15,23,42,.96); border:1px solid rgba(148,163,184,.18); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:14px; box-shadow:0 12px 30px rgba(0,0,0,.22); }
-    .ad-card-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
-    .ad-title-wrap { min-width:0; }
-    .ad-title { font-size:15px; font-weight:700; color:#f8fafc; margin-bottom:4px; word-break:break-word; }
-    .ad-sub { font-size:12px; color:#9ca3af; display:flex; gap:8px; flex-wrap:wrap; }
-    .status-badge { display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border-radius:999px; font-size:11px; font-weight:700; letter-spacing:.03em; border:1px solid rgba(148,163,184,.18); white-space:nowrap; }
-    .status-badge.active { color:#34d399; border-color:rgba(52,211,153,.35); background:rgba(52,211,153,.08); }
-    .status-badge.inactive { color:#9ca3af; border-color:rgba(148,163,184,.2); background:rgba(255,255,255,.03); }
-    .asset-box { border:1px solid rgba(148,163,184,.14); background:rgba(255,255,255,.025); border-radius:12px; padding:12px; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px 12px; }
-    .asset-item .label { font-size:10px; color:#6b7280; letter-spacing:.06em; text-transform:uppercase; margin-bottom:4px; }
-    .asset-item .value { font-size:12px; color:#e5e7eb; word-break:break-word; }
-    .asset-item .value.muted { color:#6b7280; font-style:italic; }
-    .ad-actions { display:flex; flex-wrap:wrap; gap:8px; }
-    .ad-btn { padding:8px 12px; border-radius:9px; border:1px solid rgba(148,163,184,.2); background:rgba(255,255,255,.03); color:#e5e7eb; font-size:12px; cursor:pointer; transition:all .15s; }
-    .ad-btn:hover { border-color:#f97316; color:#f97316; background:rgba(249,115,22,.08); }
-    .ad-btn.primary { background:linear-gradient(135deg,#f97316,#ec4899); border:none; color:#fff; }
-    .ad-btn.success { border-color:rgba(52,211,153,.35); color:#34d399; }
-    .ad-btn.warn { border-color:rgba(248,113,113,.35); color:#f87171; }
-    .ad-btn:disabled { opacity:.45; cursor:not-allowed; }
-    .empty-state { padding:28px; border-radius:14px; border:1px dashed rgba(148,163,184,.18); background:rgba(255,255,255,.02); text-align:center; color:#9ca3af; font-size:13px; }
-    .ads-backdrop { position:fixed; inset:0; background:rgba(2,6,23,.72); backdrop-filter:blur(5px); z-index:100; opacity:0; pointer-events:none; transition:opacity .25s; }
-    .ads-backdrop.open { opacity:1; pointer-events:all; }
-    .ads-modal { position:fixed; top:50%; left:50%; width:min(560px,94vw); transform:translate(-50%,-54%); opacity:0; pointer-events:none; background:#0f172a; border:1px solid rgba(148,163,184,.22); border-radius:20px; box-shadow:0 28px 60px rgba(0,0,0,.75); z-index:101; transition:all .25s; padding:22px; display:flex; flex-direction:column; gap:16px; }
-    .ads-modal.open { transform:translate(-50%,-50%); opacity:1; pointer-events:all; }
-    .ads-modal-header { display:flex; align-items:center; justify-content:space-between; gap:10px; }
-    .ads-modal-header h3 { font-size:15px; font-weight:700; color:#f8fafc; }
-    .ads-close { width:30px; height:30px; border-radius:50%; background:transparent; border:1px solid rgba(148,163,184,.2); color:#9ca3af; cursor:pointer; }
-    .ads-close:hover { border-color:#f87171; color:#f87171; }
-    .form-grid { display:grid; gap:12px; }
-    .form-field { display:flex; flex-direction:column; gap:6px; }
-    .form-label { font-size:11px; color:#9ca3af; text-transform:uppercase; letter-spacing:.05em; font-weight:700; }
-    .form-input,.form-select { width:100%; padding:11px 12px; border-radius:10px; border:1px solid rgba(148,163,184,.18); background:rgba(255,255,255,.03); color:#e5e7eb; font-size:13px; outline:none; }
-    .form-input:focus,.form-select:focus { border-color:#f97316; }
-    .check-row { display:flex; align-items:center; gap:10px; }
-    .drop-zone { position:relative; border:2px dashed rgba(148,163,184,.18); border-radius:12px; padding:18px 14px; display:flex; flex-direction:column; align-items:center; gap:7px; background:rgba(255,255,255,.015); transition:all .18s; }
-    .drop-zone:hover,.drop-zone.over { border-color:#f97316; background:rgba(249,115,22,.05); }
-    .drop-zone input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; }
-    .drop-main { font-size:13px; color:#cbd5e1; }
-    .drop-hint { font-size:11px; color:#64748b; }
-    .drop-file { font-size:12px; color:#34d399; display:none; }
-    .drop-file.show { display:block; }
-    .inline-help { font-size:12px; color:#94a3b8; line-height:1.5; }
-    .modal-actions { display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap; }
-    .btn-cancel { padding:10px 16px; border-radius:10px; border:1px solid rgba(148,163,184,.2); background:transparent; color:#9ca3af; cursor:pointer; }
-    .btn-save { padding:10px 18px; border-radius:10px; border:none; background:linear-gradient(135deg,#f97316,#ec4899); color:#fff; font-weight:700; cursor:pointer; }
-    .btn-save.secondary { background:rgba(255,255,255,.04); border:1px solid rgba(148,163,184,.2); color:#34d399; }
-    .btn-save:disabled { opacity:.5; cursor:not-allowed; }
-    .ad-toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(16px); background:#0f172a; border:1px solid rgba(148,163,184,.2); border-radius:12px; padding:11px 18px; font-size:13px; color:#e5e7eb; box-shadow:0 12px 30px rgba(0,0,0,.5); z-index:200; opacity:0; pointer-events:none; transition:all .3s; }
-    .ad-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-    .ad-toast.success { border-color:rgba(52,211,153,.4); }
-    .ad-toast.error { border-color:rgba(248,113,113,.4); }
+    .ads-page {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .ads-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .ads-toolbar-left h2 {
+        font-size: 16px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .ads-toolbar-left p {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-top: 4px;
+    }
+
+    .ads-create-btn {
+        padding: 10px 16px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #f97316, #ec4899);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity .15s, transform .15s;
+    }
+
+    .ads-create-btn:hover {
+        opacity: .9;
+        transform: translateY(-1px);
+    }
+
+    .ads-grid {
+        display: grid;
+        grid-template-columns:repeat(auto-fit, minmax(330px, 1fr));
+        gap: 16px;
+    }
+
+    .ad-card {
+        background: rgba(15, 23, 42, .96);
+        border: 1px solid rgba(148, 163, 184, .18);
+        border-radius: 14px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, .22);
+    }
+
+    .ad-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .ad-title-wrap {
+        min-width: 0;
+    }
+
+    .ad-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #f8fafc;
+        margin-bottom: 4px;
+        word-break: break-word;
+    }
+
+    .ad-sub {
+        font-size: 12px;
+        color: #9ca3af;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .03em;
+        border: 1px solid rgba(148, 163, 184, .18);
+        white-space: nowrap;
+    }
+
+    .status-badge.active {
+        color: #34d399;
+        border-color: rgba(52, 211, 153, .35);
+        background: rgba(52, 211, 153, .08);
+    }
+
+    .status-badge.inactive {
+        color: #9ca3af;
+        border-color: rgba(148, 163, 184, .2);
+        background: rgba(255, 255, 255, .03);
+    }
+
+    .asset-box {
+        border: 1px solid rgba(148, 163, 184, .14);
+        background: rgba(255, 255, 255, .025);
+        border-radius: 12px;
+        padding: 12px;
+        display: grid;
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+        gap: 10px 12px;
+    }
+
+    .asset-item .label {
+        font-size: 10px;
+        color: #6b7280;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+
+    .asset-item .value {
+        font-size: 12px;
+        color: #e5e7eb;
+        word-break: break-word;
+    }
+
+    .asset-item .value.muted {
+        color: #6b7280;
+        font-style: italic;
+    }
+
+    .ad-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .ad-btn {
+        padding: 8px 12px;
+        border-radius: 9px;
+        border: 1px solid rgba(148, 163, 184, .2);
+        background: rgba(255, 255, 255, .03);
+        color: #e5e7eb;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all .15s;
+    }
+
+    .ad-btn:hover {
+        border-color: #f97316;
+        color: #f97316;
+        background: rgba(249, 115, 22, .08);
+    }
+
+    .ad-btn.primary {
+        background: linear-gradient(135deg, #f97316, #ec4899);
+        border: none;
+        color: #fff;
+    }
+
+    .ad-btn.success {
+        border-color: rgba(52, 211, 153, .35);
+        color: #34d399;
+    }
+
+    .ad-btn.warn {
+        border-color: rgba(248, 113, 113, .35);
+        color: #f87171;
+    }
+
+    .ad-btn:disabled {
+        opacity: .45;
+        cursor: not-allowed;
+    }
+
+    .empty-state {
+        padding: 28px;
+        border-radius: 14px;
+        border: 1px dashed rgba(148, 163, 184, .18);
+        background: rgba(255, 255, 255, .02);
+        text-align: center;
+        color: #9ca3af;
+        font-size: 13px;
+    }
+
+    .ads-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(2, 6, 23, .72);
+        backdrop-filter: blur(5px);
+        z-index: 100;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .25s;
+    }
+
+    .ads-backdrop.open {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    .ads-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: min(560px, 94vw);
+        transform: translate(-50%, -54%);
+        opacity: 0;
+        pointer-events: none;
+        background: #0f172a;
+        border: 1px solid rgba(148, 163, 184, .22);
+        border-radius: 20px;
+        box-shadow: 0 28px 60px rgba(0, 0, 0, .75);
+        z-index: 101;
+        transition: all .25s;
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .ads-modal.open {
+        transform: translate(-50%, -50%);
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    .ads-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .ads-modal-header h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: #f8fafc;
+    }
+
+    .ads-close {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: transparent;
+        border: 1px solid rgba(148, 163, 184, .2);
+        color: #9ca3af;
+        cursor: pointer;
+    }
+
+    .ads-close:hover {
+        border-color: #f87171;
+        color: #f87171;
+    }
+
+    .form-grid {
+        display: grid;
+        gap: 12px;
+    }
+
+    .form-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .form-label {
+        font-size: 11px;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        font-weight: 700;
+    }
+
+    .form-input, .form-select {
+        width: 100%;
+        padding: 11px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, .18);
+        background: rgba(255, 255, 255, .03);
+        color: #e5e7eb;
+        font-size: 13px;
+        outline: none;
+    }
+
+    .form-input:focus, .form-select:focus {
+        border-color: #f97316;
+    }
+
+    .check-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .drop-zone {
+        position: relative;
+        border: 2px dashed rgba(148, 163, 184, .18);
+        border-radius: 12px;
+        padding: 18px 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 7px;
+        background: rgba(255, 255, 255, .015);
+        transition: all .18s;
+    }
+
+    .drop-zone:hover, .drop-zone.over {
+        border-color: #f97316;
+        background: rgba(249, 115, 22, .05);
+    }
+
+    .drop-zone input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .drop-main {
+        font-size: 13px;
+        color: #cbd5e1;
+    }
+
+    .drop-hint {
+        font-size: 11px;
+        color: #64748b;
+    }
+
+    .drop-file {
+        font-size: 12px;
+        color: #34d399;
+        display: none;
+    }
+
+    .drop-file.show {
+        display: block;
+    }
+
+    .inline-help {
+        font-size: 12px;
+        color: #94a3b8;
+        line-height: 1.5;
+    }
+
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn-cancel {
+        padding: 10px 16px;
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, .2);
+        background: transparent;
+        color: #9ca3af;
+        cursor: pointer;
+    }
+
+    .btn-save {
+        padding: 10px 18px;
+        border-radius: 10px;
+        border: none;
+        background: linear-gradient(135deg, #f97316, #ec4899);
+        color: #fff;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .btn-save.secondary {
+        background: rgba(255, 255, 255, .04);
+        border: 1px solid rgba(148, 163, 184, .2);
+        color: #34d399;
+    }
+
+    .btn-save:disabled {
+        opacity: .5;
+        cursor: not-allowed;
+    }
+
+    .ad-toast {
+        position: fixed;
+        bottom: 28px;
+        left: 50%;
+        transform: translateX(-50%) translateY(16px);
+        background: #0f172a;
+        border: 1px solid rgba(148, 163, 184, .2);
+        border-radius: 12px;
+        padding: 11px 18px;
+        font-size: 13px;
+        color: #e5e7eb;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, .5);
+        z-index: 200;
+        opacity: 0;
+        pointer-events: none;
+        transition: all .3s;
+    }
+
+    .ad-toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    .ad-toast.success {
+        border-color: rgba(52, 211, 153, .4);
+    }
+
+    .ad-toast.error {
+        border-color: rgba(248, 113, 113, .4);
+    }
 </style>
 
 <div class="card ads-page">
     <div class="ads-toolbar">
         <div class="ads-toolbar-left">
-            <h2>
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <h2 data-i18n="admin_ads.title">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
                     <rect x="2" y="6" width="20" height="12" rx="2"></rect>
                     <polygon points="10,9 16,12 10,15"></polygon>
                 </svg>
                 Video Ads Management
             </h2>
-            <p>Tạo ad mới, upload MP4 mới hoặc liên kết trực tiếp asset HLS đã có sẵn trên R2.</p>
+            <p data-i18n="admin_ads.description">Tạo ad mới, upload MP4 mới hoặc liên kết trực tiếp asset HLS đã có sẵn trên R2.</p>
         </div>
-        <button class="ads-create-btn" id="btnOpenCreateAd">+ Create Ad</button>
+        <button class="ads-create-btn" id="btnOpenCreateAd" data-i18n="admin_ads.create">+ Create Ad</button>
     </div>
 
     <div id="adsList" class="ads-grid"></div>
@@ -81,25 +449,25 @@
 
 <div class="ads-modal" id="adsModal">
     <div class="ads-modal-header">
-        <h3>Create new video ad</h3>
+        <h3 data-i18n="admin_ads.modal.title">Create new video ad</h3>
         <button class="ads-close" id="btnCloseModal">✕</button>
     </div>
 
     <div class="form-grid">
         <div class="form-field">
-            <div class="form-label">Title</div>
-            <input class="form-input" id="adTitleInput" type="text" placeholder="Ví dụ: Coca Cola 15s pre-roll">
+            <div class="form-label" data-i18n="admin_ads.modal.fields.title">Title</div>
+            <input class="form-input" id="adTitleInput" type="text" data-i18n-placeholder="admin_ads.modal.placeholders.title">
         </div>
 
         <div class="form-field">
-            <div class="form-label">Ad Type</div>
+            <div class="form-label" data-i18n="admin_ads.modal.fields.type">Ad Type</div>
             <select class="form-select" id="adTypeInput">
                 <option value="PRE_ROLL">PRE_ROLL</option>
             </select>
         </div>
 
         <div class="form-field">
-            <div class="form-label">Status</div>
+            <div class="form-label" data-i18n="admin_ads.modal.fields.status">Status</div>
             <select class="form-select" id="adStatusInput">
                 <option value="INACTIVE">INACTIVE</option>
                 <option value="ACTIVE">ACTIVE</option>
@@ -109,43 +477,43 @@
         <div class="form-field">
             <label class="check-row">
                 <input type="checkbox" id="adSkippableInput">
-                <span style="font-size:13px;color:#e5e7eb;">Skippable</span>
+                <span style="font-size:13px;color:#e5e7eb;" data-i18n="admin_ads.modal.fields.skippable">Skippable</span>
             </label>
         </div>
 
         <div class="form-field">
-            <div class="form-label">Skip after seconds</div>
-            <input class="form-input" id="adSkipSecondsInput" type="number" min="0" placeholder="Ví dụ: 5">
+            <div class="form-label" data-i18n="admin_ads.modal.fields.skip_after">Skip after seconds</div>
+            <input class="form-input" id="adSkipSecondsInput" type="number" min="0" data-i18n-placeholder="admin_ads.modal.placeholders.skip_after">
         </div>
 
         <div class="form-field">
-            <div class="form-label">Link existing asset from R2 (source ad id)</div>
-            <input class="form-input" id="r2SourceAdIdInput" type="number" min="1" placeholder="Ví dụ: 12">
-            <div class="inline-help">
+            <div class="form-label" data-i18n="admin_ads.modal.fields.r2_source">Link existing asset from R2 (source ad id)</div>
+            <input class="form-input" id="r2SourceAdIdInput" type="number" min="1" data-i18n-placeholder="admin_ads.modal.placeholders.r2_source">
+            <div class="inline-help" data-i18n="admin_ads.modal.hint.r2">
                 Điền ID của ad đã có asset trên R2 nếu bạn muốn tạo ad mới mà không cần upload MP4.
             </div>
         </div>
 
         <div class="form-field">
-            <div class="form-label">MP4 source file (optional)</div>
+            <div class="form-label"  data-i18n="admin_ads.modal.fields.file">MP4 source file (optional)</div>
             <div class="drop-zone" id="adDropZone">
                 <input type="file" id="adFileInput" accept="video/mp4,.mp4">
-                <div class="drop-main"><strong>Choose MP4</strong> hoặc kéo thả vào đây</div>
-                <div class="drop-hint">Để trống nếu bạn dùng asset đã có trên R2</div>
+                <div class="drop-main"><strong>Choose MP4</strong> or drop file here</div>
+                <div class="drop-hint" data-i18n="admin_ads.modal.hint.file">Để trống nếu bạn dùng asset đã có trên R2</div>
                 <div class="drop-file" id="adDropFile"></div>
             </div>
         </div>
     </div>
 
     <div class="modal-actions">
-        <button class="btn-cancel" id="btnCancelModal">Cancel</button>
-        <button class="btn-save secondary" id="btnCreateAndLinkR2">Create & Link from R2</button>
-        <button class="btn-save" id="btnCreateAndUpload">Create & Upload</button>
+        <button class="btn-cancel" id="btnCancelModal" data-i18n="admin_ads.modal.buttons.cancel">Cancel</button>
+        <button class="btn-save secondary" id="btnCreateAndLinkR2" data-i18n="admin_ads.modal.buttons.create_r2">Create & Link from R2</button>
+        <button class="btn-save" id="btnCreateAndUpload" data-i18n="admin_ads.modal.buttons.create_upload">Create & Upload</button>
     </div>
 </div>
 
 <div class="ad-toast" id="adToast"></div>
-
+<script src="/js/i18n.js"></script>
 <script data-fragment-script>
     (function () {
         const adsList = document.getElementById('adsList');
@@ -177,7 +545,7 @@
 
         function authHeaders(extra = {}) {
             const token = getToken();
-            return token ? { ...extra, Authorization: 'Bearer ' + token } : extra;
+            return token ? {...extra, Authorization: 'Bearer ' + token} : extra;
         }
 
         function showToast(message, type = 'success') {
@@ -228,7 +596,7 @@
             if (!file) return;
             const lower = (file.name || '').toLowerCase();
             if (!lower.endsWith('.mp4')) {
-                showToast('Chỉ hỗ trợ file .mp4', 'error');
+                showToast(t('admin_ads.toast.invalid_file'), 'error');
                 return;
             }
             selectedFile = file;
@@ -249,13 +617,13 @@
         });
 
         async function fetchAds() {
-            const res = await fetch('/api/admin/ads', { headers: authHeaders() });
+            const res = await fetch('/api/admin/ads', {headers: authHeaders()});
             if (!res.ok) throw new Error('Cannot load ads: HTTP ' + res.status);
             return await res.json();
         }
 
         async function fetchLatestAsset(adId) {
-            const res = await fetch(`/api/admin/ads/${adId}/source/latest`, { headers: authHeaders() });
+            const res = await fetch(`/api/admin/ads/${adId}/source/latest`, {headers: authHeaders()});
             if (!res.ok) return null;
             return await res.json();
         }
@@ -276,33 +644,33 @@
             return `
             <div class="asset-box">
                 <div class="asset-item">
-                    <div class="label">Encode Status</div>
+                    <div class="label">${t('admin_ads.asset.encode_status')}</div>
                     <div class="value">${status}</div>
                 </div>
                 <div class="asset-item">
-                    <div class="label">Progress</div>
+                    <div class="label">${t('admin_ads.asset.progress')}</div>
                     <div class="value">${progress}%</div>
                 </div>
                 <div class="asset-item">
-                    <div class="label">Duration</div>
+                    <div class="label">${t('admin_ads.asset.duration')}</div>
                     <div class="value">${duration}s</div>
                 </div>
                 <div class="asset-item">
-                    <div class="label">Variants</div>
+                    <div class="label">${t('admin_ads.asset.variants')}</div>
                     <div class="value">${variants}</div>
                 </div>
                 <div class="asset-item" style="grid-column:1 / -1;">
-                    <div class="label">Playback URL</div>
+                    <div class="label">${t('admin_ads.asset.playback')}</div>
                     <div class="value ${playbackUrl ? '' : 'muted'}">
-                        ${playbackUrl ? `<a href="${escapeHtml(playbackUrl)}" target="_blank" style="color:#34d399;">Open playlist</a>` : 'Not ready yet'}
+                        ${playbackUrl ? `<a href="${escapeHtml(playbackUrl)}" target="_blank" style="color:#34d399;">${t('admin_ads.asset.open')}</a>` : t('admin_ads.asset.not_ready')}
                     </div>
                 </div>
                 <div class="asset-item">
-                    <div class="label">R2 Status</div>
-                    <div class="value muted" id="r2Status-${ad.id}">Not checked</div>
+                    <div class="label">${t('admin_ads.asset.r2_status')}</div>
+                    <div class="value muted" id="r2Status-${ad.id}">${t('admin_ads.asset.not_checked')}</div>
                 </div>
                 <div class="asset-item">
-                    <div class="label">R2 Playback</div>
+                    <div class="label">${t('admin_ads.asset.r2_playback')}</div>
                     <div class="value muted" id="r2Playback-${ad.id}">—</div>
                 </div>
             </div>
@@ -310,11 +678,13 @@
         }
 
         async function renderAds() {
-            adsList.innerHTML = `<div class="empty-state">Loading ads...</div>`;
+            adsList.innerHTML =
+                `<div class="empty-state">${t('admin_ads.loading')}</div>`;
             try {
                 const ads = await fetchAds();
                 if (!Array.isArray(ads) || !ads.length) {
-                    adsList.innerHTML = `<div class="empty-state">Chưa có quảng cáo nào. Bấm <b>Create Ad</b> để tạo mới.</div>`;
+                    adsList.innerHTML =
+                        `<div class="empty-state">${t('admin_ads.empty')}</div>`;
                     return;
                 }
 
@@ -324,7 +694,7 @@
                     <div class="ad-card">
                         <div class="ad-card-top">
                             <div class="ad-title-wrap">
-                                <div class="ad-title">${escapeHtml(ad.title || '(No title)')}</div>
+                                <div class="ad-title">${escapeHtml(ad.title || t('admin_ads.no_title'))}</div>
                                 <div class="ad-sub">
                                     <span>ID ${ad.id}</span>
                                     <span>${escapeHtml(ad.adType || 'PRE_ROLL')}</span>
@@ -337,13 +707,13 @@
                         ${renderAssetBox(ad, asset)}
 
                         <div class="ad-actions">
-                            <button class="ad-btn primary" data-action="upload" data-id="${ad.id}">Upload MP4</button>
-                            <button class="ad-btn success" data-action="activate" data-id="${ad.id}">Activate</button>
-                            <button class="ad-btn" data-action="activate-exclusive" data-id="${ad.id}">Activate Exclusive</button>
-                            <button class="ad-btn warn" data-action="deactivate" data-id="${ad.id}">Deactivate</button>
-                            <button class="ad-btn" data-action="refresh" data-id="${ad.id}">Refresh Status</button>
-                            <button class="ad-btn" data-action="check-r2" data-id="${ad.id}">Check R2</button>
-                            <button class="ad-btn success" data-action="sync-r2" data-id="${ad.id}">Sync from R2</button>
+                            <button class="ad-btn primary" data-action="upload" data-id="${ad.id}" data-i18n="admin_ads.actions.upload">Upload MP4</button>
+                            <button class="ad-btn success" data-action="activate" data-id="${ad.id}" data-i18n="admin_ads.actions.activate">Activate</button>
+                            <button class="ad-btn" data-action="activate-exclusive" data-id="${ad.id}" data-i18n="admin_ads.actions.activate_exclusive">Activate Exclusive</button>
+                            <button class="ad-btn warn" data-action="deactivate" data-id="${ad.id}" data-i18n="admin_ads.actions.deactivate">Deactivate</button>
+                            <button class="ad-btn" data-action="refresh" data-id="${ad.id}" data-i18n="admin_ads.actions.refresh">Refresh Status</button>
+                            <button class="ad-btn" data-action="check-r2" data-id="${ad.id}" data-i18n="admin_ads.actions.check_r2">Check R2</button>
+                            <button class="ad-btn success" data-action="sync-r2" data-id="${ad.id}" data-i18n="admin_ads.actions.sync_r2">Sync from R2</button>
                         </div>
                     </div>
                 `;
@@ -358,7 +728,7 @@
         async function createAdOnly(payload) {
             const res = await fetch('/api/admin/ads', {
                 method: 'POST',
-                headers: authHeaders({ 'Content-Type': 'application/json' }),
+                headers: authHeaders({'Content-Type': 'application/json'}),
                 body: JSON.stringify(payload)
             });
             if (!res.ok) throw new Error('Create ad failed: HTTP ' + res.status + ' — ' + await res.text());
@@ -368,7 +738,7 @@
         async function createAdAndLinkFromR2(payload) {
             const res = await fetch('/api/admin/ads/create-from-r2', {
                 method: 'POST',
-                headers: authHeaders({ 'Content-Type': 'application/json' }),
+                headers: authHeaders({'Content-Type': 'application/json'}),
                 body: JSON.stringify(payload)
             });
             if (!res.ok) throw new Error('Create & link from R2 failed: HTTP ' + res.status + ' — ' + await res.text());
@@ -377,7 +747,7 @@
 
         async function checkAdR2(adId) {
             try {
-                const res = await fetch(`/api/admin/ads/${adId}/r2-status`, { headers: authHeaders() });
+                const res = await fetch(`/api/admin/ads/${adId}/r2-status`, {headers: authHeaders()});
                 if (!res.ok) throw new Error('Failed to check R2 status');
 
                 const data = await res.json();
@@ -386,21 +756,21 @@
                 if (!statusEl || !playbackEl) return;
 
                 if (data.found) {
-                    statusEl.textContent = 'Found on R2';
+                    statusEl.textContent = t('admin_ads.asset.found');
                     statusEl.classList.remove('muted');
                     playbackEl.classList.remove('muted');
-                    playbackEl.innerHTML = `<a href="${escapeHtml(data.playbackUrl)}" target="_blank" style="color:#34d399;">Open playlist</a>`;
-                    showToast(`Đã tìm thấy quảng cáo ${adId} trên R2`, 'success');
+                    playbackEl.innerHTML = `<a href="${escapeHtml(data.playbackUrl)}" target="_blank" style="color:#34d399;">${t('admin_ads.asset.open')}</a>`;
+                    showToast(t('admin_ads.asset.found') + ` (ID ${adId})`, 'success');
                 } else {
-                    statusEl.textContent = 'Not found on R2';
+                    statusEl.textContent = t('admin_ads.asset.not_found');
                     statusEl.classList.add('muted');
                     playbackEl.classList.add('muted');
                     playbackEl.textContent = '—';
-                    showToast(`Không tìm thấy quảng cáo ${adId} trên R2`, 'error');
+                    showToast(`Not found ad ${adId} on R2`, 'error');
                 }
             } catch (e) {
                 console.error(e);
-                showToast('Check R2 failed', 'error');
+                showToast(t('admin_ads.toast.check_r2_failed'), 'error');
             }
         }
 
@@ -410,18 +780,18 @@
                     method: 'POST',
                     headers: authHeaders()
                 });
-                if (!res.ok) throw new Error('Failed to sync from R2');
+                if (!res.ok) throw new Error(t('admin_ads.toast.sync_failed'));
                 const data = await res.json();
 
                 if (data.success) {
-                    showToast(`Đồng bộ quảng cáo ${adId} từ R2 thành công`, 'success');
+                    showToast(`Sync ad ${adId} from R2 successfully`, 'success');
                     await renderAds();
                 } else {
-                    showToast(`Không có dữ liệu trên R2 để đồng bộ cho ad ${adId}`, 'error');
+                    showToast(`Not found data from R2 to sync to AD ${adId}`, 'error');
                 }
             } catch (e) {
                 console.error(e);
-                showToast('Sync from R2 failed', 'error');
+                showToast(t('admin_ads.toast.sync_failed'), 'error');
             }
         }
 
@@ -438,7 +808,7 @@
         }
 
         async function callSimpleAction(url, method = 'PUT') {
-            const res = await fetch(url, { method, headers: authHeaders() });
+            const res = await fetch(url, {method, headers: authHeaders()});
             if (!res.ok) throw new Error('Request failed: HTTP ' + res.status + ' — ' + await res.text());
             return res;
         }
@@ -452,7 +822,7 @@
             const r2SourceAdIdRaw = r2SourceAdIdInput.value.trim();
 
             if (!title) {
-                throw new Error('Vui lòng nhập title');
+                throw new Error(t('admin_ads.toast.missing_title'));
             }
 
             return {
@@ -475,7 +845,7 @@
             }
 
             if (!selectedFile) {
-                showToast('Vui lòng chọn file MP4', 'error');
+                showToast(t('admin_ads.toast.invalid_file'), 'error');
                 return;
             }
 
@@ -483,11 +853,11 @@
             try {
                 const ad = await createAdOnly(payload);
                 await uploadAdSource(ad.id, selectedFile);
-                showToast('Tạo quảng cáo và upload MP4 thành công');
+                showToast(t('admin_ads.toast.created_success'));
                 closeModal();
                 await renderAds();
             } catch (err) {
-                showToast(err.message || 'Có lỗi xảy ra', 'error');
+                showToast(err.message || 'Error', 'error');
             } finally {
                 btnCreateAndUpload.disabled = false;
             }
@@ -503,14 +873,14 @@
             }
 
             if (!payload.sourceAdId) {
-                showToast('Vui lòng nhập Source Ad ID trên R2', 'error');
+                showToast(t('admin_ads.toast.enter_source'), 'error');
                 return;
             }
 
             btnCreateAndLinkR2.disabled = true;
             try {
                 await createAdAndLinkFromR2(payload);
-                showToast('Tạo quảng cáo và liên kết asset từ R2 thành công');
+                showToast(t('admin_ads.toast.created_and_link_success'));
                 closeModal();
                 await renderAds();
             } catch (err) {
@@ -539,12 +909,12 @@
                         const file = tempInput.files?.[0];
                         if (!file) return;
                         if (!file.name.toLowerCase().endsWith('.mp4')) {
-                            showToast('Chỉ hỗ trợ file .mp4', 'error');
+                            showToast(t('admin_ads.toast.invalid_file'), 'error');
                             return;
                         }
                         try {
                             await uploadAdSource(adId, file);
-                            showToast('Upload MP4 thành công');
+                            showToast(t('admin_ads.toast.upload_success'));
                             await renderAds();
                         } catch (err) {
                             showToast(err.message || 'Upload failed', 'error');
@@ -556,15 +926,15 @@
 
                 if (action === 'activate') {
                     await callSimpleAction(`/api/admin/ads/${adId}/activate`, 'PUT');
-                    showToast('Activated');
+                    showToast(t('admin_ads.toast.activated'));
                 } else if (action === 'activate-exclusive') {
                     await callSimpleAction(`/api/admin/ads/${adId}/activate-exclusive`, 'PUT');
-                    showToast('Activated exclusively');
+                    showToast(t('admin_ads.toast.activated_exclusive'));
                 } else if (action === 'deactivate') {
                     await callSimpleAction(`/api/admin/ads/${adId}/deactivate`, 'PUT');
-                    showToast('Deactivated');
+                    showToast(t('admin_ads.toast.deactivated'));
                 } else if (action === 'refresh') {
-                    showToast('Refreshed');
+                    showToast(t('admin_ads.toast.refreshed'));
                 } else if (action === 'check-r2') {
                     await checkAdR2(adId);
                     return;

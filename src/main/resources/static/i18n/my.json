@@ -595,5 +595,90 @@
       "success": "သိမ်းပြီးပါပြီ!",
       "error": "အမှားရှိသည်"
     }
+  },
+  "admin_ads": {
+    "title": "Video Ads စီမံခန့်ခွဲမှု",
+    "description": "Ad အသစ်ဖန်တီးရန်၊ MP4 upload လုပ်ရန် သို့မဟုတ် R2 မှ HLS asset ချိတ်ရန်",
+    "create": "+ Ad ဖန်တီးရန်",
+    "loading": "Ads များကို လုပ်ဆောင်နေသည်...",
+    "empty": "Ad မရှိသေးပါ။ \"Create Ad\" ကိုနှိပ်ပြီး စတင်ပါ။",
+    "no_title": "ခေါင်းစဉ်မရှိ",
+
+    "modal": {
+      "title": "Video ad ဖန်တီးရန်",
+      "fields": {
+        "title": "ခေါင်းစဉ်",
+        "type": "Ad အမျိုးအစား",
+        "status": "အခြေအနေ",
+        "skippable": "Skip လုပ်နိုင်",
+        "skip_after": "Skip လုပ်နိုင်သောအချိန် (စက္ကန့်)",
+        "r2_source": "R2 မှ asset ချိတ်ရန် (source ad ID)",
+        "file": "MP4 ဖိုင် (optional)"
+      },
+      "placeholders": {
+        "title": "ဥပမာ: Coca Cola 15s pre-roll",
+        "skip_after": "ဥပမာ: 5",
+        "r2_source": "ဥပမာ: 12"
+      },
+      "hint": {
+        "r2": "R2 တွင်ရှိပြီးသား asset ပါသော ad ID ကိုထည့်ပါ",
+        "file": "R2 asset အသုံးပြုပါက ဤနေရာကို ချန်ထားပါ"
+      },
+      "buttons": {
+        "cancel": "မလုပ်တော့ပါ",
+        "create_r2": "ဖန်တီးပြီး R2 ချိတ်ရန်",
+        "create_upload": "ဖန်တီးပြီး upload လုပ်ရန်"
+      }
+    },
+
+    "asset": {
+      "encode_status": "Encode အခြေအနေ",
+      "progress": "တိုးတက်မှု",
+      "duration": "ကြာချိန်",
+      "variants": "Version များ",
+      "playback": "Playback link",
+      "not_ready": "မပြင်ဆင်ရသေး",
+      "open": "Playlist ဖွင့်ရန်",
+      "r2_status": "R2 အခြေအနေ",
+      "r2_playback": "R2 မှ playback",
+      "not_checked": "မစစ်ဆေးရသေး",
+      "found": "R2 တွင်တွေ့ရှိ",
+      "not_found": "R2 တွင်မတွေ့ရှိ"
+    },
+
+    "actions": {
+      "upload": "MP4 upload",
+      "activate": "ဖွင့်ရန်",
+      "activate_exclusive": "တစ်ခုတည်းဖွင့်ရန်",
+      "deactivate": "ပိတ်ရန်",
+      "refresh": "ပြန်လည် update",
+      "check_r2": "R2 စစ်ဆေးရန်",
+      "sync_r2": "R2 မှ sync"
+    },
+
+    "toast": {
+      "invalid_file": ".mp4 ဖိုင်သာထောက်ခံသည်",
+      "missing_title": "ခေါင်းစဉ်ထည့်ပါ",
+      "upload_success": "Upload အောင်မြင်သည်",
+      "created_success": "Ad ဖန်တီးပြီး upload အောင်မြင်သည်",
+      "activated": "ဖွင့်ပြီးပါပြီ",
+      "activated_exclusive": "တစ်ခုတည်းဖွင့်ပြီးပါပြီ",
+      "deactivated": "ပိတ်ပြီးပါပြီ",
+      "refreshed": "ပြန်လည် update ပြီးပါပြီ",
+      "enter_source": "R2 Source Ad ID ထည့်ပါ",
+      "created_and_link_success": "R2 မှချိတ်ပြီး ဖန်တီးပြီးပါပြီ",
+      "check_r2_failed": "R2 စစ်ဆေးမှု မအောင်မြင်ပါ",
+      "sync_failed": "R2 မှ sync မအောင်မြင်ပါ"
+    }
+  },
+  "ip_resolve": {
+    "title": "ဝင်ရောက်ရာဒေသ အတည်ပြုခြင်း",
+    "description": "စနစ်သည် သင့် public IP ကို အလိုအလျောက် ရယူ၍ ဝင်ရောက်ရာဒေသကို သတ်မှတ်နေပါသည်။",
+    "loading_ip": "Public IP ကို ရယူနေသည်...",
+    "ip_fetched": "IP ရရှိပြီးပါပြီ: {{ip}} ။ ဒေသကို သတ်မှတ်နေသည်...",
+    "success": "ဒေသကို အောင်မြင်စွာ သတ်မှတ်ပြီးပါပြီ။ နောက်စာမျက်နှာသို့ ပြောင်းနေသည်...",
+    "error_default": "IP အတည်ပြုရာတွင် အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်။",
+    "retry": "ထပ်ကြိုးစားမည်",
+    "failed": "ipify မှ public IP ကို မရရှိနိုင်ပါ"
   }
 }

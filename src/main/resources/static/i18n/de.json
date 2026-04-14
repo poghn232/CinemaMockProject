@@ -595,5 +595,90 @@
       "success": "Erfolgreich gespeichert!",
       "error": "Fehler"
     }
+  },
+  "admin_ads": {
+    "title": "Videoanzeigen Verwaltung",
+    "description": "Anzeigen erstellen, MP4 hochladen oder HLS-Assets von R2 verknüpfen",
+    "create": "+ Anzeige erstellen",
+    "loading": "Anzeigen werden geladen...",
+    "empty": "Noch keine Anzeigen vorhanden. Klicken Sie auf \"Anzeige erstellen\".",
+    "no_title": "Kein Titel",
+
+    "modal": {
+      "title": "Videoanzeige erstellen",
+      "fields": {
+        "title": "Titel",
+        "type": "Anzeigentyp",
+        "status": "Status",
+        "skippable": "Überspringbar",
+        "skip_after": "Überspringen nach (Sekunden)",
+        "r2_source": "Asset von R2 verknüpfen (Quell-Ad-ID)",
+        "file": "MP4-Datei (optional)"
+      },
+      "placeholders": {
+        "title": "Beispiel: Coca Cola 15s pre-roll",
+        "skip_after": "Beispiel: 5",
+        "r2_source": "Beispiel: 12"
+      },
+      "hint": {
+        "r2": "Geben Sie die ID einer Anzeige ein, die bereits Assets auf R2 hat",
+        "file": "Leer lassen, wenn R2-Asset verwendet wird"
+      },
+      "buttons": {
+        "cancel": "Abbrechen",
+        "create_r2": "Erstellen & mit R2 verknüpfen",
+        "create_upload": "Erstellen & hochladen"
+      }
+    },
+
+    "asset": {
+      "encode_status": "Encode-Status",
+      "progress": "Fortschritt",
+      "duration": "Dauer",
+      "variants": "Varianten",
+      "playback": "Wiedergabe-Link",
+      "not_ready": "Nicht bereit",
+      "open": "Playlist öffnen",
+      "r2_status": "R2-Status",
+      "r2_playback": "Wiedergabe von R2",
+      "not_checked": "Nicht geprüft",
+      "found": "Auf R2 gefunden",
+      "not_found": "Nicht auf R2 gefunden"
+    },
+
+    "actions": {
+      "upload": "MP4 hochladen",
+      "activate": "Aktivieren",
+      "activate_exclusive": "Exklusiv aktivieren",
+      "deactivate": "Deaktivieren",
+      "refresh": "Status aktualisieren",
+      "check_r2": "R2 prüfen",
+      "sync_r2": "Von R2 synchronisieren"
+    },
+
+    "toast": {
+      "invalid_file": "Nur .mp4 Dateien werden unterstützt",
+      "missing_title": "Bitte Titel eingeben",
+      "upload_success": "Upload erfolgreich",
+      "created_success": "Anzeige erstellt und MP4 hochgeladen",
+      "activated": "Aktiviert",
+      "activated_exclusive": "Exklusiv aktiviert",
+      "deactivated": "Deaktiviert",
+      "refreshed": "Aktualisiert",
+      "enter_source": "Bitte R2 Source Ad ID eingeben",
+      "created_and_link_success": "Anzeige erstellt und mit R2 verknüpft",
+      "check_r2_failed": "R2-Prüfung fehlgeschlagen",
+      "sync_failed": "Synchronisation fehlgeschlagen"
+    }
+  },
+  "ip_resolve": {
+    "title": "Zugriffsregion bestätigen",
+    "description": "Das System ruft automatisch Ihre öffentliche IP ab, um Ihre Zugriffsregion zu bestimmen.",
+    "loading_ip": "Öffentliche IP wird abgerufen...",
+    "ip_fetched": "IP erhalten: {{ip}}. Region wird bestimmt...",
+    "success": "Region erfolgreich bestimmt. Weiterleitung...",
+    "error_default": "Beim Überprüfen der IP ist ein Fehler aufgetreten.",
+    "retry": "Erneut versuchen",
+    "failed": "Öffentliche IP konnte nicht von ipify abgerufen werden"
   }
 }
