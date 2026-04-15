@@ -2076,6 +2076,7 @@
     let currentPage = 1;
     let totalPages = 1;
     let currentView = "rows"; // 'rows' | 'grid' | 'search'
+    let homepageInitDone = false;
     let genresFromServer = null; // populated by loadGenres()
     const ROW_DISPLAY_LIMIT = 20; // how many items to show in a row visually
 
@@ -2547,16 +2548,15 @@
     }
 
     window.addEventListener("languageChanged", async () => {
+        // i18n dispatches once during initial DOMContentLoaded; skip it to
+        // avoid racing with initial homepage init/loadMovies.
+        if (!homepageInitDone) return;
+        if (typeof loadMovies !== "function") return;
         try {
-            // re-render lại toàn bộ movie UI
-            await renderMovies(currentView === "search");
+            // Keep a single refresh path to avoid duplicate rendering/fetching.
+            await loadMovies(currentFilter, currentPage);
         } catch (e) {
-            console.error("[languageChanged] renderMovies failed", e);
-        }
-    });
-    window.addEventListener("languageChanged", () => {
-        if (typeof loadMovies === "function") {
-            loadMovies(currentFilter, currentPage);
+            console.error("[languageChanged] loadMovies failed", e);
         }
     });
 
@@ -3790,6 +3790,7 @@
         initPremiumAndLogout();
         initSortUI();
         await loadMovies(currentFilter);
+        homepageInitDone = true;
     })();
 
     // wire featured down button
