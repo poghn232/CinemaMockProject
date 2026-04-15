@@ -5,6 +5,7 @@ import com.example.superapp.entity.SubscriptionStatus;
 import com.example.superapp.entity.User;
 import com.example.superapp.repository.SubscriptionRepository;
 import com.example.superapp.repository.UserRepository;
+import com.example.superapp.service.SubscriptionExpiryService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,7 @@ public class UserController {
     private final UserRepository userRepository;
     private final SubscriptionRepository subscriptionRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SubscriptionExpiryService subscriptionExpiryService;
 
     // 1. LẤY THÔNG TIN PROFILE VÀ CÁC GÓI SUBSCRIPTION (AN TOÀN)
     @GetMapping("/profile")
@@ -36,6 +38,9 @@ public class UserController {
         String username = authentication.getName(); 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Lazy-check: kiểm tra và cập nhật subscription hết hạn mỗi khi user load profile
+        subscriptionExpiryService.expireOverdueSubscriptions(user);
 
         // TRÍCH XUẤT DỮ LIỆU SUBSCRIPTION (Tránh lỗi đệ quy vòng lặp vô hạn của JPA)
         List<Map<String, Object>> subscriptionList = user.getSubscriptions().stream()

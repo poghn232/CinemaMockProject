@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -60,8 +61,12 @@ public class ProfileController {
         // Check max profiles based on active subscription
         // Free users: 1 profile only. Premium: from pack's maxProfiles (default 5)
         int maxProfiles = 1;
+        LocalDateTime now = LocalDateTime.now();
         for (Subscription sub : user.getSubscriptions()) {
-            if (sub.getStatus() == SubscriptionStatus.ACTIVE && sub.getPack() != null) {
+            if (sub.getStatus() == SubscriptionStatus.ACTIVE
+                    && sub.getEndDate() != null
+                    && sub.getEndDate().isAfter(now)
+                    && sub.getPack() != null) {
                 Integer packMax = sub.getPack().getMaxProfiles();
                 int effective = (packMax != null && packMax > 0) ? packMax : 5;
                 if (effective > maxProfiles) {

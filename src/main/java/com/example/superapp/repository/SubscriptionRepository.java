@@ -16,4 +16,13 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
             LocalDateTime now
     );
     boolean existsByUserAndStatus(User user, SubscriptionStatus status);
+
+    /**
+     * Tìm tất cả subscription ACTIVE mà endDate đã qua (dùng cho lazy expiry check).
+     */
+    java.util.List<Subscription> findByUserAndStatusAndEndDateBefore(
+            User user,
+            SubscriptionStatus status,
+            LocalDateTime now
+    );
 }

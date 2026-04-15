@@ -38,8 +38,11 @@ public class BannerController {
         if (userDetails != null) {
             List<Subscription> subs = userService.getUserByUsername(userDetails.getUsername()).getSubscriptions();
             if (!subs.isEmpty()) {
+                LocalDateTime now = LocalDateTime.now();
                 List<Subscription> activeSubs = subs.stream()
-                                                    .filter(sub -> sub.getStatus() == SubscriptionStatus.ACTIVE)
+                                                    .filter(sub -> sub.getStatus() == SubscriptionStatus.ACTIVE
+                                                            && sub.getEndDate() != null
+                                                            && sub.getEndDate().isAfter(now))
                                                     .toList();
                 if (!activeSubs.isEmpty()) return ResponseEntity.ok(new byte[0]);
             }
@@ -58,8 +61,11 @@ public class BannerController {
         if (userDetails != null) {
             List<Subscription> subs = userService.getUserByUsername(userDetails.getUsername()).getSubscriptions();
             if (!subs.isEmpty()) {
+                LocalDateTime now = LocalDateTime.now();
                 List<Subscription> activeSubs = subs.stream()
-                                                    .filter(sub -> sub.getStatus() == SubscriptionStatus.ACTIVE)
+                                                    .filter(sub -> sub.getStatus() == SubscriptionStatus.ACTIVE
+                                                            && sub.getEndDate() != null
+                                                            && sub.getEndDate().isAfter(now))
                                                     .toList();
                 if (!activeSubs.isEmpty()) return ResponseEntity.ok(Collections.emptyList());
             }

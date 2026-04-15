@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -36,7 +37,8 @@ public class AdminUserController {
             .stream()
             .filter(u -> u.getRole() == null || !u.getRole().toUpperCase().contains("ADMIN"))
             .map(u -> {
-                boolean isPremium = u.getSubscriptions() != null && u.getSubscriptions().stream().anyMatch(s -> s.getStatus() != null && s.getStatus().name().equals("ACTIVE"));
+                LocalDateTime now = LocalDateTime.now();
+                boolean isPremium = u.getSubscriptions() != null && u.getSubscriptions().stream().anyMatch(s -> s.getStatus() != null && s.getStatus().name().equals("ACTIVE") && s.getEndDate() != null && s.getEndDate().isAfter(now));
                 // UserAdminDto now expects (userId, username, email, role, premium, commentDisabled)
                 return new UserAdminDto(u.getUserId(), u.getUsername(), u.getEmail(), u.getRole(), isPremium, false);
             })
@@ -126,7 +128,8 @@ public class AdminUserController {
             }
         }
         log.info("User {} all profiles commentDisabled={}", saved.getUsername(), enabled);
-    boolean isPremium = saved.getSubscriptions() != null && saved.getSubscriptions().stream().anyMatch(s -> s.getStatus() != null && s.getStatus().name().equals("ACTIVE"));
+    LocalDateTime nowTime = LocalDateTime.now();
+    boolean isPremium = saved.getSubscriptions() != null && saved.getSubscriptions().stream().anyMatch(s -> s.getStatus() != null && s.getStatus().name().equals("ACTIVE") && s.getEndDate() != null && s.getEndDate().isAfter(nowTime));
     return new UserAdminDto(saved.getUserId(), saved.getUsername(), saved.getEmail(), saved.getRole(), isPremium, enabled);
     }
 }
