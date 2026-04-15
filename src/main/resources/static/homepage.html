@@ -1728,12 +1728,12 @@
                 <p class="section-subtitle" id="resultCount"></p>
             </div>
             <div id="sortWrap" style="display:flex;gap:8px;align-items:center">
-                <label for="sortFieldSelect" style="color:var(--text-subtle);font-size:13px">Sort:</label>
+                <label for="sortFieldSelect" style="color:var(--text-subtle);font-size:13px" data-i18n="movie_sort.label">Sort:</label>
                 <select id="sortFieldSelect" class="sort-field-select">
-                    <option value="default">Default</option>
-                    <option value="title">Title</option>
-                    <option value="rating">Rating</option>
-                    <option value="year">Year</option>
+                    <option value="default" data-i18n="movie_sort.default">Default</option>
+                    <option value="title" data-i18n="movie_sort.title">Title</option>
+                    <option value="rating" data-i18n="movie_sort.rating">Rating</option>
+                    <option value="year" data-i18n="movie_sort.year">Year</option>
                 </select>
                 <div id="sortOrderWrap" style="display:inline-flex;gap:6px">
                     <button id="sortAscBtn" class="btn ghost" title="Ascending">↑</button>
@@ -2765,6 +2765,11 @@
             console.error("[languageChanged] renderMovies failed", e);
         }
     });
+    window.addEventListener("languageChanged", () => {
+        if (typeof loadMovies === "function") {
+            loadMovies(currentFilter, currentPage);
+        }
+    });
 
     // Animate movie cards into view. If a root element is provided, only
     // animate cards within that root. This prevents global delays when the
@@ -2798,7 +2803,7 @@
         // Prev button
         const prev = document.createElement("button");
         prev.className = "page-button" + (currentPage === 1 ? " disabled" : "");
-        prev.textContent = "Prev";
+        prev.textContent = t("pagination.prev");
         prev.onclick = async () => {
             if (currentPage > 1) await loadMovies(currentFilter, currentPage - 1);
         };
@@ -2813,7 +2818,10 @@
         infoWrap.style.padding = '6px 10px';
 
         const info = document.createElement('div');
-        info.textContent = `Page ${currentPage} / ${totalPages}`;
+        info.textContent = t("pagination.page", {
+            current: currentPage,
+            total: totalPages
+        });
         infoWrap.appendChild(info);
 
         const input = document.createElement('input');
@@ -2849,7 +2857,7 @@
         const next = document.createElement('button');
         next.className =
             "page-button" + (currentPage >= totalPages ? " disabled" : "");
-        next.textContent = "Next";
+        next.textContent = t("pagination.next");
         next.onclick = async () => {
             if (currentPage < totalPages)
                 await loadMovies(currentFilter, currentPage + 1);
@@ -3088,7 +3096,7 @@
             const right = document.createElement("div");
             const back = document.createElement("button");
             back.className = "grid-back";
-            back.textContent = "Back";
+            back.textContent = t("movie_detail.back");
             back.addEventListener("click", async () => {
                 // return to rows view
                 currentView = "rows";
@@ -3237,13 +3245,15 @@
         const year = movie.year || "";
         const ratingText =
             typeof movie.rating === "number" ? movie.rating.toFixed(1) : "N/A";
-        const typeLabel = movie.type === "tv" ? "TV Series" : "Movie";
+        const typeLabel = movie.type === 'tv'
+            ? t("movies.tv_series")
+            : t("movies.movie");
 
         card.innerHTML = `
                     <div class="movie-thumb" style="background-image: url('${imgUrl}')">
-                        ${isTrending ? '<span class="movie-badge">Trending</span>' : ""}
-                        <span class="movie-type">${typeLabel}</span>
-                    </div>
+            ${isTrending ? `<span class="movie-badge">${t("movies.trending")}</span>` : ''}
+            <span class="movie-type">${typeLabel}</span>
+          </div>
                     <div class="movie-body">
                         <div class="movie-title">${movie.title}</div>
                         <div class="movie-meta-row">
@@ -3761,7 +3771,7 @@
                 if (totalPages > 1) {
                     const prev = document.createElement("button");
                     prev.className = "page-button disabled";
-                    prev.textContent = "Prev";
+                    prev.textContent = t("pagination.prev");
                     const info = document.createElement("div");
                     info.style.minWidth = "120px";
                     info.style.textAlign = "center";
@@ -3769,7 +3779,7 @@
                     info.textContent = `Page ${PAGE} / ${totalPages}`;
                     const next = document.createElement("button");
                     next.className = "page-button";
-                    next.textContent = "Next";
+                    next.textContent = t("pagination.next");
                     let current = PAGE;
                     prev.onclick = () => {
                         if (current <= 1) return;
@@ -3779,7 +3789,10 @@
                         items
                             .slice(start, start + PAGE_SIZE)
                             .forEach((m) => grid.appendChild(createMovieCard(m)));
-                        info.textContent = `Page ${current} / ${totalPages}`;
+                        info.textContent = t("pagination.page", {
+                            current: currentPage,
+                            total: totalPages
+                        });
                         // update disabled states
                         prev.classList.toggle("disabled", current === 1);
                         next.classList.toggle("disabled", current === totalPages);
@@ -3792,7 +3805,10 @@
                         items
                             .slice(start, start + PAGE_SIZE)
                             .forEach((m) => grid.appendChild(createMovieCard(m)));
-                        info.textContent = `Page ${current} / ${totalPages}`;
+                        info.textContent = t("pagination.page", {
+                            current: currentPage,
+                            total: totalPages
+                        });
                         prev.classList.toggle("disabled", current === 1);
                         next.classList.toggle("disabled", current === totalPages);
                     };

@@ -226,7 +226,9 @@
     "watch_all": "အားလုံးကြည့်ရန်",
     "see_all": "ပိုမိုကြည့်ရန်",
     "close": "ပိတ်ရန်",
-    "processing": "လုပ်ဆောင်နေသည်..."
+    "processing": "လုပ်ဆောင်နေသည်...",
+    "login_required": "ရုပ်ရှင်အသေးစိတ်ကို ကြည့်ရန် login ဝင်ရန်လိုသည်။ Login စာမျက်နှာသို့ သွားမလား?",
+    "home": "မူလစာမျက်နှာ"
   },
   "google_setup": {
     "title_line1": "Google Login ကို ပထမဆုံး အသုံးပြုပါသလား?",
@@ -680,5 +682,43 @@
     "error_default": "IP အတည်ပြုရာတွင် အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်။",
     "retry": "ထပ်ကြိုးစားမည်",
     "failed": "ipify မှ public IP ကို မရရှိနိုင်ပါ"
+  },
+  "movie_sort": {
+    "label": "စီရန်:",
+    "default": "မူလအတိုင်း",
+    "title": "ခေါင်းစဉ်",
+    "rating": "အဆင့်သတ်မှတ်ချက်",
+    "year": "နှစ်"
+  },
+  "pagination": {
+    "prev": "ရှေ့",
+    "next": "နောက်",
+    "page": "စာမျက်နှာ {{current}} / {{total}}",
+    "first": "ပထမ",
+    "last": "နောက်ဆုံး",
+    "page_of": "စာမျက်နှာ {{current}} / {{total}}",
+    "go": "သွား"
+  },
+  "actors": {
+    "page_title": "သရုပ်ဆောင်များ · MovieZone",
+    "title": "သရုပ်ဆောင်များ",
+    "search_placeholder": "အမည် သို့မဟုတ် ဇာတ်ကားဖြင့် ရှာဖွေပါ...",
+    "sort_label": "စီရန်:",
+    "sort_credits": "ဇာတ်ကားအရေအတွက်",
+    "sort_name": "အမည်",
+    "ascending": "တိုးစဉ်",
+    "descending": "လျော့စဉ်",
+    "no_result": "သရုပ်ဆောင်မတွေ့ပါ",
+    "loading": "သရုပ်ဆောင်များကို ဖွင့်နေသည်...",
+    "failed": "သရုပ်ဆောင်များ ဖွင့်မရပါ",
+    "credits": "{{count}} ဇာတ်ကား",
+    "born": "မွေးနေ့:",
+    "known_for": "MovieZone တွင် လူသိများသော",
+    "default_alt": "သရုပ်ဆောင်"
+  },
+  "movies": {
+    "trending": "လူကြိုက်များနေသည်",
+    "tv_series": "တီဗီစီးရီး",
+    "movie": "ရုပ်ရှင်"
   }
 }

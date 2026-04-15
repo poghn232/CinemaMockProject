@@ -226,7 +226,9 @@
     "watch_all": "すべて見る",
     "see_all": "もっと見る",
     "close": "閉じる",
-    "processing": "処理中..."
+    "processing": "処理中...",
+    "login_required": "映画の詳細を見るにはログインが必要です。ログインページへ移動しますか？",
+    "home": "ホーム"
   },
   "google_setup": {
     "title_line1": "Googleログインを初めて使用しますか？",
@@ -680,5 +682,44 @@
     "error_default": "IPの確認中にエラーが発生しました。",
     "retry": "再試行",
     "failed": "ipifyから公開IPを取得できませんでした"
+  },
+
+  "movie_sort": {
+    "label": "並び替え:",
+    "default": "デフォルト",
+    "title": "タイトル",
+    "rating": "評価",
+    "year": "年"
+  },
+  "pagination": {
+    "prev": "前へ",
+    "next": "次へ",
+    "page": "{{current}} / {{total}} ページ",
+    "first": "最初",
+    "last": "最後",
+    "page_of": "{{current}} / {{total}} ページ",
+    "go": "移動"
+  },
+  "actors": {
+    "page_title": "俳優 · MovieZone",
+    "title": "俳優",
+    "search_placeholder": "名前や作品で俳優を検索...",
+    "sort_label": "並び替え:",
+    "sort_credits": "出演数",
+    "sort_name": "名前",
+    "ascending": "昇順",
+    "descending": "降順",
+    "no_result": "俳優が見つかりません",
+    "loading": "俳優を読み込み中...",
+    "failed": "俳優の読み込みに失敗しました",
+    "credits": "{{count}} 件",
+    "born": "生年月日:",
+    "known_for": "MovieZoneでの代表作",
+    "default_alt": "俳優"
+  },
+  "movies": {
+    "trending": "トレンド",
+    "tv_series": "テレビシリーズ",
+    "movie": "映画"
   }
 }

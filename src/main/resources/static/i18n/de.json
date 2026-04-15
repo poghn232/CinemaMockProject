@@ -226,7 +226,9 @@
     "watch_all": "Alle ansehen",
     "see_all": "Mehr anzeigen",
     "close": "Schließen",
-    "processing": "Wird verarbeitet..."
+    "processing": "Wird verarbeitet...",
+    "login_required": "Sie müssen sich anmelden, um Filmdetails zu sehen. Zur Login-Seite gehen?",
+    "home": "Startseite"
   },
   "google_setup": {
     "title_line1": "Erstes Mal Google Login?",
@@ -680,5 +682,43 @@
     "error_default": "Beim Überprüfen der IP ist ein Fehler aufgetreten.",
     "retry": "Erneut versuchen",
     "failed": "Öffentliche IP konnte nicht von ipify abgerufen werden"
+  },
+  "movie_sort": {
+    "label": "Sortieren:",
+    "default": "Standard",
+    "title": "Titel",
+    "rating": "Bewertung",
+    "year": "Jahr"
+  },
+  "pagination": {
+    "prev": "Zurück",
+    "next": "Weiter",
+    "page": "Seite {{current}} / {{total}}",
+    "first": "Erste",
+    "last": "Letzte",
+    "page_of": "Seite {{current}} / {{total}}",
+    "go": "Gehe zu"
+  },
+  "actors": {
+    "page_title": "Schauspieler · MovieZone",
+    "title": "Schauspieler",
+    "search_placeholder": "Schauspieler nach Name oder Film suchen...",
+    "sort_label": "Sortieren:",
+    "sort_credits": "Filmanzahl",
+    "sort_name": "Name",
+    "ascending": "Aufsteigend",
+    "descending": "Absteigend",
+    "no_result": "Keine Schauspieler gefunden",
+    "loading": "Schauspieler werden geladen...",
+    "failed": "Fehler beim Laden der Schauspieler",
+    "credits": "{{count}} Filme",
+    "born": "Geboren:",
+    "known_for": "Bekannt auf MovieZone",
+    "default_alt": "Schauspieler"
+  },
+  "movies": {
+    "trending": "Im Trend",
+    "tv_series": "TV-Serie",
+    "movie": "Film"
   }
 }

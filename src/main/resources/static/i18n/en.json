@@ -227,7 +227,9 @@
     "watch_all": "Watch All",
     "see_all": "See all",
     "close": "Close",
-    "processing": "Processing..."
+    "processing": "Processing...",
+    "login_required": "You need to login to view movie details. Go to login page?",
+    "home": "Home"
   },
   "google_setup": {
     "title_line1": "First time using Google Login?",
@@ -681,5 +683,43 @@
     "error_default": "An error occurred while verifying IP.",
     "retry": "Retry",
     "failed": "Failed to retrieve public IP from ipify"
+  },
+  "movie_sort": {
+    "label": "Sort:",
+    "default": "Default",
+    "title": "Title",
+    "rating": "Rating",
+    "year": "Year"
+  },
+  "pagination": {
+    "prev": "Prev",
+    "next": "Next",
+    "page": "Page {{current}} / {{total}}",
+    "first": "First",
+    "last": "Last",
+    "page_of": "Page {{current}} / {{total}}",
+    "go": "Go"
+  },
+  "actors": {
+    "page_title": "Actors · MovieZone",
+    "title": "Actors",
+    "search_placeholder": "Search actors by name or title...",
+    "sort_label": "Sort:",
+    "sort_credits": "Credits",
+    "sort_name": "Name",
+    "ascending": "Ascending",
+    "descending": "Descending",
+    "no_result": "No actors found",
+    "loading": "Loading actors...",
+    "failed": "Failed to load actors",
+    "credits": "{{count}} credits",
+    "born": "Born:",
+    "known_for": "Known for on MovieZone",
+    "default_alt": "actor"
+  },
+  "movies": {
+    "trending": "Trending",
+    "tv_series": "TV Series",
+    "movie": "Movie"
   }
 }

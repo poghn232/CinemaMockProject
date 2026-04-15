@@ -227,7 +227,9 @@
     "watch_all": "Xem tất cả",
     "see_all": "Xem thêm",
     "close": "Đóng",
-    "processing": "Đang xử lý..."
+    "processing": "Đang xử lý...",
+    "home": "Trang chủ",
+    "login_required": "Bạn cần đăng nhập để xem chi tiết phim. Đi đến trang đăng nhập?"
   },
   "google_setup": {
     "title_line1": "Đăng nhập Google lần đầu?",
@@ -667,5 +669,43 @@
     "error_default": "Có lỗi xảy ra khi xác nhận IP.",
     "retry": "Thử lại",
     "failed": "Không lấy được public IP từ ipify"
+  },
+  "movie_sort": {
+    "label": "Sắp xếp:",
+    "default": "Mặc định",
+    "title": "Tiêu đề",
+    "rating": "Đánh giá",
+    "year": "Năm"
+  },
+  "pagination": {
+    "prev": "Trước",
+    "next": "Sau",
+    "page": "Trang {{current}} / {{total}}",
+    "first": "Đầu",
+    "last": "Cuối",
+    "page_of": "Trang {{current}} / {{total}}",
+    "go": "Đi"
+  },
+  "actors": {
+    "page_title": "Diễn viên · MovieZone",
+    "title": "Diễn viên",
+    "search_placeholder": "Tìm diễn viên theo tên hoặc phim...",
+    "sort_label": "Sắp xếp:",
+    "sort_credits": "Số phim",
+    "sort_name": "Tên",
+    "ascending": "Tăng dần",
+    "descending": "Giảm dần",
+    "no_result": "Không tìm thấy diễn viên",
+    "loading": "Đang tải diễn viên...",
+    "failed": "Tải diễn viên thất bại",
+    "credits": "{{count}} phim",
+    "born": "Sinh:",
+    "known_for": "Nổi bật trên MovieZone",
+    "default_alt": "diễn viên"
+  },
+  "movies": {
+    "trending": "Xu hướng",
+    "tv_series": "Phim bộ",
+    "movie": "Phim lẻ"
   }
 }

@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Actors · MovieZone</title>
+    <title data-i18n="actors.page_title">Actors · MovieZone</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <style>
 
@@ -475,6 +475,7 @@
             <div class="nav-title-main">MovieZone</div>
             <div
               class="nav-title-sub"
+              data-i18n="actors.title"
               style="color: var(--text-subtle); font-size: 12px"
             >
               Actors
@@ -486,21 +487,21 @@
             <input
               id="actorSearch"
               class="search-input"
-              placeholder="Search actors by name or title..."
+              data-i18n-placeholder="actors.search_placeholder"
             />
           </div>
           <div class="sort-controls" id="actorsSortControls" style="margin-left:12px">
-            <label for="actorsSortField" style="color:var(--text-subtle);font-size:13px;margin-right:6px">Sort:</label>
+            <label for="actorsSortField" style="color:var(--text-subtle);font-size:13px;margin-right:6px" data-i18n="actors.sort_label">Sort:</label>
             <select id="actorsSortField" class="sort-field-select">
-              <option value="credits">Credits</option>
-              <option value="name">Name</option>
+              <option value="credits" data-i18n="actors.sort_credits">Credits</option>
+              <option value="name" data-i18n="actors.sort_name">Name</option>
             </select>
             <button id="actorsSortAsc" class="btn ghost" title="Ascending">↑</button>
             <button id="actorsSortDesc" class="btn ghost" title="Descending">↓</button>
           </div>
         </div>
         <div class="nav-right">
-          <a href="homepage.html" class="nav-button">Home</a>
+          <a href="homepage.html" class="nav-button" data-i18n="common.home">Home</a>
         </div>
       </div>
 
@@ -508,20 +509,20 @@
       <div class="ad-wrapper" id="adWrapper" style="margin-top: 18px">
         <div class="ad-banner">
           <div class="ad-text">
-            <span class="ad-label">Ad · MovieZone Premium</span>
-            <span class="ad-title">Watch movies without ads, high speed.</span>
-            <span class="ad-subtitle"
+            <span class="ad-label" data-i18n="ads.label">Ad · MovieZone Premium</span>
+            <span class="ad-title" data-i18n="ads.title">Watch movies without ads, high speed.</span>
+            <span class="ad-subtitle" data-i18n="ads.subtitle"
               >Upgrade to Premium to remove ads, prioritize servers, and unlock
               more content.</span
             >
           </div>
-          <button class="ad-cta" type="button" id="adUpgradeButton">
+          <button class="ad-cta" type="button" id="adUpgradeButton" data-i18n="ads.upgrade">
             Upgrade Now
           </button>
         </div>
       </div>
 
-      <div id="actorsList" class="actors-grid">Loading actors...</div>
+      <div id="actorsList" class="actors-grid" data-i18n="actors.loading">Loading actors...</div>
 
       <div id="paginationWrap" class="pagination-wrap"></div>
 
@@ -531,6 +532,7 @@
           href="#"
           id="closePerson"
           class="nav-button"
+          data-i18n="common.close"
           style="margin-bottom: 12px; display: inline-block"
           >Close</a
         >
@@ -554,7 +556,7 @@
           </div>
           <div class="person-bio">
             <div id="personBio"></div>
-            <h3 style="margin-top: 12px">Known for on MovieZone</h3>
+            <h3 style="margin-top: 12px" data-i18n="actors.known_for">Known for on MovieZone</h3>
             <div id="personMovies" class="movies-list"></div>
           </div>
         </div>
@@ -630,7 +632,7 @@
           renderPagination(window.__actorsPage, window.__actorsTotalPages);
           window.__actorsLoading = false;
         } catch (e) {
-          el.textContent = 'Failed to load actors';
+          el.textContent = t("actors.failed");
           console.error(e);
           window.__actorsLoading = false;
         }
@@ -676,7 +678,7 @@
         const el = document.getElementById("actorsList");
         el.innerHTML = "";
         if (!list || list.length === 0) {
-          el.textContent = "No actors found";
+          el.textContent = t("actors.no_result")
           return;
         }
         list.forEach((a) => {
@@ -687,7 +689,7 @@
           const img = document.createElement("img");
           img.className = "actor-thumb";
           img.loading = "lazy";
-          img.alt = a.name || "actor";
+          img.alt = a.name || t("actors.default_alt");;
           img.src = a.profilePath || "/static/img/placeholder-actor.png";
 
           const name = document.createElement("div");
@@ -695,7 +697,9 @@
           name.textContent = a.name;
           const count = document.createElement("div");
           count.className = "actor-sub";
-          count.textContent = a.creditsCount ? a.creditsCount + " credits" : "";
+          count.textContent = a.creditsCount
+                  ? t("actors.credits", { count: a.creditsCount })
+                  : "";
           const sub = document.createElement("div");
           sub.className = "actor-sub";
           sub.textContent = a.knownFor || "";
@@ -850,8 +854,8 @@
           b.addEventListener("click", () => loadActorsPage(p, window.__actorsCurrentQuery || ""));
           return b;
         };
-        wrap.appendChild(makeBtn("First", 1, page === 1));
-        wrap.appendChild(makeBtn("Prev", Math.max(1, page - 1), page === 1));
+        wrap.appendChild(makeBtn(t("pagination.first"), 1, page === 1));
+        wrap.appendChild(makeBtn(t("pagination.prev"), Math.max(1, page - 1), page === 1));
 
         // page info + input
         const infoWrap = document.createElement('div');
@@ -862,7 +866,10 @@
         infoWrap.style.padding = '6px 10px';
 
   const info = document.createElement("div");
-  info.textContent = `Page ${page} of ${total}`;
+        info.textContent = t("pagination.page_of", {
+          current: page,
+          total: total
+        });
   infoWrap.appendChild(info);
 
   // allow user to type page number and go (styled like nav buttons)
@@ -882,7 +889,7 @@
 
   const go = document.createElement('button');
   go.className = 'nav-button';
-  go.textContent = 'Go';
+        go.textContent = t("pagination.go");
         go.addEventListener('click', () => {
           let v = parseInt(input.value, 10) || 1;
           v = Math.max(1, Math.min(total, v));
@@ -893,9 +900,9 @@
         wrap.appendChild(infoWrap);
 
         wrap.appendChild(
-          makeBtn("Next", Math.min(total, page + 1), page === total),
+                makeBtn(t("pagination.next"), Math.min(total, page + 1), page === total),
         );
-        wrap.appendChild(makeBtn("Last", total, page === total));
+        wrap.appendChild(makeBtn(t("pagination.last"), total, page === total));
       }
 
       // Show person detail by fetching server detail (includes credits)
@@ -908,11 +915,13 @@
         const imgUrl = movie.imageUrl || movie.image || '';
         const year = movie.year || '';
         const ratingText = typeof movie.rating === 'number' ? movie.rating.toFixed(1) : 'N/A';
-        const typeLabel = movie.type === 'tv' ? 'TV Series' : 'Movie';
+        const typeLabel = movie.type === 'tv'
+                ? t("movies.tv_series")
+                : t("movies.movie");
 
         card.innerHTML = `
           <div class="movie-thumb" style="background-image: url('${imgUrl}')">
-            ${isTrending ? '<span class="movie-badge">Trending</span>' : ''}
+            ${isTrending ? `<span class="movie-badge">${t("movies.trending")}</span>` : ''}
             <span class="movie-type">${typeLabel}</span>
           </div>
           <div class="movie-body">
@@ -927,7 +936,7 @@
         card.addEventListener('click', () => {
           const token = localStorage.getItem('token');
           if (!token) {
-            const goLogin = confirm('You need to login to view movie details. Go to login page?');
+            const goLogin = confirm(t("common.login_required"));
             if (goLogin) window.location.href = 'login.html';
             return;
           }
@@ -966,7 +975,7 @@
                 pd.biography || "";
               if (pd.birthday)
                 document.getElementById("personBorn").textContent =
-                  "Born: " + pd.birthday;
+                        t("actors.born") + " " + pd.birthday;
               // ensure thumbnail uses server value if available
               if (pd.profilePath)
                 document.getElementById("personThumb").style.backgroundImage =
@@ -1094,5 +1103,6 @@
     </script>
     <script src="js/bannerads.js"></script>
     <script src="js/ai-chat-support.js"></script>
+    <script src="/js/i18n.js"></script>
   </body>
 </html>
