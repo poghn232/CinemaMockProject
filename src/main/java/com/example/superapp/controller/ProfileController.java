@@ -41,12 +41,43 @@ public class ProfileController {
             user.getProfiles().add(defaultProfile);
         }
 
-        List<ProfileDto> profiles = user.getProfiles().stream()
-                .map(p -> new ProfileDto(p.getProfileId(), p.getProfileName(), user.getUsername()))
-                .toList();
+        // Kiểm tra user có đang premium hay không (status ACTIVE + endDate chưa qua)
+        LocalDateTime now = LocalDateTime.now();
+        boolean isPremium = user.getSubscriptions() != null && user.getSubscriptions().stream()
+                .anyMatch(sub -> sub.getStatus() == SubscriptionStatus.ACTIVE
+                        && sub.getEndDate() != null
+                        && sub.getEndDate().isAfter(now));
+
+        // Xác định maxProfiles dựa trên subscription
+        int maxProfiles = 1; // Free user chỉ được 1 profile
+        if (isPremium) {
+            for (Subscription sub : user.getSubscriptions()) {
+                if (sub.getStatus() == SubscriptionStatus.ACTIVE
+                        && sub.getEndDate() != null
+                        && sub.getEndDate().isAfter(now)
+                        && sub.getPack() != null) {
+                    Integer packMax = sub.getPack().getMaxProfiles();
+                    int effective = (packMax != null && packMax > 0) ? packMax : 5;
+                    if (effective > maxProfiles) {
+                        maxProfiles = effective;
+                    }
+                }
+            }
+        }
+
+        // Profile đầu tiên (default) luôn mở khóa, các profile phụ bị khóa nếu hết premium
+        final int allowedProfiles = maxProfiles;
+        List<ProfileDto> profiles = new java.util.ArrayList<>();
+        List<Profile> userProfiles = user.getProfiles();
+        for (int i = 0; i < userProfiles.size(); i++) {
+            Profile p = userProfiles.get(i);
+            boolean locked = (i >= allowedProfiles); // Profile vượt quá giới hạn sẽ bị khóa
+            profiles.add(new ProfileDto(p.getProfileId(), p.getProfileName(), user.getUsername(), locked));
+        }
 
         return ResponseEntity.ok(profiles);
     }
+
 
     @PostMapping
     public ResponseEntity<?> createProfile(Authentication auth, @RequestBody Map<String, String> body) {

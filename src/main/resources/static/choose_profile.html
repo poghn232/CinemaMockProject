@@ -187,6 +187,63 @@
             background: linear-gradient(135deg, #8b5cf6, #ec4899);
         }
 
+        /* Locked profile styles */
+        .profile-card.locked {
+            cursor: not-allowed;
+            pointer-events: none;
+            position: relative;
+        }
+
+        .profile-card.locked .profile-avatar {
+            filter: brightness(0.35) grayscale(0.7);
+            border-color: rgba(100, 100, 100, 0.3);
+        }
+
+        .profile-card.locked .profile-name {
+            color: #6b7280;
+        }
+
+        .profile-card.locked:hover {
+            transform: none;
+        }
+
+        .profile-card.locked:hover .profile-avatar {
+            border-color: rgba(100, 100, 100, 0.3);
+            box-shadow: none;
+        }
+
+        .lock-overlay {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 100px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(2px);
+            z-index: 2;
+        }
+
+        .lock-icon {
+            font-size: 32px;
+            filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.5));
+        }
+
+        .locked-badge {
+            display: inline-block;
+            font-size: 10px;
+            color: #f59e0b;
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            padding: 2px 8px;
+            border-radius: 999px;
+            margin-top: 4px;
+        }
+
         .manage-link {
             margin-top: 16px;
             display: inline-block;
@@ -268,18 +325,35 @@
 
             profiles.forEach((profile, index) => {
                 const card = document.createElement("div");
-                card.className = "profile-card";
-                card.innerHTML = `
-                    <div class="profile-avatar avatar-${index % 5}">
-                        ${avatarEmojis[index % 5]}
-                    </div>
-                    <div class="profile-name">${escapeHtml(profile.profileName)}</div>
-                `;
+                const isLocked = profile.locked === true;
+                card.className = isLocked ? "profile-card locked" : "profile-card";
 
-                card.addEventListener("click", async () => {
-                    await switchToProfile(profile.profileId, profile.profileName);
-                    window.location.href = 'homepage.html';
-                });
+                if (isLocked) {
+                    card.innerHTML = `
+                        <div style="position: relative; display: inline-block;">
+                            <div class="profile-avatar avatar-${index % 5}">
+                                ${avatarEmojis[index % 5]}
+                            </div>
+                            <div class="lock-overlay">
+                                <span class="lock-icon">🔒</span>
+                            </div>
+                        </div>
+                        <div class="profile-name">${escapeHtml(profile.profileName)}</div>
+                        <div class="locked-badge">Premium</div>
+                    `;
+                } else {
+                    card.innerHTML = `
+                        <div class="profile-avatar avatar-${index % 5}">
+                            ${avatarEmojis[index % 5]}
+                        </div>
+                        <div class="profile-name">${escapeHtml(profile.profileName)}</div>
+                    `;
+
+                    card.addEventListener("click", async () => {
+                        await switchToProfile(profile.profileId, profile.profileName);
+                        window.location.href = 'homepage.html';
+                    });
+                }
 
                 grid.appendChild(card);
             });
