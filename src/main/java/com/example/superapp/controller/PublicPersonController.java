@@ -5,11 +5,17 @@ import com.example.superapp.dto.PersonDetailDto;
 import com.example.superapp.dto.PersonDto;
 import com.example.superapp.dto.PersonListResponseDto;
 import com.example.superapp.entity.Movie;
+import com.example.superapp.entity.MovieRegionBlock;
 import com.example.superapp.entity.Person;
+import com.example.superapp.entity.TvRegionBlock;
 import com.example.superapp.entity.TvSeries;
+import com.example.superapp.repository.MovieRegionBlockRepository;
 import com.example.superapp.repository.PersonRepository;
 import com.example.superapp.repository.MovieRepository;
+import com.example.superapp.repository.TvRegionBlockRepository;
 import com.example.superapp.repository.TvSeriesRepository;
+import com.example.superapp.service.RegionResolutionService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +28,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -32,6 +39,9 @@ public class PublicPersonController {
     private final MovieRepository movieRepository;
     private final TvSeriesRepository tvSeriesRepository;
     private final JdbcTemplate jdbcTemplate;
+    private final RegionResolutionService regionResolutionService;
+    private final MovieRegionBlockRepository movieRegionBlockRepository;
+    private final TvRegionBlockRepository tvRegionBlockRepository;
 
     @Value("${tmdb.image-base-url}")
     private String imageBaseUrl;
@@ -190,8 +200,9 @@ public class PublicPersonController {
 
     @GetMapping("/{id}")
     @Transactional
-    public PersonDetailDto getPerson(@PathVariable("id") Long id) {
+    public PersonDetailDto getPerson(@PathVariable("id") Long id, HttpServletRequest request) {
         Person p = personRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Person not found"));
+        String userRegion = regionResolutionService.resolveRegion(request);
         PersonDetailDto dto = new PersonDetailDto();
         dto.setId(p.getId());
         dto.setName(p.getName());
@@ -212,6 +223,7 @@ public class PublicPersonController {
                 item.setRating(m.getVoteAverage());
                 if (m.getReleaseDate() != null) item.setYear(m.getReleaseDate().getYear());
                 if (m.getPosterPath() != null && !m.getPosterPath().isBlank()) item.setImageUrl(imageBaseUrl + m.getPosterPath());
+                item.setRegionBlocked(isMovieBlockedForRegion(m, userRegion));
                 credits.add(item);
             });
         }
@@ -227,11 +239,32 @@ public class PublicPersonController {
                 item.setRating(tv.getVoteAverage());
                 if (tv.getFirstAirDate() != null) item.setYear(tv.getFirstAirDate().getYear());
                 if (tv.getPosterPath() != null && !tv.getPosterPath().isBlank()) item.setImageUrl(imageBaseUrl + tv.getPosterPath());
+                item.setRegionBlocked(isTvBlockedForRegion(tv, userRegion));
                 credits.add(item);
             });
         }
 
         dto.setCredits(credits);
         return dto;
+    }
+
+    private boolean isMovieBlockedForRegion(Movie movie, String userRegion) {
+        if (userRegion == null || userRegion.isBlank() || movie == null || movie.getId() == null) {
+            return false;
+        }
+        return movieRegionBlockRepository.findByMovie_Id(movie.getId()).stream()
+                .map(MovieRegionBlock::getRegionCode)
+                .filter(Objects::nonNull)
+                .anyMatch(code -> code.trim().equalsIgnoreCase(userRegion));
+    }
+
+    private boolean isTvBlockedForRegion(TvSeries tv, String userRegion) {
+        if (userRegion == null || userRegion.isBlank() || tv == null || tv.getId() == null) {
+            return false;
+        }
+        return tvRegionBlockRepository.findByTvSeries_Id(tv.getId()).stream()
+                .map(TvRegionBlock::getRegionCode)
+                .filter(Objects::nonNull)
+                .anyMatch(code -> code.trim().equalsIgnoreCase(userRegion));
     }
 }

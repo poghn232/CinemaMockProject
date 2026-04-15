@@ -786,51 +786,6 @@
             z-index: 30; /* above poster but below hover glow */
         }
 
-        /* Continue Watching row specifics */
-        .continue-row .movie-card {
-            width: 180px;
-        }
-
-        .continue-thumb {
-            position: relative;
-        }
-
-        .continue-progress {
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            height: 8px;
-            background: rgba(0, 0, 0, 0.4);
-        }
-
-        .continue-progress > .bar {
-            height: 100%;
-            background: linear-gradient(90deg, #f97316, #ec4899);
-            width: 0%;
-        }
-
-        .resume-pill {
-            position: absolute;
-            right: 8px;
-            bottom: 12px;
-            padding: 6px 8px;
-            border-radius: 999px;
-            font-size: 12px;
-            cursor: pointer;
-            background: linear-gradient(135deg, #f97316, #ec4899);
-            color: #fff;
-            font-weight: 600;
-            border: none;
-            box-shadow: 0 12px 25px rgba(248, 113, 113, 0.6), 0 0 0 1px rgba(248, 113, 113, 0.7);
-            transition: filter 0.12s ease, transform 0.12s ease;
-        }
-
-        .resume-pill:hover {
-            filter: brightness(1.05);
-            transform: translateY(-1px);
-        }
-
         .movie-type {
             position: absolute;
             top: 8px;
@@ -2049,7 +2004,9 @@
     // ========== SEARCH ==========
     async function loadTopRatedData(limit = 10) {
         try {
-            const res = await fetch(`/api/public/movies/top-rated?limit=${limit}`);
+            const token = localStorage.getItem("token");
+            const headers = token ? {Authorization: "Bearer " + token} : {};
+            const res = await fetch(`/api/public/movies/top-rated?limit=${limit}`, {headers});
             if (!res.ok) return [];
             return await res.json();
         } catch (e) {
@@ -2109,18 +2066,6 @@
 
         row.appendChild(scroll);
         container.appendChild(row);
-        // ensure actor row appears after any continue-watching row if present
-        // (this keeps actor row visually after history even if actor fetch resolved early)
-        try {
-            const continueRow = container.querySelector('.movie-row.continue-row');
-            const actorRow = container.querySelector('.movie-row.actor-row');
-            if (continueRow && actorRow && continueRow !== actorRow) {
-                // move actorRow to immediately after continueRow
-                if (continueRow.nextSibling) container.insertBefore(actorRow, continueRow.nextSibling);
-                else container.appendChild(actorRow);
-            }
-        } catch (e) { /* silent */
-        }
     }
 
     let currentFilter = "all"; // all | movie | tv
@@ -2481,26 +2426,6 @@
                 renderRow(t("home.maybe_watch"), recommendations.slice(0, ROW_DISPLAY_LIMIT), recommendations);
             }
 
-            // Continue Watching (user history)
-            // (actor row will be rendered after this so it appears below continue watching)
-            try {
-                const token = localStorage.getItem('token');
-                if (token) {
-                    const pid = localStorage.getItem('profileId');
-                    const histUrl = '/api/user/history' + (pid ? '?profileId=' + pid : '');
-                    const res = await fetch(histUrl, {headers: {Authorization: 'Bearer ' + token}});
-                    if (res && res.ok) {
-                        const hist = await res.json();
-                        if (Array.isArray(hist) && hist.length) {
-                            renderContinueWatchingRow('Continue Watching', hist.slice(0, ROW_DISPLAY_LIMIT));
-                        }
-                    }
-                }
-            } catch (err) { /* ignore history fetch errors */
-            }
-
-            // actor row will be rendered later after movies/tv rows to ensure stable ordering
-
             // 2. Top Rated (User-voted)
             const topRated = await loadTopRatedData(10);
             if (topRated && topRated.length) {
@@ -2529,142 +2454,6 @@
                 renderActorRow(t("home.top_actors"), topActors);
             }
         } catch (e) { /* ignore actor fetch errors */
-        }
-
-        // helper: render continue watching row
-        function renderContinueWatchingRow(title, list) {
-            const container = document.getElementById('moviesContainer');
-            if (!list || !list.length) return;
-            const row = document.createElement('div');
-            row.className = 'movie-row continue-row';
-            const titleEl = document.createElement('div');
-            titleEl.className = 'movie-row-title';
-            titleEl.innerHTML = `<span style="width: 4px; height: 18px; background: var(--accent); border-radius: 2px; display:inline-block; margin-right:8px; vertical-align:middle;"></span> ${title}`;
-            row.appendChild(titleEl);
-            const scroll = document.createElement('div');
-            scroll.className = 'movie-row-scroll';
-            // Deduplicate TV series so we only show the latest watched episode per series.
-            // Strategy: group by tvSeriesId when present; keep the item with the latest
-            // timestamp (watchedAt/createdAt/timestamp) if available, else compare season/episode,
-            // else prefer the most recent item in the list.
-            const grouped = new Map();
-            list.forEach((item, idx) => {
-                const isTv = !!item.tvSeriesId || item.type === 'tv';
-                const id = isTv ? (item.tvSeriesId || item.id) : (item.movieId || item.id);
-                const key = (isTv ? 'tv:' : 'm:') + String(id || '');
-                const existing = grouped.get(key);
-                if (!existing) {
-                    grouped.set(key, Object.assign({}, item, {__idx: idx}));
-                    return;
-                }
-
-                // try to compare by well-known time fields
-                const timeKeys = ['watchedAt', 'watched_at', 'timestamp', 'createdAt', 'created_at', 'time', 'lastWatched'];
-                const getTime = (o) => {
-                    for (const k of timeKeys) if (o && o[k]) return Date.parse(o[k]);
-                    return null;
-                };
-                const aT = getTime(existing);
-                const bT = getTime(item);
-                if (aT && bT) {
-                    if (bT >= aT) grouped.set(key, Object.assign({}, item, {__idx: idx}));
-                    return;
-                }
-
-                // fallback: compare season/episode numbers for TV
-                const aSeason = existing.seasonNumber || existing.season || 0;
-                const aEp = existing.episodeNumber || existing.episode || existing.episodeIndex || 0;
-                const bSeason = item.seasonNumber || item.season || 0;
-                const bEp = item.episodeNumber || item.episode || item.episodeIndex || 0;
-                if (bSeason > aSeason || (bSeason === aSeason && bEp >= aEp)) {
-                    grouped.set(key, Object.assign({}, item, {__idx: idx}));
-                    return;
-                }
-
-                // last-resort: prefer later item in the original list
-                if (idx > (existing.__idx || 0)) grouped.set(key, Object.assign({}, item, {__idx: idx}));
-            });
-
-            // convert grouped map to array and show most-recent-first
-            const deduped = Array.from(grouped.values()).sort((a, b) => (b.__idx || 0) - (a.__idx || 0));
-
-            deduped.forEach((item, idx) => {
-                // map fields similar to profile.renderHistory
-                const mainTitle = item.movieTitle || item.tvSeriesName || item.title || 'Unknown';
-                const progressSec = item.progressSec || item.positionSeconds || 0;
-                const durationSec = item.durationSec || item.duration || 1;
-                const percent = Math.min(100, Math.round((progressSec / durationSec) * 100));
-                const poster = item.posterPath || item.imageUrl || item.image || 'https://placehold.co/200x300/1f2937/9ca3af?text=No+Poster';
-
-                // Build a lightweight movie-like object for createMovieCard
-                const movieObj = {
-                    id: item.movieId || item.tvSeriesId || item.id,
-                    title: mainTitle,
-                    imageUrl: poster,
-                    type: item.tvSeriesId ? 'tv' : (item.type || 'movie'),
-                    rating: item.rating || item.score
-                };
-
-                const card = createMovieCard(movieObj);
-                const thumb = card.querySelector('.movie-thumb');
-                if (thumb) {
-                    thumb.classList.add('continue-thumb');
-                    const progressWrap = document.createElement('div');
-                    progressWrap.className = 'continue-progress';
-                    const bar = document.createElement('div');
-                    bar.className = 'bar';
-                    bar.style.width = percent + '%';
-                    progressWrap.appendChild(bar);
-                    thumb.appendChild(progressWrap);
-
-                    const resume = document.createElement('div');
-                    resume.className = 'resume-pill';
-                    resume.textContent = 'Resume';
-                    resume.addEventListener('click', (ev) => {
-                        ev.stopPropagation();
-                        let link;
-                        if (item.movieId) {
-                            link = `movie-watch.html?id=${item.movieId}&type=movie&t=${progressSec}`;
-                        } else if (item.tvSeriesId) {
-                            link = `movie-watch.html?id=${item.tvSeriesId}&type=tv&season=${item.seasonNumber || item.season || 1}&episode=${item.episodeNumber || item.episode || 1}&t=${progressSec}`;
-                        } else {
-                            link = `movie-watch.html?id=${encodeURIComponent(movieObj.id)}&type=${encodeURIComponent(movieObj.type)}&t=${progressSec}`;
-                        }
-                        window.location.href = link;
-                    });
-                    thumb.appendChild(resume);
-                }
-
-                // update title and meta rows to show correct title and progress info
-                const body = card.querySelector('.movie-body');
-                if (body) {
-                    const titleEl = body.querySelector('.movie-title');
-                    if (titleEl) titleEl.textContent = mainTitle;
-
-                    // Hide rating in Continue Watching since it's N/A for history items
-                    const ratingNode = body.querySelector('.movie-rating');
-                    if (ratingNode) ratingNode.style.display = 'none';
-
-                    // show episode label for TV series (SxEx or Episode #)
-                    if (item.tvSeriesId || item.type === 'tv') {
-                        const season = item.seasonNumber || item.season || 1;
-                        const episode = item.episodeNumber || item.episode || item.episodeIndex || null;
-                        const epText = episode ? `S${season}E${String(episode).padStart(2, '0')}` : (item.episodeName ? item.episodeName : 'Episode');
-                        const epEl = document.createElement('div');
-                        epEl.className = 'movie-episode';
-                        epEl.textContent = epText;
-                        epEl.style.fontSize = '12px';
-                        epEl.style.color = 'var(--text-subtle)';
-                        epEl.style.marginTop = '4px';
-                        body.appendChild(epEl);
-                    }
-                }
-
-                scroll.appendChild(card);
-                setTimeout(() => card.classList.add('in'), 100 + (idx * 30));
-            });
-            row.appendChild(scroll);
-            container.appendChild(row);
         }
 
         // Render top genre rows (prefer server-provided list when available)

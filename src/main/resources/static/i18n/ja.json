@@ -715,7 +715,8 @@
     "credits": "{{count}} 件",
     "born": "生年月日:",
     "known_for": "MovieZoneでの代表作",
-    "default_alt": "俳優"
+    "default_alt": "俳優",
+    "unavailable_in_country": "お住まいの国では視聴できません"
   },
   "movies": {
     "trending": "トレンド",

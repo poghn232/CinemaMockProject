@@ -701,7 +701,8 @@
     "credits": "{{count}} phim",
     "born": "Sinh:",
     "known_for": "Nổi bật trên MovieZone",
-    "default_alt": "diễn viên"
+    "default_alt": "diễn viên",
+    "unavailable_in_country": "Không khả dụng tại quốc gia của bạn"
   },
   "movies": {
     "trending": "Xu hướng",

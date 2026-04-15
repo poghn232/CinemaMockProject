@@ -8,6 +8,8 @@ public class MovieItemDto {
     private Integer year;
     private Double rating;
     private String imageUrl;
+    /** True when the viewer's region cannot access this title (actor credits, etc.). */
+    private boolean regionBlocked;
 
     public Long getId() {
         return id;
@@ -55,5 +57,13 @@ public class MovieItemDto {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public boolean isRegionBlocked() {
+        return regionBlocked;
+    }
+
+    public void setRegionBlocked(boolean regionBlocked) {
+        this.regionBlocked = regionBlocked;
     }
 }

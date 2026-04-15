@@ -714,7 +714,8 @@
     "credits": "{{count}} ဇာတ်ကား",
     "born": "မွေးနေ့:",
     "known_for": "MovieZone တွင် လူသိများသော",
-    "default_alt": "သရုပ်ဆောင်"
+    "default_alt": "သရုပ်ဆောင်",
+    "unavailable_in_country": "သင့်နိုင်ငံတွင် မရနိုင်ပါ"
   },
   "movies": {
     "trending": "လူကြိုက်များနေသည်",

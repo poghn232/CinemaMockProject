@@ -714,7 +714,8 @@
     "credits": "{{count}} Filme",
     "born": "Geboren:",
     "known_for": "Bekannt auf MovieZone",
-    "default_alt": "Schauspieler"
+    "default_alt": "Schauspieler",
+    "unavailable_in_country": "In Ihrem Land nicht verfügbar"
   },
   "movies": {
     "trending": "Im Trend",

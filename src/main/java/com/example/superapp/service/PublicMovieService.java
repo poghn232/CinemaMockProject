@@ -42,6 +42,7 @@ public class PublicMovieService {
     private final UserRepository userRepository;
     private final SubscriptionRepository subscriptionRepository;
     private final ReviewRepository reviewRepository;
+    private final RegionResolutionService regionResolutionService;
 
     @Value("${tmdb.image-base-url}")
     private String imageBaseUrl;
@@ -197,27 +198,7 @@ public class PublicMovieService {
     }
 
     private String extractRegionFromRequest(HttpServletRequest request) {
-        if (request == null) {
-            return null;
-        }
-
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return null;
-        }
-
-        try {
-            String token = authHeader.substring(7);
-            String region = jwtUtils.extractRegion(token);
-
-            if (region == null || region.isBlank()) {
-                return null;
-            }
-
-            return region.trim().toUpperCase();
-        } catch (Exception e) {
-            return null;
-        }
+        return regionResolutionService.resolveRegion(request);
     }
 
     private boolean isPremiumUser(HttpServletRequest request) {

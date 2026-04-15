@@ -715,7 +715,8 @@
     "credits": "{{count}} credits",
     "born": "Born:",
     "known_for": "Known for on MovieZone",
-    "default_alt": "actor"
+    "default_alt": "actor",
+    "unavailable_in_country": "Unavailable in your country"
   },
   "movies": {
     "trending": "Trending",

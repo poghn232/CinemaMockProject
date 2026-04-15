@@ -10,7 +10,6 @@ import com.example.superapp.repository.MovieRepository;
 import com.example.superapp.repository.TvSeriesRepository;
 import com.example.superapp.repository.UserRepository;
 import com.example.superapp.repository.WatchHistoryRepository;
-import com.example.superapp.utils.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +29,7 @@ public class MaybeYouWantToWatchService {
     private final UserRepository userRepository;
     private final MovieRepository movieRepository;
     private final TvSeriesRepository tvSeriesRepository;
-    private final JwtUtils jwtUtils;
+    private final RegionResolutionService regionResolutionService;
 
     @Value("${tmdb.image-base-url}")
     private String imageBaseUrl;
@@ -186,23 +185,7 @@ public class MaybeYouWantToWatchService {
     }
 
     private String extractRegionFromRequest(HttpServletRequest request) {
-        if (request == null) {
-            return null;
-        }
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return null;
-        }
-        try {
-            String token = authHeader.substring(7);
-            String region = jwtUtils.extractRegion(token);
-            if (region == null || region.isBlank()) {
-                return null;
-            }
-            return region.trim().toUpperCase();
-        } catch (Exception e) {
-            return null;
-        }
+        return regionResolutionService.resolveRegion(request);
     }
 
     private boolean isMovieBlockedForRegion(Movie movie, String userRegion) {
