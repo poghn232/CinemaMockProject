@@ -26,14 +26,6 @@
         '  animation:ss-rot .65s linear infinite;pointer-events:none;}',
         '@keyframes ss-rot{to{transform:translateY(-50%) rotate(360deg)}}',
 
-        /* ── Dropdown autocomplete ── */
-        '.ss-dd{display:none;position:absolute;top:calc(100% + 5px);left:0;right:0;',
-        '  z-index:10300;background:rgba(6,12,30,.98);',
-        '  border:1px solid rgba(148,163,184,.2);border-radius:14px;',
-        '  box-shadow:0 20px 56px rgba(0,0,0,.75);overflow:hidden;',
-        '  max-height:440px;overflow-y:auto;}',
-        '.ss-dd.open{display:block;}',
-
         /* Row */
         '.ss-row{display:flex;align-items:center;gap:11px;padding:10px 14px;',
         '  cursor:pointer;border-bottom:1px solid rgba(148,163,184,.07);transition:background .11s;}',
@@ -213,11 +205,6 @@
         _sp.className = 'ss-sp';
         wrap.appendChild(_sp);
 
-        /* Dropdown autocomplete */
-        var dd = document.createElement('div');
-        dd.id = 'ss-dd'; dd.className = 'ss-dd';
-        wrap.appendChild(dd);
-
         /* Fallback section (sau overlayPagination) */
         var pag = document.getElementById('overlayPagination');
         if (pag) {
@@ -228,49 +215,6 @@
         return true;
     }
 
-    /* ── AUTOCOMPLETE DROPDOWN ───────────────────────────────────────── */
-    /* Dùng /search?q=...&page=1 — có sẵn trong project, không cần backend mới */
-    function openDD(q) {
-        q = (q || '').trim();
-        var dd = document.getElementById('ss-dd');
-        if (!dd) return;
-        if (q.length < 2) { closeDD(); return; }
-
-        /* Fetch search results, lấy tối đa maxSuggest item đầu */
-        jGet(CFG.searchEp + '?q=' + encodeURIComponent(q) + '&type=all&page=1')
-            .then(function (data) {
-                var items = (data && data.items) ? data.items.slice(0, CFG.maxSuggest) : [];
-                renderDD(dd, items, q);
-            });
-    }
-
-    function renderDD(dd, items, q) {
-        _ddItems = items; _idx = -1;
-        dd.innerHTML = '';
-
-        if (!items.length) {
-            var e = document.createElement('div');
-            e.className = 'ss-empty';
-            e.textContent = 'Không tìm thấy kết quả nào';
-            dd.appendChild(e);
-            dd.classList.add('open');
-            return;
-        }
-
-        items.forEach(function (item, i) {
-            dd.appendChild(buildRow(item, q, i));
-        });
-
-        /* Keyboard hint */
-        var hint = document.createElement('div');
-        hint.className = 'ss-kbd-row';
-        hint.innerHTML =
-            '<span class="ss-kbd">↑↓</span> Move up/down &nbsp;' +
-            '<span class="ss-kbd">Enter</span> Select &nbsp;' +
-            '<span class="ss-kbd">Esc</span> Exit';
-        dd.appendChild(hint);
-        dd.classList.add('open');
-    }
 
     function buildRow(item, q, i) {
         var row = document.createElement('div');
@@ -581,10 +525,9 @@
             var recs = _recommend || [];
             if (!recs.length) return;
             fb.innerHTML =
-                '<div class="ss-fb-hdr">Gợi ý dành cho bạn' +
-                '<span class="ss-fb-badge">Từ lịch sử xem</span>' +
+                '<div class="ss-fb-hdr">Recommend for you</div>' +
                 '</div>' +
-                '<div class="ss-fb-note">Không tìm thấy "' + esc(q) + '" — có thể bạn thích:</div>' +
+                '<div class="ss-fb-note">No results found for "' + esc(q) + '" — you might like:</div>' +
                 '<div id="ss-fb-grid" class="movies-grid"></div>';
             fb.className = 'ss-fb show';
             var g = document.getElementById('ss-fb-grid'); if (!g) return;
