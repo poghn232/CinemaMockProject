@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -129,7 +130,7 @@ public class VnPayCallbackService {
                         user.getEmail(),
                         user.getUsername(),
                         pack.getPackName(),
-                        pack.getPackPrice(),
+                        new BigDecimal(pack.getPackPrice()),
                         sub.getStartDate(),
                         sub.getEndDate()
                 );

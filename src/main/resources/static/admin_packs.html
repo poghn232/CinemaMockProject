@@ -27,7 +27,7 @@
     <form id="packForm" class="pack-form">
         <input type="hidden" id="packId" />
         <input type="text" id="packName" data-i18n-placeholder="admin.pack_name" placeholder="Pack name" required />
-        <input id="packPrice" type="number" step="0.01"  data-i18n-placeholder="admin.price" placeholder="Price" required />
+        <input id="packPrice" type="text"  data-i18n-placeholder="admin.price" placeholder="Price" required />
         <input id="packDays" type="number"  data-i18n-placeholder="admin.duration" placeholder="Duration days" required />
         <input id="packMaxProfiles" type="number" placeholder="Max Profiles (e.g. 5)" min="1" />
         <div style="display: flex; gap: 8px; margin-top: 8px">
@@ -115,7 +115,7 @@
                     edit.addEventListener("click", () => {
                         document.getElementById("packId").value = p.packId;
                         document.getElementById("packName").value = p.packName;
-                        document.getElementById("packPrice").value = p.packPrice;
+                        document.getElementById("packPrice").value = formatPrice(p.packPrice);
                         document.getElementById("packDays").value = p.durationDays;
                         document.getElementById("packMaxProfiles").value = p.maxProfiles || '';
                     });
@@ -196,9 +196,7 @@
 
                     const dto = {
                         packName: document.getElementById("packName").value,
-                        packPrice: parseFloat(
-                            document.getElementById("packPrice").value
-                        ),
+                        packPrice: document.getElementById("packPrice").value.trim(),
                         durationDays: parseInt(
                             document.getElementById("packDays").value
                         ),
@@ -240,6 +238,18 @@
                         alert("Save failed: " + e);
                     }
                 });
+
+            // Helper for auto-formatting price input
+            document.getElementById("packPrice").addEventListener("input", function (e) {
+                // Remove all non-digit characters
+                let value = this.value.replace(/\D/g, "");
+                if (value) {
+                    // Format with dots
+                    this.value = new Intl.NumberFormat("vi-VN").format(parseInt(value));
+                } else {
+                    this.value = "";
+                }
+            });
 
             // ============================
             // RESET

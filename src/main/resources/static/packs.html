@@ -557,6 +557,9 @@
     const subscriptionId = urlParams.get("subscriptionId");
 
     function moneyVND(n) {
+        if (typeof n === 'string') {
+            n = n.replace(/\./g, '');
+        }
         return new Intl.NumberFormat("vi-VN").format(n) + " ₫";
     }
 

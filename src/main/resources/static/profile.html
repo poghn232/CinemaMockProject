@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MovieZone | User Profile</title>
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <script>
         if (!localStorage.getItem('token')) {
@@ -316,6 +316,7 @@
                 opacity: 0;
                 transform: translateY(10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -761,44 +762,51 @@
         }
 
         .achievement-card {
-            background: rgba(255,255,255,0.04);
+            background: rgba(255, 255, 255, 0.04);
             border-radius: 14px;
-            border: 1px solid rgba(148,163,184,0.12);
+            border: 1px solid rgba(148, 163, 184, 0.12);
             padding: 20px 16px;
             text-align: center;
             transition: transform 0.2s, box-shadow 0.2s;
             position: relative;
             overflow: hidden;
         }
+
         .achievement-card:not(.locked):hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 28px rgba(249,115,22,0.2);
+            box-shadow: 0 12px 28px rgba(249, 115, 22, 0.2);
         }
+
         .achievement-card.locked {
             opacity: 0.45;
             filter: grayscale(0.6);
         }
+
         .achievement-icon {
             font-size: 40px;
             display: block;
             margin-bottom: 10px;
         }
+
         .achievement-name {
             font-weight: 700;
             font-size: 13px;
             margin-bottom: 4px;
             color: #f1f5f9;
         }
+
         .achievement-desc {
             font-size: 11px;
             color: #9ca3af;
             line-height: 1.4;
             margin-bottom: 8px;
         }
+
         .achievement-date {
             font-size: 10px;
             color: #6b7280;
         }
+
         .rarity-badge {
             position: absolute;
             top: 8px;
@@ -810,35 +818,55 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
-        .rarity-COMMON   { background: rgba(107,114,128,0.3);  color: #9ca3af; }
-        .rarity-RARE     { background: rgba(59,130,246,0.3);   color: #93c5fd; }
-        .rarity-EPIC     { background: rgba(139,92,246,0.3);   color: #c4b5fd; }
-        .rarity-LEGENDARY{ background: rgba(249,115,22,0.3);   color: #fdba74; }
+
+        .rarity-COMMON {
+            background: rgba(107, 114, 128, 0.3);
+            color: #9ca3af;
+        }
+
+        .rarity-RARE {
+            background: rgba(59, 130, 246, 0.3);
+            color: #93c5fd;
+        }
+
+        .rarity-EPIC {
+            background: rgba(139, 92, 246, 0.3);
+            color: #c4b5fd;
+        }
+
+        .rarity-LEGENDARY {
+            background: rgba(249, 115, 22, 0.3);
+            color: #fdba74;
+        }
 
         .achievement-card:not(.locked).rarity-LEGENDARY {
-            border-color: rgba(249,115,22,0.4);
-            background: rgba(249,115,22,0.06);
+            border-color: rgba(249, 115, 22, 0.4);
+            background: rgba(249, 115, 22, 0.06);
         }
+
         .achievement-card:not(.locked).rarity-EPIC {
-            border-color: rgba(139,92,246,0.3);
+            border-color: rgba(139, 92, 246, 0.3);
         }
+
         .achievement-card:not(.locked).rarity-RARE {
-            border-color: rgba(59,130,246,0.25);
+            border-color: rgba(59, 130, 246, 0.25);
         }
 
         .stat-chip {
             padding: 10px 18px;
             border-radius: 12px;
-            background: rgba(15,23,42,0.8);
-            border: 1px solid rgba(148,163,184,0.15);
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.15);
             text-align: center;
         }
+
         .stat-chip .val {
             font-size: 24px;
             font-weight: 700;
             color: #f97316;
             display: block;
         }
+
         .stat-chip .lbl {
             font-size: 11px;
             color: #9ca3af;
@@ -847,8 +875,8 @@
         /* ── Streak UI ─────────────────────────────────────────── */
         .streak-hero {
             background: linear-gradient(135deg,
-            rgba(249,115,22,0.12), rgba(236,72,153,0.08));
-            border: 1px solid rgba(249,115,22,0.25);
+                    rgba(249, 115, 22, 0.12), rgba(236, 72, 153, 0.08));
+            border: 1px solid rgba(249, 115, 22, 0.25);
             border-radius: 18px;
             padding: 28px 24px;
             display: flex;
@@ -857,17 +885,30 @@
             margin-bottom: 28px;
             flex-wrap: wrap;
         }
+
         .streak-fire {
             font-size: 64px;
             line-height: 1;
-            filter: drop-shadow(0 0 20px rgba(249,115,22,0.6));
+            filter: drop-shadow(0 0 20px rgba(249, 115, 22, 0.6));
             animation: pulse-fire 2s ease infinite;
         }
+
         @keyframes pulse-fire {
-            0%,100% { transform: scale(1); }
-            50%      { transform: scale(1.08); }
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.08);
+            }
         }
-        .streak-main-info { flex: 1; }
+
+        .streak-main-info {
+            flex: 1;
+        }
+
         .streak-number {
             font-size: 56px;
             font-weight: 800;
@@ -877,62 +918,74 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+
         .streak-label {
             font-size: 14px;
             color: #9ca3af;
             margin-top: 4px;
         }
+
         .streak-stats-row {
             display: flex;
             gap: 12px;
             margin-top: 12px;
             flex-wrap: wrap;
         }
+
         .streak-stat-pill {
             padding: 6px 14px;
             border-radius: 999px;
-            background: rgba(15,23,42,0.7);
-            border: 1px solid rgba(148,163,184,0.15);
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(148, 163, 184, 0.15);
             font-size: 12px;
             color: #e2e8f0;
             display: flex;
             align-items: center;
             gap: 6px;
         }
-        .streak-stat-pill strong { color: #f97316; }
+
+        .streak-stat-pill strong {
+            color: #f97316;
+        }
 
         /* Calendar heatmap */
         .streak-calendar-wrap {
             margin-bottom: 28px;
         }
+
         .streak-calendar-title {
             font-size: 14px;
             font-weight: 600;
             color: #e2e8f0;
             margin-bottom: 12px;
         }
+
         .streak-calendar {
             display: flex;
             gap: 4px;
             flex-wrap: wrap;
         }
+
         .streak-day {
             width: 24px;
             height: 24px;
             border-radius: 5px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(148,163,184,0.08);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(148, 163, 184, 0.08);
             title: '';
             position: relative;
             cursor: default;
         }
+
         .streak-day.today {
-            border-color: rgba(249,115,22,0.6);
+            border-color: rgba(249, 115, 22, 0.6);
         }
+
         .streak-day.logged {
-            background: rgba(249,115,22,0.75);
-            border-color: rgba(249,115,22,0.9);
+            background: rgba(249, 115, 22, 0.75);
+            border-color: rgba(249, 115, 22, 0.9);
         }
+
         .streak-day-label {
             font-size: 10px;
             color: #6b7280;
@@ -949,882 +1002,890 @@
             gap: 10px;
             margin-bottom: 28px;
         }
+
         .milestone-item {
             display: flex;
             align-items: center;
             gap: 14px;
             padding: 12px 16px;
             border-radius: 12px;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(148,163,184,0.08);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(148, 163, 184, 0.08);
             transition: border-color 0.2s;
         }
+
         .milestone-item.reached {
-            background: rgba(249,115,22,0.07);
-            border-color: rgba(249,115,22,0.25);
+            background: rgba(249, 115, 22, 0.07);
+            border-color: rgba(249, 115, 22, 0.25);
         }
-        .milestone-icon { font-size: 24px; width: 32px; text-align: center; }
-        .milestone-info { flex: 1; }
-        .milestone-name { font-weight: 600; font-size: 13px; }
-        .milestone-sub  { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+
+        .milestone-icon {
+            font-size: 24px;
+            width: 32px;
+            text-align: center;
+        }
+
+        .milestone-info {
+            flex: 1;
+        }
+
+        .milestone-name {
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .milestone-sub {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 2px;
+        }
+
         .milestone-progress {
             font-size: 12px;
             color: #f97316;
             font-weight: 700;
             white-space: nowrap;
         }
-        .milestone-check { font-size: 20px; }
+
+        .milestone-check {
+            font-size: 20px;
+        }
     </style>
 </head>
 
 <body>
-<div id="toastNotification" class="toast">
-    <i id="toastIcon" class="fas fa-check-circle"></i> <span
-        id="toastMessage">Success!</span>
-</div>
-
-<header class="navbar">
-    <div class="nav-left">
-        <div class="nav-logo">MZ</div>
-        <div class="nav-title">
-            <span class="nav-title-main">MOVIEZONE</span>
-            <span class="nav-title-sub" data-i18n="hero.subtitle">Find
-                        movies, series &amp;
-                        more</span>
-        </div>
+    <div id="toastNotification" class="toast">
+        <i id="toastIcon" class="fas fa-check-circle"></i> <span id="toastMessage">Success!</span>
     </div>
-    <nav class="nav-center">
-        <a href="homepage.html" class="nav-link"
-           data-i18n="nav.home">Home</a>
-        <button class="nav-link active" data-nav="profile"
-                data-i18n="nav.profile"
-                disabled>Profile
-        </button>
-        <a
-                href="contact.html"
-                class="nav-link nav-link-contact"
-                id="contactButton"
-                data-i18n="nav.contact">
-            Contact
-        </a>
-        <div class="lang-dropdown">
-            <button class="lang-current" id="langCurrent">
-                <img id="langFlag" src="https://flagcdn.com/w40/gb.png">
+
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="nav-logo">MZ</div>
+            <div class="nav-title">
+                <span class="nav-title-main">MOVIEZONE</span>
+                <span class="nav-title-sub" data-i18n="hero.subtitle">Find
+                    movies, series &amp;
+                    more</span>
+            </div>
+        </div>
+        <nav class="nav-center">
+            <a href="homepage.html" class="nav-link" data-i18n="nav.home">Home</a>
+            <button class="nav-link active" data-nav="profile" data-i18n="nav.profile" disabled>Profile
             </button>
+            <a href="contact.html" class="nav-link nav-link-contact" id="contactButton" data-i18n="nav.contact">
+                Contact
+            </a>
+            <div class="lang-dropdown">
+                <button class="lang-current" id="langCurrent">
+                    <img id="langFlag" src="https://flagcdn.com/w40/gb.png">
+                </button>
 
-            <div class="lang-menu" id="langMenu">
-                <div class="lang-item" onclick="changeLanguage('vi')">
-                    <img src="https://flagcdn.com/w40/vn.png">
-                    <span>Tiếng Việt</span>
-                </div>
+                <div class="lang-menu" id="langMenu">
+                    <div class="lang-item" onclick="changeLanguage('vi')">
+                        <img src="https://flagcdn.com/w40/vn.png">
+                        <span>Tiếng Việt</span>
+                    </div>
 
-                <div class="lang-item" onclick="changeLanguage('en')">
-                    <img src="https://flagcdn.com/w40/gb.png">
-                    <span>English</span>
-                </div>
-                <div class="lang-item" onclick="changeLanguage('my')">
-                    <img src="https://flagcdn.com/w40/mm.png">
-                    <span>မြန်မာဘာသာ</span>
-                </div>
+                    <div class="lang-item" onclick="changeLanguage('en')">
+                        <img src="https://flagcdn.com/w40/gb.png">
+                        <span>English</span>
+                    </div>
+                    <div class="lang-item" onclick="changeLanguage('my')">
+                        <img src="https://flagcdn.com/w40/mm.png">
+                        <span>မြန်မာဘာသာ</span>
+                    </div>
 
-                <div class="lang-item" onclick="changeLanguage('ja')">
-                    <img src="https://flagcdn.com/w40/jp.png">
-                    <span>日本語</span>
-                </div>
+                    <div class="lang-item" onclick="changeLanguage('ja')">
+                        <img src="https://flagcdn.com/w40/jp.png">
+                        <span>日本語</span>
+                    </div>
 
-                <div class="lang-item" onclick="changeLanguage('de')">
-                    <img src="https://flagcdn.com/w40/de.png">
-                    <span>Deutsch</span>
-                </div>
-            </div>
-        </div>
-        <div id="notifBellMount"></div>
-        <button class="nav-link nav-link-logout" id="logoutButton"
-                data-i18n="nav.logout"
-                type="button">Logout
-        </button>
-    </nav>
-    <div class="nav-right">
-                <span class="nav-username" id="navUsername"
-                >Loading...</span>
-    </div>
-</header>
-
-<div class="profile-banner">
-    <div class="banner-container">
-        <div class="user-info">
-            <h2 id="bannerName"
-            >Loading...</h2>
-            <p id="bannerRole">Loading...</p>
-        </div>
-    </div>
-</div>
-
-<main class="main-container">
-    <aside class="sidebar">
-        <ul class="sidebar-menu">
-            <li class="sidebar-item active" data-target="section-info">
-                <i class="fas fa-user-circle"></i>
-                <span data-i18n="profile.user_information">User
-                            Information</span>
-            </li>
-            <li class="sidebar-item" data-target="section-history">
-                <i class="fas fa-history"></i>
-                <span data-i18n="profile.history">History</span>
-            </li>
-            <li class="sidebar-item" data-target="section-subscription">
-                <i class="fas fa-credit-card"></i>
-                <span
-                        data-i18n="profile.subscriptions">Subscriptions</span>
-            </li>
-            <li class="sidebar-item" data-target="section-wishlist">
-                <i class="fas fa-heart"></i>
-                <span data-i18n="profile.wishlist_title">My Wishlist</span>
-            </li>
-            <li class="sidebar-item" data-target="section-streak">
-                <i class="fas fa-fire"></i>
-                <span data-i18n="profile_extra.sidebar.streak">Login Streak</span>
-            </li>
-            <li class="sidebar-item" data-target="section-achievements">
-                <i class="fas fa-trophy"></i>
-                <span data-i18n="profile_extra.sidebar.achievements">Achievements</span>
-            </li>
-            <li class="sidebar-item" data-target="section-password">
-                <i class="fas fa-lock"></i>
-                <span data-i18n="profile.change_password">Change
-                            password</span>
-            </li>
-        </ul>
-        <button class="btn btn-logout-full"><i
-                class="fas fa-sign-out-alt"></i>
-            <span data-i18n="nav.logout">Log out</span>
-        </button>
-    </aside>
-
-    <div class="content-area">
-
-        <section id="section-info" class="content-section active">
-            <h3 data-i18n="profile.user_information">User
-                Information</h3>
-            <form id="profileForm">
-                <div class="form-group" style="max-width: 600px;">
-                    <label data-i18n="profile.username">Username</label>
-                    <input type="text" id="inputUsername" required
-                           title="You can edit your username">
-                </div>
-                <div class="form-group" style="max-width: 600px;">
-                    <label data-i18n="profile.email">Email</label>
-                    <input type="email" id="inputEmail" readonly
-                           title="Email cannot be changed">
-                </div>
-                <div class="form-group" style="max-width: 600px;">
-                    <label data-i18n="profile.role">Role</label>
-                    <input type="text" id="inputRole" readonly
-                           title="Role cannot be changed">
-                </div>
-                <div class="form-actions"
-                     style="max-width: 600px; justify-content: flex-start;">
-                    <button type="submit" class="btn btn-save"
-                            id="saveProfileBtn"
-                            data-i18n="profile.save_changes">Save changes
-                    </button>
-                </div>
-            </form>
-        </section>
-
-        <!-- History Tab -->
-        <section id="section-history" class="content-section">
-            <h3 data-i18n="profile.history_title">Watch History</h3>
-            <div id="historyContainer" class="history-grid"></div>
-        </section>
-
-        <section id="section-subscription" class="content-section">
-            <h3 data-i18n="profile.my_subscriptions">My
-                Subscriptions</h3>
-            <div id="subscriptionContainer">
-            </div>
-        </section>
-
-        <section id="section-wishlist" class="content-section">
-            <h3 data-i18n="profile.wishlist_title">My Wishlist</h3>
-            <div id="wishlistContainer" class="history-grid"></div>
-        </section>
-        <section id="section-streak" class="content-section">
-            <h3>🔥 <span data-i18n="profile_extra.sidebar.streak"></span></h3>
-
-            <!-- Hero card -->
-            <div class="streak-hero" id="streakHero">
-                <div class="streak-fire">🔥</div>
-                <div class="streak-main-info">
-                    <div class="streak-number" id="streakCurrentNum">--</div>
-                    <div class="streak-label" data-i18n="profile_extra.streak.day_streak">Day streak</div>
-                    <div class="streak-stats-row">
-                        <div class="streak-stat-pill">
-                            🏆 <span data-i18n="profile_extra.streak.best"></span>:
-                            <strong id="streakBest">--</strong> days
-                        </div>
-                        <div class="streak-stat-pill">
-                            📅 <span data-i18n="profile_extra.streak.total_logins"></span>: <strong id="streakTotal">--</strong> days
-                        </div>
-                        <div class="streak-stat-pill" id="streakLastPill">
-                            🕐 <span data-i18n="profile_extra.streak.last"></span>: <strong id="streakLast">--</strong>
-                        </div>
+                    <div class="lang-item" onclick="changeLanguage('de')">
+                        <img src="https://flagcdn.com/w40/de.png">
+                        <span>Deutsch</span>
                     </div>
                 </div>
             </div>
+            <div id="notifBellMount"></div>
+            <button class="nav-link nav-link-logout" id="logoutButton" data-i18n="nav.logout" type="button">Logout
+            </button>
+        </nav>
+        <div class="nav-right">
+            <span class="nav-username" id="navUsername">Loading...</span>
+        </div>
+    </header>
 
-            <!-- 30-day calendar -->
-            <div class="streak-calendar-wrap">
-                <div class="streak-calendar-title" data-i18n="profile_extra.streak.last_30_days">Last 30 days</div>
-                <div class="streak-calendar" id="streakCalendar"></div>
+    <div class="profile-banner">
+        <div class="banner-container">
+            <div class="user-info">
+                <h2 id="bannerName">Loading...</h2>
+                <p id="bannerRole">Loading...</p>
             </div>
+        </div>
+    </div>
 
-            <!-- Milestones -->
-            <div class="streak-calendar-title" style="margin-bottom:12px;">
-                🎯 <span data-i18n="profile_extra.streak.milestones"></span>
-            </div>
-            <div class="milestone-list" id="milestonesContainer"></div>
-        </section>
+    <main class="main-container">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li class="sidebar-item active" data-target="section-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span data-i18n="profile.user_information">User
+                        Information</span>
+                </li>
+                <li class="sidebar-item" data-target="section-history">
+                    <i class="fas fa-history"></i>
+                    <span data-i18n="profile.history">History</span>
+                </li>
+                <li class="sidebar-item" data-target="section-subscription">
+                    <i class="fas fa-credit-card"></i>
+                    <span data-i18n="profile.subscriptions">Subscriptions</span>
+                </li>
+                <li class="sidebar-item" data-target="section-wishlist">
+                    <i class="fas fa-heart"></i>
+                    <span data-i18n="profile.wishlist_title">My Wishlist</span>
+                </li>
+                <li class="sidebar-item" data-target="section-streak">
+                    <i class="fas fa-fire"></i>
+                    <span data-i18n="profile_extra.sidebar.streak">Login Streak</span>
+                </li>
+                <li class="sidebar-item" data-target="section-achievements">
+                    <i class="fas fa-trophy"></i>
+                    <span data-i18n="profile_extra.sidebar.achievements">Achievements</span>
+                </li>
+                <li class="sidebar-item" data-target="section-password">
+                    <i class="fas fa-lock"></i>
+                    <span data-i18n="profile.change_password">Change
+                        password</span>
+                </li>
+            </ul>
+            <button class="btn btn-logout-full"><i class="fas fa-sign-out-alt"></i>
+                <span data-i18n="nav.logout">Log out</span>
+            </button>
+        </aside>
 
-        <section id="section-achievements" class="content-section">
-            <h3>🏆 <span data-i18n="profile_extra.achievement.title">🏆 Achievements</span></h3>
-            <div id="achievementStats" style="
+        <div class="content-area">
+
+            <section id="section-info" class="content-section active">
+                <h3 data-i18n="profile.user_information">User
+                    Information</h3>
+                <form id="profileForm">
+                    <div class="form-group" style="max-width: 600px;">
+                        <label data-i18n="profile.username">Username</label>
+                        <input type="text" id="inputUsername" required title="You can edit your username">
+                    </div>
+                    <div class="form-group" style="max-width: 600px;">
+                        <label data-i18n="profile.email">Email</label>
+                        <input type="email" id="inputEmail" readonly title="Email cannot be changed">
+                    </div>
+                    <div class="form-group" style="max-width: 600px;">
+                        <label data-i18n="profile.role">Role</label>
+                        <input type="text" id="inputRole" readonly title="Role cannot be changed">
+                    </div>
+                    <div class="form-actions" style="max-width: 600px; justify-content: flex-start;">
+                        <button type="submit" class="btn btn-save" id="saveProfileBtn"
+                            data-i18n="profile.save_changes">Save changes
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- History Tab -->
+            <section id="section-history" class="content-section">
+                <h3 data-i18n="profile.history_title">Watch History</h3>
+                <div id="historyContainer" class="history-grid"></div>
+            </section>
+
+            <section id="section-subscription" class="content-section">
+                <h3 data-i18n="profile.my_subscriptions">My
+                    Subscriptions</h3>
+                <div id="subscriptionContainer">
+                </div>
+            </section>
+
+            <section id="section-wishlist" class="content-section">
+                <h3 data-i18n="profile.wishlist_title">My Wishlist</h3>
+                <div id="wishlistContainer" class="history-grid"></div>
+            </section>
+            <section id="section-streak" class="content-section">
+                <h3>🔥 <span data-i18n="profile_extra.sidebar.streak"></span></h3>
+
+                <!-- Hero card -->
+                <div class="streak-hero" id="streakHero">
+                    <div class="streak-fire">🔥</div>
+                    <div class="streak-main-info">
+                        <div class="streak-number" id="streakCurrentNum">--</div>
+                        <div class="streak-label" data-i18n="profile_extra.streak.day_streak">Day streak</div>
+                        <div class="streak-stats-row">
+                            <div class="streak-stat-pill">
+                                🏆 <span data-i18n="profile_extra.streak.best"></span>:
+                                <strong id="streakBest">--</strong> days
+                            </div>
+                            <div class="streak-stat-pill">
+                                📅 <span data-i18n="profile_extra.streak.total_logins"></span>: <strong
+                                    id="streakTotal">--</strong> days
+                            </div>
+                            <div class="streak-stat-pill" id="streakLastPill">
+                                🕐 <span data-i18n="profile_extra.streak.last"></span>: <strong
+                                    id="streakLast">--</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 30-day calendar -->
+                <div class="streak-calendar-wrap">
+                    <div class="streak-calendar-title" data-i18n="profile_extra.streak.last_30_days">Last 30 days</div>
+                    <div class="streak-calendar" id="streakCalendar"></div>
+                </div>
+
+                <!-- Milestones -->
+                <div class="streak-calendar-title" style="margin-bottom:12px;">
+                    🎯 <span data-i18n="profile_extra.streak.milestones"></span>
+                </div>
+                <div class="milestone-list" id="milestonesContainer"></div>
+            </section>
+
+            <section id="section-achievements" class="content-section">
+                <h3>🏆 <span data-i18n="profile_extra.achievement.title">🏆 Achievements</span></h3>
+                <div id="achievementStats" style="
         display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;
     "></div>
-            <h4 >✅ <span style="margin-bottom: 12px; color: #f97316;" data-i18n="profile_extra.achievement.earned"></span></h4>
-            <div id="earnedGrid" class="history-grid"></div>
-            <h4>🔒 <span style="margin: 24px 0 12px; color: #6b7280;" data-i18n="profile_extra.achievement.locked"></span></h4>
-            <div id="lockedGrid" class="history-grid"></div>
-        </section>
+                <h4>✅ <span style="margin-bottom: 12px; color: #f97316;"
+                        data-i18n="profile_extra.achievement.earned"></span></h4>
+                <div id="earnedGrid" class="history-grid"></div>
+                <h4>🔒 <span style="margin: 24px 0 12px; color: #6b7280;"
+                        data-i18n="profile_extra.achievement.locked"></span></h4>
+                <div id="lockedGrid" class="history-grid"></div>
+            </section>
 
-        <section id="section-password" class="content-section">
-            <h3 data-i18n="profile.change_password">Change password</h3>
-            <form id="passwordForm">
-                <div class="form-group">
-                    <label data-i18n="profile.current_password">Current
-                        password</label>
-                    <input type="password" id="oldPassword"
-                           data-i18n-placeholder="profile.current_password"
-                           placeholder="Enter current password" required>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="profile.new_password">New
-                        password</label>
-                    <input type="password" id="newPassword"
-                           data-i18n-placeholder="auth.enter_new_password"
-                           placeholder="Enter new password" minlength="6"
-                           required>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="profile.confirm_password">Confirm
-                        new password</label>
-                    <input type="password" id="confirmPassword"
-                           data-i18n-placeholder="profile.confirm_password"
-                           placeholder="Confirm new password" minlength="6"
-                           required>
-                </div>
-                <div class="form-actions" style="margin-top: 30px;">
-                    <button type="submit" class="btn btn-save"
-                            data-i18n="profile.update_password"
+            <section id="section-password" class="content-section">
+                <h3 data-i18n="profile.change_password">Change password</h3>
+                <form id="passwordForm">
+                    <div class="form-group">
+                        <label data-i18n="profile.current_password">Current
+                            password</label>
+                        <input type="password" id="oldPassword" data-i18n-placeholder="profile.current_password"
+                            placeholder="Enter current password" required>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="profile.new_password">New
+                            password</label>
+                        <input type="password" id="newPassword" data-i18n-placeholder="auth.enter_new_password"
+                            placeholder="Enter new password" minlength="6" required>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="profile.confirm_password">Confirm
+                            new password</label>
+                        <input type="password" id="confirmPassword" data-i18n-placeholder="profile.confirm_password"
+                            placeholder="Confirm new password" minlength="6" required>
+                    </div>
+                    <div class="form-actions" style="margin-top: 30px;">
+                        <button type="submit" class="btn btn-save" data-i18n="profile.update_password"
                             id="updatePassBtn">Update password
-                    </button>
-                </div>
-            </form>
-        </section>
-    </div>
-</main>
-<script src="/js/notification-bell.js"></script>
-<script src="/js/i18n.js"></script>
-<footer class="site-footer">
-    <div class="footer-inner">
-        <div class="footer-brand">
-            <div class="footer-logo">MZ</div>
-            <span class="footer-title">MOVIEZONE</span>
+                        </button>
+                    </div>
+                </form>
+            </section>
         </div>
-        <div class="footer-links">
-            <a href="homepage.html" data-i18n="nav.home">Home</a>
-            <a href="packs.html" data-i18n="nav.premium_plan">Premium Plan</a>
-            <a href="contact.html" data-i18n="nav.contact">Contact</a>
+    </main>
+    <script src="/js/notification-bell.js"></script>
+    <script src="/js/i18n.js"></script>
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <div class="footer-logo">MZ</div>
+                <span class="footer-title">MOVIEZONE</span>
+            </div>
+            <div class="footer-links">
+                <a href="homepage.html" data-i18n="nav.home">Home</a>
+                <a href="packs.html" data-i18n="nav.premium_plan">Premium Plan</a>
+                <a href="contact.html" data-i18n="nav.contact">Contact</a>
+            </div>
         </div>
-    </div>
-    <div class="footer-bottom">
-        <span data-i18n="footer.bottom">© 2025 MovieZone. Demo Project</span>
-    </div>
-</footer>
-<script src="js/bannerads.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
+        <div class="footer-bottom">
+            <span data-i18n="footer.bottom">© 2025 MovieZone. Demo Project</span>
+        </div>
+    </footer>
+    <script src="js/bannerads.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
 
-        // --- CẤU HÌNH API ---
-        const API_URL = '/api/user';
+            // --- CẤU HÌNH API ---
+            const API_URL = '/api/user';
 
-        const getToken = () => localStorage.getItem('token') || '';
+            const getToken = () => localStorage.getItem('token') || '';
 
-        // ==========================================
-        // 1. KIỂM TRA THỜI HẠN TOKEN LIÊN TỤC
-        // ==========================================
-        function checkTokenExpiration() {
-            const token = getToken();
-            if (!token) {
-                window.location.replace('login.html');
-                return;
-            }
-            try {
-                // Giải mã JWT để lấy thời gian hết hạn (payload.exp)
-                const payload = JSON.parse(atob(token.split('.')[1]));
-                const expTime = payload.exp * 1000;
+            // ==========================================
+            // 1. KIỂM TRA THỜI HẠN TOKEN LIÊN TỤC
+            // ==========================================
+            function checkTokenExpiration() {
+                const token = getToken();
+                if (!token) {
+                    window.location.replace('login.html');
+                    return;
+                }
+                try {
+                    // Giải mã JWT để lấy thời gian hết hạn (payload.exp)
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    const expTime = payload.exp * 1000;
 
-                if (Date.now() >= expTime) {
-                    alert(t("auth.session_expired"));
+                    if (Date.now() >= expTime) {
+                        alert(t("auth.session_expired"));
+                        localStorage.removeItem('token');
+                        window.location.replace('login.html');
+                    }
+                } catch (e) {
                     localStorage.removeItem('token');
                     window.location.replace('login.html');
                 }
-            } catch (e) {
-                localStorage.removeItem('token');
-                window.location.replace('login.html');
             }
-        }
 
-        // Chạy ngay khi tải trang và lặp lại mỗi 60 giây (60000ms)
-        checkTokenExpiration();
-        setInterval(checkTokenExpiration, 60000);
+            // Chạy ngay khi tải trang và lặp lại mỗi 60 giây (60000ms)
+            checkTokenExpiration();
+            setInterval(checkTokenExpiration, 60000);
 
-        // Header đính kèm token để gọi API
-        const getAuthHeaders = () => {
-            return {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${getToken()}`
+            // Header đính kèm token để gọi API
+            const getAuthHeaders = () => {
+                return {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${getToken()}`
+                };
             };
-        };
 
-        // --- HÀM TOAST THÔNG BÁO ---
-        function showToast(message, isError = false) {
-            const toast = document.getElementById('toastNotification');
-            const msgEl = document.getElementById('toastMessage');
-            const icon = document.getElementById('toastIcon');
+            // --- HÀM TOAST THÔNG BÁO ---
+            function showToast(message, isError = false) {
+                const toast = document.getElementById('toastNotification');
+                const msgEl = document.getElementById('toastMessage');
+                const icon = document.getElementById('toastIcon');
 
-            msgEl.textContent = message;
+                msgEl.textContent = message;
 
-            if (isError) {
-                toast.classList.add('error');
-                icon.className = 'fas fa-exclamation-circle';
-            } else {
-                toast.classList.remove('error');
-                icon.className = 'fas fa-check-circle';
+                if (isError) {
+                    toast.classList.add('error');
+                    icon.className = 'fas fa-exclamation-circle';
+                } else {
+                    toast.classList.remove('error');
+                    icon.className = 'fas fa-check-circle';
+                }
+
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
             }
 
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        }
-
-        // --- LẤY DỮ LIỆU TỪ MYSQL (KHÔNG CÒN MOCK DATA) ---
-        window.loadUserData = function () {
-            fetch(`${API_URL}/profile`, {
-                method: 'GET',
-                headers: getAuthHeaders()
-            })
-                .then(response => {
-                    if (response.status === 401 || response.status === 403) {
-                        localStorage.removeItem('token');
-                        window.location.replace('login.html');
-                        throw new Error("Login Expired");
-                    }
-                    if (!response.ok) throw new Error("Server connection error");
-                    return response.json();
+            // --- LẤY DỮ LIỆU TỪ MYSQL (KHÔNG CÒN MOCK DATA) ---
+            window.loadUserData = function () {
+                fetch(`${API_URL}/profile`, {
+                    method: 'GET',
+                    headers: getAuthHeaders()
                 })
-                .then(userData => {
-                    renderUserInfo(userData.username, userData.email, userData.role);
+                    .then(response => {
+                        if (response.status === 401 || response.status === 403) {
+                            localStorage.removeItem('token');
+                            window.location.replace('login.html');
+                            throw new Error("Login Expired");
+                        }
+                        if (!response.ok) throw new Error("Server connection error");
+                        return response.json();
+                    })
+                    .then(userData => {
+                        renderUserInfo(userData.username, userData.email, userData.role);
 
-                    if (userData.subscriptions && userData.subscriptions.length > 0) {
-                        renderSubscriptions(userData.subscriptions);
-                    } else {
-                        renderSubscriptions([]);
-                    }
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                    if (error.message !== "Login Expired") {
-                        showToast("Server Connection Fail. Please try again later!", true);
-                    }
-                });
-        }
+                        if (userData.subscriptions && userData.subscriptions.length > 0) {
+                            renderSubscriptions(userData.subscriptions);
+                        } else {
+                            renderSubscriptions([]);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        if (error.message !== "Login Expired") {
+                            showToast("Server Connection Fail. Please try again later!", true);
+                        }
+                    });
+            }
 
-        function renderUserInfo(username, email, role) {
-            const shortName = (typeof displayNameFor === 'function')
-                ? displayNameFor(username)
-                : (username && username.indexOf('@')>0 ? username.split('@')[0] : username);
-            document.getElementById('navUsername').textContent =
-                "👋 " + t("nav.hello_user", {name: shortName});
-            document.getElementById('bannerName').textContent = username;
-            document.getElementById('bannerRole').textContent = "Role: " + role;
-            document.getElementById('inputUsername').value = username;
-            document.getElementById('inputEmail').value = email;
-            document.getElementById('inputRole').value = role;
-        }
+            function renderUserInfo(username, email, role) {
+                const shortName = (typeof displayNameFor === 'function')
+                    ? displayNameFor(username)
+                    : (username && username.indexOf('@') > 0 ? username.split('@')[0] : username);
+                document.getElementById('navUsername').textContent =
+                    "👋 " + t("nav.hello_user", { name: shortName });
+                document.getElementById('bannerName').textContent = username;
+                document.getElementById('bannerRole').textContent = "Role: " + role;
+                document.getElementById('inputUsername').value = username;
+                document.getElementById('inputEmail').value = email;
+                document.getElementById('inputRole').value = role;
+            }
 
-        function renderSubscriptions(subs) {
-            const subContainer = document.getElementById('subscriptionContainer');
-            subContainer.innerHTML = '';
+            function renderSubscriptions(subs) {
+                const subContainer = document.getElementById('subscriptionContainer');
+                subContainer.innerHTML = '';
 
-            const successfulSubs = (subs || []).filter(sub => sub.status === 'ACTIVE');
+                const successfulSubs = (subs || []).filter(sub => sub.status === 'ACTIVE');
 
-            if (successfulSubs.length === 0) {
-                subContainer.innerHTML = `
+                if (successfulSubs.length === 0) {
+                    subContainer.innerHTML = `
                     <p style="color: var(--text-secondary);">
                           ${t("profile.subscription.empty")}
                      </p>
                 `;
-                return;
-            }
+                    return;
+                }
 
-            successfulSubs.forEach((sub) => {
-                let statusClass = sub.status ? sub.status.toLowerCase() : 'pending';
+                successfulSubs.forEach((sub) => {
+                    let statusClass = sub.status ? sub.status.toLowerCase() : 'pending';
 
-                let dateHtml = '';
-                if (sub.startDate && sub.endDate) {
-                    dateHtml = `
+                    let dateHtml = '';
+                    if (sub.startDate && sub.endDate) {
+                        dateHtml = `
                 <div class="sub-details">
                     <p><strong>${t("profile.start_date")}</strong> ${new Date(sub.startDate).toLocaleDateString()}</p>
                     <p><strong>${t("profile.end_date")}</strong> ${new Date(sub.endDate).toLocaleDateString()}</p>
                 </div>
             `;
-                }
+                    }
 
-                let price = (sub.pack && sub.pack.packPrice) ? sub.pack.packPrice : 0;
-                let packName = (sub.pack && sub.pack.packName) ? sub.pack.packName : 'Unknown Plan';
+                    let price = (sub.pack && sub.pack.packPrice) ? sub.pack.packPrice : 0;
+                    let packName = (sub.pack && sub.pack.packName) ? sub.pack.packName : 'Unknown Plan';
+                    let formattedPrice = "";
+                    if (price) {
+                        let cleanPrice = String(price).replace(/\./g, "");
+                        let n = parseFloat(cleanPrice);
+                        formattedPrice = isNaN(n) ? price : new Intl.NumberFormat("vi-VN").format(n);
+                    }
 
-                let actionsHtml = '';
-                if (sub.status === 'ACTIVE') {
-                    let packId = (sub.pack && sub.pack.packId) ? sub.pack.packId : null;
-                    actionsHtml = `
+                    let actionsHtml = '';
+                    if (sub.status === 'ACTIVE') {
+                        let packId = (sub.pack && sub.pack.packId) ? sub.pack.packId : null;
+                        actionsHtml = `
                 <div class="sub-actions">
                     <button class="btn btn-save" id="extendBtn_${sub.subId}" onclick="extendSubscription(${sub.subId}, ${packId}, '${packName.replace(/'/g, "\\'")}')"> 
                         ${t("profile.subscription.extend")}
                     </button>
                 </div>
             `;
-                }
+                    }
 
-                subContainer.innerHTML += `
+                    subContainer.innerHTML += `
             <div class="subscription-card premium">
                 <div class="sub-header">
                     <h4>Subscription Plan #${sub.subId} - ${packName}</h4>
                     <span class="badge ${statusClass}">${sub.status}</span>
                 </div>
                 <p class="sub-desc" style="font-weight: bold; color: #fff;">
-                    ${t("profile.price")} ${price.toLocaleString('vi-VN')}đ
+                    ${t("profile.price")} ${formattedPrice}đ
                 </p>
                 ${dateHtml}
                 ${actionsHtml}
             </div>
         `;
-            });
-        }
-
-        // ==========================================
-        // 2. XỬ LÝ THANH TOÁN (GỌI API TỚI BACKEND)
-        // ==========================================
-        window.handleSubAction = function (subId, action, event) {
-            const btn = event.target;
-            const originalText = btn.textContent;
-            let confirmMsg = action === 'CANCEL_REQ' ? 'Cancel this subscription request?' : 'Confirm payment for this plan?';
-
-            if (!confirm(confirmMsg)) return;
-
-            btn.textContent = t("common.processing");
-            btn.disabled = true;
-
-            fetch(`${API_URL}/subscription/${subId}/${action}`, {
-                method: 'POST',
-                headers: getAuthHeaders()
-            })
-                .then(async response => {
-                    if (response.status === 401 || response.status === 403) {
-                        localStorage.removeItem('token');
-                        window.location.replace('login.html');
-                        return;
-                    }
-                    const data = await response.json().catch(() => ({}));
-                    if (response.ok) {
-                        showToast(data.message || 'Operation successful!');
-                        loadUserData();
-                    } else {
-                        throw new Error(data.message || "An error occurred!");
-                    }
-                })
-                .catch(err => {
-                    showToast(err.message, true);
-                    btn.textContent = originalText;
-                    btn.disabled = false;
                 });
-        };
+            }
 
-        // Chạy lúc vào trang
-        loadUserData();
-
-        // --- 3. CÁC FORM TƯƠNG TÁC ---
-
-        // Đăng xuất
-        const logoutBtns = document.querySelectorAll('.logout-btn, .btn-logout-full, .nav-link-logout');
-        logoutBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                if (confirm(t("auth.logout_confirm"))) {
-                    localStorage.removeItem('token');
-                    window.location.replace('login.html');
-                }
-            });
-        });
-
-        // Update Profile
-        const profileForm = document.getElementById('profileForm');
-        if (profileForm) {
-            profileForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const newUsername = document.getElementById('inputUsername').value.trim();
-                const saveBtn = document.getElementById('saveProfileBtn');
-                const originalText = saveBtn.textContent;
-
-                saveBtn.textContent = "Processing...";
-                saveBtn.disabled = true;
-
-                fetch(`${API_URL}/profile`, {
-                    method: 'PUT',
-                    headers: getAuthHeaders(),
-                    body: JSON.stringify({username: newUsername})
-                })
-                    .then(async res => {
-                        if (res.status === 401 || res.status === 403) {
-                            localStorage.removeItem('token');
-                            window.location.replace('login.html');
-                            return;
-                        }
-                        const data = await res.json().catch(() => ({}));
-                        if (res.ok) {
-                            document.getElementById('navUsername').textContent =
-                                t("nav.hello_user", {name: newUsername});
-                            document.getElementById('bannerName').textContent = newUsername;
-                            showToast(data.message || t("profile.update_success"));
-                        } else {
-                            throw new Error(data.message || "Update failed!");
-                        }
-                    })
-                    .catch(err => {
-                        showToast(err.message, true);
-                    })
-                    .finally(() => {
-                        saveBtn.textContent = originalText;
-                        saveBtn.disabled = false;
-                    });
-            });
-        }
-
-        // Đổi Mật khẩu
-        // Đổi Mật khẩu
-        const passwordForm = document.getElementById('passwordForm');
-        if (passwordForm) {
-            passwordForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const oldPass = document.getElementById('oldPassword').value;
-                const newPass = document.getElementById('newPassword').value;
-                const confirmPass = document.getElementById('confirmPassword').value;
-
-                // THÊM ĐOẠN KIỂM TRA ĐỘ DÀI NÀY
-                if (newPass.length < 6) {
-                    showToast(t("auth.password_min"), true);
-                    return;
-
-                }
-                if (newPass !== confirmPass) {
-                    showToast(t("auth.password_not_match"), true);
-                    return;
-                }
-
-                const btn = document.getElementById('updatePassBtn');
+            // ==========================================
+            // 2. XỬ LÝ THANH TOÁN (GỌI API TỚI BACKEND)
+            // ==========================================
+            window.handleSubAction = function (subId, action, event) {
+                const btn = event.target;
                 const originalText = btn.textContent;
-                btn.textContent = "Đang xử lý...";
+                let confirmMsg = action === 'CANCEL_REQ' ? 'Cancel this subscription request?' : 'Confirm payment for this plan?';
+
+                if (!confirm(confirmMsg)) return;
+
+                btn.textContent = t("common.processing");
                 btn.disabled = true;
 
-                fetch(`${API_URL}/password`, {
-                    method: 'PUT',
-                    headers: getAuthHeaders(),
-                    body: JSON.stringify({
-                        oldPassword: oldPass,
-                        newPassword: newPass
-                    })
+                fetch(`${API_URL}/subscription/${subId}/${action}`, {
+                    method: 'POST',
+                    headers: getAuthHeaders()
                 })
-                    .then(async res => {
-                        if (res.status === 401 || res.status === 403) {
+                    .then(async response => {
+                        if (response.status === 401 || response.status === 403) {
                             localStorage.removeItem('token');
                             window.location.replace('login.html');
                             return;
                         }
-                        const data = await res.json().catch(() => ({}));
-                        if (res.ok) {
-                            showToast(data.message || 'Password changed successfully!');
-                            passwordForm.reset();
+                        const data = await response.json().catch(() => ({}));
+                        if (response.ok) {
+                            showToast(data.message || 'Operation successful!');
+                            loadUserData();
                         } else {
-                            throw new Error(data.message || "Current password is incorrect!");
+                            throw new Error(data.message || "An error occurred!");
                         }
                     })
                     .catch(err => {
                         showToast(err.message, true);
-                    })
-                    .finally(() => {
                         btn.textContent = originalText;
                         btn.disabled = false;
                     });
-            });
-        }
+            };
 
-        // Chuyển Tab Sidebar
-        const sidebarItems = document.querySelectorAll('.sidebar-item');
-        // Nếu URL có hash → mở tab tương ứng
-        const hash = location.hash.replace('#', '');
-        if (hash === 'achievements') {
-            switchTab('section-achievements');
-        } else if (hash) {
-            // Map hash khác nếu muốn
-            switchTab('section-' + hash);
-        } else {
-            switchTab('section-info'); // mặc định
-        }
+            // Chạy lúc vào trang
+            loadUserData();
 
-        // Khi click sidebar
-        sidebarItems.forEach(item => {
-            item.addEventListener('click', function () {
-                const targetId = this.getAttribute('data-target');
-                history.pushState(null, '', `#${targetId.replace('section-', '')}`);
-                switchTab(targetId);
-            });
-        });
+            // --- 3. CÁC FORM TƯƠNG TÁC ---
 
-        // Nếu user dùng back/forward browser
-        window.addEventListener('hashchange', () => {
-            const newHash = location.hash.replace('#', '');
-            switchTab('section-' + newHash);
-        });
-
-        const contentSections = document.querySelectorAll('.content-section');
-
-        sidebarItems.forEach(item => {
-            item.addEventListener('click', function () {
-
-                sidebarItems.forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-
-                contentSections.forEach(section => section.classList.remove('active'));
-
-                const targetId = this.getAttribute('data-target');
-                const targetSection = document.getElementById(targetId);
-
-                if (targetSection) {
-                    targetSection.classList.add('active');
-                }
-
-                // ⭐ LOAD HISTORY WHEN HISTORY TAB OPEN
-                if (targetId === 'section-history') {
-                    loadHistory();
-                }
-
-                if (targetId === 'section-wishlist') {
-                    loadWishlist();
-                }
-
-                if (targetId === 'section-achievements') {
-                    loadAchievements();
-                }
-                if (targetId === 'section-streak') {
-                    loadStreak();
-                }
-
-            });
-        });
-
-        // Navbar Links
-        const navLinks = document.querySelectorAll('.nav-link');
-        navLinks.forEach(link => {
-            if (link.textContent.trim().toUpperCase() === 'HOME') {
-                link.addEventListener('click', (e) => {
+            // Đăng xuất
+            const logoutBtns = document.querySelectorAll('.logout-btn, .btn-logout-full, .nav-link-logout');
+            logoutBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
                     e.preventDefault();
-                    window.location.href = 'homepage.html';
+                    if (confirm(t("auth.logout_confirm"))) {
+                        localStorage.removeItem('token');
+                        window.location.replace('login.html');
+                    }
+                });
+            });
+
+            // Update Profile
+            const profileForm = document.getElementById('profileForm');
+            if (profileForm) {
+                profileForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const newUsername = document.getElementById('inputUsername').value.trim();
+                    const saveBtn = document.getElementById('saveProfileBtn');
+                    const originalText = saveBtn.textContent;
+
+                    saveBtn.textContent = "Processing...";
+                    saveBtn.disabled = true;
+
+                    fetch(`${API_URL}/profile`, {
+                        method: 'PUT',
+                        headers: getAuthHeaders(),
+                        body: JSON.stringify({ username: newUsername })
+                    })
+                        .then(async res => {
+                            if (res.status === 401 || res.status === 403) {
+                                localStorage.removeItem('token');
+                                window.location.replace('login.html');
+                                return;
+                            }
+                            const data = await res.json().catch(() => ({}));
+                            if (res.ok) {
+                                document.getElementById('navUsername').textContent =
+                                    t("nav.hello_user", { name: newUsername });
+                                document.getElementById('bannerName').textContent = newUsername;
+                                showToast(data.message || t("profile.update_success"));
+                            } else {
+                                throw new Error(data.message || "Update failed!");
+                            }
+                        })
+                        .catch(err => {
+                            showToast(err.message, true);
+                        })
+                        .finally(() => {
+                            saveBtn.textContent = originalText;
+                            saveBtn.disabled = false;
+                        });
                 });
             }
-        });
-    });
-    function switchTab(targetId) {
-        const sidebarItems = document.querySelectorAll('.sidebar-item');
-        const contentSections = document.querySelectorAll('.content-section');
 
-        // Remove active
-        sidebarItems.forEach(i => i.classList.remove('active'));
-        contentSections.forEach(s => s.classList.remove('active'));
+            // Đổi Mật khẩu
+            // Đổi Mật khẩu
+            const passwordForm = document.getElementById('passwordForm');
+            if (passwordForm) {
+                passwordForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const oldPass = document.getElementById('oldPassword').value;
+                    const newPass = document.getElementById('newPassword').value;
+                    const confirmPass = document.getElementById('confirmPassword').value;
 
-        // Active target sidebar
-        const targetSidebar = Array.from(sidebarItems).find(i => i.dataset.target === targetId);
-        if (targetSidebar) targetSidebar.classList.add('active');
+                    // THÊM ĐOẠN KIỂM TRA ĐỘ DÀI NÀY
+                    if (newPass.length < 6) {
+                        showToast(t("auth.password_min"), true);
+                        return;
 
-        // Active target content
-        const targetSection = document.getElementById(targetId);
-        if (targetSection) targetSection.classList.add('active');
+                    }
+                    if (newPass !== confirmPass) {
+                        showToast(t("auth.password_not_match"), true);
+                        return;
+                    }
 
-        // Load data if tab cần
-        if (targetId === 'section-history') loadHistory();
-        if (targetId === 'section-wishlist') loadWishlist();
-        if (targetId === 'section-achievements') loadAchievements();
-        if (targetId === 'section-streak') loadStreak();
+                    const btn = document.getElementById('updatePassBtn');
+                    const originalText = btn.textContent;
+                    btn.textContent = "Đang xử lý...";
+                    btn.disabled = true;
 
-        // Scroll vào section (optional)
-        if (targetSection) targetSection.scrollIntoView({behavior: 'smooth'});
-    }
+                    fetch(`${API_URL}/password`, {
+                        method: 'PUT',
+                        headers: getAuthHeaders(),
+                        body: JSON.stringify({
+                            oldPassword: oldPass,
+                            newPassword: newPass
+                        })
+                    })
+                        .then(async res => {
+                            if (res.status === 401 || res.status === 403) {
+                                localStorage.removeItem('token');
+                                window.location.replace('login.html');
+                                return;
+                            }
+                            const data = await res.json().catch(() => ({}));
+                            if (res.ok) {
+                                showToast(data.message || 'Password changed successfully!');
+                                passwordForm.reset();
+                            } else {
+                                throw new Error(data.message || "Current password is incorrect!");
+                            }
+                        })
+                        .catch(err => {
+                            showToast(err.message, true);
+                        })
+                        .finally(() => {
+                            btn.textContent = originalText;
+                            btn.disabled = false;
+                        });
+                });
+            }
 
+            // Chuyển Tab Sidebar
+            const sidebarItems = document.querySelectorAll('.sidebar-item');
+            // Nếu URL có hash → mở tab tương ứng
+            const hash = location.hash.replace('#', '');
+            if (hash === 'achievements') {
+                switchTab('section-achievements');
+            } else if (hash) {
+                // Map hash khác nếu muốn
+                switchTab('section-' + hash);
+            } else {
+                switchTab('section-info'); // mặc định
+            }
 
-    window.extendSubscription = async function (subscriptionId, packId, packName) {
-        if (!packId) {
-            alert('Cannot determine the pack for this subscription.');
-            return;
-        }
-        if (!confirm(`Extend subscription "${packName}"? You will be redirected to VNPay for payment.`)) {
-            return;
-        }
-
-        const btn = document.getElementById(`extendBtn_${subscriptionId}`);
-        if (btn) {
-            btn.disabled = true;
-            btn.textContent = 'Processing...';
-        }
-
-        try {
-            const token = localStorage.getItem('token');
-            const res = await fetch('/api/payments/vnpay', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                },
-                body: JSON.stringify({
-                    packId: packId,
-                    subscriptionId: subscriptionId
-                })
+            // Khi click sidebar
+            sidebarItems.forEach(item => {
+                item.addEventListener('click', function () {
+                    const targetId = this.getAttribute('data-target');
+                    history.pushState(null, '', `#${targetId.replace('section-', '')}`);
+                    switchTab(targetId);
+                });
             });
 
-            if (res.status === 401) {
-                localStorage.removeItem('token');
-                window.location.href = 'login.html';
+            // Nếu user dùng back/forward browser
+            window.addEventListener('hashchange', () => {
+                const newHash = location.hash.replace('#', '');
+                switchTab('section-' + newHash);
+            });
+
+            const contentSections = document.querySelectorAll('.content-section');
+
+            sidebarItems.forEach(item => {
+                item.addEventListener('click', function () {
+
+                    sidebarItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+
+                    contentSections.forEach(section => section.classList.remove('active'));
+
+                    const targetId = this.getAttribute('data-target');
+                    const targetSection = document.getElementById(targetId);
+
+                    if (targetSection) {
+                        targetSection.classList.add('active');
+                    }
+
+                    // ⭐ LOAD HISTORY WHEN HISTORY TAB OPEN
+                    if (targetId === 'section-history') {
+                        loadHistory();
+                    }
+
+                    if (targetId === 'section-wishlist') {
+                        loadWishlist();
+                    }
+
+                    if (targetId === 'section-achievements') {
+                        loadAchievements();
+                    }
+                    if (targetId === 'section-streak') {
+                        loadStreak();
+                    }
+
+                });
+            });
+
+            // Navbar Links
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                if (link.textContent.trim().toUpperCase() === 'HOME') {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        window.location.href = 'homepage.html';
+                    });
+                }
+            });
+        });
+        function switchTab(targetId) {
+            const sidebarItems = document.querySelectorAll('.sidebar-item');
+            const contentSections = document.querySelectorAll('.content-section');
+
+            // Remove active
+            sidebarItems.forEach(i => i.classList.remove('active'));
+            contentSections.forEach(s => s.classList.remove('active'));
+
+            // Active target sidebar
+            const targetSidebar = Array.from(sidebarItems).find(i => i.dataset.target === targetId);
+            if (targetSidebar) targetSidebar.classList.add('active');
+
+            // Active target content
+            const targetSection = document.getElementById(targetId);
+            if (targetSection) targetSection.classList.add('active');
+
+            // Load data if tab cần
+            if (targetId === 'section-history') loadHistory();
+            if (targetId === 'section-wishlist') loadWishlist();
+            if (targetId === 'section-achievements') loadAchievements();
+            if (targetId === 'section-streak') loadStreak();
+
+            // Scroll vào section (optional)
+            if (targetSection) targetSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+
+        window.extendSubscription = async function (subscriptionId, packId, packName) {
+            if (!packId) {
+                alert('Cannot determine the pack for this subscription.');
+                return;
+            }
+            if (!confirm(`Extend subscription "${packName}"? You will be redirected to VNPay for payment.`)) {
                 return;
             }
 
-            if (!res.ok) {
-                const errText = await res.text();
-                throw new Error(errText || 'Failed to create payment');
-            }
-
-            const data = await res.json();
-            window.location.href = data.paymentUrl;
-        } catch (e) {
-            alert('Error: ' + e.message);
+            const btn = document.getElementById(`extendBtn_${subscriptionId}`);
             if (btn) {
-                btn.disabled = false;
-                btn.textContent = 'Extend';
+                btn.disabled = true;
+                btn.textContent = 'Processing...';
             }
-        }
-    };
-    /* ── History functions — global scope so sidebar click can reach them ── */
 
-    /* ── History functions ──────────────────────────────────────────────── */
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch('/api/payments/vnpay', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({
+                        packId: packId,
+                        subscriptionId: subscriptionId
+                    })
+                });
 
-    async function loadHistory() {
-        const container = document.getElementById('historyContainer');
-        // Hiển thị trạng thái đang tải
-        container.innerHTML = `
+                if (res.status === 401) {
+                    localStorage.removeItem('token');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                if (!res.ok) {
+                    const errText = await res.text();
+                    throw new Error(errText || 'Failed to create payment');
+                }
+
+                const data = await res.json();
+                window.location.href = data.paymentUrl;
+            } catch (e) {
+                alert('Error: ' + e.message);
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = 'Extend';
+                }
+            }
+        };
+        /* ── History functions — global scope so sidebar click can reach them ── */
+
+        /* ── History functions ──────────────────────────────────────────────── */
+
+        async function loadHistory() {
+            const container = document.getElementById('historyContainer');
+            // Hiển thị trạng thái đang tải
+            container.innerHTML = `
             <div class="history-loading">
             <i class="fas fa-spinner fa-spin"></i>
             <p>${t("profile.history_sub.loading")}</p>
             </div>`;
 
-        try {
-            // Cập nhật đúng Endpoint từ WatchHistoryController
-            const _pid = localStorage.getItem('profileId');
-            const _histUrl = '/api/user/history' + (_pid ? '?profileId=' + _pid : '');
-            const res = await fetch(_histUrl, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+            try {
+                // Cập nhật đúng Endpoint từ WatchHistoryController
+                const _pid = localStorage.getItem('profileId');
+                const _histUrl = '/api/user/history' + (_pid ? '?profileId=' + _pid : '');
+                const res = await fetch(_histUrl, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (res.status === 401 || res.status === 403) {
+                    localStorage.removeItem('token');
+                    window.location.replace('login.html');
+                    return;
                 }
-            });
 
-            if (res.status === 401 || res.status === 403) {
-                localStorage.removeItem('token');
-                window.location.replace('login.html');
-                return;
+                if (!res.ok) throw new Error('Failed to fetch history from server');
+
+                const data = await res.json();
+                renderHistory(data);
+            } catch (err) {
+                console.error('History fetch error:', err);
+                renderHistory([]); // Trả về mảng rỗng nếu lỗi
             }
-
-            if (!res.ok) throw new Error('Failed to fetch history from server');
-
-            const data = await res.json();
-            renderHistory(data);
-        } catch (err) {
-            console.error('History fetch error:', err);
-            renderHistory([]); // Trả về mảng rỗng nếu lỗi
         }
-    }
 
-    function renderHistory(items) {
-        const container = document.getElementById('historyContainer');
-        if (!items || items.length === 0) {
-            container.innerHTML = `
+        function renderHistory(items) {
+            const container = document.getElementById('historyContainer');
+            if (!items || items.length === 0) {
+                container.innerHTML = `
             <div class="history-empty">
                 <i class="fas fa-film"></i>
                 <p>${t("profile.history_sub.empty")}</p>
                 <a href="homepage.html">${t("profile.history_sub.browse")}</a>
             </div>`;
-            return;
-        }
-        // Deduplicate by content id (movieId for movies, tvSeriesId for TV)
-        // Keep only the most recent entry per content (based on watchedAt if available)
-        const normalized = (items || []).slice().map(it => {
-            // parse watchedAt to timestamp (fallback 0)
-            const ts = it.watchedAt ? Date.parse(it.watchedAt) : 0;
-            return Object.assign({__watchedTs: isNaN(ts) ? 0 : ts}, it);
-        });
-        // sort descending by watched timestamp (most recent first)
-        normalized.sort((a, b) => (b.__watchedTs || 0) - (a.__watchedTs || 0));
-        const seen = new Set();
-        const dedup = [];
-        for (const it of normalized) {
-            const key = it.movieId ? `m_${it.movieId}` : (it.tvSeriesId ? `t_${it.tvSeriesId}` : (`title_${(it.movieTitle||it.tvSeriesName||'').trim()}`));
-            if (seen.has(key)) continue;
-            seen.add(key);
-            dedup.push(it);
-        }
+                return;
+            }
+            // Deduplicate by content id (movieId for movies, tvSeriesId for TV)
+            // Keep only the most recent entry per content (based on watchedAt if available)
+            const normalized = (items || []).slice().map(it => {
+                // parse watchedAt to timestamp (fallback 0)
+                const ts = it.watchedAt ? Date.parse(it.watchedAt) : 0;
+                return Object.assign({ __watchedTs: isNaN(ts) ? 0 : ts }, it);
+            });
+            // sort descending by watched timestamp (most recent first)
+            normalized.sort((a, b) => (b.__watchedTs || 0) - (a.__watchedTs || 0));
+            const seen = new Set();
+            const dedup = [];
+            for (const it of normalized) {
+                const key = it.movieId ? `m_${it.movieId}` : (it.tvSeriesId ? `t_${it.tvSeriesId}` : (`title_${(it.movieTitle || it.tvSeriesName || '').trim()}`));
+                if (seen.has(key)) continue;
+                seen.add(key);
+                dedup.push(it);
+            }
 
-        container.innerHTML = dedup.map(item => {
-            // Lấy tiêu đề: ưu tiên movieTitle, nếu không có thì dùng tvSeriesName
-            const mainTitle = item.movieTitle || item.tvSeriesName || 'Unknown Movie';
+            container.innerHTML = dedup.map(item => {
+                // Lấy tiêu đề: ưu tiên movieTitle, nếu không có thì dùng tvSeriesName
+                const mainTitle = item.movieTitle || item.tvSeriesName || 'Unknown Movie';
 
-            // Nhãn phụ: Nếu là phim bộ thì hiện tên tập, ngược lại hiện "Movie"
-            const typeLabel = item.episodeName ? `Episode: ${item.episodeName}` : 'Movie';
+                // Nhãn phụ: Nếu là phim bộ thì hiện tên tập, ngược lại hiện "Movie"
+                const typeLabel = item.episodeName ? `Episode: ${item.episodeName}` : 'Movie';
 
-            const progress = item.progressSec || 0;
-            const duration = item.durationSec || 1; // Tránh chia cho 0
-            const percent = Math.min(100, Math.round((progress / duration) * 100));
+                const progress = item.progressSec || 0;
+                const duration = item.durationSec || 1; // Tránh chia cho 0
+                const percent = Math.min(100, Math.round((progress / duration) * 100));
 
-            // posterPath is now a full URL built by WatchHistoryController
-            const poster = item.posterPath || 'https://placehold.co/200x300/1f2937/9ca3af?text=No+Poster';
+                // posterPath is now a full URL built by WatchHistoryController
+                const poster = item.posterPath || 'https://placehold.co/200x300/1f2937/9ca3af?text=No+Poster';
 
-            // Tạo link quay lại trang movie-watch.html kèm tham số t (thời gian đã xem)
-            // For movies: id=movieId. For TV: id=tvSeriesId, season+episode numbers
-            // so movie-watch.html loads the right series and auto-selects the episode.
-            const link = item.movieId
-                ? `movie-watch.html?id=${item.movieId}&type=movie&t=${progress}`
-                : `movie-watch.html?id=${item.tvSeriesId}&type=tv&season=${item.seasonNumber}&episode=${item.episodeNumber}&t=${progress}`;
+                // Tạo link quay lại trang movie-watch.html kèm tham số t (thời gian đã xem)
+                // For movies: id=movieId. For TV: id=tvSeriesId, season+episode numbers
+                // so movie-watch.html loads the right series and auto-selects the episode.
+                const link = item.movieId
+                    ? `movie-watch.html?id=${item.movieId}&type=movie&t=${progress}`
+                    : `movie-watch.html?id=${item.tvSeriesId}&type=tv&season=${item.seasonNumber}&episode=${item.episodeNumber}&t=${progress}`;
 
-            const disabledAttr = item.blocked ? 'aria-disabled="true" tabindex="-1" style="opacity:0.5;pointer-events:none;"' : '';
-            const blockedBadge = item.blocked ? `<div style="color:#f87171;font-size:12px;margin-top:6px;">Not available in your region</div>` : '';
+                const disabledAttr = item.blocked ? 'aria-disabled="true" tabindex="-1" style="opacity:0.5;pointer-events:none;"' : '';
+                const blockedBadge = item.blocked ? `<div style="color:#f87171;font-size:12px;margin-top:6px;">Not available in your region</div>` : '';
 
-            return `
+                return `
             <div class="history-card">
                 <img src="${poster}" class="history-poster" alt="${escHtml(mainTitle)}" 
                      onerror="this.src='https://placehold.co/200x300/1f2937/9ca3af?text=No+Poster';this.onerror=null;">
@@ -1844,83 +1905,83 @@
                     </div>
                 </div>
             </div>`;
-        }).join('');
-    }
+            }).join('');
+        }
 
-    function formatTime(sec) {
-        if (!sec || isNaN(sec) || sec < 0) return '00:00';
-        const h = Math.floor(sec / 3600);
-        const m = Math.floor((sec % 3600) / 60);
-        const s = Math.floor(sec % 60);
-        const mm = String(m).padStart(2, '0');
-        const ss = String(s).padStart(2, '0');
-        return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
-    }
+        function formatTime(sec) {
+            if (!sec || isNaN(sec) || sec < 0) return '00:00';
+            const h = Math.floor(sec / 3600);
+            const m = Math.floor((sec % 3600) / 60);
+            const s = Math.floor(sec % 60);
+            const mm = String(m).padStart(2, '0');
+            const ss = String(s).padStart(2, '0');
+            return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
+        }
 
-    // Sanitise user-supplied strings before injecting into innerHTML
-    function escHtml(str) {
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
-    }
+        // Sanitise user-supplied strings before injecting into innerHTML
+        function escHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
 
-    async function loadWishlist() {
-        const container = document.getElementById('wishlistContainer');
-        container.innerHTML = `
+        async function loadWishlist() {
+            const container = document.getElementById('wishlistContainer');
+            container.innerHTML = `
         <div class="history-loading">
             <i class="fas fa-spinner fa-spin"></i>
             <p>${t("profile.wishlist.loading")}</p>
         </div>`;
 
-        try {
-            const _wPid = localStorage.getItem('profileId');
-            const _wUrl = '/api/user/wishlist' + (_wPid ? '?profileId=' + _wPid : '');
-            const res = await fetch(_wUrl, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+            try {
+                const _wPid = localStorage.getItem('profileId');
+                const _wUrl = '/api/user/wishlist' + (_wPid ? '?profileId=' + _wPid : '');
+                const res = await fetch(_wUrl, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (res.status === 401 || res.status === 403) {
+                    localStorage.removeItem('token');
+                    window.location.replace('login.html');
+                    return;
                 }
-            });
 
-            if (res.status === 401 || res.status === 403) {
-                localStorage.removeItem('token');
-                window.location.replace('login.html');
-                return;
-            }
+                if (!res.ok) throw new Error('Failed to load wishlist');
+                const items = await res.json();
 
-            if (!res.ok) throw new Error('Failed to load wishlist');
-            const items = await res.json();
+                container.innerHTML = '';
 
-            container.innerHTML = '';
-
-            if (!items || items.length === 0) {
-                container.innerHTML = `
+                if (!items || items.length === 0) {
+                    container.innerHTML = `
                      <p class="wishlist-empty">
                            ${t("profile.wishlist.empty")}
                      </p>
                 `;
-                return;
-            }
-
-            items.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'history-card';
-                card.style.position = 'relative';
-                card.style.cursor = item.blocked ? 'default' : 'pointer';
-                if (item.blocked) {
-                    card.style.opacity = '0.7';
+                    return;
                 }
-                card.style.position = 'relative';
 
-                const posterUrl = item.posterUrl || 'https://via.placeholder.com/160x240?text=No+Image';
-                const ratingText = item.rating ? item.rating.toFixed(1) : 'N/A';
-                const typeLabel = item.contentType === 'tv' ? 'TV Series' : 'Movie';
+                items.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'history-card';
+                    card.style.position = 'relative';
+                    card.style.cursor = item.blocked ? 'default' : 'pointer';
+                    if (item.blocked) {
+                        card.style.opacity = '0.7';
+                    }
+                    card.style.position = 'relative';
 
-                const blockedBadge = item.blocked ? `<div style="color:#f87171;font-size:12px;margin-top:6px;">Not available in your region</div>` : '';
+                    const posterUrl = item.posterUrl || 'https://via.placeholder.com/160x240?text=No+Image';
+                    const ratingText = item.rating ? item.rating.toFixed(1) : 'N/A';
+                    const typeLabel = item.contentType === 'tv' ? 'TV Series' : 'Movie';
 
-                card.innerHTML = `
+                    const blockedBadge = item.blocked ? `<div style="color:#f87171;font-size:12px;margin-top:6px;">Not available in your region</div>` : '';
+
+                    card.innerHTML = `
                 <div class="history-thumb" style="
                     aspect-ratio: 2/3;
                     background-image: url('${posterUrl}');
@@ -1948,75 +2009,75 @@
                 </div>
             `;
 
-                // Click card → đi tới trang detail
-                card.addEventListener('click', (e) => {
-                    if (e.target.closest('.wishlist-remove-btn')) return;
-                    if (item.blocked) return; // blocked → no navigation
-                    window.location.href = `movie-detail.html?id=${item.contentId}&type=${item.contentType}`;
-                });
+                    // Click card → đi tới trang detail
+                    card.addEventListener('click', (e) => {
+                        if (e.target.closest('.wishlist-remove-btn')) return;
+                        if (item.blocked) return; // blocked → no navigation
+                        window.location.href = `movie-detail.html?id=${item.contentId}&type=${item.contentType}`;
+                    });
 
-                // Click nút X → remove khỏi wishlist
-                card.querySelector('.wishlist-remove-btn').addEventListener('click', async (e) => {
-                    e.stopPropagation();
-                    try {
-                        const r = await fetch('/api/user/wishlist/toggle', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${localStorage.getItem('token')}`
-                            },
-                            body: JSON.stringify({contentId: item.contentId, contentType: item.contentType, profileId: parseInt(localStorage.getItem('profileId')) || null})
-                        });
-                        if (r.ok) {
-                            card.remove();
-                            if (container.children.length === 0) {
-                                container.innerHTML = '<p class="wishlist-empty">You have no wishlisted movies yet.</p>';
+                    // Click nút X → remove khỏi wishlist
+                    card.querySelector('.wishlist-remove-btn').addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        try {
+                            const r = await fetch('/api/user/wishlist/toggle', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                },
+                                body: JSON.stringify({ contentId: item.contentId, contentType: item.contentType, profileId: parseInt(localStorage.getItem('profileId')) || null })
+                            });
+                            if (r.ok) {
+                                card.remove();
+                                if (container.children.length === 0) {
+                                    container.innerHTML = '<p class="wishlist-empty">You have no wishlisted movies yet.</p>';
+                                }
                             }
+                        } catch { /* ignore */
                         }
-                    } catch { /* ignore */
-                    }
+                    });
+
+                    container.appendChild(card);
                 });
 
-                container.appendChild(card);
-            });
-
-        } catch (e) {
-            container.innerHTML = '<p class="wishlist-empty">Failed to load wishlist.</p>';
-            console.error(e);
+            } catch (e) {
+                container.innerHTML = '<p class="wishlist-empty">Failed to load wishlist.</p>';
+                console.error(e);
+            }
         }
-    }
 
-    async function loadAchievements() {
+        async function loadAchievements() {
 
-        const earnedGrid  = document.getElementById('earnedGrid');
-        const lockedGrid  = document.getElementById('lockedGrid');
-        const statsEl     = document.getElementById('achievementStats');
+            const earnedGrid = document.getElementById('earnedGrid');
+            const lockedGrid = document.getElementById('lockedGrid');
+            const statsEl = document.getElementById('achievementStats');
 
-        const loadingHtml = `
+            const loadingHtml = `
         <div style="color:#9ca3af;font-size:13px;padding:12px 0">
             ${t('profile_extra.achievement.loading')}
         </div>
     `;
-        earnedGrid.innerHTML = loadingHtml;
-        lockedGrid.innerHTML = loadingHtml;
-        statsEl.innerHTML = loadingHtml;
+            earnedGrid.innerHTML = loadingHtml;
+            lockedGrid.innerHTML = loadingHtml;
+            statsEl.innerHTML = loadingHtml;
 
-        try {
-            const pid = localStorage.getItem('profileId');
-            const url = '/api/user/achievements' + (pid ? '?profileId=' + pid : '');
+            try {
+                const pid = localStorage.getItem('profileId');
+                const url = '/api/user/achievements' + (pid ? '?profileId=' + pid : '');
 
-            const res = await fetch(url, {
-                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-            });
+                const res = await fetch(url, {
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                });
 
-            if (!res.ok) throw new Error('Failed');
+                if (!res.ok) throw new Error('Failed');
 
-            const data = await res.json();
+                const data = await res.json();
 
-            const pct = data.total ? Math.round((data.count / data.total) * 100) : 0;
+                const pct = data.total ? Math.round((data.count / data.total) * 100) : 0;
 
-            // ✅ Stats
-            statsEl.innerHTML = `
+                // ✅ Stats
+                statsEl.innerHTML = `
             <div class="stat-chip">
                 <span class="val">${data.count}</span>
                 <span class="lbl">${t('profile_extra.achievement.stats.earned')}</span>
@@ -2031,124 +2092,124 @@
             </div>
         `;
 
-            // ✅ Earned
-            earnedGrid.innerHTML = '';
-            if (!data.earned.length) {
-                earnedGrid.innerHTML = `
+                // ✅ Earned
+                earnedGrid.innerHTML = '';
+                if (!data.earned.length) {
+                    earnedGrid.innerHTML = `
                 <p style="color:#9ca3af;font-size:13px">
                     ${t('profile_extra.achievement.no_achievement')}
                 </p>
             `;
-            } else {
-                data.earned.forEach(a => {
-                    earnedGrid.appendChild(buildAchievementCard(a, false));
+                } else {
+                    data.earned.forEach(a => {
+                        earnedGrid.appendChild(buildAchievementCard(a, false));
+                    });
+                }
+
+                // ✅ Locked
+                lockedGrid.innerHTML = '';
+                data.locked.forEach(a => {
+                    lockedGrid.appendChild(buildAchievementCard(a, true));
                 });
-            }
 
-            // ✅ Locked
-            lockedGrid.innerHTML = '';
-            data.locked.forEach(a => {
-                lockedGrid.appendChild(buildAchievementCard(a, true));
-            });
-
-        } catch (e) {
-            earnedGrid.innerHTML = `
+            } catch (e) {
+                earnedGrid.innerHTML = `
             <p style="color:#9ca3af">
                 ${t('profile_extra.achievement.failed')}
             </p>
         `;
-            lockedGrid.innerHTML = '';
+                lockedGrid.innerHTML = '';
+            }
         }
-    }
 
-    function getStreakMilestones() {
-        return [
-            { days: 3, name: t('profile_extra.milestone.consistent'), desc: t('profile_extra.milestone.desc_3'), icon: "🔥" },
-            { days: 7, name: t('profile_extra.milestone.weekly_warrior'), desc: t('profile_extra.milestone.desc_7'), icon: "⚡" },
-            { days: 14, name: t('profile_extra.milestone.dedicated'), desc: t('profile_extra.milestone.desc_14'), icon: "💪" },
-            { days: 30, name: t('profile_extra.milestone.unstoppable'), desc: t('profile_extra.milestone.desc_30'), icon: "🚀" },
-            { days: 100, name: t('profile_extra.milestone.legend'), desc: t('profile_extra.milestone.desc_100'), icon: "👑" }
-        ];
-    }
-
-    async function loadStreak() {
-        try {
-            const pid = localStorage.getItem('profileId');
-            const streakUrl = '/api/user/achievements/streak' + (pid ? '?profileId=' + pid : '');
-
-            const streakRes = await fetch(streakUrl, {
-                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-            });
-
-            if (!streakRes.ok) throw new Error('Failed');
-            const s = await streakRes.json();
-
-            // --- Hero numbers ---
-            document.getElementById('streakCurrentNum').textContent = s.currentStreak;
-            document.getElementById('streakBest').textContent = s.longestStreak;
-            document.getElementById('streakTotal').textContent = s.totalLoginDays;
-            document.getElementById('streakLast').textContent =
-                s.lastLoginDate ? formatStreakDate(s.lastLoginDate) : 'Never';
-
-            // Fire emoji intensity theo streak
-            const fireEl = document.querySelector('.streak-fire');
-            if      (s.currentStreak === 0)  fireEl.style.filter = 'grayscale(1)';
-            else if (s.currentStreak >= 30)  fireEl.textContent = '🔥🔥🔥';
-            else if (s.currentStreak >= 7)   fireEl.textContent = '🔥🔥';
-            else { fireEl.textContent = '🔥'; fireEl.style.filter = ''; }
-
-            // --- Calendar dùng loginDays từ API (chính xác theo streak thực tế) ---
-            const loginDates = new Set(s.loginDays || []);
-            renderCalendar(loginDates);
-
-            // --- Milestones ---
-            renderMilestones(s.currentStreak, s.longestStreak);
-
-        } catch(e) {
-            console.error('Streak load error:', e);
+        function getStreakMilestones() {
+            return [
+                { days: 3, name: t('profile_extra.milestone.consistent'), desc: t('profile_extra.milestone.desc_3'), icon: "🔥" },
+                { days: 7, name: t('profile_extra.milestone.weekly_warrior'), desc: t('profile_extra.milestone.desc_7'), icon: "⚡" },
+                { days: 14, name: t('profile_extra.milestone.dedicated'), desc: t('profile_extra.milestone.desc_14'), icon: "💪" },
+                { days: 30, name: t('profile_extra.milestone.unstoppable'), desc: t('profile_extra.milestone.desc_30'), icon: "🚀" },
+                { days: 100, name: t('profile_extra.milestone.legend'), desc: t('profile_extra.milestone.desc_100'), icon: "👑" }
+            ];
         }
-    }
 
-    function renderCalendar(loginDates) {
-        const cal = document.getElementById('streakCalendar');
-        cal.innerHTML = '';
-        const today = new Date();
+        async function loadStreak() {
+            try {
+                const pid = localStorage.getItem('profileId');
+                const streakUrl = '/api/user/achievements/streak' + (pid ? '?profileId=' + pid : '');
 
-        for (let i = 29; i >= 0; i--) {
-            const d = new Date(today);
-            d.setDate(today.getDate() - i);
-            const dateStr = d.getFullYear() + '-'
-                + String(d.getMonth() + 1).padStart(2, '0') + '-'
-                + String(d.getDate()).padStart(2, '0');
-            const isToday = i === 0;
-            const isLogged = loginDates.has(dateStr);
+                const streakRes = await fetch(streakUrl, {
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                });
 
-            const cell = document.createElement('div');
-            cell.className = 'streak-day'
-                + (isLogged ? ' logged' : '')
-                + (isToday  ? ' today'  : '');
-            cell.title = dateStr + (isLogged ? ' ✓' : '');
-            cal.appendChild(cell);
+                if (!streakRes.ok) throw new Error('Failed');
+                const s = await streakRes.json();
+
+                // --- Hero numbers ---
+                document.getElementById('streakCurrentNum').textContent = s.currentStreak;
+                document.getElementById('streakBest').textContent = s.longestStreak;
+                document.getElementById('streakTotal').textContent = s.totalLoginDays;
+                document.getElementById('streakLast').textContent =
+                    s.lastLoginDate ? formatStreakDate(s.lastLoginDate) : 'Never';
+
+                // Fire emoji intensity theo streak
+                const fireEl = document.querySelector('.streak-fire');
+                if (s.currentStreak === 0) fireEl.style.filter = 'grayscale(1)';
+                else if (s.currentStreak >= 30) fireEl.textContent = '🔥🔥🔥';
+                else if (s.currentStreak >= 7) fireEl.textContent = '🔥🔥';
+                else { fireEl.textContent = '🔥'; fireEl.style.filter = ''; }
+
+                // --- Calendar dùng loginDays từ API (chính xác theo streak thực tế) ---
+                const loginDates = new Set(s.loginDays || []);
+                renderCalendar(loginDates);
+
+                // --- Milestones ---
+                renderMilestones(s.currentStreak, s.longestStreak);
+
+            } catch (e) {
+                console.error('Streak load error:', e);
+            }
         }
-    }
 
-    function renderMilestones(current, longest) {
-        const container = document.getElementById('milestonesContainer');
-        const milestones = getStreakMilestones(); // ✅ dùng cái này
-        container.innerHTML = '';
-        const best = Math.max(current, longest);
+        function renderCalendar(loginDates) {
+            const cal = document.getElementById('streakCalendar');
+            cal.innerHTML = '';
+            const today = new Date();
 
-        milestones.forEach(m => {   // ❌ đổi từ STREAK_MILESTONES → milestones
-            const reached = best >= m.days;
+            for (let i = 29; i >= 0; i--) {
+                const d = new Date(today);
+                d.setDate(today.getDate() - i);
+                const dateStr = d.getFullYear() + '-'
+                    + String(d.getMonth() + 1).padStart(2, '0') + '-'
+                    + String(d.getDate()).padStart(2, '0');
+                const isToday = i === 0;
+                const isLogged = loginDates.has(dateStr);
 
-            const item = document.createElement('div');
-            item.className = 'milestone-item' + (reached ? ' reached' : '');
+                const cell = document.createElement('div');
+                cell.className = 'streak-day'
+                    + (isLogged ? ' logged' : '')
+                    + (isToday ? ' today' : '');
+                cell.title = dateStr + (isLogged ? ' ✓' : '');
+                cal.appendChild(cell);
+            }
+        }
 
-            const progress = reached
-                ? `${m.days}/${m.days} days`
-                : `${Math.min(current, m.days)}/${m.days} days`;
+        function renderMilestones(current, longest) {
+            const container = document.getElementById('milestonesContainer');
+            const milestones = getStreakMilestones(); // ✅ dùng cái này
+            container.innerHTML = '';
+            const best = Math.max(current, longest);
 
-            item.innerHTML = `
+            milestones.forEach(m => {   // ❌ đổi từ STREAK_MILESTONES → milestones
+                const reached = best >= m.days;
+
+                const item = document.createElement('div');
+                item.className = 'milestone-item' + (reached ? ' reached' : '');
+
+                const progress = reached
+                    ? `${m.days}/${m.days} days`
+                    : `${Math.min(current, m.days)}/${m.days} days`;
+
+                item.innerHTML = `
             <div class="milestone-icon">${m.icon}</div>
             <div class="milestone-info">
                 <div class="milestone-name">${m.name}</div>
@@ -2158,34 +2219,35 @@
             <div class="milestone-check">${reached ? '✅' : '🔒'}</div>
         `;
 
-            container.appendChild(item);
-        });
-    }
+                container.appendChild(item);
+            });
+        }
 
-    function formatStreakDate(dateStr) {
-        const d = new Date(dateStr);
-        const today = new Date();
-        const diff = Math.floor((today - d) / 86400000);
-        if (diff === 0) return 'Today';
-        if (diff === 1) return 'Yesterday';
-        return dateStr;
-    }
+        function formatStreakDate(dateStr) {
+            const d = new Date(dateStr);
+            const today = new Date();
+            const diff = Math.floor((today - d) / 86400000);
+            if (diff === 0) return 'Today';
+            if (diff === 1) return 'Yesterday';
+            return dateStr;
+        }
 
-    function buildAchievementCard(a, locked) {
-        const card = document.createElement('div');
-        card.className = `achievement-card rarity-${a.rarity}${locked ? ' locked' : ''}`;
-        card.innerHTML = `
+        function buildAchievementCard(a, locked) {
+            const card = document.createElement('div');
+            card.className = `achievement-card rarity-${a.rarity}${locked ? ' locked' : ''}`;
+            card.innerHTML = `
         <span class="rarity-badge rarity-${a.rarity}">${a.rarity}</span>
         <span class="achievement-icon">${a.icon}</span>
         <div class="achievement-name">${a.name}</div>
         <div class="achievement-desc">${a.description}</div>
         ${!locked && a.earnedAt
-            ? `<div class="achievement-date">📅 ${a.earnedAt}</div>`
-            : locked ? '<div class="achievement-date">🔒 Not earned yet</div>' : ''}
+                    ? `<div class="achievement-date">📅 ${a.earnedAt}</div>`
+                    : locked ? '<div class="achievement-date">🔒 Not earned yet</div>' : ''}
     `;
-        return card;
-    }
-</script>
-<script src="js/ai-chat-support.js"></script>
+            return card;
+        }
+    </script>
+    <script src="js/ai-chat-support.js"></script>
 </body>
+
 </html>
