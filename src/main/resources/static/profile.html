@@ -1566,7 +1566,11 @@
                             showToast(data.message || 'Password changed successfully!');
                             passwordForm.reset();
                         } else {
-                            throw new Error(data.message || "Current password is incorrect!");
+                            // prefer server-side messageKey for translation
+                            const key = data && data.messageKey;
+                            const serverMsg = data && data.message;
+                            const translated = key ? t(key) : null;
+                            throw new Error(translated || serverMsg || "Current password is incorrect!");
                         }
                     })
                     .catch(err => {

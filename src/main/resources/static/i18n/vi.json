@@ -121,6 +121,8 @@
     "reports": "Báo cáo"
   },
   "auth": {
+  "current_password_incorrect": "Lỗi: Mật khẩu hiện tại không chính xác!",
+  "new_password_same": "Lỗi: Mật khẩu mới phải khác mật khẩu hiện tại!",
     "login": "Đăng nhập",
     "login_caption": "Tiếp tục hành trình xem phim của bạn.",
     "username": "Tên đăng nhập",

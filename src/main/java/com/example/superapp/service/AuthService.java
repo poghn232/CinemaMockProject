@@ -151,6 +151,12 @@ public class AuthService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User không tồn tại"));
 
+        // Do not allow resetting to the same password as the current one
+        // (skip check if stored password is null/empty, e.g., OAuth accounts)
+        if (user.getPassword() != null && !user.getPassword().isBlank() && passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new com.example.superapp.exception.ValidationException("auth.new_password_same", "Mật khẩu mới không được giống mật khẩu hiện tại");
+        }
+
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }

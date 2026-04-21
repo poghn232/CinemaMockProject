@@ -137,9 +137,20 @@ public class UserController {
         String username = authentication.getName();
         User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Mật khẩu hiện tại không chính xác!"));
-        }
+    if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+            "messageKey", "auth.current_password_incorrect",
+            "message", "Mật khẩu hiện tại không chính xác!"
+        ));
+    }
+
+        // New password must be different from current password
+    if (passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+            "messageKey", "auth.new_password_same",
+            "message", "Mật khẩu mới không được giống mật khẩu hiện tại!"
+        ));
+    }
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);

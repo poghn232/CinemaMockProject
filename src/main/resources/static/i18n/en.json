@@ -121,6 +121,8 @@
     "reports": "Reports"
   },
   "auth": {
+  "current_password_incorrect": "Error: Current password is incorrect!",
+  "new_password_same": "Error: New password must be different from current password!",
     "login": "Login",
     "login_caption": "Continue your movie journey.",
     "username": "Username",

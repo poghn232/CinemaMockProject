@@ -40,6 +40,18 @@
         (async function () {
             const { fetchJson, api, titleCase, formatPrice, refreshCounts } =
                 window.adminApi;// Shared utilities from adminApi
+
+            // Format a number as Vietnamese đồng with dot thousands separators and no decimals
+            function formatVnd(value) {
+                if (value == null || isNaN(Number(value))) return '0';
+                try {
+                    // Round to integer VND (no decimals)
+                    const n = Math.round(Number(value));
+                    return new Intl.NumberFormat('vi-VN').format(n);
+                } catch (e) {
+                    return String(Math.round(Number(value)));
+                }
+            }
             let packsCache = [];
             let currentPackPage = 1;
             const packPageSize = 5; // change to 10 if you want
@@ -92,7 +104,8 @@
 
                 paginatedList.forEach((p) => {
                     const name = titleCase(String(p.packName || ""));
-                    const price = formatPrice(p.packPrice);
+                    // display price as VND with dot separators and 'vnđ' suffix
+                    const price = formatVnd(p.packPrice);
 
                     const row = document.createElement("div");
                     row.className = "pack-row";
@@ -101,7 +114,7 @@
                 <div>
                     <div style="font-weight:600">${name}</div>
                     <div class="muted">
-                         ${p.durationDays} ${t("profile.subscription.duration_days")} - $${price} ·
+                         ${p.durationDays} ${t("profile.subscription.duration_days")} - ${price} vnđ ·
                         ${t("profile.subscription.max_profiles")}: ${p.maxProfiles || t("profile.subscription.not_available")}
                 </div>
                 </div>
