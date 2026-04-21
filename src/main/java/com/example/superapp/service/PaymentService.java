@@ -68,14 +68,18 @@ public class PaymentService {
         // Tạo payment PENDING
         Payment payment = new Payment();
         payment.setSubscription(sub);
-        payment.setAmount(pack.getPackPrice());
+        payment.setAmount(new BigDecimal(pack.getPackPrice().replace(".", "")));
         payment.setStatus(PaymentStatus.PENDING);
         payment.setPaymentDate(LocalDateTime.now());
         payment = paymentRepo.save(payment);
 
         // Build VNPay params
         String txnRef = String.valueOf(payment.getPaymentId());
-        long amountVnp = pack.getPackPrice().multiply(BigDecimal.valueOf(100)).longValue();
+        
+        // Parse string price (remove dots) to number
+        String cleanPrice = pack.getPackPrice().replace(".", "");
+        BigDecimal numericPrice = new BigDecimal(cleanPrice);
+        long amountVnp = numericPrice.multiply(BigDecimal.valueOf(100)).longValue();
 
         String createDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
         String expireDate = LocalDateTime.now().plusMinutes(15).format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));

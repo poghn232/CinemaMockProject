@@ -144,10 +144,11 @@ public class MovieController {
                             em.put("srcFilm", playbackOpt.get());
                         }
 
-                        em.put("variants", variants);
+                        List<String> uniqueVariants = variants.stream().distinct().sorted().collect(java.util.stream.Collectors.toList());
+                        em.put("variants", uniqueVariants);
 
                         if (premiumUser) {
-                            em.put("allowedVariants", variants);
+                            em.put("allowedVariants", uniqueVariants);
                         } else {
                             em.put("allowedVariants",
                                     variants.contains("v0") ? List.of("v0") : Collections.emptyList());

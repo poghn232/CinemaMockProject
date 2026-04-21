@@ -340,10 +340,12 @@ public class PublicMovieService {
                 dto.setSrcFilm(playbackOpt.get());
             }
 
-            dto.setVariants(variants);
+            // Ensure variants are unique and strictly include v0, v1, v2 if available
+            List<String> uniqueVariants = variants.stream().distinct().sorted().collect(java.util.stream.Collectors.toList());
+            dto.setVariants(uniqueVariants);
 
             if (premiumUser) {
-                dto.setAllowedVariants(variants);
+                dto.setAllowedVariants(uniqueVariants);
             } else {
                 dto.setAllowedVariants(
                         variants.contains("v0") ? List.of("v0") : Collections.emptyList()

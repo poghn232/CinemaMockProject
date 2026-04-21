@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -20,8 +19,8 @@ public class SubscriptionPack {
     @Column(nullable = false)
     private String packName;
 
-    @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal packPrice;
+    @Column(nullable = false)
+    private String packPrice;
 
     private Integer durationDays; // ví dụ 30, 90, 365
 

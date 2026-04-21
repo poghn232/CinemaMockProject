@@ -698,6 +698,7 @@
       let _currentEpisodeId = null;
       let _currentVariants = [];
       let _currentPlaybackMasterUrl = "";
+      let _currentSelectedQuality = "auto";
       let _currentSubtitleUrl = null;
       // Custom uploaded subtitle stored as data URL in localStorage key: customSub:[movie|tv]:<id>[:episodeId]
       function _customSubtitleKey() {
@@ -816,14 +817,38 @@
         masterUrl,
         variants,
         isPremiumUser = false,
+        activeQuality = "auto",
       ) {
         const wrap = document.getElementById("qualityWrap");
         const select = document.getElementById("qualitySelect");
 
         if (!wrap || !select) return;
 
-        _currentPlaybackMasterUrl = masterUrl || "";
-        _currentVariants = Array.isArray(variants) ? variants : [];
+        // If the provided masterUrl is a master playlist, update our global reference.
+        // If it's a variant playlist (from a quality switch), don't overwrite the master.
+        if (masterUrl && masterUrl.includes("/master.m3u8")) {
+          _currentPlaybackMasterUrl = masterUrl;
+        }
+        // Deduplicate and sort variants (v0, v1, v2, etc.)
+        let processedVariants = Array.from(new Set(Array.isArray(variants) ? variants : []))
+          .filter((v) => v && typeof v === "string")
+          .sort((a, b) => {
+            const numA = parseInt(a.replace(/\D/g, "")) || 0;
+            const numB = parseInt(b.replace(/\D/g, "")) || 0;
+            return numA - numB;
+          });
+
+        _currentVariants = processedVariants;
+        _currentSelectedQuality = activeQuality || "auto";
+
+        // Validate that the active selection exists in the current quality variants
+        // If not, revert to "auto"
+        if (
+          _currentSelectedQuality !== "auto" &&
+          !_currentVariants.includes(_currentSelectedQuality)
+        ) {
+          _currentSelectedQuality = "auto";
+        }
 
         select.innerHTML = isPremiumUser
           ? `<option value="auto">Auto</option>`
@@ -834,30 +859,32 @@
           return;
         }
 
-        // Small helper: map storage variant ids (v0, v1, v2) to readable quality labels
+        // Strict mapping: map storage variant ids (v0, v1, v2) to readable quality labels
         function getVariantLabel(name) {
           if (!name) return name;
-          // If it's already a quality label like "360p", return as-is
-          if (/^\d+p$/i.test(name)) return name;
-          // Map common encoded folders to expected qualities
+          // Standard mapping as per user requirement
           if (name === "v0") return "360p";
           if (name === "v1") return "720p";
           if (name === "v2") return "1080p";
-          // fallback: return original identifier
+          // Fallback if the variant name is already a quality or something else
+          if (/^\d+p$/i.test(name)) return name;
           return name;
         }
 
         _currentVariants.forEach((v) => {
           const option = document.createElement("option");
-          option.value = v; // keep value as v0/v1/.. so playlist URL builder still works
+          option.value = v;
           option.textContent = getVariantLabel(v);
           select.appendChild(option);
         });
 
+        // Set the selection to whatever is currently active (or validated fallback)
+        select.value = _currentSelectedQuality;
         wrap.style.display = "block";
 
         select.onchange = () => {
           const selected = select.value;
+          _currentSelectedQuality = selected;
           const resume = _getCurrentTime() || 0;
 
           if (selected === "auto") {
@@ -866,13 +893,18 @@
               startSec: resume,
               variants: _currentVariants || [],
               isPremiumUser: isPremiumUser || false,
+              activeQuality: "auto",
             });
           } else {
             playMainContentWithOptionalAd({
-              videoUrl: buildVariantPlaylistUrl(_currentPlaybackMasterUrl, selected),
+              videoUrl: buildVariantPlaylistUrl(
+                _currentPlaybackMasterUrl,
+                selected,
+              ),
               startSec: resume,
               variants: _currentVariants || [],
               isPremiumUser: isPremiumUser || false,
+              activeQuality: selected,
             });
           }
         };
@@ -1747,12 +1779,21 @@
           : [];
         const isPremiumUser = movieData.premiumUser === true;
 
-        renderQualityDropdown(videoUrl, variants, isPremiumUser);
+        renderQualityDropdown(
+          videoUrl,
+          variants,
+          isPremiumUser,
+          _currentSelectedQuality,
+        );
         playMainContentWithOptionalAd({
-          videoUrl: videoUrl,
+          videoUrl:
+            _currentSelectedQuality === "auto"
+              ? videoUrl
+              : buildVariantPlaylistUrl(videoUrl, _currentSelectedQuality),
           startSec: window._resumeSec || 0,
           variants: variants || [],
           isPremiumUser: isPremiumUser,
+          activeQuality: _currentSelectedQuality,
         });
       }
       function setupTVSeries(
@@ -1814,12 +1855,20 @@
               ep.srcFilm || ep.src,
               ep.allowedVariants || [],
               ep.premiumUser === true,
+              _currentSelectedQuality,
             );
             playMainContentWithOptionalAd({
-              videoUrl: ep.srcFilm || ep.src,
+              videoUrl:
+                _currentSelectedQuality === "auto"
+                  ? ep.srcFilm || ep.src
+                  : buildVariantPlaylistUrl(
+                      ep.srcFilm || ep.src,
+                      _currentSelectedQuality,
+                    ),
               startSec: resumeOnLoad,
               variants: ep.allowedVariants || [],
               isPremiumUser: ep.premiumUser === true,
+              activeQuality: _currentSelectedQuality,
             });
           }
 
@@ -2028,12 +2077,24 @@
                 : [];
               const isPremiumUser = firstEpisode.premiumUser === true;
 
-              renderQualityDropdown(videoUrl, variants, isPremiumUser);
+              renderQualityDropdown(
+                videoUrl,
+                variants,
+                isPremiumUser,
+                _currentSelectedQuality,
+              );
               playMainContentWithOptionalAd({
-                videoUrl: videoUrl,
+                videoUrl:
+                  _currentSelectedQuality === "auto"
+                    ? videoUrl
+                    : buildVariantPlaylistUrl(
+                        videoUrl,
+                        _currentSelectedQuality,
+                      ),
                 startSec: window._resumeSec || 0,
                 variants: variants || [],
                 isPremiumUser: isPremiumUser,
+                activeQuality: _currentSelectedQuality,
               });
               window._resumeSec = 0;
             }
@@ -2872,7 +2933,12 @@
   // restore subtitle state after ad
   try { _restoreSubtitlesAfterAd(); } catch (e) {}
 
-        renderQualityDropdown(ctx.videoUrl, ctx.variants, ctx.isPremiumUser);
+        renderQualityDropdown(
+          ctx.videoUrl,
+          ctx.variants,
+          ctx.isPremiumUser,
+          ctx.activeQuality,
+        );
         loadVideo(ctx.videoUrl, ctx.startSec || 0);
         setTimeout(() => {
           if (_nativeVideo) {
@@ -3231,6 +3297,7 @@
         startSec = 0,
         variants = [],
         isPremiumUser = false,
+        activeQuality = "auto",
       }) {
         const normalizedUrl = (videoUrl || "").trim();
 
@@ -3245,12 +3312,18 @@
           startSec,
           variants,
           isPremiumUser,
+          activeQuality,
         };
 
         if (isPremiumUser) {
           _isAdPlaying = false;
           _hideAdUi();
-          renderQualityDropdown(normalizedUrl, variants, isPremiumUser);
+          renderQualityDropdown(
+            normalizedUrl,
+            variants,
+            isPremiumUser,
+            activeQuality,
+          );
           loadVideo(normalizedUrl, startSec || 0);
           setTimeout(() => {
             if (_nativeVideo) {
@@ -3267,7 +3340,12 @@
         if (!ad || !ad.srcFilm) {
           _isAdPlaying = false;
           _hideAdUi();
-          renderQualityDropdown(normalizedUrl, variants, isPremiumUser);
+          renderQualityDropdown(
+            normalizedUrl,
+            variants,
+            isPremiumUser,
+            activeQuality,
+          );
           loadVideo(normalizedUrl, startSec || 0);
           setTimeout(() => {
             if (_nativeVideo) {

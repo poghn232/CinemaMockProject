@@ -50,7 +50,7 @@ public class MaybeYouWantToWatchService {
         }
         if (history.isEmpty()) {
             return List.of();
-        }
+        } 
 
         Set<Long> watchedMovieIds = new HashSet<>();
         Set<Long> watchedTvSeriesIds = new HashSet<>();
